@@ -1,0 +1,19 @@
+/* Events — panel3-travel-events: wide list card with date-tile rows, create card alongside. */
+.events-overview .event-list { gap: var(--space-3); }
+.events-card { min-width: 0; }
+.events-card .item-row { align-items: flex-start; }
+.events-card .item-row > button { flex: none; }
+.events-description { color: var(--color-text); line-height: 1.55; margin: var(--space-3) 0 var(--space-1) calc(4rem + var(--space-3)); overflow-wrap: anywhere; white-space: pre-wrap; }
+.events-organizer { margin: 0 0 0 calc(4rem + var(--space-3)); }
+.events-card-kicker { color: var(--color-muted); font-size: 0.76rem; font-weight: 750; letter-spacing: 0.06em; margin: 0 0 var(--space-1); text-transform: uppercase; }
+.events-edit-form { background: var(--color-surface-soft); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4); }
+.events-audience-state { background: var(--color-surface); border-radius: var(--radius-sm); margin-top: var(--space-3); padding: var(--space-3); }
+.events-audience-state p:last-child { margin-bottom: 0; }
+.events-state, .events-feedback { overflow-wrap: anywhere; }
+.events-state--no-match { margin: var(--space-3) 0 0; }
+
+@media (max-width: 43.99rem) {
+  .events-card .item-row { flex-wrap: wrap; }
+  .events-card .item-row > button { flex: 1 1 100%; }
+  .events-description, .events-organizer { margin-left: 0; }
+}

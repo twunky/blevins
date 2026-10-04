@@ -1,0 +1,11 @@
+// Tasks card (panel 2 "Tasks & Coordination", adapted): description, assignee, text status pill. Not a to-do list.
+:host { display: block; }
+h4 { font-size: 1rem; }
+.incident-task-list { display: grid; gap: var(--space-3); list-style: none; margin: 0; padding: 0; }
+.incident-task { display: grid; gap: var(--space-1); min-width: 0; border-top: 1px solid var(--color-border); padding-top: var(--space-3); }
+.incident-task:first-child { border-top: 0; padding-top: 0; }
+.incident-task-top { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--space-2); }
+.incident-task-top strong { color: var(--color-primary-strong); flex: 1 1 10rem; }
+.incident-task-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-1); }
+.incident-task-form { background: var(--color-surface-soft); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3); margin-top: var(--space-2); }
+.incident-meta a { color: var(--color-primary); }

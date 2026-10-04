@@ -1,0 +1,126 @@
+<button type="button" class="incident-back" (click)="back.emit()">← Back to Incidents</button>
+
+<p class="incident-announce" role="status">{{ announcement() }}</p>
+
+@if (unavailable()) {
+  <section class="incident-card incident-unavailable" aria-labelledby="incident-unavailable-heading">
+    <h2 id="incident-unavailable-heading" tabindex="-1">This Incident is unavailable</h2>
+    <p>Only Incidents currently shared with you can be opened.</p>
+    <button type="button" class="button--secondary" (click)="back.emit()">Return to Incidents</button>
+  </section>
+} @else if (loading()) {
+  <p role="status">Loading Incident…</p>
+} @else if (loadError()) {
+  <div class="incident-card">
+    <p role="alert">{{ loadError() }}</p>
+    <button type="button" class="button--secondary" (click)="load()">Try again</button>
+  </div>
+} @else if (incident(); as incident) {
+  @if (refreshedNotice()) {
+    <p id="incident-refreshed-notice" class="incident-info" role="status" tabindex="-1">{{ refreshedNotice() }}</p>
+  }
+
+  <article class="incident-detail" aria-labelledby="incident-detail-heading">
+    <section class="incident-hero" [class.incident-hero--ended]="incident.state !== 'Open'">
+      <span class="incident-avatar incident-avatar--large" aria-hidden="true">{{ initials(incident.subjectName) }}</span>
+      <div class="incident-hero-main">
+        <h2 id="incident-detail-heading" tabindex="-1">Incident about {{ incident.subjectName }}</h2>
+        @if (reason(incident); as reason) {
+          <div class="incident-hero-block">
+            <h3>Reason for starting</h3>
+            <p class="incident-text">{{ reason.text }}</p>
+            <p class="incident-meta"><span class="incident-pill incident-pill--category">{{ categoryText(reason.category, reason.isOutdated) }}</span> {{ sourceText(reason) }}</p>
+          </div>
+        }
+        @if (currentSummary(incident); as summary) {
+          <div class="incident-hero-block">
+            <h3>Current summary</h3>
+            <p class="incident-text">{{ summary.text }}</p>
+            <p class="incident-meta"><span class="incident-pill incident-pill--category">{{ categoryText(summary.category, summary.isOutdated) }}</span>
+              {{ sourceText(summary) }} · {{ summary.contributorName }} · <time [attr.datetime]="summary.recordedAt">{{ summary.recordedAt | date:dateTimeFormat }}</time></p>
+          </div>
+        }
+        <p class="incident-meta">Coordinator: <strong>{{ incident.coordinatorName }}@if (isCoordinator(incident)) { (you)}</strong> · Started by {{ incident.createdByName }}</p>
+        <p class="incident-meta">Created <time [attr.datetime]="incident.createdAt">{{ incident.createdAt | date:dateTimeFormat }}</time>
+          · Last activity <time [attr.datetime]="incident.lastAuthorizedMutationAt">{{ incident.lastAuthorizedMutationAt | date:dateTimeFormat }}</time></p>
+        @if (incident.originatingConcernId; as concernId) {
+          <p class="incident-lineage">Started from a Concern
+            <a class="incident-link" [routerLink]="['/concerns', concernId]">Open the Concern</a></p>
+        }
+      </div>
+      <div class="incident-hero-state">
+        <span [class]="'incident-pill incident-pill--' + incident.state.toLowerCase()">{{ incident.state }}</span>
+        <span>{{ stateDescription(incident.state) }}</span>
+      </div>
+      @if (incident.state === 'Frozen') {
+        <div class="incident-note incident-hero-notice">
+          <p>Coordination in this Incident is no longer editable. Its history stays available to people with access@if (incident.expiresAt) { until <time [attr.datetime]="incident.expiresAt">{{ incident.expiresAt | date:dateOnlyFormat }}</time>, then it is removed}.</p>
+          <p>To continue coordinating, start a new Incident.</p>
+        </div>
+      }
+    </section>
+
+    @if (incident.state === 'Resolved' && incident.resolution; as resolution) {
+      <section class="incident-card incident-resolution" aria-labelledby="incident-resolution-heading">
+        <h3 id="incident-resolution-heading" tabindex="-1">Resolution</h3>
+        <p class="incident-note">Resolution means coordination ended. It does not confirm that anyone is safe or that information was verified.</p>
+        <dl class="incident-facts">
+          <div><dt>Resolution summary</dt><dd class="incident-text">{{ resolution.summary }}</dd></div>
+          <div><dt>Outcome</dt><dd><span class="incident-text">{{ resolution.outcomeText }}</span>
+            <span class="incident-meta"><span class="incident-pill incident-pill--category">{{ resolution.outcomeCategory }}</span>
+              {{ resolution.outcomeSourceUnknown || !resolution.outcomeSourceDescription ? 'Source unknown' : 'Source: ' + resolution.outcomeSourceDescription }}</span></dd></div>
+          <div><dt>Contact restored or resolution time</dt><dd>
+            @if (resolution.contactRestoredTimeUnknown || !resolution.contactRestoredAt) { Unknown }
+            @else { <time [attr.datetime]="resolution.contactRestoredAt">{{ resolution.contactRestoredAt | date:dateTimeFormat }}</time> }</dd></div>
+          @if (resolution.assistanceProvided) { <div><dt>Assistance provided</dt><dd class="incident-text">{{ resolution.assistanceProvided }}</dd></div> }
+          @if (resolution.unresolvedFollowUp) { <div><dt>Follow-up still open</dt><dd class="incident-text">{{ resolution.unresolvedFollowUp }}</dd></div> }
+          @if (resolution.lessons) { <div><dt>Lessons</dt><dd class="incident-text">{{ resolution.lessons }}</dd></div> }
+        </dl>
+        <p class="incident-meta">Resolved by {{ resolution.resolvedByName }} · <time [attr.datetime]="resolution.resolvedAt">{{ resolution.resolvedAt | date:dateTimeFormat }}</time></p>
+        @if (incident.expiresAt) { <p class="incident-meta">Kept until <time [attr.datetime]="incident.expiresAt">{{ incident.expiresAt | date:dateOnlyFormat }}</time>, then removed.</p> }
+      </section>
+    }
+
+    <div class="incident-layout">
+      <div class="incident-main">
+        <app-incident-timeline [incident]="incident" [ownProfileId]="ownProfileId" [canWrite]="canWrite(incident) && !composer()"
+          (correct)="openComposer('Correction', $event, 'incident-respond-' + $event.entryId)"
+          (challenge)="openComposer('Challenge', $event, 'incident-respond-' + $event.entryId)" />
+        @if (canWrite(incident)) {
+          <app-incident-composer [incident]="incident" [request]="composer()" (changed)="applyChange($event)"
+            (denied)="writeDenied()" (closed)="composerClosed($event)" />
+        }
+      </div>
+
+      <aside class="incident-side" aria-label="People, contributions, tasks, and coordination">
+        <app-incident-people [incident]="incident" [ownProfileId]="ownProfileId" [isCoordinator]="isCoordinator(incident)"
+          (changed)="applyChange($event)" (denied)="writeDenied()" />
+
+        @if (canWrite(incident)) {
+          <section class="incident-card" aria-labelledby="incident-contribute-heading">
+            <h3 id="incident-contribute-heading">Contribute</h3>
+            @if (composer()) {
+              <p class="incident-muted">Finish or cancel the open form to start another contribution.</p>
+            } @else {
+              <div class="incident-stack">
+                <button type="button" id="incident-add-finding" (click)="openComposer('Observation', null, 'incident-add-finding')">Add a finding</button>
+                <button type="button" class="button--secondary" id="incident-add-unknown" (click)="openComposer('Unknown', null, 'incident-add-unknown')">Record an Unknown</button>
+                <button type="button" class="button--secondary" id="incident-add-contact" (click)="openComposer('ContactAttempt', null, 'incident-add-contact')">Record a contact attempt</button>
+                @if (isCoordinator(incident)) {
+                  <button type="button" class="button--secondary" id="incident-add-summary" (click)="openComposer('Summary', null, 'incident-add-summary')">Post a summary update</button>
+                }
+              </div>
+            }
+          </section>
+        }
+
+        <app-incident-tasks [incident]="incident" [ownProfileId]="ownProfileId" [isCoordinator]="isCoordinator(incident)"
+          [canWrite]="canWrite(incident)" (changed)="applyChange($event)" (denied)="writeDenied()" />
+
+        @if (incident.state === 'Open' && isCoordinator(incident)) {
+          <app-incident-coordination [incident]="incident" (changed)="applyChange($event)" (denied)="writeDenied()" />
+        }
+      </aside>
+    </div>
+  </article>
+}

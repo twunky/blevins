@@ -1,0 +1,59 @@
+/* Family dashboard (WI-009-007, panel ②). The gear, Back to Family, Settings, and first-use live in family-settings.scss; placeholders reuse .home-future. */
+
+.family-dashboard, .family-main, .family-coordination { display: grid; gap: var(--space-4); }
+.family-main { align-items: start; }
+.family-coordination > .card { display: flex; flex-direction: column; }
+.family-coordination .card-header, .family-main .card-header { margin-bottom: var(--space-3); }
+
+.directory-filter { align-items: end; display: flex; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4); max-width: 34rem; }
+.directory-filter .field { flex: 1 1 14rem; margin: 0; }
+.directory-filter button { margin: 0; }
+.member-list { gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr)); }
+.member-button {
+  background: var(--color-surface); border-color: var(--color-border); color: var(--color-primary-strong); font-weight: 650;
+  gap: var(--space-3); justify-content: flex-start; min-height: 3.75rem; text-align: left; width: 100%;
+}
+.member-button:hover:not(:disabled) { background: var(--color-primary-soft); border-color: var(--color-accent); color: var(--color-primary-strong); }
+.member-button--selected { background: var(--color-primary-soft); border-color: var(--color-primary); }
+.member-text { flex: 1 1 auto; min-width: 0; }
+.member-name, .member-note { display: block; overflow-wrap: anywhere; }
+.member-note { color: var(--color-muted); font-size: 0.84rem; font-weight: 500; }
+
+.member-detail-heading { align-items: center; display: flex; gap: var(--space-3); margin-bottom: var(--space-4); }
+.member-detail-heading h2 { font-size: 1.25rem; margin: 0; overflow-wrap: anywhere; }
+.member-detail-fields { display: grid; gap: var(--space-2); }
+.member-detail-fields p { background: var(--color-surface-soft); border-radius: var(--radius-sm); margin: 0; overflow-wrap: anywhere; padding: var(--space-3); }
+.member-detail-empty { color: var(--color-muted); }
+.member-detail--placeholder { align-items: center; color: var(--color-muted); display: flex; gap: var(--space-3); }
+.member-detail--placeholder p { margin: 0; }
+
+/* Waiting for you: real relationship suggestions sent to the signed-in adult, or one compact clear row. */
+.family-waiting-list { display: grid; gap: var(--space-3); list-style: none; margin: 0; padding: 0; }
+.family-request { align-items: flex-start; background: var(--color-primary-soft); border: 1px solid #dbe7fb; border-radius: var(--radius-md); display: flex; gap: var(--space-3); padding: var(--space-3) var(--space-4); }
+.family-request .avatar { background: var(--color-surface); }
+.family-request-main { flex: 1 1 auto; min-width: 0; }
+.family-request-main p { margin: 0; overflow-wrap: anywhere; }
+.family-request-title { color: var(--color-primary-strong); }
+.family-request .button-row { margin-top: var(--space-3); }
+.family-waiting-clear { align-items: center; flex: 1 1 auto; background: var(--color-surface-soft); border-radius: var(--radius-md); color: var(--color-muted); display: flex; gap: var(--space-3); margin: 0; padding: var(--space-3) var(--space-4); }
+
+@media (min-width: 44rem) {
+  .family-coordination { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Sidebar widths below desktop: the member detail becomes a horizontal panel under the full-width members card. */
+@media (min-width: 64rem) and (max-width: 79.99rem) {
+  .member-detail:not(.member-detail--placeholder) { align-items: center; display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-5); }
+  .member-detail:not(.member-detail--placeholder) .member-detail-heading { flex: none; margin: 0; }
+  .member-detail-fields { flex: 1 1 20rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+}
+
+@media (min-width: 80rem) {
+  .family-main { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+}
+
+@media (max-width: 43.99rem) {
+  /* The gear stays beside the heading (the shell hides the date at this width, as on Home). */
+  .family-title > div:first-child { flex: 1 1 0; min-width: 0; }
+  .directory-filter button, .family-request .button-row > button { flex: 1 1 100%; }
+}

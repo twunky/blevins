@@ -1,0 +1,21 @@
+/* Plans — shared mockup language: list card with date-tile rows, create card alongside. */
+.plans-list { gap: var(--space-3); }
+.plans-card { min-width: 0; }
+.plans-facts { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0 0 calc(4rem + var(--space-3)); }
+.plans-fact { background: var(--color-surface-soft); border: 1px solid var(--color-border); border-radius: 999px; display: flex; gap: var(--space-1); font-size: 0.85rem; padding: 0.2rem 0.75rem; }
+.plans-fact dt { color: var(--color-muted); }
+.plans-fact dt::after { content: ':'; }
+.plans-fact dd { font-weight: 650; margin: 0; }
+.plans-note { background: var(--color-surface-soft); border-radius: var(--radius-sm); margin: var(--space-3) 0 0 calc(4rem + var(--space-3)); overflow-wrap: anywhere; padding: var(--space-3); }
+.plans-card-kicker { color: var(--color-muted); font-size: 0.74rem; font-weight: 750; letter-spacing: 0.06em; margin: 0 0 var(--space-1); text-transform: uppercase; }
+.plan-notes { line-height: 1.55; margin: 0; white-space: pre-wrap; }
+.plans-creator { color: var(--color-muted); font-size: 0.88rem; margin: var(--space-2) 0 0 calc(4rem + var(--space-3)); }
+.plans-creator strong { color: var(--color-text); }
+.plans-state { overflow-wrap: anywhere; }
+.plans-optional-fields { border-top: 1px solid var(--color-border); margin-top: var(--space-5); padding-top: var(--space-4); }
+.plans-optional-fields h3 { margin: 0; }
+.plans-notes-field .field-hint { background: var(--color-surface-soft); border-radius: var(--radius-sm); padding: var(--space-3); }
+
+@media (max-width: 43.99rem) {
+  .plans-facts, .plans-note, .plans-creator { margin-left: 0; }
+}

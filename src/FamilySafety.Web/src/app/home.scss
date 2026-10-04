@@ -1,0 +1,100 @@
+/* Home dashboard — panel1-main-home. Rows (desktop): attention + upcoming Events; Trips, Family Updates, Tasks;
+   Plans + Safety; a full-width Active Sharing bar. Shared cards, rows, and tiles live in styles.scss. */
+.home-title { align-items: center; margin-bottom: var(--space-4); }
+.home-title-aside { align-items: center; display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+.home-title-aside .page-date { padding-top: 0; }
+.home-family-button { min-height: 2.5rem; padding-inline: 0.85rem; }
+
+.home-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-areas: 'attention' 'events' 'trips' 'plans' 'safety' 'updates' 'tasks' 'sharing';
+  grid-template-columns: minmax(0, 1fr);
+}
+.home-attention { grid-area: attention; }
+.home-card--events { grid-area: events; }
+.home-card--trips { grid-area: trips; }
+.home-card--plans { grid-area: plans; }
+.home-card--safety { grid-area: safety; }
+.home-future--updates { grid-area: updates; }
+.home-future--tasks { grid-area: tasks; }
+.home-future--sharing { grid-area: sharing; }
+
+.home-grid > .card { display: flex; flex-direction: column; }
+.home-grid .card-header { margin-bottom: var(--space-3); }
+.home-preview-list .date-tile { font-size: 1.05rem; height: 3rem; width: 3rem; }
+
+/* Needs Your Attention: the prototype's tinted card with white inset rows. */
+.home-attention { background: var(--color-attention-bg); border-color: #fbd5da; }
+.card-icon--attention { background: #e11d48; border-radius: 50%; color: #fff; }
+.home-attention h2 { color: #9f1239; }
+/* One white list sized to its rows and kept at the top; any spare height stays pink. */
+.attention-list { background: var(--color-surface); border: 1px solid #fbe1e5; border-radius: var(--radius-md); padding: var(--space-1) var(--space-4); }
+.attention-row, .home-attention-clear { align-items: center; display: flex; gap: var(--space-3); }
+.attention-row { flex-wrap: wrap; padding: var(--space-3) 0; }
+.attention-row + .attention-row { border-top: 1px solid #fbe1e5; }
+.attention-row .item-main { flex: 1 1 14rem; }
+.home-attention-clear { padding-block: var(--space-3); }
+.row-icon { color: #7c3aed; display: inline-flex; }
+.row-icon--clear { color: var(--color-success); }
+
+/* Soft body panel: empty real-data cards and the Safety entry. Compact, honest, linked to the area. */
+.home-empty, .home-safety-body {
+  align-items: flex-start;
+  background: var(--color-surface-soft);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-3);
+  justify-content: center;
+  padding: var(--space-3) var(--space-4);
+}
+.home-empty p, .home-safety-body p { color: var(--color-muted); margin: 0; }
+.home-safety-actions { margin: 0; }
+
+/* Placeholder: reserves a prototype area for a capability that does not exist yet. No data and no actions. */
+.home-future .card-icon { background: #eef2f8; color: #64748b; }
+.home-future-note {
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-muted);
+  flex: 1 1 auto;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+}
+
+@media (min-width: 44rem) {
+  .home-grid {
+    grid-template-areas: 'attention events' 'trips plans' 'safety safety' 'updates tasks' 'sharing sharing';
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Full-width Safety and Active Sharing read as slim bars. */
+  .home-grid > :is(.home-card--safety, .home-future--sharing) { align-items: center; flex-flow: row wrap; gap: var(--space-3) var(--space-5); }
+  .home-grid > :is(.home-card--safety, .home-future--sharing) .card-header { margin-bottom: 0; }
+  .home-safety-body { align-items: center; flex: 1 1 24rem; flex-flow: row wrap; justify-content: space-between; }
+  .home-future--sharing .home-future-note { flex: 1 1 18rem; }
+}
+
+/* Desktop row 3 echoes row 1 (7 / 5). Safety returns to a stacked card whose panel fills the row height. */
+@media (min-width: 80rem) {
+  .home-grid {
+    grid-template-areas:
+      'attention attention attention attention attention attention attention events events events events events'
+      'trips trips trips trips updates updates updates updates tasks tasks tasks tasks'
+      'plans plans plans plans plans plans plans safety safety safety safety safety'
+      'sharing sharing sharing sharing sharing sharing sharing sharing sharing sharing sharing sharing';
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .home-grid > .home-card--safety { align-items: stretch; flex-flow: column nowrap; gap: 0; }
+  .home-grid > .home-card--safety .card-header { margin-bottom: var(--space-3); }
+  .home-safety-body { align-items: flex-start; flex: 1 1 auto; flex-flow: column nowrap; justify-content: center; }
+}
+
+@media (max-width: 43.99rem) {
+  .home-title-aside { width: 100%; }
+  .home-family-button, .attention-row button, .home-empty button, .home-safety-actions button { flex: 1 1 100%; }
+  .home-empty, .home-safety-body { align-items: stretch; }
+}

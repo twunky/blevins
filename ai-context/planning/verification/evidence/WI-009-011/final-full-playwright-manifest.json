@@ -1,0 +1,333 @@
+{
+  "runId": "20261004T013144-591feecb",
+  "createdAt": "2026-10-04T01:31:44.609Z",
+  "server": "localhost",
+  "preExistingListPath": "C:\\Dev\\blevins\\scripts\\pre-existing-scenario-databases.txt",
+  "preExistingAtRunStart": [
+    "FamilySafety",
+    "FamilySafety_Invitation_79558d15516649aeb6758a9e2496b6b7",
+    "FamilySafety_Invitation_ConcernReview20261001",
+    "FamilySafety_Invitation_ddf3f406d9024bc1ac330e46513b5209",
+    "FamilySafety_Invitation_Review_WI008004",
+    "FamilySafety_Invitation_ShellReview034731",
+    "FamilySafety_Invitation_SiteReview044319",
+    "FamilySafety_Invitation_SiteReview044420",
+    "FamilySafety_Invitation_Stage1Retry_20260928_235812_c7f2",
+    "FamilySafety_Invitation_WI075_Browser_20260928",
+    "FamilySafety_Invitation_WI075004Visual",
+    "FamilySafety_Invitation_WI075005_CodexAttempt_20260929",
+    "FamilySafety_Invitation_WI075006VerifyHost",
+    "FamilySafety_VisualReview",
+    "FamilySafety_WI005001_Verification",
+    "FamilySafety_WI005002_ConcurrencyTests",
+    "FamilySafety_WI005002_Verification",
+    "FamilySafety_WI005003_DirectoryTests"
+  ],
+  "databases": [
+    {
+      "name": "FamilySafety_Invitation_E2E_b91f18e0476b4dddaf97b601d4d90479",
+      "spec": "concern-workflow.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true
+      },
+      "createdAt": "2026-10-04T01:31:50.241Z",
+      "apiPid": 14452,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_b91f18e0476b4dddaf97b601d4d90479.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:32:17.815Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:32:17.815Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_d9b760cda75d4a46b047c7da4e324de2",
+      "spec": "events-dashboard.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true,
+        "secondFamily": true
+      },
+      "createdAt": "2026-10-04T01:32:18.583Z",
+      "apiPid": 23724,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_d9b760cda75d4a46b047c7da4e324de2.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:32:33.170Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:32:33.170Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_c88a180ab6444db1bb36e044c8ae0d55",
+      "spec": "family-dashboard.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true
+      },
+      "createdAt": "2026-10-04T01:32:34.067Z",
+      "apiPid": 19812,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_c88a180ab6444db1bb36e044c8ae0d55.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:32:58.378Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:32:58.378Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_57fc93fbc3e340ffa44425b5ac3c0bf4",
+      "spec": "first-use-arrival.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": false,
+        "secondFamily": true
+      },
+      "createdAt": "2026-10-04T01:32:59.271Z",
+      "apiPid": 3024,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_57fc93fbc3e340ffa44425b5ac3c0bf4.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:33:22.411Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:33:22.411Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_e752d48f0d6347eb9e32144296586ff4",
+      "spec": "incident-workflow.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true
+      },
+      "createdAt": "2026-10-04T01:33:23.287Z",
+      "apiPid": 3628,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_e752d48f0d6347eb9e32144296586ff4.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:34:11.535Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:34:11.535Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_b5ce8480f82e45958e6e2a2826695e36",
+      "spec": "invitation-handoff.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": false
+      },
+      "createdAt": "2026-10-04T01:34:12.447Z",
+      "apiPid": 17012,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_b5ce8480f82e45958e6e2a2826695e36.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:34:29.460Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:34:29.460Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_e9e62f0547e74880907f96b32954a641",
+      "spec": "item-links.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true,
+        "secondFamily": true
+      },
+      "createdAt": "2026-10-04T01:34:30.310Z",
+      "apiPid": 22444,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_e9e62f0547e74880907f96b32954a641.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:35:44.873Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:35:44.873Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_e1eb749617184d8382925b833270d167",
+      "spec": "navigation.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": false
+      },
+      "createdAt": "2026-10-04T01:35:45.779Z",
+      "apiPid": 26932,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_e1eb749617184d8382925b833270d167.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:36:42.282Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:36:42.282Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_57498416556543df904eaae7dd6c8724",
+      "spec": "phase9-accessibility.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true
+      },
+      "createdAt": "2026-10-04T01:36:43.323Z",
+      "apiPid": 14356,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_57498416556543df904eaae7dd6c8724.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:37:48.707Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:37:48.707Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_aca60975c4e34740b4ff40f755ec8b7c",
+      "spec": "phase9-home-filtering.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": false
+      },
+      "createdAt": "2026-10-04T01:37:49.658Z",
+      "apiPid": 13012,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_aca60975c4e34740b4ff40f755ec8b7c.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:38:01.938Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:38:01.938Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_d518bacdf797455dafbf97b3521e08be",
+      "spec": "phase9-journey.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true
+      },
+      "createdAt": "2026-10-04T01:38:02.916Z",
+      "apiPid": 3924,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_d518bacdf797455dafbf97b3521e08be.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:38:31.930Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:38:31.930Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_40113935c0454cdfaa5b2d429fbee1d8",
+      "spec": "safety-dashboard.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true,
+        "secondFamily": true
+      },
+      "createdAt": "2026-10-04T01:38:32.777Z",
+      "apiPid": 15392,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_40113935c0454cdfaa5b2d429fbee1d8.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:39:02.129Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:39:02.129Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_51123bae586749d1865c869ec724b3c0",
+      "spec": "trip-audience-removal.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true
+      },
+      "createdAt": "2026-10-04T01:39:03.028Z",
+      "apiPid": 24796,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T013144-591feecb\\FamilySafety_Invitation_E2E_51123bae586749d1865c869ec724b3c0.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:39:21.515Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:39:21.515Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    }
+  ],
+  "runnerPid": 26648,
+  "completedAt": "2026-10-04T01:39:23.503Z"
+}

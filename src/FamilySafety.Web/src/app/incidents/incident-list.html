@@ -1,0 +1,58 @@
+<section class="incident-card" aria-labelledby="incident-list-heading">
+  <div class="incident-card-heading">
+    <span class="card-icon"><app-icon name="shield" /></span>
+    <div class="incident-list-intro">
+      <h2 id="incident-list-heading" tabindex="-1">Incidents shared with you</h2>
+      <p class="incident-meta">Only Incidents you currently have access to appear here.</p>
+    </div>
+    <button type="button" class="incident-quiet" [disabled]="loading" (click)="refresh.emit()">Refresh list</button>
+    @if (canCreate) {
+      <button type="button" (click)="create.emit()"><app-icon name="plus" />Start an Incident</button>
+    }
+  </div>
+
+  @if (loading) {
+    <p role="status">Loading Incidents…</p>
+  } @else if (error) {
+    <div class="incident-list-error">
+      <p role="alert">{{ error }}</p>
+      <button type="button" class="button--secondary" (click)="refresh.emit()">Retry loading Incidents</button>
+    </div>
+  } @else if (rows.length === 0) {
+    <div class="incident-list-empty">
+      <h3>No Incidents are currently shared with you.</h3>
+      <p>An Incident is shared only with its coordinator and the people they add.</p>
+    </div>
+  } @else {
+    @for (group of [{ title: 'Open coordination', id: 'open', items: openRows() }, { title: 'Ended coordination (read-only)', id: 'ended', items: endedRows() }]; track group.id) {
+      @if (group.items.length) {
+        <section class="incident-list-group" [attr.aria-labelledby]="'incident-group-' + group.id">
+          <h3 [id]="'incident-group-' + group.id">{{ group.title }}</h3>
+          <ul class="incident-list">
+            @for (row of group.items; track row.incidentId) {
+              <li>
+                <a class="incident-row item-link" [class.incident-row--open]="row.state === 'Open'" [routerLink]="['/incidents', row.incidentId]" [state]="focusHeadingState"
+                  [attr.aria-label]="'Open Incident about ' + row.subjectName + ', ' + row.state">
+                  <span class="incident-avatar incident-avatar--large" aria-hidden="true">{{ initials(row.subjectName) }}</span>
+                  <span class="incident-row-body">
+                    <span class="incident-row-top">
+                      <strong>{{ row.subjectName }}</strong>
+                      <span [class]="'incident-pill incident-pill--' + row.state.toLowerCase()">{{ row.state }}</span>
+                    </span>
+                    <span class="incident-meta">{{ row.coordinatorProfileId === ownProfileId ? 'You coordinate this Incident' : 'Coordinated by ' + row.coordinatorName }}</span>
+                    @if (showFamilyName) { <span class="incident-meta">{{ row.familyGroupName }}</span> }
+                    <span class="incident-meta">Created <time [attr.datetime]="row.createdAt">{{ row.createdAt | date:dateTimeFormat }}</time>
+                      · Last activity <time [attr.datetime]="row.lastAuthorizedMutationAt">{{ row.lastAuthorizedMutationAt | date:dateTimeFormat }}</time></span>
+                    @if (row.state !== 'Open') {
+                      <span class="incident-meta">Read-only@if (row.expiresAt) { · kept until <time [attr.datetime]="row.expiresAt">{{ row.expiresAt | date:dateOnlyFormat }}</time>}</span>
+                    }
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    }
+  }
+</section>

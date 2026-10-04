@@ -1,0 +1,32 @@
+// Incident cards, pills, avatars, and meta text on the shared blue tokens. Calm tones only: no red or pink surfaces.
+h2, h3, h4 { color: var(--color-primary-strong); margin: 0; }
+h3 { font-size: 1.05rem; }
+p { margin: 0; line-height: 1.5; }
+.incident-card {
+  display: grid; gap: var(--space-3); align-content: start; min-width: 0;
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card); padding: clamp(1rem, 2vw, 1.35rem);
+}
+.incident-card-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); }
+.incident-meta, .incident-muted { color: var(--color-muted); font-size: 0.86rem; }
+.incident-meta { display: block; }
+.incident-pill {
+  display: inline-block; border-radius: 999px; padding: 0.12rem 0.6rem; font-size: 0.78rem; font-weight: 700; white-space: nowrap;
+  background: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-border);
+}
+.incident-pill--frozen, .incident-pill--resolved, .incident-pill--cancelled, .incident-pill--done { background: #eef2f7; color: #3f4f63; }
+.incident-pill--category { background: var(--color-surface-soft); color: var(--color-primary-strong); }
+.incident-pill--open-task { background: var(--color-primary-soft); color: #1d4ed8; }
+.incident-avatar {
+  display: inline-grid; place-items: center; flex: none; width: 2.25rem; height: 2.25rem; border-radius: 50%;
+  background: var(--color-primary-soft); color: var(--color-primary-strong); font-size: 0.8rem; font-weight: 750;
+}
+.incident-avatar--large { width: 3.5rem; height: 3.5rem; font-size: 1rem; background: var(--color-surface); }
+.incident-note { border-left: 3px solid var(--color-accent); padding-left: var(--space-3); }
+.incident-info { background: var(--color-primary-soft); border: 1px solid #dbe7fb; border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); color: var(--color-primary-strong); }
+.incident-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.incident-quiet {
+  min-height: 2.25rem; padding: 0.3rem 0.75rem; font-size: 0.9rem;
+  background: var(--color-surface); border-color: var(--color-border); color: var(--color-primary);
+}
+.incident-quiet:hover:not(:disabled) { background: var(--color-primary-soft); border-color: var(--color-border); color: var(--color-primary-strong); }

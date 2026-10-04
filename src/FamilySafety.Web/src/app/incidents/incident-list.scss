@@ -1,0 +1,19 @@
+// Incident list rows: initials tile, subject, state pill, coordinator and time meta (panel4 / panel3 rows, calm tones).
+.incident-list-intro { flex: 1 1 14rem; }
+.incident-list-group { display: grid; gap: var(--space-2); }
+.incident-list-group h3 { font-size: 0.95rem; }
+.incident-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: var(--space-3); list-style: none; margin: 0; padding: 0; }
+.incident-row {
+  display: flex; align-items: flex-start; justify-content: flex-start; gap: var(--space-3); width: 100%; height: 100%;
+  text-align: left; font-weight: 400; color: var(--color-text);
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-4);
+}
+.incident-row--open { background: var(--color-primary-soft); border-color: #cfe0fb; }
+.incident-row:hover:not(:disabled) { background: var(--color-primary-soft); border-color: var(--color-accent); color: var(--color-text); }
+.incident-row-body { display: grid; flex: 1; gap: var(--space-1); min-width: 0; overflow-wrap: anywhere; }
+.incident-row-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.incident-row-top strong { color: var(--color-primary-strong); font-size: 1.05rem; }
+.incident-list-empty { display: grid; gap: var(--space-2); justify-items: center; text-align: center; padding-block: var(--space-6); }
+.incident-list-empty p { color: var(--color-muted); }
+.incident-list-error { display: grid; gap: var(--space-2); justify-items: start; }
+.incident-row:not(.incident-row--open) .incident-avatar { background: var(--color-primary-soft); }

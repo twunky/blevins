@@ -1,0 +1,94 @@
+﻿TEST ARTIFACT STATUS  (read-only; nothing was changed)        2026-10-03 21:07
+Server localhost - 18 FamilySafety* databases - 20 run records - port 5080 free
+
+ACTIVE RUNS
+  none
+
+RUNS
+  Successful, completed (no remaining database) ............   9
+  Finished with failed, kept or stale entries, no database ..   9
+  Holding retained databases ...............................   0
+  Interrupted ..............................................   2
+  Active ...................................................   0
+  Unreadable or invalid manifest ...........................   0
+
+RETAINED DATABASES (proven run ownership; removed only by exact name + -Execute)
+  none
+
+INTERRUPTED RUNS (retained diagnostic / interrupted; never removed automatically)
+  20261002T225409-a1af6ae0  manifest 
+C:\Dev\blevins\src\FamilySafety.Web\e2e\scenario-runs\20261002T225409-a1af6ae0\manifest.json
+      ownership evidence: manifest SHA-256 D002E04F084B7CB3C3C89C810C006B75DBA962A174AAA2E55E6F78CA36C5204B; no 
+completedAt; runner and recorded API processes not alive; port 5080 free
+      FamilySafety_Invitation_E2E_6dbb940ab3fd40018265be60161f35cb  spec incident-workflow.spec.ts  status removed  
+exists: False  label: removed — absent
+  20261004T004307-49f7f81e  manifest 
+C:\Dev\blevins\src\FamilySafety.Web\e2e\scenario-runs\20261004T004307-49f7f81e\manifest.json
+      ownership evidence: manifest SHA-256 94D453E41DCE8E9A24C7E16CBF80BE2E2BFA1ACAB269F3B9CE9A9677918D22CA; no 
+completedAt; runner and recorded API processes not alive; port 5080 free
+      FamilySafety_Invitation_E2E_3180d133877c4601b6f863a7a4014ab7  spec phase9-journey.spec.ts  status removed  
+exists: False  label: removed — absent
+
+MANIFEST / SERVER MISMATCHES (reported only; manifests are not rewritten)
+  20261002T062330-c886642c  FamilySafety_Invitation_E2E_f8800e98c88645a5b578f8c706f93f85  invitation-handoff  retained 
+in manifest — absent on server
+  20261002T062821-5fe3e530  FamilySafety_Invitation_E2E_0c1229b7fb144864833228bae0377793  invitation-handoff  retained 
+in manifest — absent on server
+  20261002T063131-c166ad75  FamilySafety_Invitation_E2E_5f538d450ed643f394f1f4b79903e028  trip-audience-removal  
+retained in manifest — absent on server
+  20261002T225019-49bd4b30  FamilySafety_Invitation_E2E_5344f501e0d4474ebd55636ed3b3a904  invitation-handoff  retained 
+in manifest — absent on server
+
+RECONCILIATION LABELS (all recorded databases)
+  removed — absent                               40
+  retained in manifest — absent on server         4
+
+RUN RECORDS
+  Resolved, removable (stale) ..........................   0   (0 B)
+  Cited (protected; exact -RunId + -Execute only) .......   0   (0 B)
+  Citation uncertain (protected; exact -RunId only) .....  18   (15.2 MB)
+  Interrupted, no database (exact -RunId only) ..........   2   (632.7 KB)
+  Holding databases (kept for ownership proof) ..........   0   (0 B)
+  Unreadable or invalid (kept; never removed by the tool)   0   (0 B)
+  Active (kept) .........................................   0   (0 B)
+  Citation search uncertain: 'ai-context\planning\verification\evidence\WI-009-011\affected-first-use-angular.log' 
+could not be read; 'ai-context\planning\verification\evidence\WI-009-011\artifact-health-after-databases.txt' could 
+not be read
+
+STALE REMOVABLE RUN RECORDS
+  none
+
+PROTECTED DATABASES (never removed)
+  16 present: FamilySafety + 15 PRE-EXISTING
+    FamilySafety
+    FamilySafety_Invitation_79558d15516649aeb6758a9e2496b6b7
+    FamilySafety_Invitation_ConcernReview20261001
+    FamilySafety_Invitation_ddf3f406d9024bc1ac330e46513b5209
+    FamilySafety_Invitation_Review_WI008004
+    FamilySafety_Invitation_ShellReview034731
+    FamilySafety_Invitation_SiteReview044319
+    FamilySafety_Invitation_SiteReview044420
+    FamilySafety_Invitation_Stage1Retry_20260928_235812_c7f2
+    FamilySafety_Invitation_WI075_Browser_20260928
+    FamilySafety_Invitation_WI075004Visual
+    FamilySafety_Invitation_WI075005_CodexAttempt_20260929
+    FamilySafety_Invitation_WI075006VerifyHost
+    FamilySafety_VisualReview
+    FamilySafety_WI005001_Verification
+    FamilySafety_WI005002_Verification
+UNKNOWN OWNERSHIP (no action offered)
+  FamilySafety_WI005002_ConcurrencyTests
+  FamilySafety_WI005003_DirectoryTests
+
+GENERATED FOLDERS (fixed approved locations only)
+  e2e/test-results     1 file(s), 10 folder(s), 45 B  clearable
+  e2e/captures         273 file(s), 15 folder(s), 28.8 MB  clearable
+  dist/verification    absent
+  dist                 8 file(s), 779.4 KB  (npm run build output; reported only, never cleared)
+  e2e/scenario-runs    20 run folder(s), 15.8 MB  (see RUN RECORDS)
+
+UNEXPECTED REPOSITORY-ROOT ARTIFACTS (never deleted)
+  trips   (file, 1.5 MB, 2026-09-27)   UNCLASSIFIED / OWNER REVIEW REQUIRED
+
+SAFE NEXT STEPS (dry run first; add -Execute only for what you intend)
+  .\scripts\test-artifacts.ps1 -ClearGenerated

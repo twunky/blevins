@@ -1,0 +1,22 @@
+# PRE-EXISTING FamilySafety* databases (WI-009-001).
+# These databases are never deleted automatically. scripts/remove-scenario-database.ps1 refuses any name listed here.
+# Snapshot 1: enumerated 2026-10-02 before WI-009-001 implementation or any cleanup (75 names; corrected from a mistyped "77" on 2026-10-02).
+# One exact database name per line; lines starting with # are comments.
+FamilySafety
+FamilySafety_Invitation_79558d15516649aeb6758a9e2496b6b7
+FamilySafety_Invitation_ConcernReview20261001
+FamilySafety_Invitation_ddf3f406d9024bc1ac330e46513b5209
+FamilySafety_Invitation_Review_WI008004
+FamilySafety_Invitation_ShellReview034731
+FamilySafety_Invitation_SiteReview044319
+FamilySafety_Invitation_SiteReview044420
+FamilySafety_Invitation_Stage1Retry_20260928_235812_c7f2
+FamilySafety_Invitation_WI075_Browser_20260928
+FamilySafety_Invitation_WI075004Visual
+FamilySafety_Invitation_WI075005_CodexAttempt_20260929
+FamilySafety_Invitation_WI075006VerifyHost
+FamilySafety_VisualReview
+FamilySafety_WI005001_Verification
+FamilySafety_WI005002_Verification
+# Snapshot 2: databases created 2026-10-02 by the TASK-001 baseline runs of the old harness (5 names; it has no cleanup). All 5 were later dropped as Class C.
+# 2026-10-02: the 64 Class C databases of the WI-009-001 cleanup inventory were dropped under owner authorization and removed from this list (see database-cleanup-completion-2026-10-02.md). The 16 names above remain protected.

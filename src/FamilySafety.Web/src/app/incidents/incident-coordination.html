@@ -1,0 +1,93 @@
+<section class="incident-card" aria-labelledby="incident-coordination-heading" (keydown.escape)="onEscape()">
+  <h3 id="incident-coordination-heading">Coordination</h3>
+  @if (message()) { <p role="alert">{{ message() }}</p> }
+
+  @switch (step()) {
+    @case ('idle') {
+      <div class="incident-stack">
+        <button type="button" class="button--secondary" id="incident-start-handoff" (click)="startHandoff()">Hand off coordination…</button>
+        <button type="button" class="button--secondary" id="incident-start-resolve" (click)="startResolve()">Resolve this Incident…</button>
+      </div>
+    }
+    @case ('choose') {
+      <fieldset class="incident-fieldset">
+        <legend id="incident-handoff-legend" tabindex="-1">Hand off coordination to</legend>
+        <p class="incident-hint">The person you choose becomes the only coordinator, right away. They will manage people with access, tasks, summaries, and resolution.</p>
+        <p class="incident-hint">You will stay on this Incident as a participant. There is no shared coordination.</p>
+        @for (person of candidates(); track person.profileId) {
+          <label class="incident-option">
+            <input type="radio" name="incident-handoff" [value]="person.profileId" [checked]="handoffTo() === person.profileId" (change)="handoffTo.set(person.profileId)" />
+            <span>{{ person.displayName }}</span>
+          </label>
+        } @empty {
+          <p class="incident-hint">Add a person under People with access before handing off.</p>
+        }
+      </fieldset>
+      <div class="incident-actions">
+        <button type="button" class="button--secondary" (click)="close('incident-start-handoff')">Cancel</button>
+        @if (candidates().length) {
+          <button type="button" [disabled]="!handoffTo()" (click)="continueHandoff()">Continue</button>
+        }
+      </div>
+    }
+    @case ('confirm') {
+      <h4 id="incident-handoff-confirm" tabindex="-1">Hand off to {{ chosenName() }}?</h4>
+      <p class="incident-hint">{{ chosenName() }} becomes the only coordinator as soon as you confirm. You stay on this Incident as a participant.</p>
+      <div class="incident-actions">
+        <button type="button" class="button--secondary" [disabled]="saving()" (click)="backToChoose()">Go back</button>
+        <button type="button" [disabled]="saving()" (click)="handOff()">{{ saving() ? 'Handing off…' : 'Hand off coordination' }}</button>
+      </div>
+    }
+    @case ('resolve') {
+      <form [formGroup]="resolveForm" (ngSubmit)="resolve()" novalidate>
+        <h4 id="incident-resolve-heading" tabindex="-1">Resolve this Incident</h4>
+        @if (hasErrors()) { <p id="incident-resolve-summary" role="alert" tabindex="-1">Review the highlighted details before resolving.</p> }
+        <div class="incident-field">
+          <label for="resolve-summary">Resolution summary</label>
+          <textarea id="resolve-summary" rows="3" maxlength="2000" formControlName="summary"
+            [attr.aria-invalid]="errors()['summary'] ? true : null" [attr.aria-describedby]="describedBy('summary')"></textarea>
+          @if (errors()['summary']) { <p class="field-error" id="resolve-summary-error">{{ errors()['summary'] }}</p> }
+        </div>
+        <div class="incident-field">
+          <label for="resolve-outcome">Outcome</label>
+          <textarea id="resolve-outcome" rows="3" maxlength="2000" formControlName="outcomeText"
+            [attr.aria-invalid]="errors()['outcome'] ? true : null" [attr.aria-describedby]="'resolve-outcome-hint' + (errors()['outcome'] ? ' resolve-outcome-error' : '')"></textarea>
+          <p class="incident-hint" id="resolve-outcome-hint">What is known about how this ended, in your own words.</p>
+          @if (errors()['outcome']) { <p class="field-error" id="resolve-outcome-error">{{ errors()['outcome'] }}</p> }
+        </div>
+        <app-incident-provenance-fields [group]="resolveForm.controls.provenance" prefix="resolve" legend="How is the outcome known?"
+          sourceLegend="Outcome source" [categories]="['Confirmed', 'Reported', 'Assumption', 'Unknown']" [errors]="errors()" />
+        <fieldset class="incident-fieldset" [attr.aria-describedby]="describedBy('restoredAt')">
+          <legend>When was contact restored, or when did this end?</legend>
+          <p class="incident-hint">Enter a time, or choose Unknown. One of the two is required.</p>
+          @if (!resolveForm.controls.restoredUnknown.value) {
+            <label for="resolve-restored-at">Contact restored or resolution time</label>
+            <input id="resolve-restored-at" type="datetime-local" formControlName="restoredAt" [attr.aria-invalid]="errors()['restoredAt'] ? true : null" />
+          }
+          <label class="incident-option"><input type="checkbox" [checked]="resolveForm.controls.restoredUnknown.value" (change)="setRestoredUnknown($any($event.target).checked)" /> <span>Unknown</span></label>
+          @if (errors()['restoredAt']) { <p class="field-error" id="resolve-restoredAt-error">{{ errors()['restoredAt'] }}</p> }
+        </fieldset>
+        <div class="incident-field">
+          <label for="resolve-assistance">Assistance provided <span class="incident-hint">(optional)</span></label>
+          <textarea id="resolve-assistance" rows="2" maxlength="2000" formControlName="assistance" [attr.aria-describedby]="describedBy('assistance')"></textarea>
+          @if (errors()['assistance']) { <p class="field-error" id="resolve-assistance-error">{{ errors()['assistance'] }}</p> }
+        </div>
+        <div class="incident-field">
+          <label for="resolve-follow-up">Follow-up still open <span class="incident-hint">(optional)</span></label>
+          <textarea id="resolve-follow-up" rows="2" maxlength="2000" formControlName="followUp" [attr.aria-describedby]="describedBy('followUp')"></textarea>
+          @if (errors()['followUp']) { <p class="field-error" id="resolve-followUp-error">{{ errors()['followUp'] }}</p> }
+        </div>
+        <div class="incident-field">
+          <label for="resolve-lessons">Lessons <span class="incident-hint">(optional)</span></label>
+          <textarea id="resolve-lessons" rows="2" maxlength="2000" formControlName="lessons" [attr.aria-describedby]="describedBy('lessons')"></textarea>
+          @if (errors()['lessons']) { <p class="field-error" id="resolve-lessons-error">{{ errors()['lessons'] }}</p> }
+        </div>
+        <p class="incident-note">Resolving ends coordination for everyone with access. It can't be reopened. Resolving does not mean anyone is confirmed safe.</p>
+        <div class="incident-actions">
+          <button type="button" class="button--secondary" [disabled]="saving()" (click)="close('incident-start-resolve')">Cancel</button>
+          <button type="submit" [disabled]="saving()">{{ saving() ? 'Resolving…' : 'Resolve Incident' }}</button>
+        </div>
+      </form>
+    }
+  }
+</section>

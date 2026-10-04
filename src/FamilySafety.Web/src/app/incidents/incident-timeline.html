@@ -1,0 +1,60 @@
+<section class="incident-card" aria-labelledby="incident-timeline-heading">
+  <h3 id="incident-timeline-heading">Timeline</h3>
+  <p class="incident-meta">Categories describe how information is known. They do not say whether anyone is safe.
+    Items are ordered by event time when known, otherwise by recorded time.</p>
+  <ol class="incident-timeline" aria-label="Incident timeline, oldest first">
+    @for (item of incident.timeline; track item.type + item.itemId) {
+      @let entry = entryFor(item);
+      @let task = taskFor(item);
+      <li [id]="entry ? 'incident-entry-' + entry.entryId : null" [attr.tabindex]="entry ? -1 : null" [class]="'incident-tl incident-tl--' + marker(item)">
+        <p class="incident-tl-time" aria-hidden="true">
+          @if (entry?.eventAt) {
+            <time [attr.datetime]="entry!.eventAt" [title]="entry!.eventAt | date:dateTimeFormat">{{ entry!.eventAt | date:timelineTimeFormat }}</time>
+          } @else {
+            <time [attr.datetime]="item.recordedAt" [title]="item.recordedAt | date:dateTimeFormat">{{ item.recordedAt | date:timelineTimeFormat }}</time>
+            @if (entry) { <span>Event time unknown</span> }
+          }
+        </p>
+        <div class="incident-tl-body">
+          <p class="incident-tl-type">{{ typeLabel(item) }}</p>
+          @if (entry) {
+            <h4>
+              {{ entry.kind === 'ContactAttempt' ? contactLine(entry) : entry.contributorName }}
+              <span class="incident-pill incident-pill--category">{{ categoryText(entry.category, entry.isOutdated) }}</span>
+            </h4>
+            @if (entry.text) { <p class="incident-text">{{ entry.text }}</p> }
+            @if (relatedTask(entry); as resultTask) { <p class="incident-meta">Result for the task “{{ resultTask.description }}”</p> }
+            <p class="incident-meta">{{ sourceText(entry) }}</p>
+            @if (entry.explanation) { <p class="incident-note"><strong>Explanation:</strong> {{ entry.explanation }}</p> }
+            @if (related(entry); as target) {
+              <p class="incident-related">
+                <a [href]="'#incident-entry-' + target.entryId" (click)="goTo($event, target.entryId)">{{ relationPrefix(entry) }} {{ target.contributorName }}'s entry from {{ target.recordedAt | date:dateTimeFormat }}: view original</a>
+              </p>
+            }
+            <p class="incident-meta">
+              {{ entry.kind === 'ContactAttempt' ? 'Recorded by' : 'Added by' }} {{ entry.contributorName }} ·
+              @if (entry.eventAt) { Event time <time [attr.datetime]="entry.eventAt">{{ entry.eventAt | date:dateTimeFormat }}</time> } @else { Event time unknown }
+              · Recorded <time [attr.datetime]="entry.recordedAt">{{ entry.recordedAt | date:dateTimeFormat }}</time>
+            </p>
+            @if (canCorrect(entry) || canChallenge(entry)) {
+              <div class="incident-tl-actions">
+                @if (canCorrect(entry)) {
+                  <button type="button" class="incident-quiet" [id]="'incident-respond-' + entry.entryId" (click)="correct.emit(entry)">Add a correction</button>
+                } @else {
+                  <button type="button" class="incident-quiet" [id]="'incident-respond-' + entry.entryId" (click)="challenge.emit(entry)">Add another report</button>
+                }
+              </div>
+            }
+          } @else {
+            <h4>{{ title(item) }}</h4>
+            @if (task) {
+              <p class="incident-text">{{ task.description }}</p>
+              @if (item.type === 'TaskCancelled' && task.cancelReason) { <p class="incident-meta">Reason: {{ task.cancelReason }}</p> }
+            }
+            <p class="incident-meta">{{ item.actorName }} · Recorded <time [attr.datetime]="item.recordedAt">{{ item.recordedAt | date:dateTimeFormat }}</time></p>
+          }
+        </div>
+      </li>
+    }
+  </ol>
+</section>

@@ -1,0 +1,10 @@
+Transcript-derived summary of exact-name database dry run, 2026-10-03 21:06 local.
+The initial PowerShell pipeline did not capture Write-Host output; this is not a raw log.
+Approved tool: scripts/test-artifacts.ps1 -RemoveDatabase <the five exact names below>, without -Execute.
+Each owning manifest existed, proved the name exactly once, and excluded it from its run-start snapshot; no active runner or API remained.
+FamilySafety_Invitation_E2E_85bf89b15dab4961b696113062d482f0 — 20261004T003349-0b607b30, retained failed axe setup
+FamilySafety_Invitation_E2E_0faf4e5a3f0e42cf8dbb965761f05e52 — 20261004T003349-0b607b30, retained failed axe setup
+FamilySafety_Invitation_E2E_2750336d367a405b9840a84489058f23 — 20261004T003701-5e709e5e, intentionally retained review
+FamilySafety_Invitation_E2E_b2e1d28a43d3461c82ad786a94a1393b — 20261004T004148-b88f1ca3, failed journey locator
+FamilySafety_Invitation_E2E_3180d133877c4601b6f863a7a4014ab7 — 20261004T004307-49f7f81e, this work item's interrupted locator run
+Dry run: no changes. Exact-name -Execute authorized by the user's WI-009-011 artifact instruction.

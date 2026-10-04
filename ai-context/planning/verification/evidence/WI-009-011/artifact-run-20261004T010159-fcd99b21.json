@@ -1,0 +1,105 @@
+{
+  "runId": "20261004T010159-fcd99b21",
+  "createdAt": "2026-10-04T01:01:59.982Z",
+  "server": "localhost",
+  "preExistingListPath": "C:\\Dev\\blevins\\scripts\\pre-existing-scenario-databases.txt",
+  "preExistingAtRunStart": [
+    "FamilySafety",
+    "FamilySafety_Invitation_79558d15516649aeb6758a9e2496b6b7",
+    "FamilySafety_Invitation_ConcernReview20261001",
+    "FamilySafety_Invitation_ddf3f406d9024bc1ac330e46513b5209",
+    "FamilySafety_Invitation_E2E_0faf4e5a3f0e42cf8dbb965761f05e52",
+    "FamilySafety_Invitation_E2E_2750336d367a405b9840a84489058f23",
+    "FamilySafety_Invitation_E2E_3180d133877c4601b6f863a7a4014ab7",
+    "FamilySafety_Invitation_E2E_85bf89b15dab4961b696113062d482f0",
+    "FamilySafety_Invitation_E2E_b2e1d28a43d3461c82ad786a94a1393b",
+    "FamilySafety_Invitation_Review_WI008004",
+    "FamilySafety_Invitation_ShellReview034731",
+    "FamilySafety_Invitation_SiteReview044319",
+    "FamilySafety_Invitation_SiteReview044420",
+    "FamilySafety_Invitation_Stage1Retry_20260928_235812_c7f2",
+    "FamilySafety_Invitation_WI075_Browser_20260928",
+    "FamilySafety_Invitation_WI075004Visual",
+    "FamilySafety_Invitation_WI075005_CodexAttempt_20260929",
+    "FamilySafety_Invitation_WI075006VerifyHost",
+    "FamilySafety_VisualReview",
+    "FamilySafety_WI005001_Verification",
+    "FamilySafety_WI005002_ConcurrencyTests",
+    "FamilySafety_WI005002_Verification",
+    "FamilySafety_WI005003_DirectoryTests"
+  ],
+  "databases": [
+    {
+      "name": "FamilySafety_Invitation_E2E_68e8f2cd07564eb09b3cb6d80afae843",
+      "spec": "events-dashboard.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true,
+        "secondFamily": true
+      },
+      "createdAt": "2026-10-04T01:02:05.343Z",
+      "apiPid": 28912,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T010159-fcd99b21\\FamilySafety_Invitation_E2E_68e8f2cd07564eb09b3cb6d80afae843.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:02:30.499Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:02:30.499Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_dc8b29d0eaa84a82bb904580bae25985",
+      "spec": "family-dashboard.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": true
+      },
+      "createdAt": "2026-10-04T01:02:31.290Z",
+      "apiPid": 25204,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T010159-fcd99b21\\FamilySafety_Invitation_E2E_dc8b29d0eaa84a82bb904580bae25985.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:02:55.168Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:02:55.168Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    },
+    {
+      "name": "FamilySafety_Invitation_E2E_83a42656fa324bfda79336de00faefac",
+      "spec": "navigation.spec.ts",
+      "scenario": {
+        "tripAudienceAdult": false
+      },
+      "createdAt": "2026-10-04T01:02:55.973Z",
+      "apiPid": 19812,
+      "apiLog": "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T010159-fcd99b21\\FamilySafety_Invitation_E2E_83a42656fa324bfda79336de00faefac.api.log",
+      "outcome": "passed",
+      "status": "removed",
+      "removedAt": "2026-10-04T01:04:07.667Z",
+      "removedBy": "automatic",
+      "history": [
+        {
+          "at": "2026-10-04T01:04:07.667Z",
+          "from": "running",
+          "to": "removed",
+          "by": "automatic",
+          "note": "dropped by remove-scenario-database.ps1 and confirmed absent"
+        }
+      ]
+    }
+  ],
+  "runnerPid": 10632,
+  "completedAt": "2026-10-04T01:04:08.453Z"
+}

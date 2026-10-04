@@ -1,0 +1,408 @@
+<div class="concerns-page">
+  @if (actionError()) {
+    <p class="concerns-alert" role="alert">{{ actionError() }}</p>
+  }
+
+  @if (unavailable()) {
+    <section class="concerns-card concerns-empty" aria-labelledby="unavailable-heading">
+      <h2 id="unavailable-heading" tabindex="-1">This Concern is unavailable</h2>
+      <p>Only Concerns currently shared with you can be opened.</p>
+      <button type="button" class="button--secondary concerns-secondary" (click)="backToList()">Return to Concerns</button>
+    </section>
+  } @else if (loadingDetail()) {
+    <p class="concerns-status" role="status">Loading Concern…</p>
+  } @else if (selected(); as concern) {
+    <a class="concerns-back button-link" routerLink="/concerns" [state]="focusHeadingState" (click)="resetDetail()">← Back to Concerns</a>
+
+    @if (initialEntryMessage()) {
+      <section class="concerns-partial" [class.concerns-partial--error]="initialEntryFailure()" aria-live="polite">
+        <p>{{ initialEntryMessage() }}</p>
+        @if (initialEntryFailure()) {
+          <div class="concerns-actions">
+            <button type="button" class="button--secondary" (click)="continueToConcern()">Continue to Concern</button>
+            <button type="button" [disabled]="initialEntrySaving()" (click)="retryInitialEntry()">
+              {{ initialEntrySaving() ? 'Retrying entry…' : 'Retry initial entry only' }}
+            </button>
+          </div>
+        }
+      </section>
+    }
+
+    <article class="concerns-detail" aria-labelledby="concern-detail-heading">
+      <section class="concerns-hero" [class.concerns-hero--ended]="concern.state !== 'Open'">
+        <span class="concerns-avatar concerns-avatar--large" aria-hidden="true">{{ initials(concern.subjectName) }}</span>
+        <div class="concerns-hero-main">
+          <h2 id="concern-detail-heading">Concern about {{ concern.subjectName }}</h2>
+          <p class="concerns-reason">{{ concern.creationReason }}</p>
+          <dl class="concerns-dates">
+            <div><dt>Created</dt><dd>{{ concern.createdAt | date:dateFormat }}</dd></div>
+            <div><dt>Last activity</dt><dd>{{ concern.lastAuthorizedMutationAt | date:dateFormat }}</dd></div>
+            @if (concern.state === 'Frozen' && concern.frozenAt) {
+              <div><dt>Coordination ended</dt><dd>{{ concern.frozenAt | date:dateFormat }}</dd></div>
+            }
+          </dl>
+        </div>
+        <div class="concerns-hero-state">
+          <span [class]="'concerns-state concerns-state--' + concern.state.toLowerCase()">{{ concern.state }}</span>
+          <p>{{ stateDescription(concern.state) }}</p>
+        </div>
+        @if (concern.state === 'Frozen') {
+          <p class="concerns-state-copy">Coordination in this Concern has stopped. This record is read-only. Start a new Concern if coordination needs to continue.</p>
+        }
+      </section>
+
+      @if (concern.state === 'Resolved') {
+        <section class="concerns-card concerns-outcome" aria-labelledby="resolution-heading">
+          <h3 id="resolution-heading">Resolution</h3>
+          <p class="concerns-meta">Resolved by {{ concern.creatorName }}@if (concern.resolvedAt) { · {{ concern.resolvedAt | date:dateFormat }}}</p>
+          @if (concern.resolutionNote) { <p class="concerns-outcome-note">{{ concern.resolutionNote }}</p> }
+          <p class="concerns-state-copy">Resolution means coordination on this record ended. It does not establish safety, danger, or that information was verified.</p>
+        </section>
+      }
+
+      <div class="concerns-layout">
+        <div class="concerns-main">
+          <section class="concerns-card" aria-labelledby="concern-history-heading">
+            <div class="concerns-card-heading">
+              <h3 id="concern-history-heading">History</h3>
+            </div>
+            <p class="concerns-help">Entries are attributed contributions. Categories describe how information is known, not whether anyone is safe. Recorded time and event time may differ.</p>
+            @if (concern.entries.length === 0) {
+              <p class="concerns-muted">No entries have been added yet.</p>
+            } @else {
+              <ol class="concerns-timeline" aria-label="Concern entries in chronological order">
+                @for (entry of concern.entries; track entry.entryId) {
+                  <li [id]="'concern-entry-' + entry.entryId" [class]="'concerns-entry concerns-entry--' + entry.kind.toLowerCase()">
+                    <time class="concerns-entry-time" [attr.datetime]="entry.recordedAt" [title]="'Recorded ' + (entry.recordedAt | date:dateFormat)"><span aria-hidden="true">{{ entry.recordedAt | date:timelineFormat }}</span><span class="concerns-sr-only">Recorded {{ entry.recordedAt | date:dateFormat }}</span></time>
+                    <div class="concerns-entry-body">
+                      <p class="concerns-entry-kind">{{ entryKindText(entry.kind) }}</p>
+                      <h4>{{ entry.contributorName }} <span class="concerns-category">{{ categoryText(entry) }}</span></h4>
+                      <p class="concerns-entry-text">{{ entry.text }}</p>
+                      <p class="concerns-meta">
+                        Source: {{ entry.sourceUnknown ? 'Unknown source' : entry.sourceDescription }}
+                        @if (entry.eventAt) { · Event time {{ entry.eventAt | date:dateFormat }} }
+                      </p>
+                      @if (entry.explanation) { <p class="concerns-explanation"><strong>Explanation:</strong> {{ entry.explanation }}</p> }
+                      @if (entry.relatedEntryId) {
+                        <p class="concerns-related">{{ relationText(entry) }}:
+                          <a [href]="'#concern-entry-' + entry.relatedEntryId">View original entry</a>
+                        </p>
+                      }
+                      @if (canCorrect(entry) || canChallenge(entry)) {
+                        <div class="concerns-entry-actions">
+                          @if (canCorrect(entry)) {
+                            <button type="button" class="concerns-quiet" (click)="openComposer('Correction', entry)">Add a correction</button>
+                          }
+                          @if (canChallenge(entry)) {
+                            <button type="button" class="concerns-quiet" (click)="openComposer('Challenge', entry)">Add another report</button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </li>
+                }
+              </ol>
+            }
+          </section>
+
+          @if (composing(); as kind) {
+            <section class="concerns-card concerns-composer" aria-labelledby="entry-composer-heading">
+              <h3 id="entry-composer-heading" tabindex="-1">
+                {{ kind === 'Correction' ? 'Add a correction' : kind === 'Challenge' ? 'Add another report' : kind === 'Unknown' ? 'Record an Unknown' : 'Add an observation' }}
+              </h3>
+              @if (composerTarget(); as target) {
+                <blockquote class="concerns-target">
+                  <p class="concerns-meta">{{ target.contributorName }} · {{ target.recordedAt | date:dateFormat }}</p>
+                  <p>{{ target.text }}</p>
+                </blockquote>
+              }
+              @if (kind === 'Correction' || kind === 'Challenge') {
+                <p class="concerns-help">This adds a separate contribution linked to the original. The original entry remains unchanged.</p>
+              }
+              <form [formGroup]="entryForm" (ngSubmit)="submitEntry()" novalidate>
+                <div class="concerns-form-row">
+                  @if (kind !== 'Unknown') {
+                    <div class="concerns-field">
+                      <label for="entry-category">Information category</label>
+                      <select id="entry-category" [formControl]="entryForm.controls.category" (change)="setCategory('entry', $any($event.target).value)">
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Reported">Reported</option>
+                        <option value="Assumption">Assumption</option>
+                        <option value="Outdated">Outdated</option>
+                      </select>
+                      @if (entryForm.controls.category.value === 'Outdated') {
+                        <label for="entry-original-category">Earlier classification</label>
+                        <select id="entry-original-category" formControlName="originalCategory">
+                          <option value="Confirmed">Confirmed</option>
+                          <option value="Reported">Reported</option>
+                          <option value="Assumption">Assumption</option>
+                        </select>
+                        <p class="concerns-help">The entry keeps its earlier classification and is also marked outdated.</p>
+                      }
+                    </div>
+                  } @else {
+                    <p class="concerns-help">Unknown is an explicit record that no reliable answer is currently available.</p>
+                  }
+                  <div class="concerns-field">
+                    <label for="entry-event-time">Event time <span>(optional)</span></label>
+                    <input id="entry-event-time" type="datetime-local" formControlName="eventAt" />
+                  </div>
+                </div>
+                <div class="concerns-field">
+                  <label for="entry-text">Information</label>
+                  <textarea id="entry-text" rows="3" maxlength="2000" formControlName="text"></textarea>
+                </div>
+                <fieldset class="concerns-fieldset">
+                  <legend>Source</legend>
+                  <label class="concerns-check"><input type="checkbox" [checked]="entrySourceUnknown()" (change)="entrySourceUnknown.set($any($event.target).checked)" [disabled]="entryForm.controls.category.value === 'Confirmed'" /> Source is unknown</label>
+                  @if (!entrySourceUnknown()) {
+                    <label for="entry-source">Source description</label>
+                    <input id="entry-source" type="text" maxlength="500" formControlName="sourceDescription" />
+                  }
+                </fieldset>
+                @if (kind === 'Correction' || kind === 'Challenge') {
+                  <div class="concerns-field">
+                    <label for="entry-explanation">Explanation</label>
+                    <textarea id="entry-explanation" rows="2" maxlength="1000" formControlName="explanation"></textarea>
+                  </div>
+                }
+                <div class="concerns-actions concerns-actions--end">
+                  <button type="button" class="button--secondary" [disabled]="saving()" (click)="cancelComposer()">Cancel</button>
+                  <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Add contribution' }}</button>
+                </div>
+              </form>
+            </section>
+          }
+        </div>
+
+        <aside class="concerns-side" aria-label="Concern access and actions">
+          <section class="concerns-card" aria-labelledby="concern-audience-heading">
+            <div class="concerns-card-heading">
+              <h3 id="concern-audience-heading">People with Concern access</h3>
+              @if (concern.state === 'Open' && isCreator(concern) && !managingParticipants()) {
+                <button type="button" class="concerns-quiet" (click)="openParticipantManager()">Manage participants</button>
+              }
+            </div>
+            <ul class="concerns-people">
+              <li>
+                <span class="concerns-avatar" aria-hidden="true">{{ initials(concern.creatorName) }}</span>
+                <span><strong>{{ concern.creatorName }}@if (isCreator(concern)) { (you)}</strong><span class="concerns-meta">Creator</span></span>
+              </li>
+              @for (person of concern.participants; track person.profileId) {
+                <li>
+                  <span class="concerns-avatar" aria-hidden="true">{{ initials(person.displayName) }}</span>
+                  <span><strong>{{ person.displayName }}@if (person.profileId === ownProfileId) { (you)}</strong>
+                    <span class="concerns-meta">Selected participant@if (person.profileId === concern.subjectProfileId) { · subject, explicitly selected }</span></span>
+                </li>
+              }
+            </ul>
+            @if (concern.participants.length === 0) {
+              <p class="concerns-muted">No additional participants were selected.</p>
+            }
+            @if (concern.subjectProfileId !== concern.creatorProfileId && !subjectIsParticipant(concern)) {
+              <p class="concerns-help">The subject is not included unless explicitly selected.</p>
+            }
+            @if (concern.state === 'Open' && isCreator(concern) && managingParticipants()) {
+              <fieldset class="concerns-fieldset">
+                <legend>Selected participants</legend>
+                <p>Saving replaces the complete selected participant list. People removed here lose access.</p>
+                @for (person of participantChoices(); track person.profileId) {
+                  <label class="concerns-check"><input type="checkbox" [checked]="isManagedParticipant(person.profileId)" (change)="toggleManagedParticipant(person.profileId, $any($event.target).checked)" /> {{ person.displayName }} @if (person.profileId === concern.subjectProfileId) { (subject) }</label>
+                }
+                @if (participantChoices().length === 0) { <p>No additional active adults are available to select.</p> }
+              </fieldset>
+              <div class="concerns-actions concerns-actions--end">
+                <button type="button" class="button--secondary" [disabled]="saving()" (click)="cancelParticipantManagement()">Cancel</button>
+                <button type="button" [disabled]="saving()" (click)="saveParticipants()">{{ saving() ? 'Saving…' : 'Save participant list' }}</button>
+              </div>
+            }
+          </section>
+
+          @if (isCreator(concern)) {
+            <section class="concerns-card" aria-labelledby="concern-incident-heading">
+              <h3 id="concern-incident-heading">Separate Incident</h3>
+              <p class="concerns-help">If this needs coordinated family follow-up, you can start a separate Incident. Nothing here is copied or shared.</p>
+              <button type="button" class="button--secondary" (click)="startIncident(concern)">Start an Incident…</button>
+            </section>
+          }
+
+          @if (concern.state === 'Open' && (canContribute(concern) || isCreator(concern))) {
+            <section class="concerns-card" aria-labelledby="concern-actions-heading">
+              <h3 id="concern-actions-heading">Contribute</h3>
+              @if (canContribute(concern) && !composing()) {
+                <div class="concerns-actions concerns-actions--stack">
+                  <button type="button" (click)="openComposer('Observation')">Add an observation</button>
+                  <button type="button" class="button--secondary" (click)="openComposer('Unknown')">Record an Unknown</button>
+                </div>
+              } @else if (composing()) {
+                <p class="concerns-muted">Finish or cancel the open form to start another contribution.</p>
+              }
+              @if (isCreator(concern)) {
+                <div class="concerns-resolve">
+                  @if (!resolving()) {
+                    <button type="button" class="button--secondary" (click)="openResolve()">Resolve this Concern…</button>
+                  } @else {
+                    <form [formGroup]="resolutionForm" (ngSubmit)="resolveConcern()" novalidate>
+                      <label for="resolution-note">Resolution note</label>
+                      <textarea id="resolution-note" rows="3" maxlength="2000" formControlName="note"></textarea>
+                      <p class="concerns-help">Resolving ends coordination on this record. It cannot be reopened.</p>
+                      <div class="concerns-actions">
+                        <button type="button" class="button--secondary" [disabled]="saving()" (click)="resolving.set(false)">Cancel</button>
+                        <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Resolve Concern' }}</button>
+                      </div>
+                    </form>
+                  }
+                </div>
+              }
+            </section>
+          }
+        </aside>
+      </div>
+    </article>
+  } @else if (showCreate()) {
+    <button type="button" class="concerns-back" (click)="closeCreate()">← Back to Concerns</button>
+    <section class="concerns-card concerns-create" aria-labelledby="create-concern-heading">
+      <h2 id="create-concern-heading" tabindex="-1">Create a Concern</h2>
+      <p class="concerns-help">A Concern is a private coordination record for uncertainty. It does not establish danger or safety.</p>
+      @if (loadingMembers()) { <p class="concerns-status" role="status">Loading active adult family members…</p> }
+      <form [formGroup]="createForm" (ngSubmit)="createConcern()" novalidate>
+        <div class="concerns-create-grid">
+          <div>
+            <div class="concerns-field">
+              <label for="concern-subject">Who is this Concern about?</label>
+              <select id="concern-subject" formControlName="subjectProfileId" required>
+                <option value="">Choose a person</option>
+                @for (person of subjectChoices(); track person.profileId) {
+                  <option [value]="person.profileId">{{ person.displayName }}</option>
+                }
+              </select>
+            </div>
+            <div class="concerns-field">
+              <label for="concern-reason">Reason or context</label>
+              <textarea id="concern-reason" rows="3" maxlength="1000" formControlName="reason" required></textarea>
+            </div>
+            <fieldset class="concerns-fieldset">
+              <legend>Initial information <span>(optional)</span></legend>
+              <p>The Concern reason will be saved first. Initial information is a separate attributed entry.</p>
+              <label class="concerns-check"><input type="radio" name="initial-kind" [checked]="initialKind() === 'None'" (change)="setInitialKind('None')" /> Add no initial entry</label>
+              <label class="concerns-check"><input type="radio" name="initial-kind" [checked]="initialKind() === 'Observation'" (change)="setInitialKind('Observation')" /> Add an Observation</label>
+              <label class="concerns-check"><input type="radio" name="initial-kind" [checked]="initialKind() === 'Unknown'" (change)="setInitialKind('Unknown')" /> Record an Unknown</label>
+              @if (initialKind() !== 'None') {
+                @if (initialKind() === 'Observation') {
+                  <div class="concerns-field">
+                    <label for="initial-category">Information category</label>
+                    <select id="initial-category" [formControl]="initialForm.controls.category" (change)="setCategory('initial', $any($event.target).value)">
+                      <option value="Confirmed">Confirmed</option>
+                      <option value="Reported">Reported</option>
+                      <option value="Assumption">Assumption</option>
+                      <option value="Outdated">Outdated</option>
+                    </select>
+                  </div>
+                  @if (initialForm.controls.category.value === 'Outdated') {
+                    <div class="concerns-field">
+                      <label for="initial-original-category">Earlier classification</label>
+                      <select id="initial-original-category" [formControl]="initialForm.controls.originalCategory">
+                        <option value="Confirmed">Confirmed</option><option value="Reported">Reported</option><option value="Assumption">Assumption</option>
+                      </select>
+                    </div>
+                  }
+                }
+                <div class="concerns-field">
+                  <label for="initial-entry-text">Information</label>
+                  <textarea id="initial-entry-text" rows="2" maxlength="2000" [formControl]="initialForm.controls.text"></textarea>
+                </div>
+                <fieldset class="concerns-fieldset">
+                  <legend>Source</legend>
+                  <label class="concerns-check"><input type="checkbox" [checked]="initialSourceUnknown()" (change)="initialSourceUnknown.set($any($event.target).checked)" [disabled]="initialForm.controls.category.value === 'Confirmed'" /> Source is unknown</label>
+                  @if (!initialSourceUnknown()) {
+                    <label for="initial-source">Source description</label>
+                    <input id="initial-source" type="text" maxlength="500" [formControl]="initialForm.controls.sourceDescription" />
+                  }
+                </fieldset>
+                <div class="concerns-field">
+                  <label for="initial-event-time">Event time <span>(optional)</span></label>
+                  <input id="initial-event-time" type="datetime-local" [formControl]="initialForm.controls.eventAt" />
+                </div>
+                @if (initialKind() === 'Unknown') { <p class="concerns-help">Unknown records that no reliable answer is currently available.</p> }
+              }
+            </fieldset>
+          </div>
+          <fieldset class="concerns-fieldset concerns-audience">
+            <legend>Who should have access?</legend>
+            <div class="concerns-person concerns-person--creator">
+              <span class="concerns-avatar" aria-hidden="true">You</span>
+              <span><strong>You</strong><span class="concerns-meta">Creator access</span></span>
+            </div>
+            <p class="concerns-info">You have creator access while eligible. Only people you select receive participant access. The subject is not included unless you select them. Family membership or administrator status alone does not provide Concern access.</p>
+            @for (person of participantChoices(); track person.profileId) {
+              <label class="concerns-check"><input type="checkbox" [checked]="isCreateParticipantSelected(person.profileId)" (change)="toggleCreateParticipant(person.profileId, $any($event.target).checked)" /> {{ person.displayName }} @if (person.profileId === createForm.controls.subjectProfileId.value) { (subject) }</label>
+            }
+            @if (!loadingMembers() && participantChoices().length === 0) {
+              <p>No additional active adults are available. You can create a Concern with yourself as its only creator.</p>
+            }
+          </fieldset>
+        </div>
+        @if (initialValidation()) { <p class="concerns-alert" role="alert">{{ initialValidation() }}</p> }
+        <div class="concerns-actions concerns-actions--end">
+          <button type="button" class="button--secondary" [disabled]="saving()" (click)="closeCreate()">Cancel</button>
+          <button type="submit" [disabled]="saving() || loadingMembers() || !currentFamilyId || createAmbiguous()">
+            {{ saving() ? 'Creating Concern…' : 'Create Concern' }}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    @if (createAmbiguous()) {
+      <section class="concerns-partial concerns-partial--error" aria-live="polite">
+        <p>{{ actionError() }}</p>
+        <button type="button" [disabled]="loadingList()" (click)="checkAmbiguousCreate()">{{ loadingList() ? 'Refreshing…' : 'Refresh authorized list' }}</button>
+      </section>
+    }
+  } @else {
+    <section class="concerns-card concerns-list-section" aria-labelledby="concern-list-heading">
+      <div class="concerns-card-heading">
+        <span class="concerns-icon"><app-icon name="shield" /></span>
+        <div class="concerns-heading-text">
+          <h2 id="concern-list-heading">Concerns available to you</h2>
+          <p class="concerns-help">Only Concerns returned by the authorized service appear here.</p>
+        </div>
+        <button type="button" class="concerns-quiet" [disabled]="loadingList()" (click)="refreshList()">Refresh list</button>
+        @if (currentFamilyId) {
+          <button type="button" (click)="openCreate()"><app-icon name="plus" />Create a Concern</button>
+        }
+      </div>
+      @if (loadingList()) {
+        <p class="concerns-status" role="status">Loading Concerns…</p>
+      } @else if (listError()) {
+        <div class="concerns-error">
+          <p class="concerns-alert" role="alert">{{ listError() }}</p>
+          <button type="button" class="button--secondary" (click)="refreshList()">Retry loading Concerns</button>
+        </div>
+      } @else if (concerns().length === 0) {
+        <div class="concerns-empty">
+          <h3>No Concerns are currently available to you</h3>
+          <p>A Concern is shared only with its creator and people explicitly selected for access.</p>
+        </div>
+      } @else {
+        <ul class="concerns-list">
+          @for (concern of concerns(); track concern.concernId) {
+            <li>
+              <a class="concern-card item-link" [class.concern-card--open]="concern.state === 'Open'" [routerLink]="['/concerns', concern.concernId]" [state]="focusHeadingState" [attr.aria-label]="'Open Concern about ' + concern.subjectName + ', ' + concern.state">
+                <span class="concerns-avatar concerns-avatar--large" aria-hidden="true">{{ initials(concern.subjectName) }}</span>
+                <span class="concern-card-body">
+                  <span class="concern-card-top">
+                    <strong>{{ concern.subjectName }}</strong>
+                    <span [class]="'concerns-state concerns-state--' + concern.state.toLowerCase()">{{ concern.state }}</span>
+                  </span>
+                  <span class="concern-card-reason">{{ concern.creationReason }}</span>
+                  <span class="concerns-meta">{{ concern.creatorProfileId === ownProfileId ? 'Created by you' : 'You are a selected participant' }}</span>
+                  <span class="concerns-meta">Created {{ concern.createdAt | date:dateFormat }} · Last activity {{ concern.lastAuthorizedMutationAt | date:dateFormat }}</span>
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+</div>

@@ -1,0 +1,98 @@
+<button type="button" class="incident-back" (click)="showList.emit()">← Back to Incidents</button>
+
+<section class="incident-card" aria-labelledby="create-incident-heading">
+  <h2 id="create-incident-heading" tabindex="-1">Start an Incident</h2>
+  <p class="incident-meta">An Incident is a deliberate family coordination record. It does not establish danger or safety.</p>
+
+  @if (origin) {
+    <section class="incident-info incident-origin" aria-labelledby="incident-origin-heading">
+      <h3 id="incident-origin-heading">Starting a separate Incident</h3>
+      <p>This creates a new Incident. It does not change the Concern.</p>
+      <p>Nothing from the Concern is copied: no entries, history, sources, or people.</p>
+      <p>The Concern's participants are not added, and they will not see this Incident unless you add them.</p>
+      <p>Choosing someone as the subject does not share the Incident with them.</p>
+    </section>
+  }
+
+  @if (familyName) { <p class="incident-meta">Family: <strong>{{ familyName }}</strong></p> }
+  @if (!familyGroupId) { <p class="incident-info">Choose your current Family above to start an Incident.</p> }
+  @if (loadingMembers()) { <p role="status">Loading active adult family members…</p> }
+  @if (membersError()) {
+    <div class="incident-inline-error">
+      <p role="alert">{{ membersError() }}</p>
+      <button type="button" class="button--secondary" (click)="loadMembers()">Retry loading family members</button>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (hasErrors()) {
+      <p id="create-incident-summary" role="alert" tabindex="-1">Review the highlighted details before creating the Incident.</p>
+    }
+    <div class="incident-create-grid">
+      <div class="incident-create-main">
+        <div class="incident-field">
+          <label for="incident-subject">Who is this Incident about?</label>
+          <select id="incident-subject" formControlName="subjectProfileId" [attr.aria-invalid]="errors()['subject'] ? true : null" [attr.aria-describedby]="errorIds('subject')">
+            <option value="">Choose a person</option>
+            @for (person of subjectChoices(); track person.profileId) {
+              <option [value]="person.profileId">{{ person.displayName }}</option>
+            }
+          </select>
+          @if (errors()['subject']) { <p class="field-error" id="create-subject-error">{{ errors()['subject'] }}</p> }
+        </div>
+        <div class="incident-field">
+          <label for="incident-reason">Why are you starting this Incident?</label>
+          <textarea id="incident-reason" rows="3" maxlength="1000" formControlName="reason"
+            [attr.aria-invalid]="errors()['reason'] ? true : null" [attr.aria-describedby]="'incident-reason-hint' + (errors()['reason'] ? ' create-reason-error' : '')"></textarea>
+          <p class="incident-hint" id="incident-reason-hint">Describe what is uncertain, in your own words. This becomes the first coordinator summary.</p>
+          @if (errors()['reason']) { <p class="field-error" id="create-reason-error">{{ errors()['reason'] }}</p> }
+        </div>
+        <app-incident-provenance-fields [group]="form.controls.provenance" prefix="create" legend="How is the reason known?"
+          sourceLegend="Source of the reason" [categories]="['Confirmed', 'Reported', 'Assumption', 'Unknown']" [errors]="errors()" />
+      </div>
+
+      <fieldset class="incident-fieldset incident-people" [attr.aria-describedby]="'incident-people-privacy' + (errors()['people'] ? ' create-people-error' : '')">
+        <legend>People with access</legend>
+        <div id="incident-people-privacy" class="incident-privacy">
+          <p>You will coordinate this Incident. Only you and the people you add can see it.</p>
+          <p><strong>Choosing someone as the subject does not share the Incident with them.</strong> If they should see it, add them under People with access.</p>
+          <p>Family membership or administrator status alone does not give anyone access.</p>
+        </div>
+        @for (person of peopleChoices(); track person.profileId) {
+          <label class="incident-option">
+            <input type="checkbox" [checked]="isSelected(person.profileId)" (change)="toggle(person.profileId, $any($event.target).checked)" />
+            <span>{{ person.displayName }}
+              @if (person.profileId === subjectId()) {
+                <span class="incident-hint">{{ isSelected(person.profileId) ? '(subject, added)' : '(subject, not added)' }}</span>
+              }
+            </span>
+          </label>
+        }
+        @if (!loadingMembers() && !membersError() && peopleChoices().length === 0) {
+          <p class="incident-hint">No other active adults are available. You can start the Incident with only yourself.</p>
+        }
+        @if (errors()['people']) { <p class="field-error" id="create-people-error">{{ errors()['people'] }}</p> }
+      </fieldset>
+    </div>
+
+    @if (message()) {
+      <div class="incident-inline-error" [attr.role]="unconfirmed() ? 'status' : 'alert'">
+        <p>{{ message() }}</p>
+        @if (unconfirmed() && !checkingList()) {
+          @if (matchId(); as id) {
+            <button type="button" class="button--secondary" (click)="openIncident.emit(id)">Open the matching Incident</button>
+          } @else {
+            <button type="button" class="button--secondary" (click)="showList.emit()">Review the list</button>
+          }
+        }
+      </div>
+    }
+
+    <div class="incident-actions">
+      <button type="button" class="button--secondary" [disabled]="saving()" (click)="showList.emit()">Cancel</button>
+      <button type="submit" [disabled]="saving() || loadingMembers() || !!membersError() || !familyGroupId || checkingList() || !!matchId()">
+        {{ saving() ? 'Creating Incident…' : 'Create Incident' }}
+      </button>
+    </div>
+  </form>
+</section>

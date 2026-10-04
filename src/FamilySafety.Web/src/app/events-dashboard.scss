@@ -1,0 +1,79 @@
+/* Events dashboard (WI-009-008) — references/ux/home-dashboard panel ③. DOM order is the narrow reading order
+   (Upcoming Events, Trips, Quick Links, RSVPs Needed); the grid builds panel ③'s 2 × 2 on wider screens.
+   Shared cards, rows, tiles, and the placeholder note (.home-future) come from styles.scss and home.scss. */
+.events-title { align-items: center; margin-bottom: var(--space-4); }
+.events-title > div:first-child { flex: 1 1 0; min-width: 0; }
+/* Component styles are encapsulated, so these are plain selectors; they outrank the global app-root a.button-link. */
+a.events-create-link { background: var(--color-primary); color: #fff; flex: none; gap: var(--space-2); }
+a.events-create-link:hover { background: #1d4ed8; border-color: #1d4ed8; }
+
+/* Back to Events; also Back to Safety on the Concern and Incident lists (WI-009-009). */
+.events-back, .safety-back { margin: 0 0 var(--space-3) calc(-1 * var(--space-2)); }
+.events-back-link, .safety-back-link {
+  align-items: center; border-radius: var(--radius-sm); color: var(--color-primary); display: inline-flex; font-size: 0.9rem;
+  font-weight: 600; gap: var(--space-1); min-height: 2.25rem; padding: 0 var(--space-2); text-decoration: none;
+}
+.events-back-link:hover, .safety-back-link:hover { background: var(--color-primary-soft); color: var(--color-primary-strong); }
+
+.events-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-areas: 'upcoming' 'trips' 'links' 'rsvps';
+  grid-template-columns: minmax(0, 1fr);
+}
+.events-dash--upcoming { grid-area: upcoming; }
+.events-dash--trips { grid-area: trips; }
+.events-dash--links { grid-area: links; }
+.events-dash--rsvps { grid-area: rsvps; }
+.events-dash-card { display: flex; flex-direction: column; min-width: 0; }
+.events-grid .card-header { margin-bottom: var(--space-3); }
+a.events-view-all { align-items: center; border-radius: var(--radius-sm); display: inline-flex; font-weight: 600; text-decoration: none; }
+.events-preview-list .date-tile { font-size: 1.05rem; height: 3rem; width: 3rem; }
+.events-dash-empty {
+  background: var(--color-surface-soft); border-radius: var(--radius-md); color: var(--color-muted);
+  flex: 1 1 auto; margin: 0; padding: var(--space-3) var(--space-4);
+}
+
+/* Quick Links: compact tiles, each a real link. */
+.events-quick-links { display: grid; gap: var(--space-2); grid-template-columns: repeat(2, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; }
+.events-quick-link {
+  align-items: center; border: 1px solid var(--color-border); border-radius: var(--radius-md); color: inherit; display: flex;
+  gap: var(--space-2); height: 100%; min-height: 3.5rem; padding: var(--space-2) var(--space-3); text-decoration: none;
+}
+.events-quick-link:hover { background: var(--color-primary-soft); border-color: #dbe7fb; }
+.events-quick-icon { color: var(--color-primary); display: inline-flex; }
+.events-quick-text { display: grid; gap: 0.1rem; min-width: 0; overflow-wrap: anywhere; }
+.events-quick-text strong { color: var(--color-primary-strong); font-size: 0.9rem; }
+.events-quick-text span { color: var(--color-muted); font-size: 0.78rem; }
+
+.events-subpage { max-width: 60rem; }
+
+@media (min-width: 44rem) {
+  .events-grid { grid-template-areas: 'upcoming upcoming' 'trips rsvps' 'links links'; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .events-quick-links { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Sidebar widths: panel ③'s 2 × 2, Events slightly wider than Trips, Quick Links wider than the placeholder. */
+@media (min-width: 64rem) {
+  .events-grid {
+    grid-template-areas:
+      'upcoming upcoming upcoming upcoming upcoming upcoming upcoming trips trips trips trips trips'
+      'rsvps rsvps rsvps rsvps rsvps links links links links links links links';
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .events-quick-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 80rem) {
+  .events-grid { gap: var(--space-5); }
+  .events-quick-links { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 43.99rem) {
+  /* Title and the compact action share the first row; the subtitle takes the full width below. */
+  .events-title { align-items: center; display: grid; gap: var(--space-1) var(--space-3); grid-template-areas: 'title action' 'sub sub'; grid-template-columns: minmax(0, 1fr) auto; }
+  .events-title > div:first-child { display: contents; }
+  .events-title h1 { grid-area: title; margin: 0; }
+  .events-title p { grid-area: sub; }
+  .events-title .events-create-link { grid-area: action; min-height: 2.75rem; padding-inline: 0.85rem; }
+  .events-quick-text span { display: none; }
+}

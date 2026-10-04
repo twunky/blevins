@@ -1,0 +1,5 @@
+// People with access (panel 2 "Coordinators & Family", adapted): stacked rows with role labels. No call or message icons.
+:host { display: block; }
+.incident-people { display: grid; gap: var(--space-3); list-style: none; margin: 0; padding: 0; }
+.incident-people li { display: flex; align-items: flex-start; gap: var(--space-2); min-width: 0; overflow-wrap: anywhere; }
+.incident-people strong { color: var(--color-primary-strong); }

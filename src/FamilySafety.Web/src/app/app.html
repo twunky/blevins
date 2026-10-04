@@ -1,0 +1,1446 @@
+<div class="app-frame" [class.app-frame--focused]="view() === 'invitation' || view() === 'handoff'">
+  <header class="app-topbar">
+    <p class="brand"><span class="brand-mark"><app-icon name="users" /></span><span class="brand-name">Family Safety</span></p>
+    <div class="topbar-context">
+      @if (selectedFamily(); as family) {
+        <p class="current-family">Current Family: <strong>{{ family.name }}</strong></p>
+      }
+      @if (view() !== 'invitation' && view() !== 'handoff' && familyGroupsLoaded() && !membershipError() && activeFamilyGroups().length > 1) {
+        <div class="family-context-choice">
+          <label for="current-family">Current Family</label>
+          <select id="current-family" [value]="currentFamilyId() ?? ''"
+            (change)="switchCurrentFamily($any($event.target).value)">
+            <!-- [selected] keeps the shown choice right when the options render after the select's value (WI-009-005). -->
+            <option value="" [selected]="!currentFamilyId()">Choose a Family</option>
+            @for (group of activeFamilyGroups(); track group.familyGroupId) {
+              <option [value]="group.familyGroupId" [selected]="group.familyGroupId === currentFamilyId()">{{ group.name }}</option>
+            }
+          </select>
+        </div>
+      }
+      @if (ownerProfile(); as profile) {
+        <p class="profile-chip"><span class="avatar" aria-hidden="true">{{ initials(profile.displayName) }}</span><span>{{ profile.displayName }}</span></p>
+      }
+    </div>
+  </header>
+
+  @if (view() !== 'invitation' && view() !== 'handoff') {
+    <nav aria-label="Main navigation" class="main-navigation">
+      @for (destination of primaryDestinations; track destination.area) {
+        <a class="nav-button" [routerLink]="destination.path" [state]="focusHeadingState"
+          [class.is-active]="currentArea() === destination.area" [attr.aria-current]="ariaCurrent(destination)">
+          <app-icon [name]="destination.icon" /><span>{{ destination.label }}</span>
+        </a>
+      }
+    </nav>
+  }
+
+  <main class="app-main" aria-labelledby="profile-title">
+    @if (view() === 'familySettings') {
+      <p class="family-back"><a class="family-back-link" routerLink="/family" [state]="focusHeadingState"><app-icon name="back" />Back to Family</a></p>
+    }
+    <!-- WI-009-009 O9: navigation only, on the Concern and Incident list pages; item and create pages keep their own Back links. -->
+    @if (view() === 'concerns' || (view() === 'incidents' && !routeItemId())) {
+      <p class="safety-back"><a class="safety-back-link" routerLink="/safety" [state]="focusHeadingState"><app-icon name="back" />Back to Safety</a></p>
+    }
+    @if (view() === 'eventCreate' || view() === 'eventsAll') {
+      <p class="events-back"><a class="events-back-link" routerLink="/events" [state]="focusHeadingState"><app-icon name="back" />Back to Events</a></p>
+    }
+    @if (view() !== 'home') {
+      <header class="page-title" [class.family-title]="view() === 'family'" [class.events-title]="view() === 'events'">
+        <div>
+          <h1 id="profile-title" tabindex="-1">{{ pageTitle() }}</h1>
+          @if (pageSubtitle()) { <p>{{ pageSubtitle() }}</p> }
+        </div>
+        <!-- WI-009-007 D4: every member sees the gear. It is navigation only; Settings shows each member only the actions they may use. -->
+        @if (view() === 'family' && selectedFamily()) {
+          <div class="family-title-aside">
+            <p class="page-date">{{ today | date:'EEE, MMM d, y' }}</p>
+            <a class="family-settings-link" routerLink="/family/settings" [state]="focusHeadingState"
+              aria-label="Family settings" title="Family settings"><app-icon name="settings" /></a>
+          </div>
+        }
+        <!-- WI-009-008 D5: the one Events header action. Navigation only; the create page and the server decide what can be created. -->
+        @if (view() === 'events' && selectedFamily()) {
+          <a class="button-link events-create-link" routerLink="/events/new" [state]="focusHeadingState"><app-icon name="plus" />Create event</a>
+        }
+      </header>
+    }
+    <!-- OD-H: always present; text only after an item link actually switched the selected Family. -->
+    <p class="family-switch-status" [class.family-switch-status--shown]="!!familySwitchAnnouncement()" role="status">{{ familySwitchAnnouncement() }}</p>
+
+    @if (view() === 'invitation') {
+      <section class="focused-state first-use-card" aria-label="Invitation response">
+        @if (invitationBusy()) {
+          <p role="status">Checking your invitation…</p>
+        } @else if (invitationPreview(); as preview) {
+          <div class="first-use-main">
+            <p>{{ preview.inviterDisplayName }} invited you to join <strong>{{ preview.familyGroupName }}</strong>.</p>
+            <div class="button-row">
+              <button type="button" (click)="acceptInvitation()">Accept invitation</button>
+              <button type="button" class="button--secondary" (click)="declineInvitation()">Decline invitation</button>
+            </div>
+          </div>
+        }
+        @if (invitationError()) { <p role="alert">{{ invitationError() }}</p> }
+        @if (invitationMessage()) { <p role="status">{{ invitationMessage() }}</p> }
+        <!-- WI-009-010 O5: navigation is hidden here, so every state that cannot continue (unavailable, capacity, declined) offers Home. -->
+        @if (!invitationToken() || invitationError()) {
+          <button type="button" (click)="navigate('home')">Go to Home</button>
+        }
+      </section>
+    }
+
+    @if (view() === 'handoff') {
+      <section class="focused-state first-use-card first-use-handoff" aria-label="Accepted invitation handoff">
+        <p role="status">Your invitation has been accepted.</p>
+        @if (handoffBusy()) { <p>Loading your family…</p> }
+        @if (handoffError()) {
+          <p role="alert">{{ handoffError() }}</p>
+          <button type="button" [disabled]="handoffBusy()" (click)="retryHandoff()">Retry loading family</button>
+        }
+      </section>
+    }
+
+    @if (view() === 'home') {
+      <section class="home-dashboard" aria-label="Family welcome">
+        <header class="page-title home-title">
+          <div>
+            <h1 id="profile-title" tabindex="-1">{{ pageTitle() }}</h1>
+            @if (selectedFamily()) { <p>{{ pageSubtitle() }}</p> }
+          </div>
+          <div class="home-title-aside">
+            <p class="page-date">{{ today | date:'EEE, MMM d, y' }}</p>
+            @if (selectedFamily()) {
+              <button type="button" class="button--secondary home-family-button" (click)="navigate('family')"><app-icon name="users" />View Family</button>
+            }
+          </div>
+        </header>
+        @if (selectedFamily(); as family) {
+          <!-- Home dashboard (panel1-main-home). DOM order is reading priority; the grid places cards on wider screens.
+               Placeholder cards (.home-future) reserve the prototype's places for capabilities that do not exist yet: no data, requests, or actions. -->
+          <div class="home-grid">
+            <section class="card home-attention" aria-labelledby="home-attention-heading">
+              <div class="card-header">
+                <span class="card-icon card-icon--attention"><app-icon name="alert" /></span>
+                <div>
+                  <h2 id="home-attention-heading">Needs Your Attention</h2>
+                  <p class="card-sub">{{ hasRelationshipSuggestions() ? '1 item' : 'Nothing right now' }}</p>
+                </div>
+              </div>
+              @if (relationshipLoading()) {
+                <p role="status">Checking Family suggestions…</p>
+              } @else if (relationshipError()) {
+                <p class="message message--error" role="alert">{{ relationshipError() }}</p>
+              } @else if (hasRelationshipSuggestions()) {
+                <div class="attention-list">
+                  <div class="attention-row">
+                    <span class="row-icon"><app-icon name="heart" /></span>
+                    <div class="item-main"><strong>Relationship suggestion</strong><span class="item-meta">You have a Family relationship suggestion to respond to.</span></div>
+                    <button type="button" (click)="navigate('family')">Review in Family</button>
+                  </div>
+                </div>
+              } @else {
+                <div class="attention-list home-attention-clear">
+                  <span class="row-icon row-icon--clear"><app-icon name="check" /></span>
+                  <div class="item-main"><strong>Nothing needs your attention right now.</strong><span class="item-meta">Items that need a response from you will appear here.</span></div>
+                </div>
+              }
+            </section>
+
+            <section class="card home-card home-card--events" aria-labelledby="home-events-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="calendar" /></span>
+                <h2 id="home-events-heading">Upcoming Events</h2>
+                @if (homeEvents().length > 0) {
+                  <button type="button" class="link-button" aria-label="View all Events" (click)="navigate('events')">View all</button>
+                }
+              </div>
+              @if (eventsLoading()) { <p role="status">Loading Events…</p> }
+              @else if (eventsLoadError()) { <p class="message message--error" role="alert">{{ eventsLoadError() }}</p> }
+              @else if (homeEvents().length > 0) {
+                <ul class="home-preview-list row-list">
+                  @for (event of homeEvents(); track event.eventId) {
+                    @let tile = dateTile(event.date);
+                    <li class="item-row">
+                      <span class="date-tile" aria-hidden="true"><small>{{ tile.month }}</small>{{ tile.day }}</span>
+                      <span class="item-main"><strong><a class="item-link" [routerLink]="['/events', event.eventId]" [state]="focusHeadingState">{{ event.name }}</a></strong><span class="item-meta home-preview-detail">{{ displayDateTime(event.date, event.time) }}</span>@if (event.location) {<span class="item-meta home-preview-detail">{{ event.location }}</span>}</span>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <div class="home-empty">
+                  <p>No upcoming Events are shared with you yet.</p>
+                  <button type="button" class="button--secondary" (click)="navigate('events')">Open Events</button>
+                </div>
+              }
+            </section>
+
+            <section class="card home-card home-card--trips" aria-labelledby="home-trips-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="plane" /></span>
+                <h2 id="home-trips-heading">Trips</h2>
+                @if (homeTrips().length > 0) {
+                  <button type="button" class="link-button" aria-label="View all Trips" (click)="navigate('trips')">View all</button>
+                }
+              </div>
+              @if (homeTripsLoading()) { <p role="status">Loading Trips…</p> }
+              @else if (homeTripsError()) { <p class="message message--error" role="alert">{{ homeTripsError() }}</p> }
+              @else if (homeTrips().length > 0) {
+                <ul class="home-preview-list row-list">
+                  @for (trip of homeTrips(); track trip.tripId) {
+                    @let tile = dateTile(trip.startDate);
+                    <li class="item-row">
+                      <span class="date-tile" aria-hidden="true"><small>{{ tile.month }}</small>{{ tile.day }}</span>
+                      <span class="item-main"><strong><a class="item-link" [routerLink]="['/trips', trip.tripId]" [state]="focusHeadingState">{{ trip.title }}</a></strong><span class="item-meta home-preview-detail">{{ displayRange(trip.startDate, trip.endDate) }}</span><span class="item-meta home-preview-detail">{{ trip.primaryDestination }}</span></span>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <div class="home-empty">
+                  <p>No Trips in {{ family.name }} are available to you yet.</p>
+                  <button type="button" class="button--secondary" (click)="navigate('trips')">Open Trips</button>
+                </div>
+              }
+            </section>
+
+            <section class="card home-card home-card--plans" aria-labelledby="home-plans-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="clipboard" /></span>
+                <h2 id="home-plans-heading">Plans you can see</h2>
+                @if (homePlans().length > 0) {
+                  <button type="button" class="link-button" aria-label="View all Plans" (click)="navigate('plans')">View all</button>
+                }
+              </div>
+              @if (plansLoading()) { <p role="status">Loading Plans…</p> }
+              @else if (plansLoadError()) { <p class="message message--error" role="alert">{{ plansLoadError() }}</p> }
+              @else if (homePlans().length > 0) {
+                <ul class="home-preview-list row-list">
+                  @for (plan of homePlans(); track plan.planId) {
+                    @let tile = dateTile(plan.date);
+                    <li class="item-row">
+                      <span class="date-tile" aria-hidden="true"><small>{{ tile.month }}</small>{{ tile.day }}</span>
+                      <span class="item-main"><strong><a class="item-link" [routerLink]="['/plans', plan.planId]" [state]="focusHeadingState">{{ plan.activityOrDestination }}</a></strong><span class="item-meta home-preview-detail">{{ displayDateTime(plan.date, plan.time) }}</span></span>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <div class="home-empty">
+                  <p>No Plans are visible to you yet.</p>
+                  <button type="button" class="button--secondary" (click)="navigate('plans')">Open Plans</button>
+                </div>
+              }
+            </section>
+
+            <section class="card home-card home-card--safety" aria-labelledby="home-concerns-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="shield" /></span>
+                <h2 id="home-concerns-heading">Safety coordination</h2>
+              </div>
+              <div class="home-safety-body">
+                <p class="item-meta">Review a Concern or Incident shared with you, or start a new one.</p>
+                <div class="button-row home-safety-actions">
+                  <button type="button" class="button--secondary" (click)="navigate('concerns')">Open Concerns</button>
+                  <button type="button" class="button--secondary" (click)="navigate('incidents')">Open Incidents</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="card home-card home-future home-future--updates" aria-labelledby="home-updates-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="message" /></span>
+                <h2 id="home-updates-heading">Recent Family Updates</h2>
+              </div>
+              <p class="home-future-note">Family updates will appear here as activity and check-ins are added.</p>
+            </section>
+
+            <section class="card home-card home-future home-future--tasks" aria-labelledby="home-tasks-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="tasks" /></span>
+                <h2 id="home-tasks-heading">My Tasks</h2>
+              </div>
+              <p class="home-future-note">Shared family tasks will appear here as task features become available.</p>
+            </section>
+
+            <section class="card home-future home-future--sharing" aria-labelledby="home-sharing-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="share" /></span>
+                <h2 id="home-sharing-heading">Active Sharing</h2>
+              </div>
+              <p class="home-future-note">Active sharing will appear here when temporary family sharing is available.</p>
+            </section>
+          </div>
+        } @else if (!familyGroupsLoaded()) {
+          <p role="status">Loading your family…</p>
+        } @else if (membershipError()) {
+          <div class="card">
+            <p role="alert">{{ membershipError() }}</p>
+            <button type="button" (click)="retryMemberships()">Retry loading Families</button>
+          </div>
+        } @else if (activeFamilyGroups().length > 1) {
+          <p class="card">Choose your current Family above to see its context and available areas.</p>
+        } @else {
+          <!-- WI-009-010 O4: membership is invitation-only (REQ-FAM-005/006); the one real action is the user's own profile. -->
+          <section class="card home-no-family" aria-label="No Family yet">
+            <p>You’re not part of a Family yet. Ask a Family administrator to send you an invitation. While you wait, you can review your profile and sharing choices.</p>
+            <a class="button-link button--secondary" routerLink="/me" [state]="focusHeadingState">Review your profile</a>
+          </section>
+        }
+      </section>
+    }
+
+    @if (view() === 'plansTrips') {
+      <app-group-landing group="plansTrips" />
+    }
+    <!-- Safety dashboard (WI-009-009, DEC-079): read-only authorized summaries; no Family selection required. Deferred like Incidents. -->
+    @if (view() === 'safety') {
+      @defer (on immediate) {
+        <app-safety-dashboard [ownProfileId]="ownerProfile()?.profileId ?? null" [showFamilyName]="activeFamilyGroups().length > 1" />
+      } @loading {
+        <p role="status">Loading Safety…</p>
+      }
+    }
+
+    <!-- Item pages never show the Family prompt: the item read decides (REQ-UX-014). They show only a membership error. -->
+    @if (familyContextPromptShown()) {
+      <section class="context-prompt focused-state" aria-label="Family context required">
+        @if (!familyGroupsLoaded()) {
+          <p role="status">Loading your Families…</p>
+        } @else if (membershipError()) {
+          <p role="alert">{{ membershipError() }}</p>
+          <button type="button" (click)="retryMemberships()">Retry loading Families</button>
+        } @else if (activeFamilyGroups().length > 1) {
+          <p>Choose your current Family above to use this area.</p>
+        } @else {
+          <!-- WI-009-010: one concise shared message; the Home card carries the fuller first-use guidance. -->
+          <p>This area needs an active Family. Ask a Family administrator to send you an invitation.</p>
+          <a class="button-link button--secondary" routerLink="/me" [state]="focusHeadingState">Review your profile</a>
+        }
+      </section>
+    }
+
+    <div class="page-content" [class.profile-review-page]="view() === 'profile' && profileReview()" [hidden]="view() === 'invitation' || view() === 'handoff' || view() === 'home'
+      || view() === 'plansTrips' || view() === 'safety' || (isItemView() ? !!membershipError() : (view() !== 'profile' && !selectedFamily()
+      && !(view() === 'trips' && familyGroupsLoaded() && !membershipError()
+        && activeFamilyGroups().length === 0)))">
+    @if (loading()) {
+      <p role="status">Loading your profile…</p>
+    } @else {
+      @if (errorMessage()) {
+        <p class="message message--error" role="alert">{{ errorMessage() }}</p>
+      }
+      @if (successMessage()) {
+        <p class="message message--success" role="status">{{ successMessage() }}</p>
+      }
+      <!-- WI-009-010 O7: administrator invitation feedback renders inside the Invite card on Family settings. -->
+
+      @if (view() === 'profile' && profileReview()) {
+        <div class="info-bar profile-review-intro">
+          <p>We recommend reviewing your name and privacy choices. Your membership is already active; changes are optional.</p>
+          <button type="button" class="button--secondary" [disabled]="saving()" (click)="continueToHome()">Continue to Home without changes</button>
+        </div>
+      }
+      <form [hidden]="view() !== 'profile'" class="profile-form" [formGroup]="profileForm" (ngSubmit)="save()" novalidate>
+        <section class="card form-section profile-identity" aria-labelledby="identity-heading">
+          <div class="card-header">
+            <span class="card-icon"><app-icon name="user" /></span>
+            <h2 id="identity-heading">How family members know you</h2>
+          </div>
+          <div class="field">
+            <label for="display-name">Display name <span aria-hidden="true">*</span></label>
+            <input
+              id="display-name"
+              type="text"
+              formControlName="displayName"
+              maxlength="100"
+              autocomplete="name"
+              aria-describedby="display-name-help display-name-error"
+            />
+            <p id="display-name-help" class="help">
+              Visible to active members of your family group.
+            </p>
+            @if (
+              profileForm.controls.displayName.touched && profileForm.controls.displayName.invalid
+            ) {
+              <p id="display-name-error" class="field-error">
+                Enter a display name of 1–100 characters.
+              </p>
+            }
+          </div>
+        </section>
+
+        <section class="card form-section profile-birthday" aria-labelledby="birthday-heading">
+          <div class="card-header">
+            <span class="card-icon"><app-icon name="calendar" /></span>
+            <h2 id="birthday-heading">Optional birthday</h2>
+          </div>
+          <p class="section-help">Month and day only. We do not collect a birth year.</p>
+          <div class="birthday-grid">
+            <div class="field">
+              <label for="birthday-month">Month</label>
+              <input
+                id="birthday-month"
+                type="number"
+                min="1"
+                max="12"
+                formControlName="birthdayMonth"
+              />
+            </div>
+            <div class="field">
+              <label for="birthday-day">Day</label>
+              <input
+                id="birthday-day"
+                type="number"
+                min="1"
+                max="31"
+                formControlName="birthdayDay"
+              />
+            </div>
+            <div class="field">
+              <label for="birthday-visibility">Who can see your birthday?</label>
+              <select id="birthday-visibility" formControlName="birthdayVisibility">
+                @for (option of visibilityOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          @if (
+            profileForm.touched &&
+            (profileForm.hasError('birthdayPair') || profileForm.hasError('birthdayDate'))
+          ) {
+            <p class="field-error">Enter a valid month and day together, or leave both empty.</p>
+          }
+        </section>
+
+        <section class="card form-section profile-contact" aria-labelledby="contact-heading">
+          <div class="card-header">
+            <span class="card-icon"><app-icon name="link" /></span>
+            <h2 id="contact-heading">Optional contact details</h2>
+          </div>
+          <p class="section-help">Each detail starts private. Sharing is always your choice.</p>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="contact-email">Contact email</label>
+              <input
+                id="contact-email"
+                type="email"
+                formControlName="contactEmail"
+                maxlength="254"
+                autocomplete="email"
+                aria-describedby="contact-email-help contact-email-error"
+              />
+              <p id="contact-email-help" class="help">
+                This is separate from your sign-in information.
+              </p>
+              @if (
+                profileForm.controls.contactEmail.touched &&
+                profileForm.controls.contactEmail.invalid
+              ) {
+                <p id="contact-email-error" class="field-error">Enter a valid contact email.</p>
+              }
+            </div>
+            <div class="field">
+              <label for="contact-email-visibility">Who can see your contact email?</label>
+              <select id="contact-email-visibility" formControlName="contactEmailVisibility">
+                @for (option of visibilityOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="contact-phone">Contact phone</label>
+              <input
+                id="contact-phone"
+                type="tel"
+                formControlName="contactPhone"
+                maxlength="32"
+                autocomplete="tel"
+              />
+            </div>
+            <div class="field">
+              <label for="contact-phone-visibility">Who can see your contact phone?</label>
+              <select id="contact-phone-visibility" formControlName="contactPhoneVisibility">
+                @for (option of visibilityOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <div class="action-bar">
+          <button type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save profile' }}
+          </button>
+        </div>
+      </form>
+
+      @if (view() === 'profile' && profileReview()) {
+        <div class="profile-review-end">
+          <button type="button" [disabled]="saving()" (click)="continueToHome()">Continue to Home</button>
+        </div>
+      }
+
+      <section [hidden]="view() !== 'events' && view() !== 'eventsAll' && view() !== 'eventCreate'" class="events-page" aria-labelledby="events-heading">
+        <h2 id="events-heading" class="visually-hidden">Family events</h2>
+        @if (!familyGroupsLoaded()) {
+          <p class="events-state events-state--loading" role="status">Loading family groups…</p>
+        } @else if (activeFamilyGroups().length === 0) {
+          @if (!sharedNoFamilyPromptShown()) {
+            <p class="card events-state events-state--no-family">Family access begins through an administrator invitation or controlled setup. Open a valid invitation link to respond.</p>
+          }
+        } @else {
+          @if (view() === 'events') {
+            <!-- Events dashboard (WI-009-008, references/ux/home-dashboard panel ③). DOM order is the narrow reading order:
+                 Upcoming Events, Trips, Quick Links, RSVPs Needed; the grid places the cards in panel ③'s 2 × 2 on wider screens.
+                 Every row comes from an existing authorized read for the selected Family. RSVPs Needed is a placeholder only. -->
+            <div class="events-grid">
+              <section class="card events-dash-card events-dash--upcoming" aria-labelledby="events-upcoming-heading">
+                <div class="card-header">
+                  <span class="card-icon"><app-icon name="calendar" /></span>
+                  <h2 id="events-upcoming-heading">Upcoming Events</h2>
+                  <a class="link-button events-view-all" routerLink="/events/all" [state]="focusHeadingState" aria-label="View all Events">View all</a>
+                </div>
+                @if (eventsLoading()) { <p role="status">Loading Events…</p> }
+                @else if (eventsLoadError()) { <p class="message message--error" role="alert">{{ eventsLoadError() }}</p> }
+                @else if (dashboardEvents().length > 0) {
+                  <ul class="events-preview-list row-list">
+                    @for (event of dashboardEvents(); track event.eventId) {
+                      @let tile = dateTile(event.date);
+                      <li class="item-row">
+                        <span class="date-tile" aria-hidden="true"><small>{{ tile.month }}</small>{{ tile.day }}</span>
+                        <span class="item-main"><strong><a class="item-link" [routerLink]="['/events', event.eventId]" [state]="focusHeadingState">{{ event.name }}</a></strong><span class="item-meta">{{ displayDateTime(event.date, event.time) }}</span>@if (event.location) {<span class="item-meta">{{ event.location }}</span>}</span>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <p class="events-dash-empty">No upcoming Events are shared with you yet. Past Events stay in All events.</p>
+                }
+              </section>
+
+              <section class="card events-dash-card events-dash--trips" aria-labelledby="events-trips-heading">
+                <div class="card-header">
+                  <span class="card-icon"><app-icon name="plane" /></span>
+                  <h2 id="events-trips-heading">Trips</h2>
+                  <a class="link-button events-view-all" routerLink="/trips" [state]="focusHeadingState" aria-label="View all Trips">View all</a>
+                </div>
+                @if (homeTripsLoading()) { <p role="status">Loading Trips…</p> }
+                @else if (homeTripsError()) { <p class="message message--error" role="alert">{{ homeTripsError() }}</p> }
+                @else if (homeTrips().length > 0) {
+                  <ul class="events-preview-list row-list">
+                    @for (trip of homeTrips(); track trip.tripId) {
+                      @let tile = dateTile(trip.startDate);
+                      <li class="item-row">
+                        <span class="date-tile" aria-hidden="true"><small>{{ tile.month }}</small>{{ tile.day }}</span>
+                        <span class="item-main"><strong><a class="item-link" [routerLink]="['/trips', trip.tripId]" [state]="focusHeadingState">{{ trip.title }}</a></strong><span class="item-meta">{{ displayRange(trip.startDate, trip.endDate) }}</span><span class="item-meta">{{ trip.primaryDestination }}</span></span>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <p class="events-dash-empty">No Trips in {{ selectedFamily()?.name }} are available to you yet.</p>
+                }
+              </section>
+
+              <nav class="card events-dash-card events-dash--links" aria-labelledby="events-links-heading">
+                <div class="card-header">
+                  <span class="card-icon"><app-icon name="link" /></span>
+                  <h2 id="events-links-heading">Quick Links</h2>
+                </div>
+                <ul class="events-quick-links">
+                  @for (link of eventQuickLinks; track link.id) {
+                    <li><a class="events-quick-link" [routerLink]="link.path" [state]="focusHeadingState">
+                      <span class="events-quick-icon"><app-icon [name]="link.icon" /></span>
+                      <span class="events-quick-text"><strong>{{ link.label }}</strong><span>{{ link.detail }}</span></span>
+                    </a></li>
+                  }
+                </ul>
+              </nav>
+
+              <section class="card events-dash-card home-future events-dash--rsvps" aria-labelledby="events-rsvps-heading">
+                <div class="card-header">
+                  <span class="card-icon"><app-icon name="check" /></span>
+                  <h2 id="events-rsvps-heading">RSVPs Needed</h2>
+                </div>
+                <p class="home-future-note">Event invitations that need your response will appear here.</p>
+              </section>
+            </div>
+          }
+
+          @if (view() === 'eventsAll') {
+          <div class="events-subpage">
+          <section class="card events-overview" aria-labelledby="upcoming-events-heading">
+            <div class="card-header">
+              <span class="card-icon"><app-icon name="calendar" /></span>
+              <h2 id="upcoming-events-heading">Events you can see</h2>
+              @if (familyEvents().length > 0) { <span class="card-count">{{ familyEvents().length }}</span> }
+            </div>
+            @if (eventsLoading()) {
+              <p class="events-state events-state--loading" role="status">Loading events…</p>
+            } @else if (eventsLoadError()) {
+              <p class="message message--error events-state" role="alert">{{ eventsLoadError() }}</p>
+            } @else if (familyEvents().length === 0) {
+              <p class="empty-state events-state events-state--empty">No Events are currently shared with you in this Family. Events are for coordinating family gatherings and activities.</p>
+            } @else {
+              <ul class="event-list row-list">
+                @for (event of familyEvents(); track event.eventId) {
+                  <li class="events-card">
+                    <ng-container *ngTemplateOutlet="eventCard; context: { $implicit: event, detail: false }" />
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+          </div>
+          }
+
+          <!-- WI-009-008 D4: the create form moved here unchanged from beside the list. -->
+          @if (view() === 'eventCreate') {
+          <div class="events-subpage events-subpage--create">
+          <section class="card events-create-panel" aria-labelledby="events-create-heading">
+          <div class="card-header">
+            <span class="card-icon"><app-icon name="plus" /></span>
+            <h2 id="events-create-heading">Create an Event</h2>
+          </div>
+          <form class="events-create-form" [formGroup]="eventForm" (ngSubmit)="createEvent()" novalidate>
+            <div class="field-grid">
+              <div class="field">
+                <label for="event-name">Event name <span aria-hidden="true">*</span></label>
+                <input id="event-name" type="text" formControlName="name" required />
+              </div>
+              <div class="field">
+                <label for="event-location">Location <span aria-hidden="true">*</span></label>
+                <input id="event-location" type="text" formControlName="location" required />
+              </div>
+            </div>
+            <div class="field">
+              <label for="event-description">Description <span aria-hidden="true">*</span></label>
+              <textarea id="event-description" formControlName="description" required></textarea>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="event-date">Date <span aria-hidden="true">*</span></label>
+                <input id="event-date" type="date" formControlName="date" required />
+              </div>
+              <div class="field">
+                <label for="event-time">Time <span aria-hidden="true">*</span></label>
+                <input id="event-time" type="time" formControlName="time" required />
+              </div>
+            </div>
+            <p class="help">The event time is shown as entered; this slice does not convert time zones.</p>
+
+            <fieldset class="audience-fieldset events-audience">
+              <legend>Who can see or edit this event? <span aria-hidden="true">*</span></legend>
+              <p class="help">Choose view or edit access for each active adult in this family group.</p>
+              @if (availableEventAudienceMembers().length > 1) {
+                <div class="field">
+                  <label for="event-audience-search">Filter family members</label>
+                  <input
+                    id="event-audience-search"
+                    type="search"
+                    [value]="eventAudienceSearch()"
+                    (input)="eventAudienceSearch.set($any($event.target).value)"
+                  />
+                </div>
+              }
+              @if (availableEventAudienceMembers().length === 0) {
+                <div class="events-audience-state">
+                  <p>No other active adult family members are available to select.</p>
+                  <p>To create an Event, choose at least one other active adult to share it with.</p>
+                </div>
+              } @else if (visibleEventAudienceMembers().length === 0) {
+                <p class="events-state events-state--no-match">No family members match that filter.</p>
+              } @else {
+                <ul class="event-access-list">
+                  @for (member of visibleEventAudienceMembers(); track member.profileId) {
+                    <li>
+                      <label [for]="'event-access-' + member.profileId">{{ member.displayName }}</label>
+                      <select
+                        [id]="'event-access-' + member.profileId"
+                        [value]="eventAccessForMember(member.profileId)"
+                        (change)="setEventMemberAccess(member.profileId, $any($event.target).value)"
+                      >
+                        <option value="none">No access</option>
+                        <option value="view">Can view</option>
+                        <option value="edit">Can edit and view</option>
+                      </select>
+                    </li>
+                  }
+                </ul>
+              }
+            </fieldset>
+
+            @if (eventError()) {
+              <p class="message message--error events-feedback" role="alert">{{ eventError() }}</p>
+            }
+            @if (eventMessage()) {
+              <p class="message message--success events-feedback" role="status">{{ eventMessage() }}</p>
+            }
+            <button
+              type="submit"
+              [disabled]="eventSubmitting() || availableEventAudienceMembers().length === 0"
+            >
+              {{ eventSubmitting() ? 'Creating event…' : 'Create event' }}
+            </button>
+          </form>
+          </section>
+          </div>
+          }
+        }
+      </section>
+
+      <section [hidden]="view() !== 'plans'" class="plans-page" aria-labelledby="plans-heading">
+        <h2 id="plans-heading" class="visually-hidden">Plans</h2>
+        @if (!familyGroupsLoaded()) {
+          <p class="plans-state" role="status">Loading family groups…</p>
+        } @else if (activeFamilyGroups().length === 0) {
+          @if (!sharedNoFamilyPromptShown()) {
+            <p class="card plans-state">Family access begins through an administrator invitation or controlled setup. Open a valid invitation link to respond.</p>
+          }
+        } @else {
+          <div class="split-layout plans-layout">
+          <section class="card plans-overview" aria-labelledby="visible-plans-heading">
+            <div class="card-header">
+              <span class="card-icon"><app-icon name="clipboard" /></span>
+              <div>
+                <h2 id="visible-plans-heading">Plans you can see</h2>
+                <p class="card-sub">Review the timing and details shared with you.</p>
+              </div>
+              @if (familyPlans().length > 0) { <span class="card-count">{{ familyPlans().length }}</span> }
+            </div>
+            @if (plansLoading()) {
+              <p class="plans-state" role="status">Loading plans…</p>
+            } @else if (plansLoadError()) {
+              <p class="plans-state plans-state--error message message--error" role="alert">{{ plansLoadError() }}</p>
+            } @else if (familyPlans().length === 0) {
+              <p class="empty-state plans-state plans-state--empty">No Plans are currently visible to you in this Family. A Plan is a lightweight way to share a future activity or destination.</p>
+            } @else {
+              <ul class="plans-list row-list">
+                @for (plan of familyPlans(); track plan.planId) {
+                  <li class="plans-card">
+                    <ng-container *ngTemplateOutlet="planCard; context: { $implicit: plan, detail: false }" />
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+
+          <section class="card plans-create-panel" aria-labelledby="create-plan-heading">
+          <div class="card-header">
+            <span class="card-icon"><app-icon name="plus" /></span>
+            <div>
+              <h2 id="create-plan-heading">Create a Plan</h2>
+              <p class="card-sub">Choose the details and audience for this Plan.</p>
+            </div>
+          </div>
+          <form class="plans-form" [formGroup]="planForm" (ngSubmit)="createPlan()" novalidate>
+            <div class="field">
+              <label for="plan-activity">Activity or destination <span aria-hidden="true">*</span></label>
+              <input id="plan-activity" type="text" maxlength="200" formControlName="activityOrDestination" required />
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="plan-date">Date <span aria-hidden="true">*</span></label>
+                <input id="plan-date" type="date" formControlName="date" required />
+              </div>
+              <div class="field">
+                <label for="plan-time">Time <span aria-hidden="true">*</span></label>
+                <input id="plan-time" type="time" formControlName="time" required />
+              </div>
+            </div>
+
+            <section class="plans-optional-fields" aria-labelledby="plan-optional-heading">
+              <h3 id="plan-optional-heading">Optional details</h3>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="plan-return-date">Expected return date</label>
+                  <input id="plan-return-date" type="date" formControlName="expectedReturnDate" />
+                </div>
+                <div class="field">
+                  <label for="plan-return-time">Expected return time</label>
+                  <input id="plan-return-time" type="time" formControlName="expectedReturnTime" />
+                </div>
+              </div>
+            </section>
+
+            <fieldset class="audience-fieldset plans-audience">
+              <legend>Who can see this plan? <span aria-hidden="true">*</span></legend>
+              <label class="checkbox-label">
+                <input
+                  id="plan-audience-group"
+                  type="radio"
+                  name="audienceType"
+                  value="FamilyGroup"
+                  formControlName="audienceType"
+                  required
+                  (change)="onPlanAudienceTypeChange()"
+                />
+                This Family Group
+              </label>
+              <label class="checkbox-label">
+                <input
+                  id="plan-audience-people"
+                  type="radio"
+                  name="audienceType"
+                  value="SelectedPeople"
+                  formControlName="audienceType"
+                  required
+                  (change)="onPlanAudienceTypeChange()"
+                />
+                Selected people
+              </label>
+
+              @if (planForm.controls.audienceType.value === 'SelectedPeople') {
+                @if (visiblePlanAudienceMembers().length > 1) {
+                  <div class="field">
+                    <label for="plan-audience-search">Filter family members</label>
+                    <input
+                      id="plan-audience-search"
+                      type="search"
+                      [value]="planAudienceSearch()"
+                      (input)="planAudienceSearch.set($any($event.target).value)"
+                    />
+                  </div>
+                }
+                @if (visiblePlanAudienceMembers().length === 0) {
+                  <p>No other active adult family members are available to select.</p>
+                } @else if (visiblePlanAudienceMembers().length > 0) {
+                  <ul class="checkbox-list" aria-label="Active adult plan recipients">
+                    @for (member of visiblePlanAudienceMembers(); track member.profileId) {
+                      <li>
+                        <label class="checkbox-label" [for]="'plan-recipient-' + member.profileId">
+                          <input
+                            [id]="'plan-recipient-' + member.profileId"
+                            type="checkbox"
+                            [checked]="isPlanAudienceSelected(member.profileId)"
+                            (change)="setPlanAudienceMember(member.profileId, $any($event.target).checked)"
+                          />
+                          {{ member.displayName }}
+                        </label>
+                      </li>
+                    }
+                  </ul>
+                }
+              }
+              <p class="help">Plan audience choices do not start location sharing or send notifications.</p>
+            </fieldset>
+
+            <div class="plans-optional-fields">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="plan-checkin-date">Expected check-in date</label>
+                  <input id="plan-checkin-date" type="date" formControlName="expectedCheckInDate" />
+                </div>
+                <div class="field">
+                  <label for="plan-checkin-time">Expected check-in time</label>
+                  <input id="plan-checkin-time" type="time" formControlName="expectedCheckInTime" />
+                </div>
+              </div>
+              <div class="field plans-notes-field">
+                <label for="plan-notes">Notes <span class="help">(optional, up to 1,000 characters)</span></label>
+                <textarea id="plan-notes" formControlName="notes" rows="4" maxlength="1000" aria-describedby="plan-notes-audience"></textarea>
+                <p class="field-hint" id="plan-notes-audience">
+                  Notes are visible to the audience selected for this Plan. For a whole-group Plan, future active adult members can also see the Plan and its notes.
+                </p>
+                @if (planForm.controls.notes.touched && planForm.controls.notes.hasError('maxlength')) {
+                  <p class="message message--error">Notes cannot exceed 1,000 characters.</p>
+                }
+              </div>
+            </div>
+
+            @if (planError()) {
+              <p class="message message--error" role="alert">{{ planError() }}</p>
+            }
+            @if (planMessage()) {
+              <p class="message message--success" role="status">{{ planMessage() }}</p>
+            }
+            <button
+              type="submit"
+              [disabled]="planSubmitting() || (planForm.controls.audienceType.value === 'SelectedPeople' && visiblePlanAudienceMembers().length === 0)"
+            >
+              {{ planSubmitting() ? 'Creating plan…' : 'Create plan' }}
+            </button>
+          </form>
+          </section>
+          </div>
+        }
+      </section>
+
+    @if (view() === 'eventItem' || view() === 'planItem') {
+      @let kind = view() === 'eventItem' ? 'event' : 'plan';
+      <section class="item-page" [attr.aria-label]="kind === 'event' ? 'Event' : 'Plan'">
+        @switch (itemStatus()) {
+          @case ('loading') { <p role="status">Loading {{ kind === 'event' ? 'Event' : 'Plan' }}…</p> }
+          @case ('unavailable') { <app-item-unavailable [kind]="kind" /> }
+          @case ('error') { <p class="message message--error" role="alert">{{ itemError() }}</p> }
+          @case ('ready') {
+            @if (kind === 'event') {
+              <a class="button-link button--secondary item-back" routerLink="/events" [state]="focusHeadingState">Back to Events</a>
+              @if (itemEvent(); as event) {
+                <article class="card events-card item-detail" aria-label="Event details">
+                  <ng-container *ngTemplateOutlet="eventCard; context: { $implicit: event, detail: true }" />
+                  @if (eventMessage()) { <p class="message message--success events-feedback" role="status">{{ eventMessage() }}</p> }
+                </article>
+              }
+            } @else {
+              <a class="button-link button--secondary item-back" routerLink="/plans" [state]="focusHeadingState">Back to Plans</a>
+              @if (itemPlan(); as plan) {
+                <article class="card plans-card item-detail" aria-label="Plan details">
+                  <ng-container *ngTemplateOutlet="planCard; context: { $implicit: plan, detail: true }" />
+                </article>
+              }
+            }
+          }
+        }
+      </section>
+    }
+    @if (view() === 'concerns' || view() === 'concernItem') {
+      <app-concerns [currentFamilyId]="currentFamilyId()" [ownProfileId]="ownerProfile()?.profileId ?? null"
+        [concernId]="view() === 'concernItem' ? routeItemId() : null" [adoptItemFamily]="adoptAuthorizedItemFamily" />
+    }
+    @if (view() === 'incidents') {
+      @defer (on immediate) {
+        <app-incidents [currentFamilyId]="currentFamilyId()" [ownProfileId]="ownerProfile()?.profileId ?? null"
+          [families]="activeFamilyGroups()" [adoptItemFamily]="adoptAuthorizedItemFamily" />
+      } @loading {
+        <p role="status">Loading Incidents…</p>
+      }
+    }
+    @if (view() === 'trips' && (selectedFamily() || (familyGroupsLoaded() && !membershipError() && activeFamilyGroups().length === 0))) {
+        @for (familyKey of [currentFamilyId()]; track familyKey) {
+          <app-trips [activeGroups]="selectedFamily() ? [selectedFamily()!] : []"
+            [allActiveGroups]="activeFamilyGroups()" [currentFamilyId]="familyKey"
+            [ownProfileId]="ownerProfile()?.profileId ?? null" />
+        }
+      }
+    <!-- A Trip item is not re-keyed on the Family: one read; the Family decision updates its inputs. -->
+    @if (view() === 'tripItem') {
+      <app-trips [tripId]="routeItemId()" [adoptItemFamily]="adoptAuthorizedItemFamily"
+        [activeGroups]="selectedFamily() ? [selectedFamily()!] : []" [allActiveGroups]="activeFamilyGroups()"
+        [currentFamilyId]="currentFamilyId()" [ownProfileId]="ownerProfile()?.profileId ?? null" />
+    }
+
+      <!-- Family dashboard (WI-009-007; prototype panel ②): members and member details, then the coordination grid.
+           .home-future cards reserve places for capabilities that do not exist yet: no data, requests, or actions. -->
+      <!-- WI-009-010 O11: with no Family the shared prompt is the page's one message, so the directory card is hidden. -->
+      <section [hidden]="view() !== 'family' || sharedNoFamilyPromptShown()" class="family-space family-dashboard" aria-label="Family dashboard">
+        <div class="family-main">
+          <section class="card family-directory-card" aria-labelledby="family-directory-heading">
+            <div class="card-header">
+              <span class="card-icon"><app-icon name="users" /></span>
+              <div>
+                <h2 id="family-directory-heading">Family members</h2>
+                <p class="card-sub">Choose a member to see the profile details they chose to share.</p>
+              </div>
+            </div>
+
+            @if (!familyGroupsLoaded()) {
+              <p role="status">Loading family groups…</p>
+            } @else if (activeFamilyGroups().length === 0) {
+              <p>You do not currently have an active family group.</p>
+            } @else {
+              <form class="directory-filter" role="search" [formGroup]="directoryForm" (ngSubmit)="searchDirectory()" novalidate>
+                <div class="field">
+                  <label for="directory-search">Filter by display name</label>
+                  <input id="directory-search" type="search" formControlName="search" />
+                </div>
+                <button type="submit" class="button--secondary" [disabled]="directoryLoading()">Filter members</button>
+                @if (directoryForm.controls.search.value) {
+                  <button type="button" class="button--secondary" [disabled]="directoryLoading()" (click)="clearDirectoryFilter()">Clear filter</button>
+                }
+              </form>
+
+              @if (directoryError()) {
+                <p class="message message--error" role="alert">{{ directoryError() }}</p>
+              }
+              @if (directoryLoading()) {
+                <p role="status">Loading family members…</p>
+              } @else if (directoryMembers().length === 0 && !directoryError()) {
+                @if (directoryForm.controls.search.value?.trim()) {
+                  <p>No active adult family members match this filter.</p>
+                  <button type="button" class="button--secondary" (click)="clearDirectoryFilter()">Clear filter</button>
+                } @else {
+                  <p>No active adult Family members are currently available to show.</p>
+                }
+              } @else {
+                <ul class="member-list" aria-label="Active adult family members">
+                  @for (member of directoryMembers(); track member.profileId) {
+                    <li>
+                      <button
+                        type="button"
+                        class="member-button"
+                        [class.member-button--selected]="selectedMember()?.profileId === member.profileId"
+                        (click)="selectDirectoryMember(member)"
+                      >
+                        <span class="avatar" aria-hidden="true">{{ initials(member.displayName) }}</span>
+                        <span class="member-text">
+                          <span class="member-name">{{ member.displayName }}</span>
+                          @if (memberTileNote(member.profileId); as note) { <span class="member-note">{{ note }}</span> }
+                        </span>
+                        <app-icon name="chevron" />
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+              @if (directoryMembers().length === 1 && !directoryLoading() && !directoryError()) {
+                <p class="help">This Family currently shows one active adult member. A Family administrator may invite another adult.</p>
+              }
+            }
+          </section>
+
+          @if (selectedMember(); as member) {
+            <section class="card member-detail" aria-labelledby="selected-member-heading">
+              <div class="member-detail-heading">
+                <span class="avatar avatar--large" aria-hidden="true">{{ initials(member.displayName) }}</span>
+                <div>
+                  <h2 id="selected-member-heading">{{ member.displayName }}</h2>
+                  <p class="card-sub">Shared profile details</p>
+                </div>
+              </div>
+              <div class="member-detail-fields">
+              @if (member.contactEmail) {
+                <p><strong>Email:</strong> {{ member.contactEmail }}</p>
+              }
+              @if (member.contactPhone) {
+                <p><strong>Phone:</strong> {{ member.contactPhone }}</p>
+              }
+              @if (member.birthdayMonth && member.birthdayDay) {
+                <p>
+                  <strong>Birthday:</strong> {{ member.birthdayMonth }}/{{ member.birthdayDay }}
+                </p>
+              }
+              @if (!member.contactEmail && !member.contactPhone && !member.birthdayMonth) {
+                <p class="member-detail-empty">No optional profile details are shared.</p>
+              }
+              @for (relationship of acceptedRelationshipsFor(member.profileId); track relationship.relationshipId) {
+                <p>
+                  <strong>Relationship:</strong> {{ relationship.proposerDisplayName }}: {{ relationshipLabelText(relationship.proposerLabel) }}
+                  and {{ relationship.recipientDisplayName }}: {{ relationshipLabelText(relationship.recipientLabel) }}
+                </p>
+              }
+              </div>
+            </section>
+          } @else if (familyGroupsLoaded() && activeFamilyGroups().length > 0) {
+            <section class="card member-detail member-detail--placeholder" aria-label="Member details">
+              <span class="card-icon"><app-icon name="user" /></span>
+              <p>Choose a family member to see the profile details they chose to share.</p>
+            </section>
+          }
+        </div>
+
+        @if (familyGroupsLoaded() && activeFamilyGroups().length > 0) {
+          <div class="family-coordination">
+            <!-- D2: real, actionable items only. Today that is relationship suggestions sent to you. -->
+            <section class="card family-waiting" aria-labelledby="family-waiting-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="heart" /></span>
+                <div>
+                  <h2 id="family-waiting-heading">Waiting for you</h2>
+                  @if (incomingRelationshipSuggestions().length) {
+                    <p class="card-sub">{{ incomingRelationshipSuggestions().length === 1 ? '1 relationship suggestion' : incomingRelationshipSuggestions().length + ' relationship suggestions' }}</p>
+                  }
+                </div>
+                <a class="family-card-link" routerLink="/family/settings" [state]="focusHeadingState">Manage<span class="visually-hidden"> relationships in Family settings</span><app-icon name="chevron" /></a>
+              </div>
+              @if (relationshipError()) {
+                <p class="message message--error" role="alert">{{ relationshipError() }}</p>
+              }
+              @if (relationshipMessage()) {
+                <p class="message message--success" role="status">{{ relationshipMessage() }}</p>
+              }
+              @if (incomingRelationshipSuggestions().length) {
+                <ul class="family-waiting-list" aria-label="Relationship suggestions waiting for you">
+                  @for (relationship of incomingRelationshipSuggestions(); track relationship.relationshipId) {
+                    <li class="family-request">
+                      <span class="avatar" aria-hidden="true">{{ initials(relationship.proposerDisplayName) }}</span>
+                      <div class="family-request-main">
+                        <p class="family-request-title"><strong>{{ relationship.proposerDisplayName }}</strong> suggested a relationship</p>
+                        <p class="help">
+                          {{ relationshipLabelText(relationship.proposerLabel) }} to them and
+                          {{ relationshipLabelText(relationship.recipientLabel) }} to you. Only you and this person
+                          can see the suggestion unless you accept.
+                        </p>
+                        <div class="button-row">
+                          <button type="button" [disabled]="relationshipBusyId() === relationship.relationshipId"
+                            (click)="respondToRelationship(relationship, 'accept')">Accept relationship</button>
+                          <button type="button" class="button--secondary" [disabled]="relationshipBusyId() === relationship.relationshipId"
+                            (click)="respondToRelationship(relationship, 'decline')">Decline suggestion</button>
+                        </div>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              } @else if (relationshipLoading()) {
+                <p role="status">Checking for items waiting for you…</p>
+              } @else {
+                <p class="family-waiting-clear"><span class="row-icon row-icon--clear"><app-icon name="check" /></span>Nothing is waiting for you right now.</p>
+              }
+            </section>
+
+            <section class="card home-future family-future" aria-labelledby="family-birthdays-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="calendar" /></span>
+                <h2 id="family-birthdays-heading">Upcoming birthdays</h2>
+              </div>
+              <p class="home-future-note">Birthdays shared with your family will appear here.</p>
+            </section>
+
+            <section class="card home-future family-future" aria-labelledby="family-updates-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="message" /></span>
+                <h2 id="family-updates-heading">Recent Family Updates</h2>
+              </div>
+              <p class="home-future-note">Family updates will appear here as activity is shared.</p>
+            </section>
+
+            <section class="card home-future family-future" aria-labelledby="family-checkins-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="check" /></span>
+                <h2 id="family-checkins-heading">Recent Check-Ins</h2>
+              </div>
+              <p class="home-future-note">Recent family check-ins will appear here when available.</p>
+            </section>
+          </div>
+        }
+      </section>
+
+      <!-- Family Settings (WI-009-007). Reachable by every member; each section renders only for members who may use it today.
+           The server still authorizes every action. -->
+      <section [hidden]="view() !== 'familySettings'" class="family-space family-settings" aria-label="Family settings">
+        @if (selectedFamily(); as family) {
+          <div class="family-settings-top" [class.family-settings-top--single]="!canAdministerCurrentFamily()">
+            <section class="card family-details" aria-labelledby="family-details-heading">
+              <div class="card-header">
+                <span class="card-icon"><app-icon name="info" /></span>
+                <h2 id="family-details-heading">Family details</h2>
+              </div>
+              <dl class="family-facts">
+                <div><dt>Family</dt><dd>{{ family.name }}</dd></div>
+                <div><dt>Your membership</dt><dd>You are an active member.</dd></div>
+              </dl>
+              <p class="help">Membership and relationships do not grant access to every Event, Plan, Trip, or private profile field.</p>
+              <p class="help">A Family administrator can invite adult members. Administrator status does not provide access to private information.</p>
+              <p class="family-details-link"><a routerLink="/me" [state]="focusHeadingState">Edit what you share in your profile</a></p>
+            </section>
+
+            @if (canAdministerCurrentFamily()) {
+              <form [formGroup]="invitationForm" class="card admin-section family-admin-panel" novalidate>
+                <div class="card-header">
+                  <span class="card-icon"><app-icon name="plus" /></span>
+                  <h2 id="invite-heading">Invite an adult family member</h2>
+                </div>
+                <!-- WI-009-010 O7: the administrator privacy statement appears once, in Family details. -->
+                <p class="section-help">Administering {{ selectedFamily()?.name }}. Invite an adult, resend an invitation, or revoke one.</p>
+                <div class="field">
+                  <label for="invitation-email">Recipient email</label>
+                  <input
+                    id="invitation-email"
+                    type="email"
+                    maxlength="254"
+                    formControlName="recipientEmail"
+                  />
+                </div>
+                <div class="button-row">
+                  <button type="button" [disabled]="invitationBusy()" (click)="sendInvitation()">
+                    Send or resend invitation
+                  </button>
+                  <button
+                    type="button"
+                    class="button--secondary"
+                    [disabled]="invitationBusy()"
+                    (click)="revokeInvitation()"
+                  >
+                    Revoke invitation
+                  </button>
+                </div>
+                <!-- O7: feedback stays next to the action that produced it, so it is visible at 390 px. -->
+                @if (view() === 'familySettings' && invitationError()) {
+                  <p class="message message--error invite-feedback" role="alert">{{ invitationError() }}</p>
+                }
+                @if (view() === 'familySettings' && invitationMessage()) {
+                  <p class="message message--success invite-feedback" role="status">{{ invitationMessage() }}</p>
+                }
+              </form>
+            }
+          </div>
+
+          <section class="card relationship-section family-relationship-panel" aria-labelledby="relationships-heading">
+            <div class="card-header">
+              <span class="card-icon"><app-icon name="heart" /></span>
+              <h2 id="relationships-heading">Family relationships</h2>
+            </div>
+            <p class="section-help">
+              Relationship suggestions are private between the two adults until accepted. Accepted
+              relationships are visible to active adults in this family group and do not change
+              anyone's access or permissions.
+            </p>
+
+            @if (relationshipError()) {
+              <p class="message message--error" role="alert">{{ relationshipError() }}</p>
+            }
+            @if (relationshipMessage()) {
+              <p class="message message--success" role="status">{{ relationshipMessage() }}</p>
+            }
+            @if (relationshipLoading()) {
+              <p role="status">Updating family relationships…</p>
+            }
+
+            <h3 class="relationship-group-heading" id="relationship-suggest-heading">Suggest a relationship</h3>
+            <form class="relationship-form" [formGroup]="relationshipForm" (ngSubmit)="proposeRelationship()" aria-labelledby="relationship-suggest-heading" novalidate>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="relationship-member">Adult family member</label>
+                  <select id="relationship-member" formControlName="recipientProfileId">
+                    <option value="">Choose a family member</option>
+                    @for (member of availableRelationshipMembers(); track member.profileId) {
+                      <option [value]="member.profileId">{{ member.displayName }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="relationship-label">Your relationship to them</label>
+                  <select id="relationship-label" formControlName="proposerLabel">
+                    @for (option of relationshipLabelOptions; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+              <p class="help">
+                The other adult must accept. A relationship describes family context only; it does
+                not establish legal, caregiving, guardian, or emergency authority.
+              </p>
+              <button
+                type="submit"
+                [disabled]="relationshipSubmitting() || availableRelationshipMembers().length === 0"
+              >
+                Suggest relationship
+              </button>
+            </form>
+
+            @if (
+              !relationshipLoading() && familyRelationships().length === 0 && !relationshipError()
+            ) {
+              <p class="empty-state relationship-empty">No Family relationships or suggestions are currently visible here.</p>
+            }
+
+            @if (incomingRelationshipSuggestions().length) {
+              <h3 class="relationship-group-heading" id="relationship-incoming-heading">Waiting for you</h3>
+              <ul class="relationship-list" aria-labelledby="relationship-incoming-heading">
+                @for (relationship of incomingRelationshipSuggestions(); track relationship.relationshipId) {
+                  <li class="relationship-card relationship-card--incoming">
+                    <p>
+                      <strong>{{ relationship.proposerDisplayName }}</strong> suggests:
+                      {{ relationshipLabelText(relationship.proposerLabel) }} to them and
+                      {{ relationshipLabelText(relationship.recipientLabel) }} to you. Only you
+                      and this person can see the suggestion unless you accept.
+                    </p>
+                    <div class="button-row">
+                      <button
+                        type="button"
+                        [disabled]="relationshipBusyId() === relationship.relationshipId"
+                        (click)="respondToRelationship(relationship, 'accept')"
+                      >
+                        Accept relationship
+                      </button>
+                      <button
+                        type="button"
+                        class="button--secondary"
+                        [disabled]="relationshipBusyId() === relationship.relationshipId"
+                        (click)="respondToRelationship(relationship, 'decline')"
+                      >
+                        Decline suggestion
+                      </button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (outgoingRelationshipSuggestions().length) {
+              <h3 class="relationship-group-heading" id="relationship-outgoing-heading">Sent by you</h3>
+              <ul class="relationship-list" aria-labelledby="relationship-outgoing-heading">
+                @for (relationship of outgoingRelationshipSuggestions(); track relationship.relationshipId) {
+                  <li class="relationship-card relationship-card--outgoing">
+                    <p>
+                      Waiting for <strong>{{ relationship.recipientDisplayName }}</strong> to
+                      confirm {{ relationshipLabelText(relationship.proposerLabel) }}. Only the
+                      two of you can see this suggestion.
+                    </p>
+                    <button
+                      type="button"
+                      class="button--secondary"
+                      [disabled]="relationshipBusyId() === relationship.relationshipId"
+                      (click)="respondToRelationship(relationship, 'withdraw')"
+                    >
+                      Withdraw suggestion
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (acceptedRelationships().length) {
+              <h3 class="relationship-group-heading" id="relationship-accepted-heading">Accepted relationships</h3>
+              <ul class="relationship-list" aria-labelledby="relationship-accepted-heading">
+                @for (relationship of acceptedRelationships(); track relationship.relationshipId) {
+                  <li class="relationship-card relationship-card--accepted">
+                    <p>
+                      <strong>{{ relationship.proposerDisplayName }}</strong
+                      >:
+                      {{ relationshipLabelText(relationship.proposerLabel) }}
+                      <span aria-hidden="true"> and </span>
+                      <strong>{{ relationship.recipientDisplayName }}</strong
+                      >:
+                      {{ relationshipLabelText(relationship.recipientLabel) }}
+                    </p>
+                    @if (
+                      relationship.isCurrentUserProposer || relationship.isCurrentUserRecipient
+                    ) {
+                      @if (relationshipRemovalPendingId() === relationship.relationshipId) {
+                        <p role="status">
+                          Remove this relationship? It will no longer be visible in this family
+                          group.
+                        </p>
+                        <div class="button-row">
+                          <button
+                            type="button"
+                            class="button--secondary"
+                            [disabled]="relationshipBusyId() === relationship.relationshipId"
+                            (click)="respondToRelationship(relationship, 'remove')"
+                          >
+                            Confirm removal
+                          </button>
+                          <button
+                            type="button"
+                            class="button--secondary"
+                            (click)="cancelRelationshipRemoval()"
+                          >
+                            Keep relationship
+                          </button>
+                        </div>
+                      } @else {
+                        <button
+                          type="button"
+                          class="button--secondary"
+                          (click)="requestRelationshipRemoval(relationship.relationshipId)"
+                        >
+                          Remove relationship
+                        </button>
+                      }
+                    }
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        }
+      </section>
+    }
+    </div>
+  </main>
+</div>
+
+<!-- One Event card for the Events list and the Event item page (WI-009-005, OD-C); the list keeps its inline edit. -->
+<ng-template #eventCard let-event let-detail="detail">
+  @let idPrefix = detail ? 'item-edit-event-' : 'edit-event-';
+  @if (editingEventId() === event.eventId) {
+    <form class="events-edit-form" [formGroup]="eventEditForm" (ngSubmit)="saveEventEdits(event)" novalidate>
+      <p class="events-card-kicker">Editing Event</p>
+      @if (detail) { <h2>Edit {{ event.name }}</h2> } @else { <h3>Edit {{ event.name }}</h3> }
+      <div class="field-grid">
+        <div class="field">
+          <label [for]="idPrefix + 'name-' + event.eventId">Event name</label>
+          <input [id]="idPrefix + 'name-' + event.eventId" formControlName="name" required />
+        </div>
+        <div class="field">
+          <label [for]="idPrefix + 'location-' + event.eventId">Location</label>
+          <input [id]="idPrefix + 'location-' + event.eventId" formControlName="location" required />
+        </div>
+      </div>
+      <div class="field">
+        <label [for]="idPrefix + 'description-' + event.eventId">Description</label>
+        <textarea [id]="idPrefix + 'description-' + event.eventId" formControlName="description" required></textarea>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label [for]="idPrefix + 'date-' + event.eventId">Date</label>
+          <input [id]="idPrefix + 'date-' + event.eventId" type="date" formControlName="date" required />
+        </div>
+        <div class="field">
+          <label [for]="idPrefix + 'time-' + event.eventId">Time</label>
+          <input [id]="idPrefix + 'time-' + event.eventId" type="time" formControlName="time" required />
+        </div>
+      </div>
+      <p class="help">Event access and family membership cannot be changed here.</p>
+      @if (eventEditError()) {
+        <p class="message message--error events-feedback" role="alert">{{ eventEditError() }}</p>
+      }
+      <div class="event-actions">
+        <button type="submit" [disabled]="eventUpdating()">
+          {{ eventUpdating() ? 'Saving…' : 'Save event details' }}
+        </button>
+        <button type="button" class="secondary-button" (click)="cancelEventEdit()">Cancel</button>
+      </div>
+    </form>
+  } @else {
+    @let tile = dateTile(event.date);
+    <div class="item-row">
+      <span class="date-tile date-tile--large" aria-hidden="true"><small>{{ tile.month }}</small>{{ tile.day }}</span>
+      <div class="item-main">
+        @if (detail) {
+          <h2>{{ event.name }}</h2>
+        } @else {
+          <h3><a class="item-link" [routerLink]="['/events', event.eventId]" [state]="focusHeadingState">{{ event.name }}</a></h3>
+        }
+        <p class="item-meta"><span class="visually-hidden">Date and time: </span>{{ displayDateTime(event.date, event.time) }}</p>
+        <p class="item-meta"><span class="visually-hidden">Location: </span>{{ event.location }}</p>
+      </div>
+      @if (event.canEdit) {
+        <button type="button" class="secondary-button" (click)="beginEventEdit(event)">
+          Edit event details
+        </button>
+      }
+    </div>
+    <p class="events-description">{{ event.description }}</p>
+    <p class="help events-organizer">Organized by {{ event.organizerDisplayName }}</p>
+  }
+</ng-template>
+
+<!-- One read-only Plan card for the Plans list and the Plan item page (WI-009-005, OD-C). -->
+<ng-template #planCard let-plan let-detail="detail">
+  @let tile = dateTile(plan.date);
+  <div class="item-row">
+    <span class="date-tile date-tile--large" aria-hidden="true"><small>{{ tile.month }}</small>{{ tile.day }}</span>
+    <div class="item-main">
+      @if (detail) {
+        <h2>{{ plan.activityOrDestination }}</h2>
+      } @else {
+        <h3><a class="item-link" [routerLink]="['/plans', plan.planId]" [state]="focusHeadingState">{{ plan.activityOrDestination }}</a></h3>
+      }
+      <p class="item-meta"><span class="visually-hidden">Date and time: </span>{{ displayDateTime(plan.date, plan.time) }}</p>
+    </div>
+  </div>
+  @if ((plan.expectedReturnDate && plan.expectedReturnTime) || (plan.expectedCheckInDate && plan.expectedCheckInTime)) {
+    <dl class="plans-facts">
+      @if (plan.expectedReturnDate && plan.expectedReturnTime) {
+        <div class="plans-fact"><dt>Expected return</dt><dd>{{ displayDateTime(plan.expectedReturnDate, plan.expectedReturnTime) }}</dd></div>
+      }
+      @if (plan.expectedCheckInDate && plan.expectedCheckInTime) {
+        <div class="plans-fact"><dt>Expected check-in</dt><dd>{{ displayDateTime(plan.expectedCheckInDate, plan.expectedCheckInTime) }}</dd></div>
+      }
+    </dl>
+  }
+  @if (plan.notes) {
+    <div class="plans-note">
+      <p class="plans-card-kicker">Notes</p>
+      <p class="plan-notes">{{ plan.notes }}</p>
+    </div>
+  }
+  <p class="plans-creator">Planned by <strong>{{ plan.creatorDisplayName }}</strong></p>
+</ng-template>

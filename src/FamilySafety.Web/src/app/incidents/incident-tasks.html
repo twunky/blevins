@@ -1,0 +1,119 @@
+<section class="incident-card" aria-labelledby="incident-tasks-heading">
+  <div class="incident-card-heading">
+    <h3 id="incident-tasks-heading">Tasks</h3>
+    @if (canWrite && !mode()) {
+      <button type="button" class="incident-quiet" id="incident-add-task" (click)="open({ type: 'create' }, 'incident-add-task')">
+        {{ isCoordinator ? 'Add a task' : 'Add a task for yourself' }}
+      </button>
+    }
+  </div>
+  <p class="incident-meta">Tasks can't be edited or reassigned. To change one, cancel it and add a new task.</p>
+
+  @if (isMode('create')) {
+    <form class="incident-task-form" [formGroup]="createForm" (ngSubmit)="submitCreate()" novalidate>
+      <h4 id="incident-task-form-heading" tabindex="-1">{{ isCoordinator ? 'Add a task' : 'Add a task for yourself' }}</h4>
+      @if (hasErrors()) { <p id="incident-task-summary" role="alert" tabindex="-1">Review the highlighted details before saving.</p> }
+      <div class="incident-field">
+        <label for="task-description">Task description</label>
+        <textarea id="task-description" rows="2" maxlength="500" formControlName="description"
+          [attr.aria-invalid]="errors()['description'] ? true : null" [attr.aria-describedby]="describedBy('description')"></textarea>
+        @if (errors()['description']) { <p class="field-error" id="task-description-error">{{ errors()['description'] }}</p> }
+      </div>
+      @if (isCoordinator) {
+        <div class="incident-field">
+          <label for="task-assignee">Assign to</label>
+          <select id="task-assignee" formControlName="assigneeProfileId" [attr.aria-invalid]="errors()['assignee'] ? true : null" [attr.aria-describedby]="describedBy('assignee')">
+            <option value="">Choose a person with access</option>
+            @for (person of assigneeChoices(); track person.profileId) { <option [value]="person.profileId">{{ person.label }}</option> }
+          </select>
+          @if (errors()['assignee']) { <p class="field-error" id="task-assignee-error">{{ errors()['assignee'] }}</p> }
+        </div>
+      } @else {
+        <p class="incident-meta">Assigned to you</p>
+      }
+      @if (message()) { <p role="alert">{{ message() }}</p> }
+      <div class="incident-actions">
+        <button type="button" class="button--secondary" [disabled]="saving()" (click)="close()">Cancel</button>
+        <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Add task' }}</button>
+      </div>
+    </form>
+  }
+
+  @if (incident.tasks.length === 0) {
+    <p class="incident-muted">No tasks have been added.</p>
+  } @else {
+    <ul class="incident-task-list">
+      @for (task of incident.tasks; track task.taskId) {
+        <li class="incident-task">
+          <div class="incident-task-top">
+            <strong class="incident-text">{{ task.description }}</strong>
+            <span [class]="statusClass(task)">{{ statusText(task) }}</span>
+          </div>
+          <span class="incident-meta">Assigned to {{ task.assigneeName }}@if (task.assigneeProfileId === ownProfileId) { (you)}</span>
+          <span class="incident-meta">Added by {{ task.createdByName }} · <time [attr.datetime]="task.createdAt">{{ task.createdAt | date:dateTimeFormat }}</time></span>
+          @if (task.status === 'Done' && task.completedAt) {
+            <span class="incident-meta">Completed <time [attr.datetime]="task.completedAt">{{ task.completedAt | date:dateTimeFormat }}</time>
+              @if (task.resultEntryId) { · <a [href]="'#incident-entry-' + task.resultEntryId" (click)="focusEntry($event, task.resultEntryId)">View result<span class="visually-hidden"> for “{{ task.description }}”</span></a> }</span>
+          }
+          @if (task.status === 'Cancelled' && task.cancelledAt) {
+            <span class="incident-meta">Cancelled by {{ task.cancelledByName }} · <time [attr.datetime]="task.cancelledAt">{{ task.cancelledAt | date:dateTimeFormat }}</time></span>
+            @if (task.cancelReason) { <span class="incident-meta incident-text">Reason: {{ task.cancelReason }}</span> }
+          }
+
+          @if (!mode() && (canComplete(task) || canCancel(task))) {
+            <div class="incident-task-actions">
+              @if (canComplete(task)) {
+                <button type="button" class="incident-quiet" [id]="'task-complete-' + task.taskId" (click)="open({ type: 'complete', task }, 'task-complete-' + task.taskId)">Complete…<span class="visually-hidden"> {{ task.description }}</span></button>
+              }
+              @if (canCancel(task)) {
+                <button type="button" class="incident-quiet" [id]="'task-cancel-' + task.taskId" (click)="open({ type: 'cancel', task }, 'task-cancel-' + task.taskId)">Cancel task…<span class="visually-hidden"> {{ task.description }}</span></button>
+              }
+            </div>
+          }
+
+          @if (isMode('complete', task)) {
+            <form class="incident-task-form" [formGroup]="completeForm" (ngSubmit)="submitComplete(task)" novalidate>
+              <h4 id="incident-task-form-heading" tabindex="-1">Complete this task</h4>
+              @if (hasErrors()) { <p id="incident-task-summary" role="alert" tabindex="-1">Review the highlighted details before saving.</p> }
+              <div class="incident-field">
+                <label for="task-result">Result</label>
+                <textarea id="task-result" rows="3" maxlength="2000" formControlName="resultText"
+                  [attr.aria-invalid]="errors()['result'] ? true : null" [attr.aria-describedby]="describedBy('result')"></textarea>
+                @if (errors()['result']) { <p class="field-error" id="task-result-error">{{ errors()['result'] }}</p> }
+              </div>
+              <app-incident-provenance-fields [group]="completeForm.controls.provenance" prefix="task" legend="How is the result known?"
+                [categories]="['Confirmed', 'Reported', 'Assumption', 'Unknown']" [errors]="errors()" />
+              <div class="incident-field">
+                <label for="task-event-time">When did this happen? <span class="incident-hint">(optional)</span></label>
+                <input id="task-event-time" type="datetime-local" formControlName="eventAt" />
+              </div>
+              @if (message()) { <p role="alert">{{ message() }}</p> }
+              <div class="incident-actions">
+                <button type="button" class="button--secondary" [disabled]="saving()" (click)="close()">Cancel</button>
+                <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Complete task' }}</button>
+              </div>
+            </form>
+          }
+
+          @if (isMode('cancel', task)) {
+            <form class="incident-task-form" [formGroup]="cancelForm" (ngSubmit)="submitCancel(task)" novalidate>
+              <h4 id="incident-task-form-heading" tabindex="-1">Cancel this task</h4>
+              @if (hasErrors()) { <p id="incident-task-summary" role="alert" tabindex="-1">Review the highlighted details before saving.</p> }
+              <div class="incident-field">
+                <label for="task-cancel-reason">Reason for cancelling</label>
+                <textarea id="task-cancel-reason" rows="2" maxlength="1000" formControlName="reason"
+                  [attr.aria-invalid]="errors()['reason'] ? true : null" [attr.aria-describedby]="describedBy('reason')"></textarea>
+                @if (errors()['reason']) { <p class="field-error" id="task-reason-error">{{ errors()['reason'] }}</p> }
+              </div>
+              @if (message()) { <p role="alert">{{ message() }}</p> }
+              <div class="incident-actions">
+                <button type="button" class="button--secondary" [disabled]="saving()" (click)="close()">Keep task</button>
+                <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Cancel task' }}</button>
+              </div>
+            </form>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>

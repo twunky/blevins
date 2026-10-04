@@ -1,0 +1,31 @@
+﻿{
+    "startingDatabaseCount":  18,
+    "currentDatabaseCount":  18,
+    "differences":  [
+
+                    ],
+    "listeningPorts":  [
+
+                       ],
+    "apiProcessCount":  0,
+    "databases":  [
+                      "FamilySafety",
+                      "FamilySafety_Invitation_79558d15516649aeb6758a9e2496b6b7",
+                      "FamilySafety_Invitation_ConcernReview20261001",
+                      "FamilySafety_Invitation_ddf3f406d9024bc1ac330e46513b5209",
+                      "FamilySafety_Invitation_Review_WI008004",
+                      "FamilySafety_Invitation_ShellReview034731",
+                      "FamilySafety_Invitation_SiteReview044319",
+                      "FamilySafety_Invitation_SiteReview044420",
+                      "FamilySafety_Invitation_Stage1Retry_20260928_235812_c7f2",
+                      "FamilySafety_Invitation_WI075_Browser_20260928",
+                      "FamilySafety_Invitation_WI075004Visual",
+                      "FamilySafety_Invitation_WI075005_CodexAttempt_20260929",
+                      "FamilySafety_Invitation_WI075006VerifyHost",
+                      "FamilySafety_VisualReview",
+                      "FamilySafety_WI005001_Verification",
+                      "FamilySafety_WI005002_ConcurrencyTests",
+                      "FamilySafety_WI005002_Verification",
+                      "FamilySafety_WI005003_DirectoryTests"
+                  ]
+}

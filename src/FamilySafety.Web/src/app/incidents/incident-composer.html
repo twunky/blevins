@@ -1,0 +1,108 @@
+@if (request; as req) {
+  <section class="incident-card" aria-labelledby="incident-composer-heading">
+    <h3 id="incident-composer-heading" tabindex="-1">{{ copy[req.kind].heading }}</h3>
+    @if (req.target; as target) {
+      <blockquote class="incident-note incident-target">
+        <p class="incident-meta">{{ target.contributorName }} · {{ target.recordedAt | date:dateTimeFormat }}</p>
+        @if (target.text) { <p class="incident-text">{{ target.text }}</p> }
+      </blockquote>
+      <p class="incident-hint">This adds a separate entry linked to the original. The original stays as it was.</p>
+    }
+    @if (req.kind === 'Unknown') {
+      <p class="incident-hint">An Unknown records that no reliable answer is available yet.</p>
+    }
+    @if (req.kind === 'ContactAttempt') {
+      <p class="incident-hint">This records an attempt someone already made. The app does not call, text, or email anyone.</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      @if (hasErrors()) {
+        <p id="incident-composer-summary" role="alert" tabindex="-1">Review the highlighted details before saving.</p>
+      }
+
+      @if (req.kind === 'ContactAttempt') {
+        <fieldset class="incident-fieldset">
+          <legend>Who attempted contact?</legend>
+          <div class="incident-options">
+            <label class="incident-option"><input type="radio" name="composer-attempted-by" [checked]="form.controls.attemptedBy.value === 'me'" (change)="setAttemptedBy('me')" /> <span>I did</span></label>
+            <label class="incident-option"><input type="radio" name="composer-attempted-by" [checked]="form.controls.attemptedBy.value === 'someone'" (change)="setAttemptedBy('someone')" /> <span>Someone else</span></label>
+          </div>
+          @if (form.controls.attemptedBy.value === 'someone') {
+            <label for="composer-attempted-by">Who attempted contact</label>
+            <input id="composer-attempted-by" type="text" maxlength="200" formControlName="attemptedByDescription"
+              [attr.aria-invalid]="errors()['attemptedBy'] ? true : null" [attr.aria-describedby]="describedBy('attemptedBy')" />
+            @if (errors()['attemptedBy']) { <p class="field-error" id="composer-attemptedBy-error">{{ errors()['attemptedBy'] }}</p> }
+          }
+        </fieldset>
+        <div class="incident-field">
+          <label for="composer-target">Person or place contacted</label>
+          <input id="composer-target" type="text" maxlength="200" formControlName="targetLabel"
+            [attr.aria-invalid]="errors()['target'] ? true : null" [attr.aria-describedby]="'composer-target-hint' + (errors()['target'] ? ' composer-target-error' : '')" />
+          <p class="incident-hint" id="composer-target-hint">A name or short label. Do not enter phone numbers or addresses.</p>
+          @if (errors()['target']) { <p class="field-error" id="composer-target-error">{{ errors()['target'] }}</p> }
+        </div>
+        <div class="incident-row">
+          <div class="incident-field">
+            <label for="composer-method">Method</label>
+            <select id="composer-method" formControlName="method" [attr.aria-invalid]="errors()['method'] ? true : null" [attr.aria-describedby]="describedBy('method')">
+              <option value="">Choose a method</option>
+              @for (method of methods; track method.value) { <option [value]="method.value">{{ method.label }}</option> }
+            </select>
+            @if (errors()['method']) { <p class="field-error" id="composer-method-error">{{ errors()['method'] }}</p> }
+          </div>
+          <div class="incident-field">
+            <label for="composer-outcome">Outcome</label>
+            <select id="composer-outcome" formControlName="outcome" [attr.aria-invalid]="errors()['outcome'] ? true : null" [attr.aria-describedby]="describedBy('outcome')">
+              <option value="">Choose an outcome</option>
+              @for (outcome of outcomes; track outcome.value) { <option [value]="outcome.value">{{ outcome.label }}</option> }
+            </select>
+            @if (errors()['outcome']) { <p class="field-error" id="composer-outcome-error">{{ errors()['outcome'] }}</p> }
+          </div>
+        </div>
+        <fieldset class="incident-fieldset" [attr.aria-describedby]="describedBy('eventAt')">
+          <legend>When was contact attempted?</legend>
+          <p class="incident-hint">Enter a time, or choose Time unknown. One of the two is required.</p>
+          @if (!form.controls.timeUnknown.value) {
+            <label for="composer-event-time">Attempt time</label>
+            <input id="composer-event-time" type="datetime-local" formControlName="eventAt" [attr.aria-invalid]="errors()['eventAt'] ? true : null" />
+          }
+          <label class="incident-option"><input type="checkbox" [checked]="form.controls.timeUnknown.value" (change)="setTimeUnknown($any($event.target).checked)" /> <span>Time unknown</span></label>
+          @if (errors()['eventAt']) { <p class="field-error" id="composer-eventAt-error">{{ errors()['eventAt'] }}</p> }
+        </fieldset>
+      }
+
+      <div class="incident-field">
+        <label for="composer-text">{{ copy[req.kind].text }}</label>
+        <textarea id="composer-text" rows="3" maxlength="2000" formControlName="text"
+          [attr.aria-invalid]="errors()['text'] ? true : null" [attr.aria-describedby]="describedBy('text')"></textarea>
+        @if (errors()['text']) { <p class="field-error" id="composer-text-error">{{ errors()['text'] }}</p> }
+      </div>
+
+      @if (req.kind === 'Correction' || req.kind === 'Challenge') {
+        <div class="incident-field">
+          <label for="composer-explanation">Explanation</label>
+          <textarea id="composer-explanation" rows="2" maxlength="1000" formControlName="explanation"
+            [attr.aria-invalid]="errors()['explanation'] ? true : null" [attr.aria-describedby]="describedBy('explanation')"></textarea>
+          @if (errors()['explanation']) { <p class="field-error" id="composer-explanation-error">{{ errors()['explanation'] }}</p> }
+        </div>
+      }
+
+      <app-incident-provenance-fields [group]="form.controls.provenance" prefix="composer" [categories]="categories(req.kind)"
+        [showCategory]="req.kind !== 'Unknown'" [errors]="errors()" />
+
+      @if (req.kind !== 'ContactAttempt') {
+        <div class="incident-field">
+          <label for="composer-event-time">Event time <span class="incident-hint">(optional)</span></label>
+          <input id="composer-event-time" type="datetime-local" formControlName="eventAt" aria-describedby="composer-event-hint" />
+          <p class="incident-hint" id="composer-event-hint">Leave blank if the time is not known; it will show as “Event time unknown”.</p>
+        </div>
+      }
+
+      @if (message()) { <p role="alert">{{ message() }}</p> }
+      <div class="incident-actions">
+        <button type="button" class="button--secondary" [disabled]="saving()" (click)="cancel()">Cancel</button>
+        <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : copy[req.kind].submit }}</button>
+      </div>
+    </form>
+  </section>
+}

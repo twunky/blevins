@@ -1,0 +1,52 @@
+<section class="incident-card" aria-labelledby="incident-people-heading">
+  <div class="incident-card-heading">
+    <h3 id="incident-people-heading">People with access</h3>
+    @if (canManage() && !managing()) {
+      <button type="button" class="incident-quiet" id="incident-manage-people" (click)="startManaging()">Manage people with access</button>
+    }
+  </div>
+  <ul class="incident-people">
+    @for (person of people(); track person.profileId) {
+      <li>
+        <span class="incident-avatar" aria-hidden="true">{{ initials(person.displayName) }}</span>
+        <span>
+          <strong>{{ person.displayName }}@if (person.profileId === ownProfileId) { (you)}</strong>
+          <span class="incident-meta">
+            {{ person.isCoordinator ? 'Coordinator' : 'Participant' }}@if (person.profileId === incident.subjectProfileId) { · subject, added explicitly }
+          </span>
+        </span>
+      </li>
+    }
+  </ul>
+  @if (!subjectHasAccess()) {
+    <p class="incident-note">{{ incident.subjectName }} is the subject of this Incident and does not have access unless added.</p>
+  }
+  @if (canManage() && incident.participants.length === 1) {
+    <p class="incident-meta">Only you have access. Add people when you are ready.</p>
+  }
+  @if (message()) { <p role="alert">{{ message() }}</p> }
+
+  @if (managing()) {
+    @if (loadingMembers()) {
+      <p role="status">Loading active adult family members…</p>
+    } @else {
+      <fieldset class="incident-fieldset">
+        <legend id="incident-people-legend" tabindex="-1">People with access</legend>
+        <p class="incident-hint">Saving replaces this list. People you remove lose access right away. What they already added stays in the history.
+          Someone removed and added again gets new access; old access is never restored.</p>
+        @for (person of choices(); track person.profileId) {
+          <label class="incident-option">
+            <input type="checkbox" [checked]="isSelected(person.profileId)" (change)="toggle(person.profileId, $any($event.target).checked)" />
+            <span>{{ person.displayName }}@if (person.profileId === incident.subjectProfileId) { <span class="incident-hint">(subject)</span> }</span>
+          </label>
+        }
+        @if (choices().length === 0) { <p class="incident-hint">No other active adults are available to add.</p> }
+        <p class="incident-hint">The coordinator can't be removed. To step back, hand off coordination first.</p>
+      </fieldset>
+      <div class="incident-actions">
+        <button type="button" class="button--secondary" [disabled]="saving()" (click)="cancel()">Cancel</button>
+        <button type="button" [disabled]="saving()" (click)="save()">{{ saving() ? 'Saving…' : 'Save people with access' }}</button>
+      </div>
+    }
+  }
+</section>

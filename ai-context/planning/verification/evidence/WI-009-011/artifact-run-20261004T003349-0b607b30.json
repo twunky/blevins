@@ -1,0 +1,92 @@
+{
+    "runId":  "20261004T003349-0b607b30",
+    "createdAt":  "2026-10-04T00:33:49.202Z",
+    "server":  "localhost",
+    "preExistingListPath":  "C:\\Dev\\blevins\\scripts\\pre-existing-scenario-databases.txt",
+    "preExistingAtRunStart":  [
+                                  "FamilySafety",
+                                  "FamilySafety_Invitation_79558d15516649aeb6758a9e2496b6b7",
+                                  "FamilySafety_Invitation_ConcernReview20261001",
+                                  "FamilySafety_Invitation_ddf3f406d9024bc1ac330e46513b5209",
+                                  "FamilySafety_Invitation_Review_WI008004",
+                                  "FamilySafety_Invitation_ShellReview034731",
+                                  "FamilySafety_Invitation_SiteReview044319",
+                                  "FamilySafety_Invitation_SiteReview044420",
+                                  "FamilySafety_Invitation_Stage1Retry_20260928_235812_c7f2",
+                                  "FamilySafety_Invitation_WI075_Browser_20260928",
+                                  "FamilySafety_Invitation_WI075004Visual",
+                                  "FamilySafety_Invitation_WI075005_CodexAttempt_20260929",
+                                  "FamilySafety_Invitation_WI075006VerifyHost",
+                                  "FamilySafety_VisualReview",
+                                  "FamilySafety_WI005001_Verification",
+                                  "FamilySafety_WI005002_ConcurrencyTests",
+                                  "FamilySafety_WI005002_Verification",
+                                  "FamilySafety_WI005003_DirectoryTests"
+                              ],
+    "databases":  [
+                      {
+                          "name":  "FamilySafety_Invitation_E2E_85bf89b15dab4961b696113062d482f0",
+                          "spec":  "phase9-accessibility.spec.ts",
+                          "scenario":  {
+                                           "tripAudienceAdult":  true
+                                       },
+                          "createdAt":  "2026-10-04T00:33:58.923Z",
+                          "apiPid":  16288,
+                          "apiLog":  "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T003349-0b607b30\\FamilySafety_Invitation_E2E_85bf89b15dab4961b696113062d482f0.api.log",
+                          "outcome":  "failed",
+                          "status":  "removed",
+                          "history":  [
+                                          {
+                                              "at":  "2026-10-04T00:34:34.809Z",
+                                              "from":  "running",
+                                              "to":  "retained",
+                                              "by":  "harness",
+                                              "note":  "spec failed; FAMILY_SAFETY_E2E_KEEP_DATABASES=1"
+                                          },
+                                          {
+                                              "at":  "2026-10-04T01:06:29.168Z",
+                                              "from":  "retained",
+                                              "to":  "removed",
+                                              "by":  "manual",
+                                              "note":  "dropped by remove-scenario-database.ps1 and confirmed absent"
+                                          }
+                                      ],
+                          "note":  "spec failed; FAMILY_SAFETY_E2E_KEEP_DATABASES=1",
+                          "removedAt":  "2026-10-04T01:06:29.168Z",
+                          "removedBy":  "manual"
+                      },
+                      {
+                          "name":  "FamilySafety_Invitation_E2E_0faf4e5a3f0e42cf8dbb965761f05e52",
+                          "spec":  "phase9-accessibility.spec.ts",
+                          "scenario":  {
+                                           "tripAudienceAdult":  true
+                                       },
+                          "createdAt":  "2026-10-04T00:34:35.967Z",
+                          "apiPid":  6056,
+                          "apiLog":  "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T003349-0b607b30\\FamilySafety_Invitation_E2E_0faf4e5a3f0e42cf8dbb965761f05e52.api.log",
+                          "outcome":  "failed",
+                          "status":  "removed",
+                          "history":  [
+                                          {
+                                              "at":  "2026-10-04T00:35:08.839Z",
+                                              "from":  "running",
+                                              "to":  "retained",
+                                              "by":  "harness",
+                                              "note":  "spec failed; FAMILY_SAFETY_E2E_KEEP_DATABASES=1"
+                                          },
+                                          {
+                                              "at":  "2026-10-04T01:06:30.014Z",
+                                              "from":  "retained",
+                                              "to":  "removed",
+                                              "by":  "manual",
+                                              "note":  "dropped by remove-scenario-database.ps1 and confirmed absent"
+                                          }
+                                      ],
+                          "note":  "spec failed; FAMILY_SAFETY_E2E_KEEP_DATABASES=1",
+                          "removedAt":  "2026-10-04T01:06:30.014Z",
+                          "removedBy":  "manual"
+                      }
+                  ],
+    "runnerPid":  552,
+    "completedAt":  "2026-10-04T00:35:09.003Z"
+}

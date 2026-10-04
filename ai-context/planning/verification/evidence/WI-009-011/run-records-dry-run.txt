@@ -1,0 +1,17 @@
+﻿REMOVE RUN RECORDS - DRY RUN (nothing is changed; add -Execute to act)
+  Citation search uncertain, so every run counts as protected: 
+'ai-context\planning\verification\evidence\WI-009-011\run-records-dry-run.txt' could not be read
+  Remove:   20261004T003349-0b607b30  [CitationUncertain]  307.8 KB  
+C:\Dev\blevins\src\FamilySafety.Web\e2e\scenario-runs\20261004T003349-0b607b30
+  Remove:   20261004T003701-5e709e5e  [CitationUncertain]  468.8 KB  
+C:\Dev\blevins\src\FamilySafety.Web\e2e\scenario-runs\20261004T003701-5e709e5e
+  Remove:   20261004T004148-b88f1ca3  [CitationUncertain]  162.9 KB  
+C:\Dev\blevins\src\FamilySafety.Web\e2e\scenario-runs\20261004T004148-b88f1ca3
+  Remove:   20261004T004307-49f7f81e  [InterruptedNoDatabase]  318.4 KB  
+C:\Dev\blevins\src\FamilySafety.Web\e2e\scenario-runs\20261004T004307-49f7f81e
+  Remove:   20261004T004650-a06ab969  [CitationUncertain]  434.9 KB  
+C:\Dev\blevins\src\FamilySafety.Web\e2e\scenario-runs\20261004T004650-a06ab969
+  Remove:   20261004T010159-fcd99b21  [CitationUncertain]  1.2 MB  
+C:\Dev\blevins\src\FamilySafety.Web\e2e\scenario-runs\20261004T010159-fcd99b21
+
+Dry run complete. 6 run folder(s) would be removed. Nothing was changed.

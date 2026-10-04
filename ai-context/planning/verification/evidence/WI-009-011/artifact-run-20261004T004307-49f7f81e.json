@@ -1,0 +1,64 @@
+{
+    "runId":  "20261004T004307-49f7f81e",
+    "createdAt":  "2026-10-04T00:43:07.024Z",
+    "server":  "localhost",
+    "preExistingListPath":  "C:\\Dev\\blevins\\scripts\\pre-existing-scenario-databases.txt",
+    "preExistingAtRunStart":  [
+                                  "FamilySafety",
+                                  "FamilySafety_Invitation_79558d15516649aeb6758a9e2496b6b7",
+                                  "FamilySafety_Invitation_ConcernReview20261001",
+                                  "FamilySafety_Invitation_ddf3f406d9024bc1ac330e46513b5209",
+                                  "FamilySafety_Invitation_E2E_0faf4e5a3f0e42cf8dbb965761f05e52",
+                                  "FamilySafety_Invitation_E2E_2750336d367a405b9840a84489058f23",
+                                  "FamilySafety_Invitation_E2E_85bf89b15dab4961b696113062d482f0",
+                                  "FamilySafety_Invitation_E2E_b2e1d28a43d3461c82ad786a94a1393b",
+                                  "FamilySafety_Invitation_Review_WI008004",
+                                  "FamilySafety_Invitation_ShellReview034731",
+                                  "FamilySafety_Invitation_SiteReview044319",
+                                  "FamilySafety_Invitation_SiteReview044420",
+                                  "FamilySafety_Invitation_Stage1Retry_20260928_235812_c7f2",
+                                  "FamilySafety_Invitation_WI075_Browser_20260928",
+                                  "FamilySafety_Invitation_WI075004Visual",
+                                  "FamilySafety_Invitation_WI075005_CodexAttempt_20260929",
+                                  "FamilySafety_Invitation_WI075006VerifyHost",
+                                  "FamilySafety_VisualReview",
+                                  "FamilySafety_WI005001_Verification",
+                                  "FamilySafety_WI005002_ConcurrencyTests",
+                                  "FamilySafety_WI005002_Verification",
+                                  "FamilySafety_WI005003_DirectoryTests"
+                              ],
+    "databases":  [
+                      {
+                          "name":  "FamilySafety_Invitation_E2E_3180d133877c4601b6f863a7a4014ab7",
+                          "spec":  "phase9-journey.spec.ts",
+                          "scenario":  {
+                                           "tripAudienceAdult":  true
+                                       },
+                          "createdAt":  "2026-10-04T00:43:13.676Z",
+                          "apiPid":  13288,
+                          "apiLog":  "C:\\Dev\\blevins\\src\\FamilySafety.Web\\e2e\\scenario-runs\\20261004T004307-49f7f81e\\FamilySafety_Invitation_E2E_3180d133877c4601b6f863a7a4014ab7.api.log",
+                          "outcome":  "pending",
+                          "status":  "removed",
+                          "note":  "run interrupted; marked retained by test-artifacts.ps1",
+                          "history":  [
+                                          {
+                                              "at":  "2026-10-04T01:06:32.226Z",
+                                              "from":  "running",
+                                              "to":  "retained",
+                                              "by":  "test-artifacts.ps1",
+                                              "note":  "run interrupted; marked retained by test-artifacts.ps1"
+                                          },
+                                          {
+                                              "at":  "2026-10-04T01:06:32.663Z",
+                                              "from":  "retained",
+                                              "to":  "removed",
+                                              "by":  "manual",
+                                              "note":  "dropped by remove-scenario-database.ps1 and confirmed absent"
+                                          }
+                                      ],
+                          "removedAt":  "2026-10-04T01:06:32.663Z",
+                          "removedBy":  "manual"
+                      }
+                  ],
+    "runnerPid":  30260
+}

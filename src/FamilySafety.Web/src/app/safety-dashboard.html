@@ -1,0 +1,103 @@
+<!-- Safety dashboard (WI-009-009, panel ④). DOM order is the narrow reading order: Concerns, Incidents, Recent Check-Ins,
+     About Concerns and Incidents. The grid places them in panel ④'s 2 × 2 at sidebar widths. No create, resolve, or contact action. -->
+<div class="safety-grid">
+  <section class="card safety-card" aria-labelledby="safety-concerns-heading">
+    <div class="card-header">
+      <span class="card-icon"><app-icon name="shield" /></span>
+      <h2 id="safety-concerns-heading">Open Concerns</h2>
+      <a class="link-button safety-view-all" routerLink="/concerns" [state]="focusHeadingState" aria-label="View all Concerns">View all</a>
+    </div>
+    @if (concernsLoading()) {
+      <p class="safety-status" role="status">Loading Concerns…</p>
+    } @else if (concernsError()) {
+      <div class="safety-error">
+        <p class="message message--error" role="alert">{{ concernsError() }}</p>
+        <button type="button" class="button--secondary" (click)="loadConcerns()">Retry loading Concerns</button>
+      </div>
+    } @else if (concernRows().length > 0) {
+      <ul class="row-list safety-rows">
+        @for (concern of concernRows(); track concern.concernId) {
+          <li class="item-row">
+            <span class="avatar" aria-hidden="true">{{ initials(concern.subjectName) }}</span>
+            <span class="item-main">
+              <span class="safety-row-top">
+                <strong><a class="item-link" [routerLink]="['/concerns', concern.concernId]" [state]="focusHeadingState"
+                  [attr.aria-label]="'Open Concern about ' + concern.subjectName + ', ' + concern.state">Concern about {{ concern.subjectName }}</a></strong>
+                <span class="safety-state">{{ concern.state }}</span>
+              </span>
+              <span class="item-meta">{{ concern.creatorProfileId === ownProfileId ? 'Created by you' : 'You are a selected participant' }}@if (showFamilyName) { · {{ concern.familyGroupName }}}</span>
+              <span class="item-meta">Last activity <time [attr.datetime]="concern.lastAuthorizedMutationAt">{{ concern.lastAuthorizedMutationAt | date:dateFormat }}</time></span>
+            </span>
+          </li>
+        }
+      </ul>
+      @if (moreConcerns()) { <p class="safety-more">Additional open Concerns are available.</p> }
+    } @else {
+      <p class="safety-empty">No open Concerns are shared with you.</p>
+    }
+  </section>
+
+  <section class="card safety-card" aria-labelledby="safety-incidents-heading">
+    <div class="card-header">
+      <span class="card-icon"><app-icon name="shield" /></span>
+      <h2 id="safety-incidents-heading">Open Safety Incidents</h2>
+      <a class="link-button safety-view-all" routerLink="/incidents" [state]="focusHeadingState" aria-label="View all Safety Incidents">View all</a>
+    </div>
+    @if (incidentsLoading()) {
+      <p class="safety-status" role="status">Loading Safety Incidents…</p>
+    } @else if (incidentsError()) {
+      <div class="safety-error">
+        <p class="message message--error" role="alert">{{ incidentsError() }}</p>
+        <button type="button" class="button--secondary" (click)="loadIncidents()">Retry loading Safety Incidents</button>
+      </div>
+    } @else if (incidentRows().length > 0) {
+      <ul class="row-list safety-rows">
+        @for (incident of incidentRows(); track incident.incidentId) {
+          <li class="item-row">
+            <span class="avatar" aria-hidden="true">{{ initials(incident.subjectName) }}</span>
+            <span class="item-main">
+              <span class="safety-row-top">
+                <strong><a class="item-link" [routerLink]="['/incidents', incident.incidentId]" [state]="focusHeadingState"
+                  [attr.aria-label]="'Open Incident about ' + incident.subjectName + ', ' + incident.state">Incident about {{ incident.subjectName }}</a></strong>
+                <span class="safety-state">{{ incident.state }}</span>
+              </span>
+              <span class="item-meta">{{ incident.coordinatorProfileId === ownProfileId ? 'You coordinate this Incident' : 'Coordinated by ' + incident.coordinatorName }}@if (showFamilyName) { · {{ incident.familyGroupName }}}</span>
+              <span class="item-meta">Last activity <time [attr.datetime]="incident.lastAuthorizedMutationAt">{{ incident.lastAuthorizedMutationAt | date:dateFormat }}</time></span>
+            </span>
+          </li>
+        }
+      </ul>
+      @if (moreIncidents()) { <p class="safety-more">Additional open Safety Incidents are available.</p> }
+    } @else {
+      <p class="safety-empty">No open Safety Incidents are shared with you.</p>
+    }
+    <p class="safety-footnote">Contact attempts, tasks, and timelines remain inside each Incident.</p>
+  </section>
+
+  <!-- Placeholder only (DEC-079, O7): no request, name, time, count, or state. Check-Ins are not available yet. -->
+  <section class="card safety-card safety-future" aria-labelledby="safety-checkins-heading">
+    <div class="card-header">
+      <span class="card-icon"><app-icon name="check" /></span>
+      <h2 id="safety-checkins-heading">Recent Check-Ins</h2>
+    </div>
+    <p class="safety-future-note">Check-ins shared with you will appear here when available.</p>
+  </section>
+
+  <section class="card safety-card" aria-labelledby="safety-about-heading">
+    <div class="card-header">
+      <span class="card-icon"><app-icon name="info" /></span>
+      <h2 id="safety-about-heading">About Concerns and Incidents</h2>
+    </div>
+    <dl class="safety-about">
+      <div>
+        <dt>Concerns</dt>
+        <dd>Keep uncertainty and shared information clear while coordinating with selected people.</dd>
+      </div>
+      <div>
+        <dt>Safety Incidents</dt>
+        <dd>Coordinate a deliberate family response with the people you choose.</dd>
+      </div>
+    </dl>
+    <p class="safety-boundary">Neither one proves danger or safety. Each is shared only with the people chosen for it.</p>
+  </section>
+</div>

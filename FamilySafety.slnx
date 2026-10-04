@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FamilySafety.Api/FamilySafety.Api.csproj" />
+    <Project Path="src/FamilySafety.Application/FamilySafety.Application.csproj" />
+    <Project Path="src/FamilySafety.Domain/FamilySafety.Domain.csproj" />
+    <Project Path="src/FamilySafety.Infrastructure/FamilySafety.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FamilySafety.Foundation.Tests/FamilySafety.Foundation.Tests.csproj" />
+  </Folder>
+</Solution>

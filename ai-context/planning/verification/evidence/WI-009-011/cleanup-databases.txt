@@ -1,0 +1,11 @@
+Transcript-derived summary of exact-name database cleanup, 2026-10-03 21:06 local.
+The initial PowerShell pipeline did not capture Write-Host output; this is not a raw log.
+scripts/test-artifacts.ps1 delegated each exact name to remove-scenario-database.ps1 with its owning manifest and -RemoveRetained.
+Confirmed absent: FamilySafety_Invitation_E2E_85bf89b15dab4961b696113062d482f0
+Confirmed absent: FamilySafety_Invitation_E2E_0faf4e5a3f0e42cf8dbb965761f05e52
+Confirmed absent: FamilySafety_Invitation_E2E_2750336d367a405b9840a84489058f23
+Confirmed absent: FamilySafety_Invitation_E2E_b2e1d28a43d3461c82ad786a94a1393b
+Confirmed absent: FamilySafety_Invitation_E2E_3180d133877c4601b6f863a7a4014ab7
+The last entry was first marked retained from running with prior status preserved in history by the approved tool.
+All post-removal ownership/history snapshots are saved as artifact-run-<runId>.json beside this file.
+Read-only post-database report: artifact-health-after-databases.txt — baseline 18 databases restored, no retained database, port 5080 free.

@@ -1,0 +1,475 @@
+using FamilySafety.Domain.Profiles;
+using FamilySafety.Domain.Relationships;
+using FamilySafety.Domain.Events;
+using FamilySafety.Domain.Plans;
+using FamilySafety.Domain.Trips;
+using FamilySafety.Domain.Concerns;
+using FamilySafety.Domain.Incidents;
+using Microsoft.EntityFrameworkCore;
+
+namespace FamilySafety.Infrastructure.Persistence;
+
+public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext> options)
+    : DbContext(options)
+{
+    public DbSet<Account> Accounts => Set<Account>();
+
+    public DbSet<AdultProfile> AdultProfiles => Set<AdultProfile>();
+
+    public DbSet<FamilyGroup> FamilyGroups => Set<FamilyGroup>();
+
+    public DbSet<FamilyGroupMembership> FamilyGroupMemberships => Set<FamilyGroupMembership>();
+
+    public DbSet<FamilyAdministratorAssignment> FamilyAdministratorAssignments =>
+        Set<FamilyAdministratorAssignment>();
+
+    public DbSet<MembershipInvitation> MembershipInvitations => Set<MembershipInvitation>();
+
+    public DbSet<FamilyRelationship> FamilyRelationships => Set<FamilyRelationship>();
+
+    public DbSet<FamilyEvent> FamilyEvents => Set<FamilyEvent>();
+
+    public DbSet<FamilyEventAudienceMember> FamilyEventAudienceMembers => Set<FamilyEventAudienceMember>();
+
+    public DbSet<FamilyPlan> FamilyPlans => Set<FamilyPlan>();
+
+    public DbSet<FamilyPlanAudienceMember> FamilyPlanAudienceMembers => Set<FamilyPlanAudienceMember>();
+
+    public DbSet<FamilyTrip> FamilyTrips => Set<FamilyTrip>();
+    public DbSet<FamilyTripTraveler> FamilyTripTravelers => Set<FamilyTripTraveler>();
+    public DbSet<FamilyTripAudienceMember> FamilyTripAudienceMembers => Set<FamilyTripAudienceMember>();
+    public DbSet<FamilyTripContact> FamilyTripContacts => Set<FamilyTripContact>();
+    public DbSet<FamilyTripNote> FamilyTripNotes => Set<FamilyTripNote>();
+    public DbSet<Concern> Concerns => Set<Concern>();
+    public DbSet<ConcernParticipantGrant> ConcernParticipantGrants => Set<ConcernParticipantGrant>();
+    public DbSet<ConcernEntry> ConcernEntries => Set<ConcernEntry>();
+    public DbSet<ConcernAuditEvent> ConcernAuditEvents => Set<ConcernAuditEvent>();
+    public DbSet<SafetyIncident> Incidents => Set<SafetyIncident>();
+    public DbSet<IncidentParticipantGrant> IncidentParticipantGrants => Set<IncidentParticipantGrant>();
+    public DbSet<IncidentCoordinatorChange> IncidentCoordinatorChanges => Set<IncidentCoordinatorChange>();
+    public DbSet<IncidentEntry> IncidentEntries => Set<IncidentEntry>();
+    public DbSet<IncidentTask> IncidentTasks => Set<IncidentTask>();
+    public DbSet<IncidentAuditEvent> IncidentAuditEvents => Set<IncidentAuditEvent>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        var account = modelBuilder.Entity<Account>();
+        account.ToTable("Accounts");
+        account.HasKey(entity => entity.Id);
+        account.Property(entity => entity.SignInIdentifier).HasMaxLength(254).IsRequired();
+        account.HasIndex(entity => entity.SignInIdentifier).IsUnique();
+
+        var profile = modelBuilder.Entity<AdultProfile>();
+        profile.ToTable("AdultProfiles");
+        profile.HasKey(entity => entity.Id);
+        profile.Property(entity => entity.DisplayName).HasMaxLength(100).IsRequired();
+        profile.Property(entity => entity.ContactEmail).HasMaxLength(254);
+        profile.Property(entity => entity.ContactPhone).HasMaxLength(32);
+        profile.Property(entity => entity.ContactEmailVisibility).HasConversion<string>().HasMaxLength(32);
+        profile.Property(entity => entity.ContactPhoneVisibility).HasConversion<string>().HasMaxLength(32);
+        profile.Property(entity => entity.BirthdayVisibility).HasConversion<string>().HasMaxLength(32);
+        profile.HasIndex(entity => entity.AccountId).IsUnique();
+        profile.HasOne<Account>()
+            .WithOne()
+            .HasForeignKey<AdultProfile>(entity => entity.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var familyGroup = modelBuilder.Entity<FamilyGroup>();
+        familyGroup.ToTable("FamilyGroups");
+        familyGroup.HasKey(entity => entity.Id);
+        familyGroup.Property(entity => entity.Name).HasMaxLength(100).IsRequired();
+        familyGroup.Property(entity => entity.CapacityLimit).IsRequired();
+
+        var membership = modelBuilder.Entity<FamilyGroupMembership>();
+        membership.ToTable("FamilyGroupMemberships");
+        membership.HasKey(entity => entity.Id);
+        membership.HasIndex(entity => new { entity.AccountId, entity.FamilyGroupId }).IsUnique();
+        membership.HasIndex(entity => new { entity.FamilyGroupId, entity.IsActive });
+        membership.Property(entity => entity.AccessVersion).HasDefaultValue(0);
+        membership.Property(entity => entity.EndedAt).HasColumnType("datetimeoffset(7)");
+        membership.HasOne<Account>()
+            .WithMany()
+            .HasForeignKey(entity => entity.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+        membership.HasOne<AdultProfile>()
+            .WithMany()
+            .HasForeignKey(entity => entity.AdultProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+        membership.HasOne<FamilyGroup>()
+            .WithMany()
+            .HasForeignKey(entity => entity.FamilyGroupId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var administrator = modelBuilder.Entity<FamilyAdministratorAssignment>();
+        administrator.ToTable("FamilyAdministratorAssignments");
+        administrator.HasKey(entity => entity.Id);
+        administrator.HasIndex(entity => entity.MembershipId).IsUnique();
+        administrator.HasOne<FamilyGroupMembership>()
+            .WithOne()
+            .HasForeignKey<FamilyAdministratorAssignment>(entity => entity.MembershipId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var invitation = modelBuilder.Entity<MembershipInvitation>();
+        invitation.ToTable("MembershipInvitations");
+        invitation.HasKey(entity => entity.Id);
+        invitation.Property(entity => entity.RecipientEmail).HasMaxLength(254).IsRequired();
+        invitation.Property(entity => entity.NormalizedRecipientEmail).HasMaxLength(254).IsRequired();
+        invitation.Property(entity => entity.TokenHash).HasMaxLength(64).IsRequired();
+        invitation.Property(entity => entity.Status).HasConversion<string>().HasMaxLength(32).IsRequired();
+        invitation.Property(entity => entity.RowVersion).IsRowVersion();
+        invitation.HasIndex(entity => entity.TokenHash).IsUnique();
+        invitation.HasIndex(entity => new { entity.FamilyGroupId, entity.NormalizedRecipientEmail })
+            .IsUnique()
+            .HasFilter("[Status] = N'Pending'");
+        invitation.HasOne<FamilyGroup>()
+            .WithMany()
+            .HasForeignKey(entity => entity.FamilyGroupId)
+            .OnDelete(DeleteBehavior.Restrict);
+        invitation.HasOne<FamilyGroupMembership>()
+            .WithMany()
+            .HasForeignKey(entity => entity.IssuedByMembershipId)
+            .OnDelete(DeleteBehavior.Restrict);
+        invitation.HasOne<Account>()
+            .WithMany()
+            .HasForeignKey(entity => entity.AcceptedByAccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var relationship = modelBuilder.Entity<FamilyRelationship>();
+        relationship.ToTable("FamilyRelationships");
+        relationship.HasKey(entity => entity.Id);
+        relationship.Property(entity => entity.ProposerLabel).HasConversion<string>().HasMaxLength(32).IsRequired();
+        relationship.Property(entity => entity.Status).HasConversion<string>().HasMaxLength(32).IsRequired();
+        relationship.HasIndex(entity => new
+        {
+            entity.FamilyGroupId,
+            entity.FirstProfileId,
+            entity.SecondProfileId,
+        }).IsUnique();
+        relationship.HasIndex(entity => new { entity.FamilyGroupId, entity.Status });
+        relationship.HasOne<FamilyGroup>()
+            .WithMany()
+            .HasForeignKey(entity => entity.FamilyGroupId)
+            .OnDelete(DeleteBehavior.Restrict);
+        relationship.HasOne<AdultProfile>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ProposerProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+        relationship.HasOne<AdultProfile>()
+            .WithMany()
+            .HasForeignKey(entity => entity.RecipientProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var familyEvent = modelBuilder.Entity<FamilyEvent>();
+        familyEvent.ToTable("FamilyEvents");
+        familyEvent.HasKey(entity => entity.Id);
+        familyEvent.Property(entity => entity.Name).IsRequired();
+        familyEvent.Property(entity => entity.Description).IsRequired();
+        familyEvent.Property(entity => entity.Location).IsRequired();
+        familyEvent.Property(entity => entity.Date).HasColumnType("date");
+        familyEvent.Property(entity => entity.Time).HasColumnType("time");
+        familyEvent.HasIndex(entity => new { entity.FamilyGroupId, entity.Date });
+        familyEvent.HasOne<FamilyGroup>()
+            .WithMany()
+            .HasForeignKey(entity => entity.FamilyGroupId)
+            .OnDelete(DeleteBehavior.Restrict);
+        familyEvent.HasOne<AdultProfile>()
+            .WithMany()
+            .HasForeignKey(entity => entity.CreatorProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var eventAudienceMember = modelBuilder.Entity<FamilyEventAudienceMember>();
+        eventAudienceMember.ToTable("FamilyEventAudienceMembers");
+        eventAudienceMember.HasKey(entity => new { entity.EventId, entity.ProfileId });
+        eventAudienceMember.Property(entity => entity.CanEdit).HasDefaultValue(false);
+        eventAudienceMember.HasOne<FamilyEvent>()
+            .WithMany()
+            .HasForeignKey(entity => entity.EventId)
+            .OnDelete(DeleteBehavior.Restrict);
+        eventAudienceMember.HasOne<AdultProfile>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var familyPlan = modelBuilder.Entity<FamilyPlan>();
+        familyPlan.ToTable("FamilyPlans");
+        familyPlan.HasKey(entity => entity.Id);
+        familyPlan.Property(entity => entity.ActivityOrDestination).HasMaxLength(200).IsRequired();
+        familyPlan.Property(entity => entity.Date).HasColumnType("date");
+        familyPlan.Property(entity => entity.Time).HasColumnType("time");
+        familyPlan.Property(entity => entity.ExpectedReturnDate).HasColumnType("date");
+        familyPlan.Property(entity => entity.ExpectedReturnTime).HasColumnType("time");
+        familyPlan.Property(entity => entity.ExpectedCheckInDate).HasColumnType("date");
+        familyPlan.Property(entity => entity.ExpectedCheckInTime).HasColumnType("time");
+        familyPlan.Property(entity => entity.AudienceType).HasConversion<string>().HasMaxLength(32).IsRequired();
+        familyPlan.Property(entity => entity.Notes).HasMaxLength(1000);
+        familyPlan.HasIndex(entity => new { entity.FamilyGroupId, entity.Date });
+        familyPlan.HasOne<FamilyGroup>()
+            .WithMany()
+            .HasForeignKey(entity => entity.FamilyGroupId)
+            .OnDelete(DeleteBehavior.Restrict);
+        familyPlan.HasOne<AdultProfile>()
+            .WithMany()
+            .HasForeignKey(entity => entity.CreatorProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var planAudienceMember = modelBuilder.Entity<FamilyPlanAudienceMember>();
+        planAudienceMember.ToTable("FamilyPlanAudienceMembers");
+        planAudienceMember.HasKey(entity => new { entity.PlanId, entity.ProfileId });
+        planAudienceMember.HasOne<FamilyPlan>()
+            .WithMany()
+            .HasForeignKey(entity => entity.PlanId)
+            .OnDelete(DeleteBehavior.Restrict);
+        planAudienceMember.HasOne<AdultProfile>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var trip = modelBuilder.Entity<FamilyTrip>();
+        trip.ToTable("FamilyTrips");
+        trip.HasKey(entity => entity.Id);
+        trip.Property(entity => entity.Title).HasMaxLength(100).IsRequired();
+        trip.Property(entity => entity.PrimaryDestination).HasMaxLength(200).IsRequired();
+        trip.Property(entity => entity.StartDate).HasColumnType("date");
+        trip.Property(entity => entity.EndDate).HasColumnType("date");
+        trip.Property(entity => entity.Description).HasMaxLength(1000);
+        trip.Property(entity => entity.TransportationNotes).HasMaxLength(1000);
+        trip.Property(entity => entity.AccommodationNotes).HasMaxLength(1000);
+        trip.Property(entity => entity.ExpectedArrivalDate).HasColumnType("date");
+        trip.Property(entity => entity.ExpectedArrivalTime).HasColumnType("time");
+        trip.Property(entity => entity.ExpectedArrivalTimeZone).HasMaxLength(128);
+        trip.Property(entity => entity.AudienceType).HasConversion<string>().HasMaxLength(32).IsRequired();
+        trip.HasIndex(entity => new { entity.FamilyGroupId, entity.StartDate });
+        trip.HasOne<FamilyGroup>().WithMany().HasForeignKey(entity => entity.FamilyGroupId)
+            .OnDelete(DeleteBehavior.Restrict);
+        trip.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.CreatorProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var traveler = modelBuilder.Entity<FamilyTripTraveler>();
+        traveler.ToTable("FamilyTripTravelers");
+        traveler.HasKey(entity => new { entity.TripId, entity.ProfileId });
+        traveler.HasOne<FamilyTrip>().WithMany().HasForeignKey(entity => entity.TripId)
+            .OnDelete(DeleteBehavior.Restrict);
+        traveler.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.ProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var tripAudience = modelBuilder.Entity<FamilyTripAudienceMember>();
+        tripAudience.ToTable("FamilyTripAudienceMembers");
+        tripAudience.HasKey(entity => new { entity.TripId, entity.ProfileId });
+        tripAudience.HasOne<FamilyTrip>().WithMany().HasForeignKey(entity => entity.TripId)
+            .OnDelete(DeleteBehavior.Restrict);
+        tripAudience.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.ProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var contact = modelBuilder.Entity<FamilyTripContact>();
+        contact.ToTable("FamilyTripContacts");
+        contact.HasKey(entity => entity.Id);
+        contact.Property(entity => entity.Name).HasMaxLength(100).IsRequired();
+        contact.Property(entity => entity.RelationshipRole).HasMaxLength(100);
+        contact.Property(entity => entity.Phone).HasMaxLength(32);
+        contact.Property(entity => entity.Email).HasMaxLength(254);
+        contact.HasIndex(entity => entity.TripId);
+        contact.HasOne<FamilyTrip>().WithMany().HasForeignKey(entity => entity.TripId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var note = modelBuilder.Entity<FamilyTripNote>();
+        note.ToTable("FamilyTripNotes");
+        note.HasKey(entity => entity.Id);
+        note.Property(entity => entity.Content).HasMaxLength(1000).IsRequired();
+        note.Property(entity => entity.State).HasConversion<string>().HasMaxLength(32).IsRequired();
+        note.Property(entity => entity.RowVersion).IsRowVersion();
+        note.HasIndex(entity => new { entity.TripId, entity.State, entity.CreatedAt });
+        note.HasOne<FamilyTrip>().WithMany().HasForeignKey(entity => entity.TripId)
+            .OnDelete(DeleteBehavior.Restrict);
+        note.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.AuthorProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var concern = modelBuilder.Entity<Concern>();
+        concern.ToTable("Concerns");
+        concern.HasKey(entity => entity.Id);
+        concern.Property(entity => entity.CreationReason).HasMaxLength(1000).IsRequired();
+        concern.Property(entity => entity.State).HasConversion<string>().HasMaxLength(24).IsRequired();
+        concern.Property(entity => entity.FreezeReason).HasConversion<string>().HasMaxLength(40);
+        concern.Property(entity => entity.FrozenAt).HasColumnType("datetimeoffset(7)");
+        concern.Property(entity => entity.ResolvedAt).HasColumnType("datetimeoffset(7)");
+        concern.Property(entity => entity.CreatorAccessRevokedAt).HasColumnType("datetimeoffset(7)");
+        concern.Property(entity => entity.ResolutionNote).HasMaxLength(2000);
+        concern.Property(entity => entity.CreatedAt).HasColumnType("datetimeoffset(7)");
+        concern.Property(entity => entity.LastAuthorizedMutationAt).HasColumnType("datetimeoffset(7)");
+        concern.Property(entity => entity.RowVersion).IsRowVersion();
+        concern.HasIndex(entity => new { entity.FamilyGroupId, entity.CreatedAt });
+        concern.HasIndex(entity => new { entity.State, entity.FrozenAt, entity.ResolvedAt });
+        concern.HasOne<FamilyGroup>().WithMany().HasForeignKey(entity => entity.FamilyGroupId)
+            .OnDelete(DeleteBehavior.Restrict);
+        concern.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.CreatorProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+        concern.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.SubjectProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+        concern.HasOne<FamilyGroupMembership>().WithMany().HasForeignKey(entity => entity.CreatorMembershipId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var concernGrant = modelBuilder.Entity<ConcernParticipantGrant>();
+        concernGrant.ToTable("ConcernParticipantGrants");
+        concernGrant.HasKey(entity => entity.Id);
+        concernGrant.Property(entity => entity.SelectedAt).HasColumnType("datetimeoffset(7)");
+        concernGrant.Property(entity => entity.RemovedAt).HasColumnType("datetimeoffset(7)");
+        concernGrant.HasIndex(entity => new { entity.ConcernId, entity.ProfileId })
+            .IsUnique().HasFilter("[RemovedAt] IS NULL");
+        concernGrant.HasIndex(entity => new { entity.ConcernId, entity.ProfileId, entity.RemovedAt });
+        concernGrant.HasIndex(entity => new { entity.AccountId, entity.RemovedAt });
+        concernGrant.HasOne<Concern>().WithMany().HasForeignKey(entity => entity.ConcernId)
+            .OnDelete(DeleteBehavior.Restrict);
+        concernGrant.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.ProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+        concernGrant.HasOne<FamilyGroupMembership>().WithMany().HasForeignKey(entity => entity.MembershipId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var concernEntry = modelBuilder.Entity<ConcernEntry>();
+        concernEntry.ToTable("ConcernEntries");
+        concernEntry.HasKey(entity => entity.Id);
+        concernEntry.Property(entity => entity.Kind).HasConversion<string>().HasMaxLength(24).IsRequired();
+        concernEntry.Property(entity => entity.Category).HasConversion<string>().HasMaxLength(24).IsRequired();
+        concernEntry.Property(entity => entity.Text).HasMaxLength(2000).IsRequired();
+        concernEntry.Property(entity => entity.SourceDescription).HasMaxLength(500);
+        concernEntry.Property(entity => entity.Explanation).HasMaxLength(1000);
+        concernEntry.Property(entity => entity.RecordedAt).HasColumnType("datetimeoffset(7)");
+        concernEntry.Property(entity => entity.EventAt).HasColumnType("datetimeoffset(7)");
+        concernEntry.HasIndex(entity => new { entity.ConcernId, entity.RecordedAt });
+        concernEntry.HasIndex(entity => new { entity.ConcernId, entity.RelatedEntryId });
+        concernEntry.HasOne<Concern>().WithMany().HasForeignKey(entity => entity.ConcernId)
+            .OnDelete(DeleteBehavior.Restrict);
+        concernEntry.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.ContributorProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+        concernEntry.HasOne<ConcernEntry>().WithMany().HasForeignKey(entity => entity.RelatedEntryId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var concernAudit = modelBuilder.Entity<ConcernAuditEvent>();
+        concernAudit.ToTable("ConcernAuditEvents");
+        concernAudit.HasKey(entity => entity.Id);
+        concernAudit.Property(entity => entity.Action).HasMaxLength(48).IsRequired();
+        concernAudit.Property(entity => entity.OccurredAt).HasColumnType("datetimeoffset(7)");
+        concernAudit.Property(entity => entity.UtcHourBucket).HasColumnType("datetimeoffset(7)");
+        concernAudit.Property(entity => entity.FirstAttemptAt).HasColumnType("datetimeoffset(7)");
+        concernAudit.Property(entity => entity.LastAttemptAt).HasColumnType("datetimeoffset(7)");
+        concernAudit.HasIndex(entity => entity.OccurredAt);
+        concernAudit.HasIndex(entity => new { entity.ConcernId, entity.OccurredAt });
+        concernAudit.HasIndex(entity => new { entity.ActorAccountId, entity.Action, entity.UtcHourBucket })
+            .IsUnique().HasFilter("[DeniedAttemptCount] > 0");
+        // Deliberately no Concern FK: audit retention is independent of product-history deletion.
+
+        ConfigureIncidents(modelBuilder);
+    }
+
+    // All Incident relationships are Restrict so whole-aggregate deletion stays explicit and ordered.
+    private static void ConfigureIncidents(ModelBuilder modelBuilder)
+    {
+        var incident = modelBuilder.Entity<SafetyIncident>();
+        incident.ToTable("Incidents");
+        incident.HasKey(entity => entity.Id);
+        incident.Property(entity => entity.State).HasConversion<string>().HasMaxLength(24).IsRequired();
+        incident.Property(entity => entity.FreezeReason).HasConversion<string>().HasMaxLength(40);
+        incident.Property(entity => entity.OutcomeCategory).HasConversion<string>().HasMaxLength(24);
+        incident.Property(entity => entity.CreatedAt).HasColumnType("datetimeoffset(7)");
+        incident.Property(entity => entity.LastAuthorizedMutationAt).HasColumnType("datetimeoffset(7)");
+        incident.Property(entity => entity.FrozenAt).HasColumnType("datetimeoffset(7)");
+        incident.Property(entity => entity.ResolvedAt).HasColumnType("datetimeoffset(7)");
+        incident.Property(entity => entity.ContactRestoredAt).HasColumnType("datetimeoffset(7)");
+        incident.Property(entity => entity.ResolutionSummary).HasMaxLength(2000);
+        incident.Property(entity => entity.OutcomeText).HasMaxLength(2000);
+        incident.Property(entity => entity.OutcomeSourceDescription).HasMaxLength(500);
+        incident.Property(entity => entity.AssistanceProvided).HasMaxLength(2000);
+        incident.Property(entity => entity.UnresolvedFollowUp).HasMaxLength(2000);
+        incident.Property(entity => entity.Lessons).HasMaxLength(2000);
+        incident.Property(entity => entity.RowVersion).IsRowVersion();
+        incident.HasIndex(entity => new { entity.FamilyGroupId, entity.CreatedAt });
+        incident.HasIndex(entity => new { entity.State, entity.LastAuthorizedMutationAt });
+        incident.HasIndex(entity => new { entity.State, entity.FrozenAt, entity.ResolvedAt });
+        incident.HasOne<FamilyGroup>().WithMany().HasForeignKey(entity => entity.FamilyGroupId)
+            .OnDelete(DeleteBehavior.Restrict);
+        incident.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.CreatedByProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+        incident.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.SubjectProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+        // Deliberately no FK for CoordinatorGrantId (avoids an Incident <-> grant cycle) or for
+        // OriginatingConcernId (non-authorizing lineage; Concern expiry must neither cascade nor block).
+
+        var grant = modelBuilder.Entity<IncidentParticipantGrant>();
+        grant.ToTable("IncidentParticipantGrants");
+        grant.HasKey(entity => entity.Id);
+        grant.Property(entity => entity.SelectedAt).HasColumnType("datetimeoffset(7)");
+        grant.Property(entity => entity.RemovedAt).HasColumnType("datetimeoffset(7)");
+        grant.HasIndex(entity => new { entity.IncidentId, entity.ProfileId })
+            .IsUnique().HasFilter("[RemovedAt] IS NULL");
+        grant.HasIndex(entity => new { entity.AccountId, entity.RemovedAt });
+        grant.HasOne<SafetyIncident>().WithMany().HasForeignKey(entity => entity.IncidentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        grant.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.ProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+        grant.HasOne<FamilyGroupMembership>().WithMany().HasForeignKey(entity => entity.MembershipId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var coordinatorChange = modelBuilder.Entity<IncidentCoordinatorChange>();
+        coordinatorChange.ToTable("IncidentCoordinatorChanges");
+        coordinatorChange.HasKey(entity => entity.Id);
+        coordinatorChange.Property(entity => entity.ChangedAt).HasColumnType("datetimeoffset(7)");
+        coordinatorChange.HasIndex(entity => new { entity.IncidentId, entity.ChangedAt });
+        coordinatorChange.HasOne<SafetyIncident>().WithMany().HasForeignKey(entity => entity.IncidentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var task = modelBuilder.Entity<IncidentTask>();
+        task.ToTable("IncidentTasks");
+        task.HasKey(entity => entity.Id);
+        task.Property(entity => entity.Description).HasMaxLength(500).IsRequired();
+        task.Property(entity => entity.Status).HasConversion<string>().HasMaxLength(24).IsRequired();
+        task.Property(entity => entity.CancelReason).HasMaxLength(1000);
+        task.Property(entity => entity.CreatedAt).HasColumnType("datetimeoffset(7)");
+        task.Property(entity => entity.CompletedAt).HasColumnType("datetimeoffset(7)");
+        task.Property(entity => entity.CancelledAt).HasColumnType("datetimeoffset(7)");
+        task.Property(entity => entity.RowVersion).IsRowVersion();
+        task.HasIndex(entity => new { entity.IncidentId, entity.CreatedAt });
+        task.HasOne<SafetyIncident>().WithMany().HasForeignKey(entity => entity.IncidentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        task.HasOne<IncidentParticipantGrant>().WithMany().HasForeignKey(entity => entity.AssigneeGrantId)
+            .OnDelete(DeleteBehavior.Restrict);
+        task.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.AssigneeProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var entry = modelBuilder.Entity<IncidentEntry>();
+        entry.ToTable("IncidentEntries");
+        entry.HasKey(entity => entity.Id);
+        entry.Property(entity => entity.Kind).HasConversion<string>().HasMaxLength(24).IsRequired();
+        entry.Property(entity => entity.Category).HasConversion<string>().HasMaxLength(24).IsRequired();
+        entry.Property(entity => entity.Text).HasMaxLength(2000);
+        entry.Property(entity => entity.SourceDescription).HasMaxLength(500);
+        entry.Property(entity => entity.Explanation).HasMaxLength(1000);
+        entry.Property(entity => entity.AttemptedByDescription).HasMaxLength(200);
+        entry.Property(entity => entity.TargetLabel).HasMaxLength(200);
+        entry.Property(entity => entity.ContactMethod).HasConversion<string>().HasMaxLength(24);
+        entry.Property(entity => entity.ContactOutcome).HasConversion<string>().HasMaxLength(24);
+        entry.Property(entity => entity.RecordedAt).HasColumnType("datetimeoffset(7)");
+        entry.Property(entity => entity.EventAt).HasColumnType("datetimeoffset(7)");
+        entry.HasIndex(entity => new { entity.IncidentId, entity.RecordedAt });
+        entry.HasIndex(entity => new { entity.IncidentId, entity.RelatedEntryId });
+        entry.HasOne<SafetyIncident>().WithMany().HasForeignKey(entity => entity.IncidentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        entry.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.ContributorProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+        entry.HasOne<IncidentEntry>().WithMany().HasForeignKey(entity => entity.RelatedEntryId)
+            .OnDelete(DeleteBehavior.Restrict);
+        entry.HasOne<IncidentTask>().WithMany().HasForeignKey(entity => entity.RelatedTaskId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var audit = modelBuilder.Entity<IncidentAuditEvent>();
+        audit.ToTable("IncidentAuditEvents");
+        audit.HasKey(entity => entity.Id);
+        audit.Property(entity => entity.Action).HasMaxLength(48).IsRequired();
+        audit.Property(entity => entity.OccurredAt).HasColumnType("datetimeoffset(7)");
+        audit.Property(entity => entity.UtcHourBucket).HasColumnType("datetimeoffset(7)");
+        audit.Property(entity => entity.FirstAttemptAt).HasColumnType("datetimeoffset(7)");
+        audit.Property(entity => entity.LastAttemptAt).HasColumnType("datetimeoffset(7)");
+        audit.HasIndex(entity => entity.OccurredAt);
+        audit.HasIndex(entity => new { entity.IncidentId, entity.OccurredAt });
+        audit.HasIndex(entity => new { entity.ActorAccountId, entity.Action, entity.UtcHourBucket })
+            .IsUnique().HasFilter("[DeniedAttemptCount] > 0");
+        // Deliberately no Incident FK: audit retention is independent of product-history deletion.
+    }
+}
