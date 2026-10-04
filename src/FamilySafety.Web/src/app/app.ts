@@ -514,6 +514,7 @@ export class App implements OnInit {
   protected readonly plansLoadError = signal('');
   protected readonly planMessage = signal('');
   protected readonly editingPlanNoteId = signal<string | null>(null);
+  protected readonly planNoteClearPendingId = signal<string | null>(null);
   protected readonly planNoteSaving = signal(false);
   protected readonly planNoteError = signal('');
   protected readonly planNoteMessage = signal('');
@@ -1111,6 +1112,7 @@ export class App implements OnInit {
 
   protected beginPlanNoteEdit(plan: FamilyPlanView): void {
     if (plan.creatorProfileId !== this.ownerProfile()?.profileId) return;
+    this.planNoteClearPendingId.set(null);
     this.planNoteError.set('');
     this.planNoteMessage.set('');
     this.planNoteForm.reset({ notes: plan.notes ?? '' });
@@ -1119,8 +1121,24 @@ export class App implements OnInit {
 
   protected cancelPlanNoteEdit(): void {
     this.editingPlanNoteId.set(null);
+    this.planNoteClearPendingId.set(null);
     this.planNoteError.set('');
     this.planNoteForm.reset({ notes: '' });
+  }
+
+  protected requestPlanNoteClear(plan: FamilyPlanView): void {
+    if (plan.creatorProfileId !== this.ownerProfile()?.profileId || !plan.notes || this.planNoteSaving()) return;
+    this.planNoteClearPendingId.set(plan.planId);
+  }
+
+  protected cancelPlanNoteClear(): void {
+    this.planNoteClearPendingId.set(null);
+  }
+
+  protected confirmPlanNoteClear(plan: FamilyPlanView): void {
+    if (this.planNoteClearPendingId() !== plan.planId || !plan.notes) return;
+    this.planNoteClearPendingId.set(null);
+    this.savePlanNote(plan, true);
   }
 
   protected savePlanNote(plan: FamilyPlanView, clear = false): void {

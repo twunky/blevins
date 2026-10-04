@@ -94,6 +94,7 @@ export class Trips implements OnInit, OnChanges {
   protected readonly noteDraft = this.formBuilder.control('', [Validators.required, Validators.maxLength(1000)]);
   protected readonly noteEditDraft = this.formBuilder.control('', [Validators.required, Validators.maxLength(1000)]);
   protected readonly editingNoteId = signal<string | null>(null);
+  protected readonly noteRemovalPending = signal<{ noteId: string; action: 'delete' | 'hide' } | null>(null);
   protected readonly noteSaving = signal(false);
   protected readonly noteError = signal('');
   protected readonly availableMembers = signal<readonly Person[]>([]);
@@ -173,6 +174,7 @@ export class Trips implements OnInit, OnChanges {
 
   protected openCreate(): void {
     this.error.set('');
+    this.noteRemovalPending.set(null);
     this.editingTripId.set(null);
     this.selectedTrip.set(null);
     this.resetForm();
@@ -217,6 +219,7 @@ export class Trips implements OnInit, OnChanges {
    */
   private openRoutedTrip(tripId: string): void {
     this.detailError.set('');
+    this.noteRemovalPending.set(null);
     if (!isItemId(tripId)) {
       this.unavailable.set(true);
       return;
@@ -253,6 +256,7 @@ export class Trips implements OnInit, OnChanges {
 
   protected closeDetail(): void {
     this.selectedTrip.set(null);
+    this.noteRemovalPending.set(null);
     this.notes.set([]);
     this.notesTripId = null;
     this.notesReadState.set('idle');
@@ -423,8 +427,20 @@ export class Trips implements OnInit, OnChanges {
       () => this.editingNoteId.set(null));
   }
 
-  protected deleteNote(note: TripNote): void { this.removeNote(note, 'delete'); }
-  protected hideNote(note: TripNote): void { this.removeNote(note, 'hide'); }
+  protected requestNoteRemoval(note: TripNote, action: 'delete' | 'hide'): void {
+    if (!this.selectedTrip() || this.noteSaving()
+      || (action === 'delete' && !note.canDelete) || (action === 'hide' && !note.canHide)) return;
+    this.noteRemovalPending.set({ noteId: note.noteId, action });
+  }
+
+  protected cancelNoteRemoval(): void { this.noteRemovalPending.set(null); }
+
+  protected confirmNoteRemoval(note: TripNote): void {
+    const pending = this.noteRemovalPending();
+    if (!pending || pending.noteId !== note.noteId || this.noteSaving()) return;
+    this.noteRemovalPending.set(null);
+    this.removeNote(note, pending.action);
+  }
 
   private removeNote(note: TripNote, action: 'delete' | 'hide'): void {
     const trip = this.selectedTrip();

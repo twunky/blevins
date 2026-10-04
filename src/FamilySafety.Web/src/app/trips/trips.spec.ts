@@ -443,7 +443,7 @@ describe('Trips', () => {
     expect(notesSection.textContent).not.toContain('No Notes yet.');
   });
 
-  it('sends add, own edit, own delete, and creator hide through bounded routes', () => {
+  it('sends add and own edit through bounded routes', () => {
     const fixture = TestBed.createComponent(Trips);
     fixture.detectChanges();
     http.expectOne('/api/trips').flush([trip(true)]);
@@ -454,8 +454,6 @@ describe('Trips', () => {
       addNote: () => void;
       beginNoteEdit: (note: object) => void;
       saveNoteEdit: (note: object) => void;
-      deleteNote: (note: object) => void;
-      hideNote: (note: object) => void;
     };
     const own = { noteId: 'a', authorProfileId: creator.profileId, authorDisplayName: 'Alex',
       content: 'Original', createdAt: '2026-09-27T10:00:00Z', updatedAt: null,
@@ -480,18 +478,56 @@ describe('Trips', () => {
     expect(edit.request.body).toEqual({ content: 'Updated' });
     edit.flush(own);
     http.expectOne(base).flush([own, other]);
-    component.deleteNote(own);
-    const remove = http.expectOne(`${base}/a`);
-    expect(remove.request.method).toBe('DELETE');
-    remove.flush(null);
-    http.expectOne(base).flush([other]);
-    component.hideNote(other);
-    const hide = http.expectOne(`${base}/b/hide`);
-    expect(hide.request.body).toEqual({});
-    hide.flush(null);
-    http.expectOne(base).flush([]);
+  });
+
+  it.each([
+    { action: 'Delete note', confirm: 'Confirm delete', noteId: 'a', urlSuffix: '/a', method: 'DELETE', prompt: 'Delete this note?' },
+    { action: 'Hide note', confirm: 'Confirm hide', noteId: 'b', urlSuffix: '/b/hide', method: 'POST', prompt: 'Hide this note?' },
+  ])('requires confirmation before $action and keeps the Note on Cancel', ({ action, confirm, noteId, urlSuffix, method, prompt }) => {
+    const fixture = TestBed.createComponent(Trips);
+    fixture.componentRef.setInput('ownProfileId', creator.profileId);
     fixture.detectChanges();
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('No Notes yet.');
+    http.expectOne('/api/trips').flush([trip(true)]);
+    const component = fixture.componentInstance as unknown as { openRoutedTrip: (id: string) => void };
+    const own = { noteId: 'a', authorProfileId: creator.profileId, authorDisplayName: 'Alex',
+      content: 'Flight booked', createdAt: '2026-09-27T10:00:00Z', updatedAt: null,
+      canEdit: true, canDelete: true, canHide: false };
+    const other = { ...own, noteId: 'b', authorProfileId: recipient.profileId, authorDisplayName: 'Emma',
+      content: 'Rental car', canEdit: false, canDelete: false, canHide: true };
+    const base = `/api/trips/${trip(true).tripId}/notes`;
+    component.openRoutedTrip(trip(true).tripId);
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(trip(true));
+    http.expectOne(base).flush([own, other]);
+    fixture.detectChanges();
+    const notes = fixture.nativeElement as HTMLElement;
+    const note = () => Array.from(notes.querySelectorAll('li'))
+      .find(item => item.textContent?.includes(noteId === 'a' ? 'Flight booked' : 'Rental car'))!;
+    const button = (name: string) => Array.from(note().querySelectorAll('button'))
+      .find(candidate => candidate.textContent?.trim() === name)!;
+    expect(button(action)).toBeTruthy();
+    expect(note().textContent).not.toContain(noteId === 'a' ? 'Hide note' : 'Delete note');
+
+    button(action).click();
+    fixture.detectChanges();
+    expect(note().textContent).toContain(prompt);
+    expect(button(confirm)).toBeTruthy();
+    http.expectNone(`${base}${urlSuffix}`);
+    button('Cancel').click();
+    fixture.detectChanges();
+    expect(note().textContent).not.toContain(prompt);
+    expect(note().textContent).toContain(noteId === 'a' ? 'Flight booked' : 'Rental car');
+    http.expectNone(`${base}${urlSuffix}`);
+
+    button(action).click();
+    fixture.detectChanges();
+    button(confirm).click();
+    const removal = http.expectOne(`${base}${urlSuffix}`);
+    expect(removal.request.method).toBe(method);
+    if (method === 'POST') expect(removal.request.body).toEqual({});
+    removal.flush(null);
+    http.expectOne(base).flush(noteId === 'a' ? [other] : [own]);
+    fixture.detectChanges();
+    expect(notes.textContent).not.toContain(noteId === 'a' ? 'Flight booked' : 'Rental car');
   });
 });
 

@@ -940,20 +940,35 @@
                           <textarea id="item-plan-note" formControlName="notes" rows="4" maxlength="1000"></textarea>
                         </div>
                         @if (planNoteError()) { <p class="message message--error" role="alert">{{ planNoteError() }}</p> }
-                        <div class="button-row">
-                          <button type="submit" [disabled]="planNoteSaving()">Save note</button>
-                          <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="cancelPlanNoteEdit()">Cancel</button>
-                          @if (plan.notes) {
-                            <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="savePlanNote(plan, true)">Clear note</button>
-                          }
-                        </div>
+                        @if (planNoteClearPendingId() === plan.planId) {
+                          <p role="status">Clear this note? This removes the note from the Plan.</p>
+                          <div class="button-row">
+                            <button type="button" [disabled]="planNoteSaving()" (click)="confirmPlanNoteClear(plan)">Confirm clear</button>
+                            <button type="button" class="button--secondary" (click)="cancelPlanNoteClear()">Cancel</button>
+                          </div>
+                        } @else {
+                          <div class="button-row">
+                            <button type="submit" [disabled]="planNoteSaving()">Save note</button>
+                            <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="cancelPlanNoteEdit()">Cancel</button>
+                            @if (plan.notes) {
+                              <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="requestPlanNoteClear(plan)">Clear note</button>
+                            }
+                          </div>
+                        }
                       </form>
                     } @else {
                       <div class="plans-note-actions">
                         <button type="button" class="button--secondary" (click)="beginPlanNoteEdit(plan)">{{ plan.notes ? 'Edit note' : 'Add note' }}</button>
                         @if (plan.notes) {
-                          <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="savePlanNote(plan, true)">Clear note</button>
+                          <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="requestPlanNoteClear(plan)">Clear note</button>
                         }
+                      </div>
+                    }
+                    @if (editingPlanNoteId() !== plan.planId && planNoteClearPendingId() === plan.planId) {
+                      <p role="status">Clear this note? This removes the note from the Plan.</p>
+                      <div class="button-row">
+                        <button type="button" [disabled]="planNoteSaving()" (click)="confirmPlanNoteClear(plan)">Confirm clear</button>
+                        <button type="button" class="button--secondary" (click)="cancelPlanNoteClear()">Cancel</button>
                       </div>
                     }
                     @if (planNoteMessage()) { <p class="message message--success" role="status">{{ planNoteMessage() }}</p> }

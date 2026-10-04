@@ -331,6 +331,8 @@ test('Plan creator can add, edit, and clear the existing note on the item page',
   await detail.getByRole('button', { name: 'Save note' }).click();
   await expect(detail).toContainText('Bring water.');
   await detail.getByRole('button', { name: 'Clear note' }).click();
+  await expect(detail.getByText('Clear this note? This removes the note from the Plan.')).toBeVisible();
+  await detail.getByRole('button', { name: 'Confirm clear' }).click();
   await expect(detail.getByRole('button', { name: 'Add note' })).toBeVisible();
   await page.reload();
   await expect(detail).not.toContainText('Bring water.');

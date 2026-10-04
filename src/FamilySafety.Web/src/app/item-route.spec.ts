@@ -369,8 +369,36 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
     expect(article.textContent).toContain('Updated route note');
     expect(article.textContent).toContain('Plan note saved.');
 
+    button('Edit note').click();
+    harness.detectChanges();
+    const draft = article.querySelector<HTMLTextAreaElement>('textarea#item-plan-note')!;
+    draft.value = 'Keep this draft';
+    draft.dispatchEvent(new Event('input'));
     button('Clear note').click();
+    harness.detectChanges();
+    http.expectNone(`/api/plans/${itemId}/notes`);
+    button('Cancel').click();
+    harness.detectChanges();
+    expect(article.querySelector<HTMLTextAreaElement>('textarea#item-plan-note')?.value).toBe('Keep this draft');
+    expect(article.textContent).toContain('Updated route note');
+    button('Cancel').click();
+    harness.detectChanges();
+
+    button('Clear note').click();
+    harness.detectChanges();
+    expect(article.textContent).toContain('Clear this note?');
+    http.expectNone(`/api/plans/${itemId}/notes`);
+    button('Cancel').click();
+    harness.detectChanges();
+    expect(article.textContent).toContain('Updated route note');
+    expect(article.textContent).not.toContain('Clear this note?');
+    http.expectNone(`/api/plans/${itemId}/notes`);
+
+    button('Clear note').click();
+    harness.detectChanges();
+    button('Confirm clear').click();
     const clear = http.expectOne(`/api/plans/${itemId}/notes`);
+    expect(clear.request.method).toBe('PUT');
     expect(clear.request.body).toEqual({ notes: null });
     clear.flush({ ...original, notes: null });
     await settle(harness);

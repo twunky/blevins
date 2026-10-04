@@ -316,9 +316,18 @@
                 <p class="trip-text">{{ note.content }}</p>
                 <div class="trip-note-actions">
                   @if (note.canEdit) { <button type="button" class="button--secondary" (click)="beginNoteEdit(note)">Edit note</button> }
-                  @if (note.canDelete) { <button type="button" class="button--secondary" [disabled]="noteSaving()" (click)="deleteNote(note)">Delete note</button> }
-                  @if (note.canHide) { <button type="button" class="button--secondary" [disabled]="noteSaving()" (click)="hideNote(note)">Hide note</button> }
+                  @if (note.canDelete) { <button type="button" class="button--secondary" [disabled]="noteSaving()" (click)="requestNoteRemoval(note, 'delete')">Delete note</button> }
+                  @if (note.canHide) { <button type="button" class="button--secondary" [disabled]="noteSaving()" (click)="requestNoteRemoval(note, 'hide')">Hide note</button> }
                 </div>
+                @if (noteRemovalPending(); as pending) {
+                  @if (pending.noteId === note.noteId) {
+                    <p role="status">{{ pending.action === 'delete' ? 'Delete this note? This note will no longer appear in the Trip.' : 'Hide this note? This note will no longer be visible in the Trip Notes view.' }}</p>
+                    <div class="trip-note-actions">
+                      <button type="button" [disabled]="noteSaving()" (click)="confirmNoteRemoval(note)">{{ pending.action === 'delete' ? 'Confirm delete' : 'Confirm hide' }}</button>
+                      <button type="button" class="button--secondary" (click)="cancelNoteRemoval()">Cancel</button>
+                    </div>
+                  }
+                }
               }
             </li>
           }
