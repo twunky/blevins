@@ -1,19 +1,21 @@
 # FamilyConnect: Home Page Build Spec (for Codex)
 
+> **Archived historical brief.** This earlier Codex implementation prompt is not current implementation authority; its stack and staged instructions may be obsolete. Start with [AI context](../../README.md) and [project status](../../project-status.md) for current authority. Phase 9 closed under [DEC-081](../../decision-log.md), with its final exit mapping in [VER-PH-009](../../planning/verification/VER-PH-009.md). The original brief below is preserved for history; its image links point to the retained primary copies.
+
 ## 0. How to use this brief
 
 You are building the **Home / Dashboard** page of a web app called **FamilyConnect** (tagline: *Together. Informed. Connected.*).
 
-Reference images are in `./reference/`:
+Reference images are retained in [claude-handoff/reference](../../../claude-handoff/reference/):
 
 | File | What it is |
 |---|---|
-| `full-mockup.png` | The original 4-panel board. Overview only. Do not build from this alone, text is too small. |
-| `panel1-main-home.png` | **The default Home screen. Build this first.** |
-| `panel2-family-activity.png` | Variant: Family Activity & Coordination |
-| `panel3-travel-events.png` | Variant: Travel & Events Summary |
-| `panel4-safety-aware.png` | Variant: Safety-Aware Dashboard |
-| `detail-shell-topbar.png` | Close-up of sidebar and top bar |
+| [full-mockup.png](../../../claude-handoff/reference/full-mockup.png) | The original 4-panel board. Overview only. Do not build from this alone, text is too small. |
+| [panel1-main-home.png](../../../claude-handoff/reference/panel1-main-home.png) | **The default Home screen. Build this first.** |
+| [panel2-family-activity.png](../../../claude-handoff/reference/panel2-family-activity.png) | Variant: Family Activity & Coordination |
+| [panel3-travel-events.png](../../../claude-handoff/reference/panel3-travel-events.png) | Variant: Travel & Events Summary |
+| [panel4-safety-aware.png](../../../claude-handoff/reference/panel4-safety-aware.png) | Variant: Safety-Aware Dashboard |
+| [detail-shell-topbar.png](../../../claude-handoff/reference/detail-shell-topbar.png) | Close-up of sidebar and top bar |
 
 **Important:** the board shows **one Home page in four views**, not four unrelated pages. Panels 2-4 reuse the same shell (sidebar, top bar, card style) and the same components with different content. Build the shared shell and components once.
 

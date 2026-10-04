@@ -100,4 +100,4 @@ Phase 9 — Integration & UX Refinement is `COMPLETE / CLOSED` (`DEC-081`, 2026-
 
 ## Relationship to `codex-handoff/`
 
-`codex-handoff/` is an earlier, Codex-targeted Home-page build brief. It was used as a structural and workflow reference for this package only. Its stack (Next.js/Tailwind) and mock-data instructions do not apply. `codex-handoff/reference/` contains the same six images as `claude-handoff/reference/`; use the `claude-handoff` copies.
+The earlier Codex-targeted Home-page build brief is preserved at [ai-context/archive/codex-handoff/CODEX_PROMPT.md](../ai-context/archive/codex-handoff/CODEX_PROMPT.md). It is historical; its Next.js/Tailwind and mock-data instructions do not apply. Its six duplicate image copies were removed; the retained originals are in `claude-handoff/reference/`.

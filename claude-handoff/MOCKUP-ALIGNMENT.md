@@ -16,7 +16,7 @@ generated screenshots      = WHAT WAS BUILT BEFORE (evidence, not design)
 - Do not treat rendered verification evidence (`ai-context\planning\verification\evidence\**`, `src\FamilySafety.Web\*-review-*.png`) as equivalent to the mockups. Those images show what was built, not what is wanted.
 - Compare a screen with its approved reference only within a separately authorized UI work item. Later owner decisions and canonical rules control any difference.
 - The mockups do **not** authorize functionality. Canonical behavior remains in `ai-context`.
-- `codex-handoff\reference\` holds byte-for-byte copies of the same six files. Use the `claude-handoff\reference` copies.
+- The earlier Codex brief is [archived](../ai-context/archive/codex-handoff/CODEX_PROMPT.md). Its former `codex-handoff\reference\` copies were byte-for-byte duplicates; use the retained `claude-handoff\reference\` images.
 
 ## Reference inventory
 
