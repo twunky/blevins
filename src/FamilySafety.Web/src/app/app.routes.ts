@@ -27,7 +27,7 @@ export const routes: Routes = [
   { path: 'plans/:planId', component: App }, // Item URL (REQ-UX-014).
   { path: 'trips', component: App },
   { path: 'trips/:tripId', component: App }, // Item URL (REQ-UX-014).
-  { path: 'safety', component: App }, // Navigation landing only (REQ-UX-013).
+  { path: 'safety', component: App }, // Read-only Safety dashboard (DEC-079).
   { matcher: concernsMatcher, component: App },
   { matcher: incidentsMatcher, component: App },
   { path: 'me', component: App },

@@ -16,7 +16,7 @@ Confirm the authorizing work item and its scope before editing `src/` or `tests/
 
 ### Current authorized work item: none
 
-Phase 9 is `COMPLETE / CLOSED` under `DEC-081`; Phase 9.5 is `READY TO BEGIN` but no product implementation work item is authorized. The current approved activity is repository cleanup Wave 1, limited to current context and documentation reconciliation. Do not change application code, tests, or scripts under this authorization. The owner performs commits; do not commit or push.
+Phase 9 is `COMPLETE / CLOSED` under `DEC-081`; Phase 9.5 is `READY TO BEGIN` but no product implementation work item is authorized. The current approved activity is repository cleanup Wave 4, limited to current discoverability and stale-reference corrections, including the specified comment-only `/safety` route correction. Do not change application behavior, tests, or scripts under this authorization. The owner performs commits; do not commit or push.
 
 ### Historical: WI-009-010 — First-Use and Invitation Arrival Workflow — `DONE / PASS`, owner approved 2026-10-03
 
@@ -198,7 +198,7 @@ For **presentation-only UI work**, do not change .NET code, API routes, contract
 
 ## For a separately authorized product work item
 
-The permissions below describe the usual product work-item workflow. They do not expand the current documentation-only Wave 1 authorization.
+The permissions below describe the usual product work-item workflow. They do not expand the current Wave 4 maintenance authorization.
 
 - Edit the files the current authorized work item allows (see above).
 - Run `dotnet build`, `dotnet test`, Angular/Vitest tests, Playwright, and the production build.

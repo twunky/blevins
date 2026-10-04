@@ -22,7 +22,7 @@ Current approved panel mapping: ① Home (`DEC-076`), ② Family (`DEC-077`), �
 | Current state, next action, open decisions | `ai-context/project-status.md` |
 | Phase 9 closure, Phase 9.5 readiness, and other phase status | `ai-context/planning/roadmap.md`, `ai-context/decision-log.md` → `DEC-081`, `ai-context/planning/verification/VER-PH-009.md` |
 | Historical Phase 9 scope and exit criteria; current navigation and deep-link rules | `ai-context/planning/proposals/PRP-030-phase-9-scope-themes-and-exit-criteria.md` (closed Phase 9 planning basis), `ai-context/decision-log.md` → `DEC-074`, `DEC-075`, `DEC-081`; canonical `REQ-UX-011`, `REQ-UX-013`, `REQ-UX-014` (`ai-context/core/ux-contract.md`) and `REQ-PRIV-027` |
-| Current implementation authorization | None. Repository cleanup Wave 1 is documentation maintenance only; see `claude-handoff/CURRENT-TASK.md` and `ai-context/project-status.md`. |
+| Current implementation authorization | None. Repository cleanup Wave 4 is maintenance only; see `claude-handoff/CURRENT-TASK.md` and `ai-context/project-status.md`. |
 | Product behavior, boundaries, permissions | `ai-context/core/product-contract.md` (`REQ-PROD-004`, `REQ-PROD-007`–`012` for Concern) |
 | Privacy and safety rules, protected data, Concern and Incident access and retention | `ai-context/core/privacy-safety-contract.md` (`REQ-PRIV-005`–`008`, `011`, `025`, `026`) |
 | UX rules: calm presentation, accessibility, uncertainty, provenance | `ai-context/core/ux-contract.md` (`REQ-UX-001`, `003`–`008`, `010`–`012`) |

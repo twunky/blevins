@@ -28,7 +28,7 @@ Session and task guidance for Claude coding sessions working in this repository.
 - **Project root:** `C:\Dev\blevins`
 - **Product:** Family Safety, Coordination & Planning Application (local-first MVP; .NET 10 API + Angular 22 web client)
 - **Canonical context:** `C:\Dev\blevins\ai-context`
-- **Prepared:** 2026-10-01. Current guidance reconciled after Phase 9 closure (`DEC-081`; `VER-PH-009`) against active baseline `CTX-1.28`. Repository cleanup Wave 1 is documentation maintenance only; no product implementation item is authorized.
+- **Prepared:** 2026-10-01. Current guidance reconciled after Phase 9 closure (`DEC-081`; `VER-PH-009`) against active baseline `CTX-1.28`. Repository cleanup Wave 4 is maintenance only; no product implementation item is authorized.
 
 ## Source of truth
 
