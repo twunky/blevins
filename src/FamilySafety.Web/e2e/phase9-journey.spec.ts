@@ -103,14 +103,14 @@ test('invited adult completes the continuous Phase 9 cross-feature journey', asy
     await expect(page.getByRole('heading', { name: 'Invited adult Plan', exact: true })).toBeVisible();
     await area('Plans & Trips');
     await page.getByRole('link', { name: /^Open Trips/ }).click();
-    await page.getByRole('button', { name: 'Create Trip', exact: true }).click();
+    await page.getByRole('button', { name: 'Create trip', exact: true }).click();
     await page.locator('#trip-title').fill('Invited adult Trip');
     await page.locator('#trip-destination').fill('Family coast');
     await page.locator('#trip-start').fill(date(4));
     await page.locator('#trip-end').fill(date(6));
     await page.getByRole('group', { name: /^Travelers/ }).getByRole('checkbox', { name: /Development Recipient/ }).check();
-    await page.getByRole('radio', { name: 'This Family Group', exact: true }).check();
-    await page.locator('form.trip-form').getByRole('button', { name: 'Create Trip', exact: true }).click();
+    await page.getByRole('radio', { name: 'This Family', exact: true }).check();
+    await page.locator('form.trip-form').getByRole('button', { name: 'Create trip', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Invited adult Trip', exact: true })).toBeVisible();
     await capture('created-trip');
     await page.getByRole('link', { name: 'Back to Trips', exact: true }).click();
@@ -137,7 +137,7 @@ test('invited adult completes the continuous Phase 9 cross-feature journey', asy
     await page.getByRole('link', { name: /^Open Incident about Development Adult/ }).click();
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Incident about Development Adult', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: /Back to Incidents/ }).click();
+    await page.getByRole('link', { name: 'Back to Incidents', exact: true }).click();
     await page.getByRole('link', { name: 'Back to Safety', exact: true }).click();
     await capture('authorized-safety');
   });

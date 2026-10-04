@@ -23,7 +23,7 @@
               <span class="safety-row-top">
                 <strong><a class="item-link" [routerLink]="['/concerns', concern.concernId]" [state]="focusHeadingState"
                   [attr.aria-label]="'Open Concern about ' + concern.subjectName + ', ' + concern.state">Concern about {{ concern.subjectName }}</a></strong>
-                <span class="safety-state">{{ concern.state }}</span>
+                <span class="status-pill safety-state">{{ concern.state }}</span>
               </span>
               <span class="item-meta">{{ concern.creatorProfileId === ownProfileId ? 'Created by you' : 'You are a selected participant' }}@if (showFamilyName) { · {{ concern.familyGroupName }}}</span>
               <span class="item-meta">Last activity <time [attr.datetime]="concern.lastAuthorizedMutationAt">{{ concern.lastAuthorizedMutationAt | date:dateFormat }}</time></span>
@@ -59,7 +59,7 @@
               <span class="safety-row-top">
                 <strong><a class="item-link" [routerLink]="['/incidents', incident.incidentId]" [state]="focusHeadingState"
                   [attr.aria-label]="'Open Incident about ' + incident.subjectName + ', ' + incident.state">Incident about {{ incident.subjectName }}</a></strong>
-                <span class="safety-state">{{ incident.state }}</span>
+                <span class="status-pill safety-state">{{ incident.state }}</span>
               </span>
               <span class="item-meta">{{ incident.coordinatorProfileId === ownProfileId ? 'You coordinate this Incident' : 'Coordinated by ' + incident.coordinatorName }}@if (showFamilyName) { · {{ incident.familyGroupName }}}</span>
               <span class="item-meta">Last activity <time [attr.datetime]="incident.lastAuthorizedMutationAt">{{ incident.lastAuthorizedMutationAt | date:dateFormat }}</time></span>

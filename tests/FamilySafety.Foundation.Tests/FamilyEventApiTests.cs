@@ -24,6 +24,46 @@ public sealed class FamilyEventApiTests : IClassFixture<FamilyEventApiTests.Even
     }
 
     [Fact]
+    public async Task CreateEndpointReturnsTheCreatedEventItemLocation()
+    {
+        var eventId = Guid.NewGuid();
+        var recipientId = Guid.Parse("77777777-7777-7777-7777-777777777777");
+        service.Created = new FamilyEventView(
+            eventId,
+            StubFamilyEventService.GroupId,
+            "Family dinner",
+            "Bring a dish.",
+            new DateOnly(2026, 10, 3),
+            new TimeOnly(18, 30),
+            "Community room",
+            Guid.NewGuid(),
+            "Organizer",
+            true);
+
+        var response = await client.PostAsJsonAsync(
+            $"/api/family-groups/{StubFamilyEventService.GroupId:D}/events",
+            new
+            {
+                name = "Family dinner",
+                description = "Bring a dish.",
+                date = "2026-10-03",
+                time = "18:30",
+                location = "Community room",
+                audienceProfileIds = new[] { recipientId },
+                editorProfileIds = Array.Empty<Guid>(),
+            });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal($"/api/events/{eventId:D}", response.Headers.Location?.OriginalString);
+        Assert.Equal(StubFamilyEventService.GroupId, service.LastGroupId);
+        Assert.Equal(recipientId, Assert.Single(service.LastCreateRequest!.AudienceProfileIds));
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal(eventId, json.RootElement.GetProperty("eventId").GetGuid());
+        Assert.Equal("Family dinner", json.RootElement.GetProperty("name").GetString());
+        Assert.True(json.RootElement.GetProperty("canEdit").GetBoolean());
+    }
+
+    [Fact]
     public async Task UpdateEndpointPassesOnlyEventDetailsToService()
     {
         var eventId = Guid.NewGuid();
@@ -167,6 +207,8 @@ public sealed class FamilyEventApiTests : IClassFixture<FamilyEventApiTests.Even
         public Guid LastGroupId { get; private set; }
         public Guid LastEventId { get; private set; }
         public UpdateFamilyEventRequest? LastUpdateRequest { get; private set; }
+        public CreateFamilyEventRequest? LastCreateRequest { get; private set; }
+        public FamilyEventView? Created { get; set; }
         public FamilyEventView? Updated { get; set; }
         public bool Unavailable { get; set; }
         public FamilyEventView? Item { get; set; }
@@ -177,6 +219,8 @@ public sealed class FamilyEventApiTests : IClassFixture<FamilyEventApiTests.Even
             LastGroupId = Guid.Empty;
             LastEventId = Guid.Empty;
             LastUpdateRequest = null;
+            LastCreateRequest = null;
+            Created = null;
             Updated = null;
             Unavailable = false;
             Item = null;
@@ -200,8 +244,12 @@ public sealed class FamilyEventApiTests : IClassFixture<FamilyEventApiTests.Even
         public Task<FamilyEventView> CreateAsync(
             Guid familyGroupId,
             CreateFamilyEventRequest request,
-            CancellationToken cancellationToken) =>
-            throw new NotSupportedException("Event creation is not exercised in this API test.");
+            CancellationToken cancellationToken)
+        {
+            LastGroupId = familyGroupId;
+            LastCreateRequest = request;
+            return Task.FromResult(Created!);
+        }
 
         public Task<FamilyEventView> UpdateAsync(
             Guid familyGroupId,

@@ -6,4 +6,14 @@ The client provides Home, Family and Family Settings, Events, Plans & Trips, Saf
 
 In `src/app`, `app.ts` and `app.html` still implement Home, Family, Events, Plans, Me / Settings, and first use. Standalone feature code lives in `concerns/`, `incidents/`, `trips/`, `safety/`, and `plans-trips/`; navigation and cross-feature item routing remain at the app root.
 
+## Structure and extraction
+
+This is the current rule for organizing `src/app`:
+
+- **A folder is a real boundary.** Create a folder only when it holds a genuine ownership or implementation boundary, such as `concerns/`, `incidents/`, `trips/`, `safety/`, or `plans-trips/`. Do not create feature folders for symmetry.
+- **No dumping grounds.** Do not create `shared/`, `core/`, `common/`, `utils/`, or `features/` folders. Keep a cross-feature helper at the app root under a name that says what it does, as `navigation.ts`, `item-route.ts`, and `date-format.ts` do.
+- **`App` concentration is not a defect by itself.** Home, Family, Family Settings, Events, Plans, Me / Settings, and first use stay in `App` until there is a concrete reason to move them.
+- **Extract incrementally.** Move a feature out of `App` as part of an authorized work item, when that feature's growth creates a real boundary: for example, its own state, API calls, and tests that no longer depend on `App`'s shared Family-scoped state. Do not run broad `App` decomposition as a cleanup project.
+- **Family-scoped state in `App`.** If you add Family-scoped state to `App`, also reset it in `clearFamilyScopedState()` so a Family switch never shows another Family's data.
+
 See the [repository README](../../README.md) for the project overview, [local development](../../docs/local-development.md) for setup and test-artifact guidance, and [AI context](../../ai-context/README.md) for authoritative product and project rules.

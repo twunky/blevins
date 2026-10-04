@@ -39,6 +39,8 @@ export class Concerns implements OnInit, OnChanges {
   protected readonly saving = signal(false);
   protected readonly listError = signal('');
   protected readonly actionError = signal('');
+  /** The routed Concern read failed for a reason other than unavailability; Retry repeats that read. */
+  protected readonly detailReadFailed = signal(false);
   protected readonly unavailable = signal(false);
   protected readonly showCreate = signal(false);
   protected readonly initialKind = signal<InitialKind>('None');
@@ -128,6 +130,7 @@ export class Concerns implements OnInit, OnChanges {
    */
   private openConcern(concernId: string): void {
     this.actionError.set('');
+    this.detailReadFailed.set(false);
     this.unavailable.set(false);
     this.selected.set(null);
     if (!isItemId(concernId)) {
@@ -147,11 +150,19 @@ export class Concerns implements OnInit, OnChanges {
         if (this.concernId !== concernId) return;
         this.loadingDetail.set(false);
         if (this.isUnavailable(error)) this.showUnavailable();
-        else this.actionError.set(this.isUnauthorized(error)
-          ? 'Your session may have ended. Please sign in again.'
-          : 'This Concern could not be opened. Please try again.');
+        else {
+          this.actionError.set(this.isUnauthorized(error)
+            ? 'Your session may have ended. Please sign in again.'
+            : 'This Concern could not be opened. Please try again.');
+          this.detailReadFailed.set(true);
+        }
       },
     });
+  }
+
+  /** Repeats the same protected item read; the server still authorizes it, and a 404 still shows the unavailable state. */
+  protected retryOpenConcern(): void {
+    if (this.concernId) this.openConcern(this.concernId);
   }
 
   /** Returns to the list, and to the list URL when this is a Concern URL. */
@@ -177,6 +188,7 @@ export class Concerns implements OnInit, OnChanges {
     this.loadingDetail.set(false);
     this.unavailable.set(false);
     this.actionError.set('');
+    this.detailReadFailed.set(false);
     this.managingParticipants.set(false);
     this.composing.set(null);
     this.resolving.set(false);
@@ -185,6 +197,7 @@ export class Concerns implements OnInit, OnChanges {
   protected openCreate(): void {
     this.showCreate.set(true);
     this.actionError.set('');
+    this.detailReadFailed.set(false);
     this.focusById('create-concern-heading');
   }
 

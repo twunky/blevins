@@ -257,7 +257,67 @@ describe('Home and feature empty states', () => {
     expect(harness.routeNativeElement?.textContent).toContain('No Trips are currently available to you');
     expect(harness.routeNativeElement?.textContent).toContain('Trip Notes for authorized viewers');
     expect(Array.from(harness.routeNativeElement!.querySelectorAll('button'))
-      .some(button => button.textContent?.trim() === 'Create Trip')).toBe(true);
+      .some(button => button.textContent?.trim() === 'Create trip')).toBe(true);
+  });
+
+  it('offers a Retry for each failed Home read that repeats only that read and then shows its content', async () => {
+    const harness = await visit('/home');
+    initial([family]);
+    const fail = { status: 503, statusText: 'Unavailable' };
+    http.expectOne(`/api/family-groups/${family.familyGroupId}/members`).flush([{ profileId: 'person-a', displayName: 'Alex' }]);
+    http.expectOne(`/api/family-groups/${family.familyGroupId}/relationships`).flush({}, fail);
+    http.expectOne(`/api/family-groups/${family.familyGroupId}/events`).flush({}, fail);
+    http.expectOne(`/api/family-groups/${family.familyGroupId}/plans`).flush({}, fail);
+    http.expectOne('/api/trips').flush({}, fail);
+    harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    const retry = (name: string) => Array.from(root.querySelectorAll('button')).find(button => button.textContent?.trim() === name);
+    const unrelated = (except: string) => [
+      `/api/family-groups/${family.familyGroupId}/relationships`, `/api/family-groups/${family.familyGroupId}/events`,
+      `/api/family-groups/${family.familyGroupId}/plans`, '/api/trips', `/api/family-groups/${family.familyGroupId}/members`,
+    ].filter(url => url !== except).forEach(url => http.expectNone(url));
+    for (const name of ['Retry loading relationships', 'Retry loading Events', 'Retry loading Plans', 'Retry loading Trips'])
+      expect(retry(name)).toBeDefined();
+
+    retry('Retry loading Events')!.click();
+    harness.detectChanges();
+    expect(root.textContent).toContain('Loading Events…');
+    expect(root.textContent).not.toContain('Events could not be loaded');
+    const eventsUrl = `/api/family-groups/${family.familyGroupId}/events`;
+    unrelated(eventsUrl);
+    http.expectOne(eventsUrl).flush([{ eventId: 'event-1', familyGroupId: family.familyGroupId, name: 'Retried picnic',
+      description: 'Bring food', date: dateAfter(3), time: '12:00:00', location: 'Park', organizerProfileId: 'person-a',
+      organizerDisplayName: 'Alex', canEdit: true }]);
+    harness.detectChanges();
+    expect(root.textContent).toContain('Retried picnic');
+    expect(retry('Retry loading Events')).toBeUndefined();
+
+    retry('Retry loading Plans')!.click();
+    const plansUrl = `/api/family-groups/${family.familyGroupId}/plans`;
+    unrelated(plansUrl);
+    http.expectOne(plansUrl).flush([planPreview('Retried plan', 2, null)]);
+    harness.detectChanges();
+    expect(root.textContent).toContain('Retried plan');
+
+    retry('Retry loading Trips')!.click();
+    unrelated('/api/trips');
+    http.expectOne('/api/trips').flush([{ tripId: 'trip-1', familyGroupId: family.familyGroupId, title: 'Retried trip',
+      primaryDestination: 'Atlanta', startDate: dateAfter(1), endDate: dateAfter(4) }]);
+    harness.detectChanges();
+    expect(root.textContent).toContain('Retried trip');
+
+    // A Retry that fails again returns to the same safe error state with Retry still offered.
+    retry('Retry loading relationships')!.click();
+    const relationshipsUrl = `/api/family-groups/${family.familyGroupId}/relationships`;
+    unrelated(relationshipsUrl);
+    http.expectOne(relationshipsUrl).flush({}, fail);
+    harness.detectChanges();
+    expect(root.textContent).toContain('Family relationships could not be loaded');
+    retry('Retry loading relationships')!.click();
+    http.expectOne(relationshipsUrl).flush([]);
+    harness.detectChanges();
+    expect(root.textContent).toContain('Nothing needs your attention right now.');
+    expect(retry('Retry loading relationships')).toBeUndefined();
   });
 
   it('does not present the Event empty state when its authorized list fails to load', async () => {
@@ -273,7 +333,8 @@ describe('Home and feature empty states', () => {
     eventsHarness.detectChanges();
     expect(eventsHarness.routeNativeElement?.textContent).toContain('Events could not be loaded');
     expect(eventsHarness.routeNativeElement?.textContent).not.toContain('No Events are currently shared with you');
-
+    expect(Array.from(eventsHarness.routeNativeElement!.querySelectorAll('button'))
+      .some(button => button.textContent?.trim() === 'Retry loading Events')).toBe(true);
   });
 
   it('does not present the Plan empty state when its authorized list fails to load', async () => {
@@ -289,6 +350,15 @@ describe('Home and feature empty states', () => {
     harness.detectChanges();
     expect(harness.routeNativeElement?.textContent).toContain('Plans could not be loaded');
     expect(harness.routeNativeElement?.textContent).not.toContain('No Plans are currently visible to you');
+
+    // Retry repeats only the Plan list read; a successful read shows the normal empty state.
+    Array.from(harness.routeNativeElement!.querySelectorAll('button'))
+      .find(button => button.textContent?.trim() === 'Retry loading Plans')!.click();
+    http.expectNone(`/api/family-groups/${family.familyGroupId}/events`);
+    http.expectOne(`/api/family-groups/${family.familyGroupId}/plans`).flush([]);
+    harness.detectChanges();
+    expect(harness.routeNativeElement?.textContent).toContain('No Plans are currently visible to you');
+    expect(harness.routeNativeElement?.textContent).not.toContain('Plans could not be loaded');
   });
 
   it('shows a retryable Trip load error without presenting the successful empty state', async () => {

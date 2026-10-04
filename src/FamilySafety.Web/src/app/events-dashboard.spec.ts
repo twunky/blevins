@@ -236,6 +236,61 @@ describe('Events dashboard, Create event, and All events (WI-009-008)', () => {
     expect(root(harness).querySelector('#event-name')).toBeNull();
   });
 
+  it('shows the existing Event success message on /events/all after a successful inline edit', async () => {
+    const editable = event(1, 'Past picnic', -30, { canEdit: true });
+    const harness = await open('/events/all', [editable], null);
+    const list = root(harness).querySelector<HTMLElement>('.events-overview')!;
+    expect(list.querySelector('[role="status"]')).toBeNull();
+    Array.from(list.querySelectorAll('button')).find(button => button.textContent?.includes('Edit event details'))!.click();
+    harness.detectChanges();
+    const component = harness.routeDebugElement!.componentInstance as { eventEditForm: { patchValue: (value: object) => void } };
+    component.eventEditForm.patchValue({ name: 'Spring picnic' });
+    Array.from(list.querySelectorAll('button')).find(button => button.textContent?.trim() === 'Save event details')!.click();
+    const update = http.expectOne(`/api/family-groups/${familyA.familyGroupId}/events/${guid(1)}`);
+    expect(update.request.method).toBe('PUT');
+    update.flush({ ...editable, name: 'Spring picnic' });
+    harness.detectChanges();
+    expect(list.querySelector('[role="status"]')?.textContent).toContain('Event details updated.');
+    expect(rowNames(list)).toEqual(['Spring picnic']);
+  });
+
+  it('on /events/new, shows a failed member read with Retry instead of the one-person explanation', async () => {
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/events/new', App);
+    shellReads();
+    http.expectOne(`/api/family-groups/${familyA.familyGroupId}/members`).flush({}, { status: 503, statusText: 'Unavailable' });
+    http.expectOne(`/api/family-groups/${familyA.familyGroupId}/relationships`).flush([]);
+    http.expectOne(`/api/family-groups/${familyA.familyGroupId}/events`).flush([]);
+    http.expectOne(`/api/family-groups/${familyA.familyGroupId}/plans`).flush([]);
+    harness.detectChanges();
+    const form = root(harness).querySelector<HTMLElement>('form.events-create-form')!;
+    expect(form.textContent).toContain('Your family directory could not be loaded.');
+    expect(form.textContent).not.toContain('This Family has no other active adult members yet.');
+    Array.from(form.querySelectorAll('button')).find(button => button.textContent?.trim() === 'Retry loading Family members')!.click();
+    http.expectNone(`/api/family-groups/${familyA.familyGroupId}/events`);
+    http.expectOne(`/api/family-groups/${familyA.familyGroupId}/members`).flush(members);
+    harness.detectChanges();
+    expect(root(harness).querySelector('#event-access-sam')).not.toBeNull();
+    expect(form.textContent).not.toContain('could not be loaded');
+  });
+
+  it('offers Retry on /events/all when the Event list read fails, and shows the list after it succeeds', async () => {
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/events/all', App);
+    shellReads();
+    http.expectOne(`/api/family-groups/${familyA.familyGroupId}/members`).flush(members);
+    http.expectOne(`/api/family-groups/${familyA.familyGroupId}/relationships`).flush([]);
+    http.expectOne(`/api/family-groups/${familyA.familyGroupId}/events`).flush({}, { status: 503, statusText: 'Unavailable' });
+    http.expectOne(`/api/family-groups/${familyA.familyGroupId}/plans`).flush([]);
+    harness.detectChanges();
+    const list = root(harness).querySelector<HTMLElement>('.events-overview')!;
+    expect(list.textContent).toContain('Events could not be loaded');
+    Array.from(list.querySelectorAll('button')).find(button => button.textContent?.trim() === 'Retry loading Events')!.click();
+    http.expectOne(`/api/family-groups/${familyA.familyGroupId}/events`).flush([event(1, 'Retried dinner', 5)]);
+    harness.detectChanges();
+    expect(rowNames(list)).toEqual(['Retried dinner']);
+  });
+
   it('clears and reloads the dashboard Event and Trip summaries when the Family changes', async () => {
     TestBed.inject(CurrentFamilyContext).familyId.set(familyA.familyGroupId);
     const harness = await RouterTestingHarness.create();

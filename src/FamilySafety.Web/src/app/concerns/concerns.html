@@ -1,10 +1,13 @@
 <div class="concerns-page">
   @if (actionError()) {
     <p class="concerns-alert" role="alert">{{ actionError() }}</p>
+    @if (detailReadFailed()) {
+      <div class="concerns-actions"><button type="button" class="button--secondary" (click)="retryOpenConcern()">Retry loading Concern</button></div>
+    }
   }
 
   @if (unavailable()) {
-    <section class="concerns-card concerns-empty" aria-labelledby="unavailable-heading">
+    <section class="card concerns-card concerns-empty" aria-labelledby="unavailable-heading">
       <h2 id="unavailable-heading" tabindex="-1">This Concern is unavailable</h2>
       <p>Only Concerns currently shared with you can be opened.</p>
       <button type="button" class="button--secondary concerns-secondary" (click)="backToList()">Return to Concerns</button>
@@ -12,7 +15,7 @@
   } @else if (loadingDetail()) {
     <p class="concerns-status" role="status">Loading Concern…</p>
   } @else if (selected(); as concern) {
-    <a class="concerns-back button-link" routerLink="/concerns" [state]="focusHeadingState" (click)="resetDetail()">← Back to Concerns</a>
+    <a class="detail-back-link" routerLink="/concerns" [state]="focusHeadingState" (click)="resetDetail()"><app-icon name="back" />Back to Concerns</a>
 
     @if (initialEntryMessage()) {
       <section class="concerns-partial" [class.concerns-partial--error]="initialEntryFailure()" aria-live="polite">
@@ -43,7 +46,7 @@
           </dl>
         </div>
         <div class="concerns-hero-state">
-          <span [class]="'concerns-state concerns-state--' + concern.state.toLowerCase()">{{ concern.state }}</span>
+          <span [class]="'status-pill concerns-state concerns-state--' + concern.state.toLowerCase()">{{ concern.state }}</span>
           <p>{{ stateDescription(concern.state) }}</p>
         </div>
         @if (concern.state === 'Frozen') {
@@ -52,7 +55,7 @@
       </section>
 
       @if (concern.state === 'Resolved') {
-        <section class="concerns-card concerns-outcome" aria-labelledby="resolution-heading">
+        <section class="card concerns-card concerns-outcome" aria-labelledby="resolution-heading">
           <h3 id="resolution-heading">Resolution</h3>
           <p class="concerns-meta">Resolved by {{ concern.creatorName }}@if (concern.resolvedAt) { · {{ concern.resolvedAt | date:dateFormat }}}</p>
           @if (concern.resolutionNote) { <p class="concerns-outcome-note">{{ concern.resolutionNote }}</p> }
@@ -62,7 +65,7 @@
 
       <div class="concerns-layout">
         <div class="concerns-main">
-          <section class="concerns-card" aria-labelledby="concern-history-heading">
+          <section class="card concerns-card" aria-labelledby="concern-history-heading">
             <div class="concerns-card-heading">
               <h3 id="concern-history-heading">History</h3>
             </div>
@@ -73,10 +76,10 @@
               <ol class="concerns-timeline" aria-label="Concern entries in chronological order">
                 @for (entry of concern.entries; track entry.entryId) {
                   <li [id]="'concern-entry-' + entry.entryId" [class]="'concerns-entry concerns-entry--' + entry.kind.toLowerCase()">
-                    <time class="concerns-entry-time" [attr.datetime]="entry.recordedAt" [title]="'Recorded ' + (entry.recordedAt | date:dateFormat)"><span aria-hidden="true">{{ entry.recordedAt | date:timelineFormat }}</span><span class="concerns-sr-only">Recorded {{ entry.recordedAt | date:dateFormat }}</span></time>
+                    <time class="concerns-entry-time" [attr.datetime]="entry.recordedAt" [title]="'Recorded ' + (entry.recordedAt | date:dateFormat)"><span aria-hidden="true">{{ entry.recordedAt | date:timelineFormat }}</span><span class="visually-hidden">Recorded {{ entry.recordedAt | date:dateFormat }}</span></time>
                     <div class="concerns-entry-body">
                       <p class="concerns-entry-kind">{{ entryKindText(entry.kind) }}</p>
-                      <h4>{{ entry.contributorName }} <span class="concerns-category">{{ categoryText(entry) }}</span></h4>
+                      <h4>{{ entry.contributorName }} <span class="status-pill concerns-category">{{ categoryText(entry) }}</span></h4>
                       <p class="concerns-entry-text">{{ entry.text }}</p>
                       <p class="concerns-meta">
                         Source: {{ entry.sourceUnknown ? 'Unknown source' : entry.sourceDescription }}
@@ -106,7 +109,7 @@
           </section>
 
           @if (composing(); as kind) {
-            <section class="concerns-card concerns-composer" aria-labelledby="entry-composer-heading">
+            <section class="card concerns-card concerns-composer" aria-labelledby="entry-composer-heading">
               <h3 id="entry-composer-heading" tabindex="-1">
                 {{ kind === 'Correction' ? 'Add a correction' : kind === 'Challenge' ? 'Add another report' : kind === 'Unknown' ? 'Record an Unknown' : 'Add an observation' }}
               </h3>
@@ -176,7 +179,7 @@
         </div>
 
         <aside class="concerns-side" aria-label="Concern access and actions">
-          <section class="concerns-card" aria-labelledby="concern-audience-heading">
+          <section class="card concerns-card" aria-labelledby="concern-audience-heading">
             <div class="concerns-card-heading">
               <h3 id="concern-audience-heading">People with Concern access</h3>
               @if (concern.state === 'Open' && isCreator(concern) && !managingParticipants()) {
@@ -219,7 +222,7 @@
           </section>
 
           @if (isCreator(concern)) {
-            <section class="concerns-card" aria-labelledby="concern-incident-heading">
+            <section class="card concerns-card" aria-labelledby="concern-incident-heading">
               <h3 id="concern-incident-heading">Separate Incident</h3>
               <p class="concerns-help">If this needs coordinated family follow-up, you can start a separate Incident. Nothing here is copied or shared.</p>
               <button type="button" class="button--secondary" (click)="startIncident(concern)">Start an Incident…</button>
@@ -227,7 +230,7 @@
           }
 
           @if (concern.state === 'Open' && (canContribute(concern) || isCreator(concern))) {
-            <section class="concerns-card" aria-labelledby="concern-actions-heading">
+            <section class="card concerns-card" aria-labelledby="concern-actions-heading">
               <h3 id="concern-actions-heading">Contribute</h3>
               @if (canContribute(concern) && !composing()) {
                 <div class="concerns-actions concerns-actions--stack">
@@ -261,7 +264,7 @@
     </article>
   } @else if (showCreate()) {
     <button type="button" class="concerns-back" (click)="closeCreate()">← Back to Concerns</button>
-    <section class="concerns-card concerns-create" aria-labelledby="create-concern-heading">
+    <section class="card concerns-card concerns-create" aria-labelledby="create-concern-heading">
       <h2 id="create-concern-heading" tabindex="-1">Create a Concern</h2>
       <p class="concerns-help">A Concern is a private coordination record for uncertainty. It does not establish danger or safety.</p>
       @if (loadingMembers()) { <p class="concerns-status" role="status">Loading active adult family members…</p> }
@@ -359,9 +362,9 @@
       </section>
     }
   } @else {
-    <section class="concerns-card concerns-list-section" aria-labelledby="concern-list-heading">
+    <section class="card concerns-card concerns-list-section" aria-labelledby="concern-list-heading">
       <div class="concerns-card-heading">
-        <span class="concerns-icon"><app-icon name="shield" /></span>
+        <span class="card-icon"><app-icon name="shield" /></span>
         <div class="concerns-heading-text">
           <h2 id="concern-list-heading">Concerns available to you</h2>
           <p class="concerns-help">Only Concerns returned by the authorized service appear here.</p>
@@ -387,12 +390,12 @@
         <ul class="concerns-list">
           @for (concern of concerns(); track concern.concernId) {
             <li>
-              <a class="concern-card item-link" [class.concern-card--open]="concern.state === 'Open'" [routerLink]="['/concerns', concern.concernId]" [state]="focusHeadingState" [attr.aria-label]="'Open Concern about ' + concern.subjectName + ', ' + concern.state">
+              <a class="card concern-card item-link" [class.concern-card--open]="concern.state === 'Open'" [routerLink]="['/concerns', concern.concernId]" [state]="focusHeadingState" [attr.aria-label]="'Open Concern about ' + concern.subjectName + ', ' + concern.state">
                 <span class="concerns-avatar concerns-avatar--large" aria-hidden="true">{{ initials(concern.subjectName) }}</span>
                 <span class="concern-card-body">
                   <span class="concern-card-top">
                     <strong>{{ concern.subjectName }}</strong>
-                    <span [class]="'concerns-state concerns-state--' + concern.state.toLowerCase()">{{ concern.state }}</span>
+                    <span [class]="'status-pill concerns-state concerns-state--' + concern.state.toLowerCase()">{{ concern.state }}</span>
                   </span>
                   <span class="concern-card-reason">{{ concern.creationReason }}</span>
                   <span class="concerns-meta">{{ concern.creatorProfileId === ownProfileId ? 'Created by you' : 'You are a selected participant' }}</span>

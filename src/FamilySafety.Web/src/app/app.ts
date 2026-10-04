@@ -462,6 +462,9 @@ export class App implements OnInit {
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly errorMessage = signal('');
+  /** The own-profile read failed (Retry applies), as opposed to a profile save failing. */
+  protected readonly profileLoadFailed = signal(false);
+  protected readonly profileReloading = signal(false);
   protected readonly successMessage = signal('');
   protected readonly administeredGroups = signal<readonly AdministeredFamilyGroup[]>([]);
   protected readonly invitationBusy = signal(false);
@@ -476,11 +479,15 @@ export class App implements OnInit {
   protected readonly directoryMembers = signal<readonly FamilyDirectoryEntry[]>([]);
   protected readonly directoryLoading = signal(false);
   protected readonly directoryError = signal('');
+  /** The member list read itself failed (Retry applies), as opposed to a single member's profile being unavailable. */
+  protected readonly directoryLoadFailed = signal(false);
   protected readonly selectedMember = signal<SharedAdultProfile | null>(null);
   protected readonly familyRelationships = signal<readonly FamilyRelationshipView[]>([]);
   protected readonly relationshipLoading = signal(false);
   protected readonly relationshipSubmitting = signal(false);
   protected readonly relationshipError = signal('');
+  /** The relationship list read itself failed (Retry applies), as opposed to a suggestion or response action failing. */
+  protected readonly relationshipsLoadFailed = signal(false);
   protected readonly relationshipMessage = signal('');
   protected readonly relationshipBusyId = signal('');
   protected readonly relationshipRemovalPendingId = signal('');
@@ -561,17 +568,7 @@ export class App implements OnInit {
         }
       }
     }
-    this.http.get<AdultProfile>('/api/profile').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (profile) => {
-        this.ownerProfile.set(profile);
-        this.applyProfile(profile);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.errorMessage.set('Your profile could not be loaded. Please try again.');
-        this.loading.set(false);
-      },
-    });
+    this.loadProfile();
     this.http.get<AdministeredFamilyGroup[]>('/api/family-groups/administered').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (groups) => {
         this.administeredGroups.set(groups);
@@ -697,6 +694,45 @@ export class App implements OnInit {
 
   protected retryMemberships(): void { this.loadMemberships(); }
 
+  private loadProfile(): void {
+    this.http.get<AdultProfile>('/api/profile')
+      .pipe(finalize(() => this.profileReloading.set(false)), takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: (profile) => {
+          this.ownerProfile.set(profile);
+          this.applyProfile(profile);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.errorMessage.set('Your profile could not be loaded. Please try again.');
+          this.profileLoadFailed.set(true);
+          this.loading.set(false);
+        },
+      });
+  }
+
+  /**
+   * Repeats only the profile read. The page stays in place with its own loading status: re-entering the initial
+   * `loading` state would re-create every embedded page and repeat their reads.
+   */
+  protected retryProfile(): void {
+    this.errorMessage.set('');
+    this.profileLoadFailed.set(false);
+    this.profileReloading.set(true);
+    this.loadProfile();
+  }
+
+  // Retry for a failed read repeats only that read, through its existing loader and the same server authorization.
+  protected retryEvents(): void { this.loadEvents(); }
+  protected retryPlans(): void { this.loadPlans(); }
+  protected retryDirectory(): void { this.loadDirectory(); }
+  protected retryRelationships(): void { this.loadRelationships(); }
+  protected retryHomeTrips(): void {
+    const familyId = this.currentFamilyId();
+    if (familyId) this.loadHomeTrips(familyId);
+  }
+  /** Repeats the authorize-first item read (OD-C): the item is read by ID before any Family decision. */
+  protected retryRoutedItem(): void { this.openRoutedItem(); }
+
   /** `refresh` (OD-B) keeps the current selection's loaded state when the refreshed list still selects it. */
   private loadMemberships(refresh = false): void {
     const membershipVersion = ++this.membershipLoadVersion;
@@ -758,10 +794,12 @@ export class App implements OnInit {
     this.directoryMembers.set([]);
     this.directoryLoading.set(false);
     this.directoryError.set('');
+    this.directoryLoadFailed.set(false);
     this.clearDirectorySelection();
     this.familyRelationships.set([]);
     this.relationshipLoading.set(false);
     this.relationshipError.set('');
+    this.relationshipsLoadFailed.set(false);
     this.relationshipMessage.set('');
     this.relationshipRemovalPendingId.set('');
     this.relationshipBusyId.set('');
@@ -900,17 +938,6 @@ export class App implements OnInit {
     this.submitRecipientAction('/api/membership-invitations/decline', 'Invitation declined.');
   }
 
-  protected changeFamilyGroup(): void {
-    this.directoryForm.controls.search.setValue('');
-    this.clearDirectorySelection();
-    this.familyRelationships.set([]);
-    this.relationshipForm.reset({ recipientProfileId: '', proposerLabel: 'OtherFamily' });
-    this.relationshipError.set('');
-    this.relationshipMessage.set('');
-    this.loadDirectory();
-    this.loadRelationships();
-  }
-
   protected eventAccessForMember(profileId: string): 'none' | 'view' | 'edit' {
     if (this.eventEditorProfileIds().includes(profileId)) return 'edit';
     if (this.eventAudienceProfileIds().includes(profileId)) return 'view';
@@ -931,20 +958,6 @@ export class App implements OnInit {
     this.eventAudienceProfileIds.set([...audience]);
     this.eventEditorProfileIds.set([...editors]);
     this.eventError.set('');
-  }
-
-  protected changeEventGroup(): void {
-    this.eventAudienceProfileIds.set([]);
-    this.eventEditorProfileIds.set([]);
-    this.eventAudienceSearch.set('');
-    this.familyEvents.set([]);
-    this.editingEventId.set(null);
-    this.eventEditForm.reset();
-    this.eventEditError.set('');
-    this.eventMessage.set('');
-    this.eventError.set('');
-    this.loadEvents();
-    this.loadEventAudienceMembers();
   }
 
   protected createEvent(): void {
@@ -1000,16 +1013,6 @@ export class App implements OnInit {
         },
         error: () => this.eventError.set('The event could not be created. Please try again.'),
       });
-  }
-
-  protected changePlanGroup(): void {
-    this.planAudienceProfileIds.set([]);
-    this.planAudienceSearch.set('');
-    this.planError.set('');
-    this.planMessage.set('');
-    this.familyPlans.set([]);
-    this.loadPlans();
-    this.loadPlanAudienceMembers();
   }
 
   protected availablePlanAudienceMembers(): readonly FamilyDirectoryEntry[] {
@@ -1365,6 +1368,7 @@ export class App implements OnInit {
         next: (profile) => {
           this.ownerProfile.set(profile);
           this.applyProfile(profile);
+          this.profileLoadFailed.set(false);
           this.successMessage.set('Profile saved.');
         },
         error: (error: HttpErrorResponse) => {
@@ -1424,6 +1428,7 @@ export class App implements OnInit {
     const query = search ? `?search=${encodeURIComponent(search)}` : '';
     this.directoryLoading.set(true);
     this.directoryError.set('');
+    this.directoryLoadFailed.set(false);
     this.http
       .get<FamilyDirectoryEntry[]>(
         `/api/family-groups/${encodeURIComponent(familyGroupId)}/members${query}`,
@@ -1446,6 +1451,7 @@ export class App implements OnInit {
           if (requestVersion !== this.directoryRequestVersion) return;
           this.directoryMembers.set([]);
           this.directoryError.set('Your family directory could not be loaded. Please try again.');
+          this.directoryLoadFailed.set(true);
         },
       });
   }
@@ -1611,6 +1617,7 @@ export class App implements OnInit {
     const requestVersion = ++this.relationshipRequestVersion;
     this.relationshipLoading.set(true);
     this.relationshipError.set('');
+    this.relationshipsLoadFailed.set(false);
     this.http
       .get<FamilyRelationshipView[]>(
         `/api/family-groups/${encodeURIComponent(familyGroupId)}/relationships`,
@@ -1640,6 +1647,7 @@ export class App implements OnInit {
             this.relationshipError.set(
               'Family relationships could not be loaded. Please try again.',
             );
+            this.relationshipsLoadFailed.set(true);
           }
         },
       });

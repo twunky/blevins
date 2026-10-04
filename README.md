@@ -6,7 +6,7 @@ Local-first MVP for private family coordination and safety, with a .NET API and 
 
 The application includes Home, Family and Family Settings, Events, Plans & Trips, Safety, and Me / Settings. It supports adult profiles, family relationships and invitations, Event and Plan coordination, Trips and Trip Notes, and private Concern and Safety Incident workflows. Approved capabilities that are not yet implemented remain outside the current application.
 
-**Project state:** Phase 9 is `COMPLETE / CLOSED` under [DEC-081](ai-context/decision-log.md) and [VER-PH-009](ai-context/planning/verification/VER-PH-009.md). `CTX-1.28` is active; development user testing is ready. Phase 9.5 is `READY TO BEGIN`, but no product implementation item is authorized. See [project status](ai-context/project-status.md) for the current checkpoint and [AI context](ai-context/README.md) for authority and working rules.
+**Project state:** Phase 9 is `COMPLETE / CLOSED` under [DEC-081](ai-context/decision-log.md) and [VER-PH-009](ai-context/planning/verification/VER-PH-009.md). `CTX-1.29` is active under [DEC-082](ai-context/decision-log.md) (creator edit/clear of the existing optional Plan note); development user testing is ready. Phase 9.5 is `READY TO BEGIN`, but no product implementation item is authorized. See [project status](ai-context/project-status.md) for the current checkpoint and [AI context](ai-context/README.md) for authority and working rules.
 
 For local setup, development database behavior, seeded accounts, and current screens, see [Local development](docs/local-development.md).
 
@@ -36,7 +36,7 @@ ai-context/                     Approved project context and work records
 docs/                            Developer guides
 ```
 
-The API host is in `src/FamilySafety.Api/`; the Angular client is in `src/FamilySafety.Web/`. Product and privacy authority lives in `ai-context/`, not in this overview.
+The API host is in `src/FamilySafety.Api/`; the Angular client is in `src/FamilySafety.Web/`. Product and privacy authority lives in `ai-context/`, not in this overview. Before adding or moving Angular folders, read the client's [structure and extraction rule](src/FamilySafety.Web/README.md#structure-and-extraction).
 
 ## Restore, build, and test
 

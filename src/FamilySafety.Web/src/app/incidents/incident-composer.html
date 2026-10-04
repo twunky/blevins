@@ -1,5 +1,5 @@
 @if (request; as req) {
-  <section class="incident-card" aria-labelledby="incident-composer-heading">
+  <section class="card incident-card" aria-labelledby="incident-composer-heading">
     <h3 id="incident-composer-heading" tabindex="-1">{{ copy[req.kind].heading }}</h3>
     @if (req.target; as target) {
       <blockquote class="incident-note incident-target">

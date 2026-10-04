@@ -78,12 +78,12 @@ app-root button {
 }
 app-root button:hover:not(:disabled) { background: #1d4ed8; border-color: #1d4ed8; }
 app-root button:disabled { cursor: not-allowed; opacity: 0.55; }
-app-root :is(.button--secondary, .secondary-button, .trip-secondary) {
+app-root .button--secondary {
   background: var(--color-primary-soft);
   border-color: #dbe7fb;
   color: #1d4ed8;
 }
-app-root :is(.button--secondary, .secondary-button, .trip-secondary):hover:not(:disabled) {
+app-root .button--secondary:hover:not(:disabled) {
   background: #dbeafe;
   border-color: var(--color-accent);
   color: var(--color-primary-strong);
@@ -103,7 +103,7 @@ app-root .link-button:hover:not(:disabled) { background: var(--color-primary-sof
 /* Item links (WI-009-005): rows and names that open an item's own URL keep their look as links. */
 app-root a.item-link { color: inherit; text-decoration: none; }
 app-root :is(h2, h3, strong) > a.item-link:hover { text-decoration: underline; }
-/* A link shaped like a button; colour classes such as .button--secondary or .trip-secondary still apply. */
+/* A link shaped like a button; colour classes such as .button--secondary still apply. */
 app-root a.button-link {
   align-items: center;
   border: 1px solid var(--color-primary);
@@ -116,6 +116,12 @@ app-root a.button-link {
   text-decoration: none;
 }
 .item-back { margin-bottom: var(--space-4); }
+app-root a.detail-back-link {
+  align-items: center; border-radius: var(--radius-sm); color: var(--color-primary); display: inline-flex;
+  font-size: 0.9rem; font-weight: 600; gap: var(--space-1); justify-self: start; min-height: 2.25rem;
+  padding: 0 var(--space-2); text-decoration: none;
+}
+app-root a.detail-back-link:hover { background: var(--color-primary-soft); color: var(--color-primary-strong); }
 /* OD-H: the always-present polite status for an automatic Family switch; it takes no space while empty. */
 app-root p.family-switch-status { margin: 0; padding: 0; }
 app-root p.family-switch-status--shown {
@@ -236,6 +242,7 @@ app-root .page-title h1:focus-visible { border-radius: var(--radius-sm); outline
 .card-icon { align-items: center; background: var(--color-primary-soft); border-radius: 0.6rem; color: var(--color-primary); display: inline-flex; flex: none; height: 2.25rem; justify-content: center; width: 2.25rem; }
 .card-sub { color: var(--color-muted); font-size: 0.86rem; margin: 0.15rem 0 0; }
 .card-count { background: var(--color-primary-soft); border-radius: 999px; color: #1d4ed8; font-size: 0.8rem; font-weight: 700; margin-left: auto; padding: 0.15rem 0.6rem; }
+.status-pill { border: 1px solid var(--color-border); border-radius: 999px; display: inline-block; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
 .row-list, .member-list, .relationship-list, .checkbox-list { display: grid; gap: var(--space-2); list-style: none; margin: 0; padding: 0; }
 .row-list > li { border-top: 1px solid var(--color-border); padding-top: var(--space-3); }
 .row-list > li:first-child { border-top: 0; padding-top: 0; }

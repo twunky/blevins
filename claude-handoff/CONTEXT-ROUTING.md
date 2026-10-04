@@ -20,6 +20,7 @@ Current approved panel mapping: ① Home (`DEC-076`), ② Family (`DEC-077`), �
 |---|---|
 | AI operating rules, authority, work modes, auto-approval limits | `ai-context/README.md` |
 | Current state, next action, open decisions | `ai-context/project-status.md` |
+| Active context baseline | `CTX-1.29` (`DEC-082`, `REQ-PLAN-007`); confirm in `ai-context/project-status.md` |
 | Phase 9 closure, Phase 9.5 readiness, and other phase status | `ai-context/planning/roadmap.md`, `ai-context/decision-log.md` → `DEC-081`, `ai-context/planning/verification/VER-PH-009.md` |
 | Historical Phase 9 scope and exit criteria; current navigation and deep-link rules | `ai-context/planning/proposals/PRP-030-phase-9-scope-themes-and-exit-criteria.md` (closed Phase 9 planning basis), `ai-context/decision-log.md` → `DEC-074`, `DEC-075`, `DEC-081`; canonical `REQ-UX-011`, `REQ-UX-013`, `REQ-UX-014` (`ai-context/core/ux-contract.md`) and `REQ-PRIV-027` |
 | Current implementation authorization | None. Repository Cleanup Waves 1–5 are complete; no additional broad cleanup or reorganization is authorized. See `claude-handoff/CURRENT-TASK.md` and `ai-context/project-status.md`. |
@@ -27,6 +28,8 @@ Current approved panel mapping: ① Home (`DEC-076`), ② Family (`DEC-077`), �
 | Privacy and safety rules, protected data, Concern and Incident access and retention | `ai-context/core/privacy-safety-contract.md` (`REQ-PRIV-005`–`008`, `011`, `025`, `026`) |
 | UX rules: calm presentation, accessibility, uncertainty, provenance | `ai-context/core/ux-contract.md` (`REQ-UX-001`, `003`–`008`, `010`–`012`) |
 | Concern and Incident workflow, categories, correction, resolution | `ai-context/workflows/safety.md` (`REQ-SAFE-001`–`016`; Concern `015`, Incident `016`) |
+| Plan and Trip behavior, including the current Plan note edit/clear rule | `ai-context/workflows/plans-trips.md` (`REQ-PLAN-001`–`007`, with `REQ-PLAN-007` added in `CTX-1.29`; `REQ-TRIP-*`) |
+| Event behavior, audience, and editing | `ai-context/workflows/events.md` (`REQ-EVT-*`) |
 | Requirement ID lookup and traceability | `ai-context/core/requirements-index.md` |
 | Terms (Concern, Participant, Frozen, …) | `ai-context/core/domain-glossary.md` |
 | Check-In / Sharing separation (only if a mockup idea touches it) | `ai-context/workflows/sharing-checkins.md` |
@@ -56,8 +59,14 @@ Current approved panel mapping: ① Home (`DEC-076`), ② Family (`DEC-077`), �
 
 | Area | Location |
 |---|---|
+| Angular structure and extraction rule (read before adding or moving folders) | `src/FamilySafety.Web/README.md` § Structure and extraction |
+| Home, Family, Family Settings, Events, Plans, Me / Settings, first use, and invitation arrival | `src/FamilySafety.Web/src/app/app.ts` and `app.html`, with `home.scss`, `family.scss`, `family-settings.scss`, `events.scss`, `events-dashboard.scss`, `plans.scss` |
+| Main navigation, item routes, and shared date display | `src/FamilySafety.Web/src/app/navigation.ts`, `item-route.ts`, `item-unavailable.ts`, `date-format.ts` |
+| Trips and Trip Notes | `src/FamilySafety.Web/src/app/trips/` |
+| Safety Incidents | `src/FamilySafety.Web/src/app/incidents/` |
 | Concern feature (component, template, styles, spec, API client) | `src/FamilySafety.Web/src/app/concerns/` — `concerns.ts`, `concerns.html`, `concerns.scss`, `concerns.spec.ts`, `concern-api.ts` |
 | Shell, routes, Home entry card | `src/FamilySafety.Web/src/app/app.html`, `app.ts`, `app.routes.ts`, `app.scss` |
+| API endpoints by domain | `src/FamilySafety.Api/<Domain>/` (for example `Events/`, `Plans/`, `Trips/`, `Concerns/`, `Incidents/`) |
 | Plans & Trips navigation landing | `src/FamilySafety.Web/src/app/plans-trips/` — `group-landing.ts`, `group-landing.spec.ts` |
 | Safety dashboard | `src/FamilySafety.Web/src/app/safety/` — `safety-dashboard.ts`, `.html`, `.scss`, `.spec.ts` |
 | Design tokens (colors, radii, shadow) and global styles | `src/FamilySafety.Web/src/styles.scss` |
@@ -70,6 +79,8 @@ Current approved panel mapping: ① Home (`DEC-076`), ② Family (`DEC-077`), �
 
 - `ai-context/bootstrap/` — extraction evidence only, not canonical
 - Old `VER-CTX-1.x` reports and Phase 2–7 verification reports
-- `events.md` and `plans-trips.md` workflows and unrelated proposals (PRP-003 to PRP-023)
+- `events.md` and `plans-trips.md` workflows, unless the work touches Events, Plans, or Trips; `plans-trips.md` holds the current `REQ-PLAN-007`
+- Unrelated proposals (PRP-003 to PRP-023)
+- `claude-handoff/HISTORY.md`, the word-for-word archive of earlier handoff checkpoints, closed work-item scopes, and old closeout templates
 - `ai-context/skills/` and `templates/`, unless you are creating a new work item or verification report
 - `src/FamilySafety.Web/node_modules` and `dist` (generated output)

@@ -227,6 +227,54 @@ describe('First use and invitation arrival (WI-009-010)', () => {
     expect(error!.closest('.page-content')).not.toBeNull();
   });
 
+  it('offers Retry for a failed profile read on Me / Settings that repeats only the profile read', async () => {
+    const harness = await visit('/me');
+    const unavailable = { status: 503, statusText: 'Unavailable' };
+    http.expectOne('/api/profile').flush({}, unavailable);
+    http.expectOne('/api/family-groups/administered').flush([]);
+    http.expectOne('/api/family-groups/mine').flush([]);
+    await settle(harness);
+    const retry = () => Array.from(root(harness).querySelectorAll('button'))
+      .find(button => button.textContent?.trim() === 'Retry loading profile');
+    const displayName = () => root(harness).querySelector<HTMLInputElement>('#display-name')!.value;
+    expect(root(harness).textContent).toContain('Your profile could not be loaded. Please try again.');
+    expect(retry()).toBeDefined();
+
+    // A Retry that fails again returns to the same error with Retry still offered.
+    retry()!.click();
+    harness.detectChanges();
+    expect(root(harness).textContent).toContain('Loading your profile…');
+    expect(root(harness).textContent).not.toContain('could not be loaded');
+    http.expectNone('/api/family-groups/mine');
+    http.expectNone('/api/family-groups/administered');
+    http.expectOne('/api/profile').flush({}, unavailable);
+    harness.detectChanges();
+    expect(root(harness).textContent).toContain('Your profile could not be loaded. Please try again.');
+    expect(root(harness).textContent).not.toContain('Loading your profile…');
+    expect(displayName()).toBe('');
+
+    retry()!.click();
+    http.expectOne('/api/profile').flush(profile);
+    harness.detectChanges();
+    expect(displayName()).toBe('Alex');
+    expect(retry()).toBeUndefined();
+    expect(root(harness).textContent).not.toContain('could not be loaded');
+    expect(root(harness).textContent).not.toContain('Loading your profile…');
+  });
+
+  it('does not offer a profile Retry beside a profile save error', async () => {
+    const harness = await visit('/me');
+    shellReads([]);
+    await settle(harness);
+    Array.from(root(harness).querySelectorAll('button')).find(button => button.textContent?.trim() === 'Save profile')!.click();
+    http.expectOne(request => request.method === 'PUT' && request.url === '/api/profile')
+      .flush({}, { status: 503, statusText: 'Unavailable' });
+    harness.detectChanges();
+    expect(root(harness).textContent).toContain('Your profile could not be saved. Please try again.');
+    expect(Array.from(root(harness).querySelectorAll('button')).some(button => button.textContent?.trim() === 'Retry loading profile'))
+      .toBe(false);
+  });
+
   it.each(['/family', '/events', '/events/all', '/events/new', '/plans'])(
     'shows one approved Family-required message on %s with no Family, and no inner no-Family copy (O11)', async url => {
       const router = TestBed.inject(Router);

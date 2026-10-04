@@ -295,14 +295,14 @@ test('AC-01 to AC-10, AC-29, AC-41 — each item URL renders on direct entry and
   const trip = page.getByRole('article', { name: 'Trip details' });
   await expect(trip).toContainText('Harbor Coast');
   await expect(trip.getByRole('heading', { name: 'Trip Notes' })).toBeVisible();
-  await expect(trip.getByRole('button', { name: 'Change Audience' })).toBeVisible();
-  await expect(trip.getByRole('link', { name: 'Back to Trips' })).toHaveAttribute('href', '/trips');
+  await expect(trip.getByRole('button', { name: 'Change audience' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Back to Trips' })).toHaveAttribute('href', '/trips');
 
   await page.goto(`/concerns/${w.family1Items.concern}`);
   await expect(page.getByText('Harbor Concern reason')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'History' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'People with Concern access' })).toBeVisible();
-  await expect(page.getByRole('link', { name: '← Back to Concerns' })).toHaveAttribute('href', '/concerns');
+  await expect(page.getByRole('link', { name: 'Back to Concerns' })).toHaveAttribute('href', '/concerns');
 
   // AC-10: a member of two Families refreshes an Incident URL with nothing selected; no Family prompt, ever.
   const sawPrompt: boolean[] = [];
@@ -334,6 +334,32 @@ test('Plan creator can add, edit, and clear the existing note on the item page',
   await expect(detail.getByRole('button', { name: 'Add note' })).toBeVisible();
   await page.reload();
   await expect(detail).not.toContainText('Bring water.');
+});
+
+test('A transient Event or Trip item read failure offers Retry, which repeats the authorized read and renders the item', async ({ page, request }) => {
+  const world = await setUpWorld(request);
+  const eventId = world.family1Items.event;
+  // Only the first item read fails; the Retry goes to the real server, which authorizes it as before.
+  await page.route(`**/api/events/${eventId}`, route => route.fulfill({ status: 503, body: '' }), { times: 1 });
+  await page.goto(`/events/${eventId}`);
+  await expect(page.getByRole('alert').filter({ hasText: 'This Event could not be opened. Please try again.' })).toBeVisible();
+  const read = page.waitForResponse(response => response.url().endsWith(`/api/events/${eventId}`));
+  await page.getByRole('button', { name: 'Retry loading Event' }).click();
+  expect((await read).status()).toBe(200);
+  await expect(page.getByRole('article', { name: 'Event details' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Retry loading Event' })).toHaveCount(0);
+
+  // A Trip read failure is a read error with Retry, not the generic unavailable card.
+  const tripId = world.family1Items.trip;
+  await page.route(`**/api/trips/${tripId}`, route => route.fulfill({ status: 503, body: '' }), { times: 1 });
+  await page.goto(`/trips/${tripId}`);
+  await expect(page.getByRole('alert').filter({ hasText: 'This Trip could not be opened. Please try again.' })).toBeVisible();
+  await expect(page.getByText('This Trip is unavailable')).toHaveCount(0);
+  const tripRead = page.waitForResponse(response => response.url().endsWith(`/api/trips/${tripId}`));
+  await page.getByRole('button', { name: 'Retry loading Trip' }).click();
+  expect((await tripRead).status()).toBe(200);
+  await expect(page.getByRole('heading', { name: 'Harbor Trip' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Retry loading Trip' })).toHaveCount(0);
 });
 
 test('AC-17 to AC-21, AC-32, AC-33, AC-41 — authorized cross-Family links switch only after the item read, and announce once', async ({ page, request }) => {

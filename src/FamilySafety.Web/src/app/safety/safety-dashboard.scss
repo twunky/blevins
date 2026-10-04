@@ -12,8 +12,7 @@ a.safety-view-all { align-items: center; display: inline-flex; flex: none; font-
 .safety-row-top { align-items: center; display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); }
 /* The existing Open state, as text in a neutral pill; never a colour-only or alarm signal. */
 .safety-state {
-  background: var(--color-primary-soft); border: 1px solid #dbe7fb; border-radius: 999px; color: var(--color-primary-strong);
-  font-size: 0.78rem; font-weight: 700; padding: 0.1rem 0.6rem;
+  background: var(--color-primary-soft); border-color: #dbe7fb; color: var(--color-primary-strong); padding: 0.1rem 0.6rem;
 }
 /* Row title links are at least 44 px tall touch targets. */
 .safety-rows a.item-link { align-items: center; display: inline-flex; min-height: 2.75rem; }

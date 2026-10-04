@@ -1,36 +1,32 @@
 <section class="trips" aria-label="Trips">
   @if (activeGroups.length > 0 && !showingForm() && tripId === null) {
     <div class="trips-toolbar">
-      <button type="button" (click)="openCreate()"><app-icon name="plus" />Create Trip</button>
+      <button type="button" (click)="openCreate()"><app-icon name="plus" />Create trip</button>
     </div>
   }
-
-  @if (detailError()) { <p class="trip-error trip-feedback" role="alert">{{ detailError() }}</p> }
 
   @if (unavailable()) {
     <app-item-unavailable kind="trip" />
   } @else if (itemLoading()) {
     <p class="trip-feedback" role="status">Loading Trip…</p>
+  } @else if (detailError()) {
+    <!-- A failed Trip item read: not the unavailable card, and no Trips list in its place. -->
+    <div class="trip-feedback"><p class="trip-error" role="alert">{{ detailError() }}</p>
+      <button type="button" class="button--secondary" (click)="retryRoutedTrip()">Retry loading Trip</button></div>
   } @else if (showingForm()) {
     <form class="trip-form" [formGroup]="tripForm" (ngSubmit)="saveTrip()" novalidate>
       <div class="trips-heading trip-form-heading">
         <h2>{{ editingTripId() ? 'Edit Trip' : 'Create Trip' }}</h2>
-        <button type="button" class="trip-secondary" (click)="cancelForm()">Cancel</button>
+        <button type="button" class="button--secondary" (click)="cancelForm()">Cancel</button>
       </div>
 
-      <section class="trip-form-section" aria-labelledby="trip-essentials-heading">
+      <section class="card trip-form-section" aria-labelledby="trip-essentials-heading">
         <h3 id="trip-essentials-heading">Trip essentials</h3>
+      <!-- Read-only context: a new Trip always belongs to the selected Family; an edited Trip keeps its own Family. -->
       @if (!editingTripId()) {
-        <div class="trip-field">
-          <label for="trip-group">Family Group <span aria-hidden="true">*</span></label>
-          <select id="trip-group" formControlName="familyGroupId" (change)="changeGroup()" required>
-            @for (group of activeGroups; track group.familyGroupId) {
-              <option [value]="group.familyGroupId">{{ group.name }}</option>
-            }
-          </select>
-        </div>
+        <p class="trip-help">Family: {{ activeGroups[0]?.name }}</p>
       } @else if (selectedTrip(); as trip) {
-        <p class="trip-help">Family Group: {{ trip.familyGroupName }}</p>
+        <p class="trip-help">Family: {{ trip.familyGroupName }}</p>
       }
 
       <div class="trip-field">
@@ -60,7 +56,7 @@
       </div>
       </section>
 
-      <section class="trip-form-section trip-people-section" aria-labelledby="trip-people-heading">
+      <section class="card trip-form-section trip-people-section" aria-labelledby="trip-people-heading">
         <h3 id="trip-people-heading">People and visibility</h3>
         <div class="trip-people-grid">
       <fieldset class="trip-fieldset">
@@ -86,7 +82,7 @@
           <legend>Who can see this Trip? <span aria-hidden="true">*</span></legend>
           <p class="trip-help">Sharing a Trip does not share anyone's location or private Check-In data.</p>
           <label class="trip-choice"><input type="radio" value="FamilyGroup" formControlName="audienceType"
-            (change)="changeAudience()" /> This Family Group</label>
+            (change)="changeAudience()" /> This Family</label>
           <label class="trip-choice"><input type="radio" value="SelectedPeople" formControlName="audienceType"
             (change)="changeAudience()" /> Selected people</label>
           @if (tripForm.controls.audienceType.value === 'SelectedPeople') {
@@ -110,7 +106,7 @@
         </div>
       </section>
 
-      <section class="trip-form-section" aria-labelledby="trip-optional-heading">
+      <section class="card trip-form-section" aria-labelledby="trip-optional-heading">
       <h3 id="trip-optional-heading">Optional travel details</h3>
       <div class="trip-optional-grid">
       <div class="trip-field">
@@ -147,7 +143,7 @@
         @for (contact of contactForms.controls; track contact; let index = $index) {
           <div class="trip-contact" [formGroupName]="index">
             <div class="trips-heading"><h4>Contact {{ index + 1 }}</h4>
-              <button type="button" class="trip-secondary" (click)="removeContact(index)">Remove</button></div>
+              <button type="button" class="button--secondary" (click)="removeContact(index)">Remove</button></div>
             <div class="trip-field"><label [for]="'trip-contact-name-' + index">Name <span aria-hidden="true">*</span></label>
               <input [id]="'trip-contact-name-' + index" type="text" maxlength="100" formControlName="name" required /></div>
             <div class="trip-field"><label [for]="'trip-contact-role-' + index">Relationship or role</label>
@@ -160,22 +156,22 @@
             </div>
           </div>
         }
-        <button type="button" class="trip-secondary" (click)="addContact()">Add contact</button>
+        <button type="button" class="button--secondary" (click)="addContact()">Add contact</button>
       </fieldset>
       </section>
 
       <div class="trip-form-actions">
         @if (error()) { <p class="trip-error" role="alert">{{ error() }}</p> }
-        <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : (editingTripId() ? 'Save changes' : 'Create Trip') }}</button>
+        <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : (editingTripId() ? 'Save changes' : 'Create trip') }}</button>
       </div>
     </form>
   } @else if (selectedTrip(); as trip) {
+    <a class="detail-back-link" routerLink="/trips" [state]="focusHeadingState" (click)="tripId === null && closeDetail()"><app-icon name="back" />Back to Trips</a>
     <article class="trip-detail" aria-label="Trip details">
-      <section class="trip-detail-hero" aria-label="Trip overview">
+      <section class="card trip-detail-hero" aria-label="Trip overview">
         <div class="trips-heading">
           <span class="date-tile date-tile--large" aria-hidden="true"><small>{{ dateTile(trip.startDate).month }}</small>{{ dateTile(trip.startDate).day }}</span>
-          <h2>{{ trip.title }}</h2>
-          <a class="button-link trip-secondary" routerLink="/trips" [state]="focusHeadingState" (click)="tripId === null && closeDetail()">Back to Trips</a></div>
+          <h2>{{ trip.title }}</h2></div>
         <div class="trip-facts">
           <p><strong>Destination:</strong> {{ trip.primaryDestination }}</p>
           <p><strong>Dates:</strong> {{ displayRange(trip.startDate, trip.endDate) }}</p>
@@ -184,11 +180,11 @@
         @if (trip.description) { <p class="trip-text trip-description">{{ trip.description }}</p> }
       </section>
       <div class="trip-detail-grid">
-        <section class="trip-detail-panel" aria-labelledby="trip-travelers-heading">
+        <section class="card trip-detail-panel" aria-labelledby="trip-travelers-heading">
           <h3 id="trip-travelers-heading">Travelers</h3>
           <ul class="trip-traveler-list">@for (person of trip.travelers; track person.profileId) { <li>{{ person.displayName }}</li> }</ul>
         </section>
-        <section class="trip-detail-panel trip-audience-panel" aria-labelledby="trip-audience-context-heading">
+        <section class="card trip-detail-panel trip-audience-panel" aria-labelledby="trip-audience-context-heading">
           <h3 id="trip-audience-context-heading">Who can see this Trip</h3>
           <p><strong>Audience:</strong> {{ trip.audienceType === 'FamilyGroup' ? trip.familyGroupName : 'Shared with selected people' }}</p>
           @if (trip.canEdit && trip.audienceRecipients.length > 0) {
@@ -199,18 +195,18 @@
             </p>
           }
           @if (trip.canEdit) {
-            <button type="button" class="trip-secondary" (click)="beginAudienceChange()">Change Audience</button>
+            <button type="button" class="button--secondary" (click)="beginAudienceChange()">Change audience</button>
           }
         </section>
       </div>
       @if (changingAudience()) {
-        <section class="trip-audience-editor" aria-labelledby="trip-audience-heading">
+        <section class="card trip-audience-editor" aria-labelledby="trip-audience-heading">
           <div class="trips-heading"><h3 id="trip-audience-heading">Change Trip audience</h3>
-            <button type="button" class="trip-secondary" (click)="cancelAudienceChange()">Cancel</button></div>
+            <button type="button" class="button--secondary" (click)="cancelAudienceChange()">Cancel</button></div>
           <p class="trip-help">Choose the complete audience. Trip access does not change location, Check-In, or Sharing Session access.</p>
           @if (canBrowseTripGroup(trip)) {
             <label class="trip-choice"><input type="radio" [checked]="audienceMode() === 'FamilyGroup'"
-              (change)="changeAudienceMode('FamilyGroup')" /> This Family Group</label>
+              (change)="changeAudienceMode('FamilyGroup')" /> This Family</label>
           }
           <label class="trip-choice"><input type="radio" [checked]="audienceMode() === 'SelectedPeople'"
             (change)="changeAudienceMode('SelectedPeople')" /> Selected people</label>
@@ -268,13 +264,13 @@
         </section>
       }
       @if (trip.transportationNotes || trip.accommodationNotes || (trip.expectedArrivalDate && trip.expectedArrivalTime && trip.expectedArrivalTimeZone) || trip.contacts.length > 0) {
-        <section class="trip-detail-panel trip-optional-section" aria-labelledby="trip-optional-detail-heading">
+        <section class="card trip-detail-panel trip-optional-section" aria-labelledby="trip-optional-detail-heading">
           <h3 id="trip-optional-detail-heading">Optional travel details</h3>
           <div class="trip-optional-facts">
             @if (trip.transportationNotes) { <p class="trip-text"><strong>Transportation:</strong> {{ trip.transportationNotes }}</p> }
             @if (trip.accommodationNotes) { <p class="trip-text"><strong>Accommodation:</strong> {{ trip.accommodationNotes }}</p> }
             @if (trip.expectedArrivalDate && trip.expectedArrivalTime && trip.expectedArrivalTimeZone) {
-              <p><strong>Expected arrival:</strong> {{ trip.expectedArrivalDate }} at {{ trip.expectedArrivalTime }} ({{ trip.expectedArrivalTimeZone }})</p>
+              <p><strong>Expected arrival:</strong> {{ displayDateTime(trip.expectedArrivalDate, trip.expectedArrivalTime) }} ({{ trip.expectedArrivalTimeZone }})</p>
             }
             @if (trip.contacts.length > 0) {
               <div class="trip-contact-facts">
@@ -293,14 +289,14 @@
           </div>
         </section>
       }
-      <section class="trip-notes" aria-labelledby="trip-notes-heading">
+      <section class="card trip-notes" aria-labelledby="trip-notes-heading">
         <h3 id="trip-notes-heading">Trip Notes</h3>
         <p class="trip-help">Share useful trip details with this Trip's audience.</p>
         @if (noteError()) { <p class="trip-error" role="alert">{{ noteError() }}</p> }
         @if (notesReadState() === 'loading') { <p role="status">Loading Notes…</p> }
         @else if (notesReadState() === 'error') {
           <p class="trip-error" role="alert">We couldn’t load Notes.</p>
-          <button type="button" class="trip-secondary" (click)="retryNotes()">Retry loading Notes</button>
+          <button type="button" class="button--secondary" (click)="retryNotes()">Retry loading Notes</button>
         }
         @else if (notesReadState() === 'loaded' && notes().length === 0) {
           <p class="trip-notes-empty">No Notes yet.</p>
@@ -314,14 +310,14 @@
               @if (editingNoteId() === note.noteId) {
                 <label [for]="'trip-note-edit-' + note.noteId">Edit your Note</label>
                 <textarea [id]="'trip-note-edit-' + note.noteId" [formControl]="noteEditDraft" maxlength="1000" rows="4"></textarea>
-                <div class="trip-note-actions"><button type="button" [disabled]="noteSaving()" (click)="saveNoteEdit(note)">Save Note</button>
-                <button type="button" class="trip-secondary" (click)="cancelNoteEdit()">Cancel</button></div>
+                <div class="trip-note-actions"><button type="button" [disabled]="noteSaving()" (click)="saveNoteEdit(note)">Save note</button>
+                <button type="button" class="button--secondary" (click)="cancelNoteEdit()">Cancel</button></div>
               } @else {
                 <p class="trip-text">{{ note.content }}</p>
                 <div class="trip-note-actions">
-                  @if (note.canEdit) { <button type="button" class="trip-secondary" (click)="beginNoteEdit(note)">Edit Note</button> }
-                  @if (note.canDelete) { <button type="button" class="trip-secondary" [disabled]="noteSaving()" (click)="deleteNote(note)">Delete Note</button> }
-                  @if (note.canHide) { <button type="button" class="trip-secondary" [disabled]="noteSaving()" (click)="hideNote(note)">Hide Note</button> }
+                  @if (note.canEdit) { <button type="button" class="button--secondary" (click)="beginNoteEdit(note)">Edit note</button> }
+                  @if (note.canDelete) { <button type="button" class="button--secondary" [disabled]="noteSaving()" (click)="deleteNote(note)">Delete note</button> }
+                  @if (note.canHide) { <button type="button" class="button--secondary" [disabled]="noteSaving()" (click)="hideNote(note)">Hide note</button> }
                 </div>
               }
             </li>
@@ -329,21 +325,21 @@
         </ul>
         <div class="trip-note-compose"><label for="trip-note-new">Add a Note</label>
           <textarea id="trip-note-new" [formControl]="noteDraft" maxlength="1000" rows="4"></textarea>
-          <button type="button" [disabled]="noteSaving()" (click)="addNote()">Add Note</button></div>
+          <button type="button" [disabled]="noteSaving()" (click)="addNote()">Add note</button></div>
       </section>
-      @if (trip.canEdit) { <div class="trip-management"><button type="button" (click)="beginEdit()">Edit Trip details</button></div> }
+      @if (trip.canEdit) { <div class="trip-management"><button type="button" (click)="beginEdit()">Edit trip details</button></div> }
     </article>
   } @else {
-    <section class="trip-card" aria-labelledby="trip-list-heading">
+    <section class="card trip-card" aria-labelledby="trip-list-heading">
       <div class="trip-card-header">
-        <span class="trip-card-icon"><app-icon name="plane" /></span>
+        <span class="card-icon"><app-icon name="plane" /></span>
         <h2 id="trip-list-heading" class="trip-list-heading">Trips in the current Family</h2>
-        @if (currentTrips().length > 0) { <span class="trip-count">{{ currentTrips().length }}</span> }
+        @if (currentTrips().length > 0) { <span class="card-count">{{ currentTrips().length }}</span> }
       </div>
       @if (loading()) { <p class="trip-feedback" role="status">Loading Trips…</p> }
       @else if (tripsLoadError()) {
         <div class="trip-feedback"><p class="trip-error" role="alert">{{ tripsLoadError() }}</p>
-          <button type="button" class="trip-secondary" (click)="retryTrips()">Retry loading Trips</button></div>
+          <button type="button" class="button--secondary" (click)="retryTrips()">Retry loading Trips</button></div>
       }
       @else if (currentTrips().length === 0 && retainedCreatorTrips().length === 0) {
         <p class="trip-empty">No Trips are currently available to you. Trips organize travel details and support Trip Notes for authorized viewers.</p>
@@ -368,9 +364,9 @@
       }
     </section>
     @if (!loading() && !tripsLoadError() && retainedCreatorTrips().length > 0) {
-      <section class="trip-card" aria-labelledby="trip-retained-heading">
+      <section class="card trip-card" aria-labelledby="trip-retained-heading">
         <div class="trip-card-header trip-retained-heading">
-          <span class="trip-card-icon"><app-icon name="user" /></span>
+          <span class="card-icon"><app-icon name="user" /></span>
           <div><h2 id="trip-retained-heading" class="trip-list-heading">Trips you created outside your active Families</h2>
             <p class="trip-help">You retain access to these Trips as their creator. This does not restore Family membership or directory access.</p></div>
         </div>

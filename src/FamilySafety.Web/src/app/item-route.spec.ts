@@ -101,6 +101,8 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
   const status = (harness: RouterTestingHarness) => root(harness).querySelector('p.family-switch-status')!;
   const topFamily = (harness: RouterTestingHarness) => root(harness).querySelector('.current-family strong')?.textContent?.trim() ?? null;
   const selector = (harness: RouterTestingHarness) => root(harness).querySelector<HTMLSelectElement>('#current-family')!;
+  const retryButton = (harness: RouterTestingHarness, name: string) =>
+    Array.from(root(harness).querySelectorAll('button')).find(button => button.textContent?.trim() === name);
 
   it('accepts only GUID item IDs', () => {
     expect(isItemId(itemId)).toBe(true);
@@ -182,6 +184,50 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
       expect(familyScoped(two)).toHaveLength(0);
       expect(root(harness).textContent).not.toContain('Choose your current Family');
       unavailableMarkup[kind] = missingCard.innerHTML;
+    });
+
+    it(`offers Retry for a transient ${kind} read failure and repeats the same authorize-first read before any switch`, async () => {
+      context.familyId.set(one.familyGroupId);
+      const harness = await visit(`${path}${itemId}`);
+      shellReads().flush([one, two]);
+      familyReads(one);
+      http.expectOne(`${read}${itemId}`).flush(null, { status: 503, statusText: 'Unavailable' });
+      await settle(harness);
+      expect(root(harness).textContent).toContain(`This ${kind} could not be opened. Please try again.`);
+      expect(root(harness).querySelector('app-item-unavailable')).toBeNull();
+      expect(context.familyId()).toBe(one.familyGroupId);
+
+      retryButton(harness, `Retry loading ${kind}`)!.click();
+      harness.detectChanges();
+      expect(root(harness).textContent).toContain(`Loading ${kind}…`);
+      expect(root(harness).textContent).not.toContain('could not be opened');
+      // The Family stays as it was until the repeated read returns 200; nothing for Family Two is read first.
+      expect(context.familyId()).toBe(one.familyGroupId);
+      expect(familyScoped(two)).toHaveLength(0);
+      http.expectOne(`${read}${itemId}`).flush(view(two.familyGroupId));
+      await settle(harness);
+      familyReads(two);
+      harness.detectChanges();
+      expect(context.familyId()).toBe(two.familyGroupId);
+      expect(status(harness).textContent).toBe('Switched to Family Two.');
+      expect(itemHeading(harness)).toBe(title);
+      expect(retryButton(harness, `Retry loading ${kind}`)).toBeUndefined();
+    });
+
+    it(`shows the same generic card, with no Retry, when a ${kind} Retry returns 404`, async () => {
+      context.familyId.set(one.familyGroupId);
+      const harness = await visit(`${path}${itemId}`);
+      shellReads().flush([one, two]);
+      familyReads(one);
+      http.expectOne(`${read}${itemId}`).flush(null, { status: 503, statusText: 'Unavailable' });
+      await settle(harness);
+      retryButton(harness, `Retry loading ${kind}`)!.click();
+      http.expectOne(`${read}${itemId}`).flush(null, { status: 404, statusText: 'Not Found' });
+      await settle(harness);
+      const card = root(harness).querySelector('app-item-unavailable')!;
+      expect(card.innerHTML).toBe(unavailableMarkup[kind]);
+      expect(retryButton(harness, `Retry loading ${kind}`)).toBeUndefined();
+      expect(context.familyId()).toBe(one.familyGroupId);
     });
 
     it(`shows the identical card for a non-GUID ${kind} ID without any request (AC-23, AC-25)`, async () => {
@@ -442,6 +488,53 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
     harness.detectChanges();
     expect(itemHeading(harness)).toBe('This Concern is unavailable');
     expect(root(harness).textContent).not.toContain('Casey');
+    expect(context.familyId()).toBe(one.familyGroupId);
+  });
+
+  it('offers Retry for a transient Concern read failure and repeats the same protected read before any Family decision', async () => {
+    context.familyId.set(one.familyGroupId);
+    const harness = await visit(`/concerns/${itemId}`);
+    shellReads().flush([one, two]);
+    familyReads(one);
+    await settle(harness);
+    http.expectOne('/api/concerns').flush([]);
+    http.expectOne(`/api/concerns/${itemId}`).flush(null, { status: 503, statusText: 'Unavailable' });
+    await settle(harness);
+    expect(root(harness).textContent).toContain('This Concern could not be opened. Please try again.');
+    expect(root(harness).textContent).not.toContain('This Concern is unavailable');
+    expect(context.familyId()).toBe(one.familyGroupId);
+
+    retryButton(harness, 'Retry loading Concern')!.click();
+    harness.detectChanges();
+    expect(root(harness).textContent).not.toContain('could not be opened');
+    expect(context.familyId()).toBe(one.familyGroupId);
+    http.expectNone('/api/concerns');
+    http.expectOne(`/api/concerns/${itemId}`).flush(concernView(two.familyGroupId));
+    await settle(harness);
+    familyReads(two);
+    harness.detectChanges();
+    expect(context.familyId()).toBe(two.familyGroupId);
+    expect(itemHeading(harness)).toBe('Concern about Casey');
+    expect(retryButton(harness, 'Retry loading Concern')).toBeUndefined();
+  });
+
+  it('shows the same Concern unavailable card, with no Retry, when a Concern Retry returns 404', async () => {
+    context.familyId.set(one.familyGroupId);
+    const harness = await visit(`/concerns/${itemId}`);
+    shellReads().flush([one, two]);
+    familyReads(one);
+    await settle(harness);
+    http.expectOne('/api/concerns').flush([]);
+    http.expectOne(`/api/concerns/${itemId}`).flush(null, { status: 503, statusText: 'Unavailable' });
+    await settle(harness);
+    retryButton(harness, 'Retry loading Concern')!.click();
+    http.expectOne(`/api/concerns/${itemId}`).flush(null, { status: 404, statusText: 'Not Found' });
+    await settle(harness);
+    http.match('/api/concerns').forEach(request => request.flush([]));
+    harness.detectChanges();
+    expect(itemHeading(harness)).toBe('This Concern is unavailable');
+    expect(root(harness).textContent).toContain('Only Concerns currently shared with you can be opened.');
+    expect(retryButton(harness, 'Retry loading Concern')).toBeUndefined();
     expect(context.familyId()).toBe(one.familyGroupId);
   });
 

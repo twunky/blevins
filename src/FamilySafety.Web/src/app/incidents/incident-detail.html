@@ -1,9 +1,9 @@
-<button type="button" class="incident-back" (click)="back.emit()">← Back to Incidents</button>
+<a class="detail-back-link" routerLink="/incidents" [state]="focusHeadingState"><app-icon name="back" />Back to Incidents</a>
 
 <p class="incident-announce" role="status">{{ announcement() }}</p>
 
 @if (unavailable()) {
-  <section class="incident-card incident-unavailable" aria-labelledby="incident-unavailable-heading">
+  <section class="card incident-card incident-unavailable" aria-labelledby="incident-unavailable-heading">
     <h2 id="incident-unavailable-heading" tabindex="-1">This Incident is unavailable</h2>
     <p>Only Incidents currently shared with you can be opened.</p>
     <button type="button" class="button--secondary" (click)="back.emit()">Return to Incidents</button>
@@ -11,9 +11,9 @@
 } @else if (loading()) {
   <p role="status">Loading Incident…</p>
 } @else if (loadError()) {
-  <div class="incident-card">
+  <div class="card incident-card">
     <p role="alert">{{ loadError() }}</p>
-    <button type="button" class="button--secondary" (click)="load()">Try again</button>
+    <button type="button" class="button--secondary" (click)="load()">Retry loading Incident</button>
   </div>
 } @else if (incident(); as incident) {
   @if (refreshedNotice()) {
@@ -29,14 +29,14 @@
           <div class="incident-hero-block">
             <h3>Reason for starting</h3>
             <p class="incident-text">{{ reason.text }}</p>
-            <p class="incident-meta"><span class="incident-pill incident-pill--category">{{ categoryText(reason.category, reason.isOutdated) }}</span> {{ sourceText(reason) }}</p>
+            <p class="incident-meta"><span class="status-pill incident-pill incident-pill--category">{{ categoryText(reason.category, reason.isOutdated) }}</span> {{ sourceText(reason) }}</p>
           </div>
         }
         @if (currentSummary(incident); as summary) {
           <div class="incident-hero-block">
             <h3>Current summary</h3>
             <p class="incident-text">{{ summary.text }}</p>
-            <p class="incident-meta"><span class="incident-pill incident-pill--category">{{ categoryText(summary.category, summary.isOutdated) }}</span>
+            <p class="incident-meta"><span class="status-pill incident-pill incident-pill--category">{{ categoryText(summary.category, summary.isOutdated) }}</span>
               {{ sourceText(summary) }} · {{ summary.contributorName }} · <time [attr.datetime]="summary.recordedAt">{{ summary.recordedAt | date:dateTimeFormat }}</time></p>
           </div>
         }
@@ -49,7 +49,7 @@
         }
       </div>
       <div class="incident-hero-state">
-        <span [class]="'incident-pill incident-pill--' + incident.state.toLowerCase()">{{ incident.state }}</span>
+        <span [class]="'status-pill incident-pill incident-pill--' + incident.state.toLowerCase()">{{ incident.state }}</span>
         <span>{{ stateDescription(incident.state) }}</span>
       </div>
       @if (incident.state === 'Frozen') {
@@ -61,13 +61,13 @@
     </section>
 
     @if (incident.state === 'Resolved' && incident.resolution; as resolution) {
-      <section class="incident-card incident-resolution" aria-labelledby="incident-resolution-heading">
+      <section class="card incident-card incident-resolution" aria-labelledby="incident-resolution-heading">
         <h3 id="incident-resolution-heading" tabindex="-1">Resolution</h3>
         <p class="incident-note">Resolution means coordination ended. It does not confirm that anyone is safe or that information was verified.</p>
         <dl class="incident-facts">
           <div><dt>Resolution summary</dt><dd class="incident-text">{{ resolution.summary }}</dd></div>
           <div><dt>Outcome</dt><dd><span class="incident-text">{{ resolution.outcomeText }}</span>
-            <span class="incident-meta"><span class="incident-pill incident-pill--category">{{ resolution.outcomeCategory }}</span>
+            <span class="incident-meta"><span class="status-pill incident-pill incident-pill--category">{{ resolution.outcomeCategory }}</span>
               {{ resolution.outcomeSourceUnknown || !resolution.outcomeSourceDescription ? 'Source unknown' : 'Source: ' + resolution.outcomeSourceDescription }}</span></dd></div>
           <div><dt>Contact restored or resolution time</dt><dd>
             @if (resolution.contactRestoredTimeUnknown || !resolution.contactRestoredAt) { Unknown }
@@ -97,7 +97,7 @@
           (changed)="applyChange($event)" (denied)="writeDenied()" />
 
         @if (canWrite(incident)) {
-          <section class="incident-card" aria-labelledby="incident-contribute-heading">
+          <section class="card incident-card" aria-labelledby="incident-contribute-heading">
             <h3 id="incident-contribute-heading">Contribute</h3>
             @if (composer()) {
               <p class="incident-muted">Finish or cancel the open form to start another contribution.</p>

@@ -133,7 +133,7 @@ test('Adult A removes B from a Trip audience while C and creator access remain a
   console.log('Angular ready: http://localhost:4200');
   await page.getByRole('link', { name: 'Plans & Trips', exact: true }).click();
   await page.getByRole('link', { name: 'Open Trips', exact: true }).click();
-  await page.getByRole('button', { name: 'Create Trip', exact: true }).click();
+  await page.getByRole('button', { name: 'Create trip', exact: true }).click();
 
   const tripTitle = `Audience access ${test.info().workerIndex}-${Date.now()}`;
   const noteContent = `B note ${Date.now()}`;
@@ -151,7 +151,7 @@ test('Adult A removes B from a Trip audience while C and creator access remain a
   const createResponsePromise = page.waitForResponse(response =>
     response.url().includes(`/api/family-groups/${family.familyGroupId}/trips`)
       && response.request().method() === 'POST');
-  await page.getByRole('button', { name: 'Create Trip', exact: true }).click();
+  await page.getByRole('button', { name: 'Create trip', exact: true }).click();
   const createResponse = await createResponsePromise;
   expect(createResponse.status()).toBe(201);
   const createdTrip = await createResponse.json() as Trip;
@@ -197,7 +197,7 @@ test('Adult A removes B from a Trip audience while C and creator access remain a
   await page.getByLabel('Add a Note').fill(noteContent);
   const noteCreatePromise = page.waitForResponse(response =>
     response.url().endsWith(`/api/trips/${tripId}/notes`) && response.request().method() === 'POST');
-  await page.getByRole('button', { name: 'Add Note', exact: true }).click();
+  await page.getByRole('button', { name: 'Add note', exact: true }).click();
   const noteCreateResponse = await noteCreatePromise;
   expect(noteCreateResponse.status()).toBe(201);
   const createdNote = await noteCreateResponse.json() as TripNote;
@@ -223,7 +223,7 @@ test('Adult A removes B from a Trip audience while C and creator access remain a
   await page.getByRole('link', { name: 'Open Trips', exact: true }).click();
   await expect(page.getByRole('link', { name: new RegExp(tripTitle) })).toBeVisible();
   await page.getByRole('link', { name: new RegExp(tripTitle) }).click();
-  await page.getByRole('button', { name: 'Change Audience', exact: true }).click();
+  await page.getByRole('button', { name: 'Change audience', exact: true }).click();
 
   const audienceEditor = page.getByRole('region', { name: 'Change Trip audience' });
   await expect(audienceEditor).toBeVisible();

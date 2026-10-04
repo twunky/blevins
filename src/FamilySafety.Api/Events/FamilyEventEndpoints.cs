@@ -65,7 +65,7 @@ public static class FamilyEventEndpoints
         try
         {
             var created = await service.CreateAsync(familyGroupId, request, cancellationToken);
-            return Results.Created($"/api/family-groups/{familyGroupId:D}/events", created);
+            return Results.Created($"/api/events/{created.EventId:D}", created);
         }
         catch (CurrentAccountUnavailableException)
         {

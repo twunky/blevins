@@ -180,6 +180,110 @@ describe('Family dashboard and Family settings (WI-009-007)', () => {
     expect(buttons(settings, 'Revoke invitation')).toHaveLength(0);
   });
 
+  it('explains in Settings, once members load, why a relationship cannot be suggested when no other adult is active', async () => {
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/family/settings', App);
+    http.expectOne('/api/profile').flush(profile);
+    http.expectOne('/api/family-groups/administered').flush([]);
+    http.expectOne('/api/family-groups/mine').flush([family]);
+    http.expectOne('/api/family-groups/family-a/relationships').flush([]);
+    http.expectOne('/api/family-groups/family-a/events').flush([]);
+    http.expectOne('/api/family-groups/family-a/plans').flush([]);
+    harness.detectChanges();
+    const settings = harness.routeNativeElement!.querySelector('section.family-settings')!;
+    const suggest = buttons(settings, 'Suggest relationship')[0];
+    const explanation = 'This Family has no other active adult member to suggest a relationship with yet.';
+
+    // Still loading the member list: the action is disabled, but nothing claims there is no one to choose.
+    expect(suggest.disabled).toBe(true);
+    expect(settings.textContent).not.toContain(explanation);
+
+    http.expectOne('/api/family-groups/family-a/members').flush([members[0]]);
+    harness.detectChanges();
+    expect(suggest.disabled).toBe(true);
+    expect(settings.textContent).toContain(explanation);
+    expect(settings.textContent).toContain('A Family administrator may invite another adult.');
+    const describedBy = suggest.getAttribute('aria-describedby');
+    expect(describedBy && settings.querySelector(`#${describedBy}`)?.textContent).toContain(explanation);
+  });
+
+  it('shows no missing-adult explanation in Settings when another active adult can be chosen', async () => {
+    const harness = await open('/family/settings');
+    const settings = harness.routeNativeElement!.querySelector('section.family-settings')!;
+    const suggest = buttons(settings, 'Suggest relationship')[0];
+    expect(suggest.disabled).toBe(false);
+    expect(suggest.hasAttribute('aria-describedby')).toBe(false);
+    expect(settings.textContent).not.toContain('no other active adult member');
+    expect(Array.from(settings.querySelectorAll<HTMLOptionElement>('#relationship-member option')).map(option => option.textContent?.trim()))
+      .toEqual(['Choose a family member', 'Sam Lee', 'Kim Lee', 'Pat Lee']);
+  });
+
+  it('offers separate Retry actions for failed member and relationship reads on the Family dashboard', async () => {
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/family', App);
+    http.expectOne('/api/profile').flush(profile);
+    http.expectOne('/api/family-groups/administered').flush([]);
+    http.expectOne('/api/family-groups/mine').flush([family]);
+    const fail = { status: 503, statusText: 'Unavailable' };
+    http.expectOne('/api/family-groups/family-a/members').flush({}, fail);
+    http.expectOne('/api/family-groups/family-a/relationships').flush({}, fail);
+    http.expectOne('/api/family-groups/family-a/events').flush([]);
+    http.expectOne('/api/family-groups/family-a/plans').flush([]);
+    harness.detectChanges();
+    const dashboard = harness.routeNativeElement!.querySelector('section.family-dashboard')!;
+    expect(dashboard.textContent).toContain('Your family directory could not be loaded.');
+    expect(dashboard.textContent).toContain('Family relationships could not be loaded.');
+
+    buttons(dashboard, 'Retry loading Family members')[0].click();
+    http.expectNone('/api/family-groups/family-a/relationships');
+    http.expectOne('/api/family-groups/family-a/members').flush(members);
+    harness.detectChanges();
+    expect(dashboard.textContent).toContain('Sam Lee');
+    expect(buttons(dashboard, 'Retry loading Family members')).toHaveLength(0);
+
+    buttons(dashboard, 'Retry loading relationships')[0].click();
+    http.expectNone('/api/family-groups/family-a/members');
+    http.expectOne('/api/family-groups/family-a/relationships').flush([incoming]);
+    harness.detectChanges();
+    expect(dashboard.textContent).toContain('Sam Lee suggested a relationship');
+    expect(buttons(dashboard, 'Retry loading relationships')).toHaveLength(0);
+  });
+
+  it('does not offer Retry for an unavailable member profile, which is not a failed list read', async () => {
+    const harness = await open('/family');
+    const dashboard = harness.routeNativeElement!.querySelector('section.family-dashboard')!;
+    Array.from(dashboard.querySelectorAll<HTMLButtonElement>('button.member-button'))
+      .find(button => button.textContent?.includes('Sam Lee'))!.click();
+    http.expectOne('/api/family-members/sam/profile').flush({}, { status: 404, statusText: 'Not Found' });
+    harness.detectChanges();
+    expect(dashboard.textContent).toContain('This family member is unavailable.');
+    expect(buttons(dashboard, 'Retry loading Family members')).toHaveLength(0);
+  });
+
+  it('in Settings, shows a failed member read with Retry instead of claiming no other adult exists', async () => {
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/family/settings', App);
+    http.expectOne('/api/profile').flush(profile);
+    http.expectOne('/api/family-groups/administered').flush([]);
+    http.expectOne('/api/family-groups/mine').flush([family]);
+    http.expectOne('/api/family-groups/family-a/members').flush({}, { status: 503, statusText: 'Unavailable' });
+    http.expectOne('/api/family-groups/family-a/relationships').flush([]);
+    http.expectOne('/api/family-groups/family-a/events').flush([]);
+    http.expectOne('/api/family-groups/family-a/plans').flush([]);
+    harness.detectChanges();
+    const settings = harness.routeNativeElement!.querySelector('section.family-settings')!;
+    expect(settings.textContent).toContain('Your family directory could not be loaded.');
+    expect(settings.textContent).not.toContain('no other active adult member');
+    expect(buttons(settings, 'Suggest relationship')[0].disabled).toBe(true);
+
+    buttons(settings, 'Retry loading Family members')[0].click();
+    http.expectNone('/api/family-groups/family-a/relationships');
+    http.expectOne('/api/family-groups/family-a/members').flush(members);
+    harness.detectChanges();
+    expect(buttons(settings, 'Suggest relationship')[0].disabled).toBe(false);
+    expect(settings.textContent).not.toContain('could not be loaded');
+  });
+
   it('withdraws a sent suggestion and removes an accepted relationship after confirmation in Settings', async () => {
     const harness = await open('/family/settings', [outgoing, acceptedWithMe]);
     const settings = harness.routeNativeElement!.querySelector('section.family-settings')!;

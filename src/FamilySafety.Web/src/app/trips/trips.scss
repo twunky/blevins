@@ -7,18 +7,8 @@
 .trips-heading h2, .trips-heading h4 { margin: 0; }
 .trips-heading h2 { flex: 1 1 12rem; font-size: clamp(1.25rem, 2.2vw, 1.6rem); overflow-wrap: anywhere; }
 
-.trip-card, .trip-form-section, .trip-detail-hero, .trip-detail-panel, .trip-notes, .trip-audience-editor {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  min-width: 0;
-  padding: clamp(1rem, 2vw, 1.35rem);
-}
 .trip-card-header { align-items: center; display: flex; gap: var(--space-3); margin-bottom: var(--space-3); }
-.trip-card-icon { align-items: center; background: var(--color-primary-soft); border-radius: 0.6rem; color: var(--color-primary); display: inline-flex; height: 2.25rem; justify-content: center; width: 2.25rem; flex: none; }
 .trip-list-heading { font-size: 1.1rem; margin: 0; }
-.trip-count { background: var(--color-primary-soft); border-radius: 999px; color: #1d4ed8; font-size: 0.8rem; font-weight: 700; margin-left: auto; padding: 0.15rem 0.6rem; }
 .trip-retained-heading .trip-help { margin: var(--space-1) 0 0; }
 
 .trip-list, .trip-options, .trip-note-list, .trip-traveler-list { display: grid; list-style: none; margin: 0; padding: 0; }

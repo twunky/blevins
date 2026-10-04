@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AppIcon } from '../icon';
-import { dateTile, displayRange } from '../date-format';
+import { dateTile, displayDateTime, displayRange } from '../date-format';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, Input, OnChanges, OnInit, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -236,10 +236,19 @@ export class Trips implements OnInit, OnChanges {
       },
       error: (response: HttpErrorResponse) => {
         this.itemLoading.set(false);
+        // Missing and unauthorized are the same 404 and keep the generic unavailable card. Any other failure is a
+        // read problem, not a statement about the Trip, so it gets its own message and a Retry.
         if (response.status === 404) this.unavailable.set(true);
-        else this.detailError.set('This trip is unavailable.');
+        else this.detailError.set(response.status === 401
+          ? 'Your session may have ended. Please sign in again.'
+          : 'This Trip could not be opened. Please try again.');
       },
     });
+  }
+
+  /** Repeats the same authorize-first Trip read; the Family is still decided only after a 200. */
+  protected retryRoutedTrip(): void {
+    if (this.tripId !== null) this.openRoutedTrip(this.tripId);
   }
 
   protected closeDetail(): void {
@@ -251,6 +260,7 @@ export class Trips implements OnInit, OnChanges {
 
   protected readonly dateTile = dateTile;
   protected readonly displayRange = displayRange;
+  protected readonly displayDateTime = displayDateTime;
 
   protected beginAudienceChange(): void {
     const trip = this.selectedTrip();
@@ -435,13 +445,6 @@ export class Trips implements OnInit, OnChanges {
         this.noteError.set(validation ? Object.values(validation).flat().join(' ') : 'This Note could not be changed. Refresh the Trip and try again.');
       },
     });
-  }
-
-  protected changeGroup(): void {
-    this.travelerIds.set([]);
-    this.recipientIds.set([]);
-    this.availableMembers.set([]);
-    this.loadMembers();
   }
 
   protected changeAudience(): void {

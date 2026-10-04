@@ -1,8 +1,8 @@
 # Project Status
 
-**Post-Phase-9 Trip Notes read-state follow-up (2026-10-04):** The owner authorized a bounded loading, empty, failure, and Retry presentation fix for the existing Trip Notes read. It is implemented and `SELF-VERIFIED` with focused Angular tests, the full Angular suite, Angular compilation, and a production web build; owner review and commit remain pending. No requirement or context-baseline change; Phase 9 remains closed and `CTX-1.29` remains active.
+**Post-Phase-9 Trip Notes read-state follow-up (2026-10-04):** The owner authorized a bounded loading, empty, failure, and Retry presentation fix for the existing Trip Notes read. It is implemented and `SELF-VERIFIED` with focused Angular tests, the full Angular suite, Angular compilation, and a production web build. The owner has committed it (`9140349`). No requirement or context-baseline change; Phase 9 remains closed and `CTX-1.29` remains active.
 
-**Phase 9 closure (2026-10-03):** WI-009-011 is `DONE / PASS — OWNER APPROVED`; VER-WI-009-011 is `DONE / PASS`; [VER-PH-009](planning/verification/VER-PH-009.md) is `PASS / PHASE CLOSURE VERIFIED`, all 15 exits PASS. DEC-081 records explicit conditional owner closure after Plan filtering, focused verification, one final build, sole final full Playwright 34/34 and artifact health passed. Phase 9 `COMPLETE / CLOSED`; CTX-1.28 ACTIVE; Development user testing READY; Phase 9.5 READY TO BEGIN. No implementation work item remains authorized; no new CTX, out-of-scope feature, commit or push.
+**Phase 9 closure (2026-10-03):** WI-009-011 is `DONE / PASS — OWNER APPROVED`; VER-WI-009-011 is `DONE / PASS`; [VER-PH-009](planning/verification/VER-PH-009.md) is `PASS / PHASE CLOSURE VERIFIED`, all 15 exits PASS. DEC-081 records explicit conditional owner closure after Plan filtering, focused verification, one final build, sole final full Playwright 34/34 and artifact health passed. Phase 9 `COMPLETE / CLOSED`; CTX-1.28 ACTIVE at closure (`CTX-1.29` is now active under `DEC-082`); Development user testing READY; Phase 9.5 READY TO BEGIN. No implementation work item remains authorized; no new CTX, out-of-scope feature, commit or push.
 
 **Post-Phase-9 Plan note follow-up (2026-10-04):** `DEC-082` approves creator edit/clear of the existing optional Plan note, implemented under `REQ-PLAN-007`; `CTX-1.29` is ACTIVE after `VER-CTX-1.29`. Phase 9 remains closed under `DEC-081` and `VER-PH-009`.
 
@@ -25,7 +25,7 @@
 | Verification | `VER-CTX-1.29` — `PASS / SELF-VERIFIED`; `VER-CTX-1.28` and earlier reports remain historical evidence. |
 | Standing authorization | `DEC-032` — routine, reversible `ROUTINE`/`STANDARD` work may use bounded auto-approval; high-impact work still requires explicit approval |
 | Primary blocker | None. Backup-aging and restore-operation evidence remains a production deployment dependency. |
-| Next action | Owner reviews the uncommitted Plan note follow-up and performs commits manually. The Plan create `Location` header and one-person Event explanation were also resolved separately on 2026-10-04; Event audience eligibility is unchanged. Further Phase 9.5 work requires separate approval. Existing technical/budget and predeployment follow-ups remain separate. OD-001/004 resolved, OD-002 open for Phase 9.5, OD-003 outside MVP. |
+| Next action | Owner selects and scopes the next work. The post-Phase-9 follow-ups (Plan note edit/clear, the Plan create `Location` header, the one-person Event explanation, and Trip Notes read states) are committed (`9140349`, 2026-10-04); Event audience eligibility is unchanged. Further Phase 9.5 work requires separate approval. Existing technical/budget and predeployment follow-ups remain separate. OD-001/004 resolved, OD-002 open for Phase 9.5, OD-003 outside MVP. |
 
 ## Current phase
 
@@ -42,6 +42,8 @@
 - backups: aged out within 30 days of active deletion.
 
 `CTX-1.26` is active after `VER-CTX-1.26` (`PASS / SELF-VERIFIED`). `WI-008-003 — Safety Incident Domain and Access Foundation` has since been prepared as a single server-first story with 29 acceptance checks. The project owner approved it and authorized its execution against `CTX-1.26` on 2026-10-01 (`APPROVED — EXECUTION AUTHORIZED`), accepting its design as written. It is `DONE / PASS`, owner approved on 2026-10-01; see `planning/verification/VER-WI-008-003.md`. The owner also accepted two narrow implementation readings (task self-cancel under the same grant; coordinator excluded from participant-list requests) as consistent with `DEC-071`. `WI-008-004 — Incident UI and Start-an-Incident Flow` (Angular UI only, against `CTX-1.26`) is `DONE / PASS` — `OWNER APPROVED`. The owner's visual review on 2026-10-02 passed, and the owner accepted the recorded visual differences and implementation deviations; see `planning/verification/VER-WI-008-004.md`. The Incident workflow is now implemented and verified end to end. The owner then closed Phase 8 under `DEC-072`. The Phase 7.5 closure record below is historical and remains valid.
+
+*Historical Phase 7.5 records follow, as written at the time. Statements in them such as "Phase 8 scope is unchanged" or "Phase 9 remains planned" describe that checkpoint; current status is the continuation checkpoint above.*
 
 **Phase 7.5 — End-to-End UX & User-Test Readiness** is `COMPLETE / CLOSED` under `DEC-065`; the phase-level closure assessment is in `planning/verification/VER-PH-075.md`. WI-075-005 remains `DONE`: the owner accepts the supplied functional/user validation as sufficient for the current MVP milestone, with participant/session detail limitations preserved in its evidence. Broader formal human usability validation remains future work and was not required for phase closure. The owner has determined broader formal human usability validation is premature until visual design, screen composition, and mockup alignment are substantially more mature. Do not make a new participant test a prerequisite for each UI story; continue UI verification with automated regressions, stable Playwright flows, rendered browser review, accessibility checks, and owner visual review. Keep human usability validation in the longer-term plan as a later maturity gate.
 
@@ -70,15 +72,18 @@ Resolved: `OD-001` mobile navigation is resolved by `DEC-074` and `REQ-UX-013` (
 - No implementation work item is authorized. The next action is owner selection/scoping of Phase 9.5 work; load DEC-081 and VER-PH-009 for closure/boundaries.
 - `planning/stories/WI-009-005-refresh-safe-item-urls-and-authorize-first-deep-links.md` with `VER-WI-009-005`, and `planning/stories/WI-009-006-home-dashboard-prototype-alignment.md` with `VER-WI-009-006` — closed item-link and Home work (`DEC-075`, `DEC-076`). Load them when later work touches item routes, Family switching, or Home.
 - `planning/stories/WI-009-007-family-dashboard-prototype-alignment.md` with `VER-WI-009-007` — closed Family dashboard and Family Settings work (`DEC-077`). Load them when later work touches the Family page.
-- `planning/stories/WI-009-004-event-and-plan-single-item-read-foundation.md` and `planning/verification/VER-WI-009-004.md` — the closed server item-read foundation. They record the `GET /api/events/{eventId}` and `GET /api/plans/{planId}` contract. Load them when planning the `REQ-UX-014` client item.
+- `planning/stories/WI-009-004-event-and-plan-single-item-read-foundation.md` and `planning/verification/VER-WI-009-004.md` — the closed server item-read foundation. They record the `GET /api/events/{eventId}` and `GET /api/plans/{planId}` contract. Load them when later work touches Event or Plan item reads (the `REQ-UX-014` client item is closed as `WI-009-005`).
 - `planning/stories/WI-009-003-six-area-navigation-and-safety-discoverability.md` and `planning/verification/VER-WI-009-003.md` — the closed navigation item; load only when later work touches the shell navigation.
 - `planning/roadmap.md`, DEC-081 and `planning/verification/VER-PH-009.md` — closed Phase 9, M5 substitution/M6 date rule, next-phase readiness and preserved follow-ups. PRP-030 remains the approved historical planning basis; no Phase 9 item is pending.
 - `decision-log.md#dec-072` and `planning/verification/VER-PH-008.md`: Phase 8 closure and the carried-forward follow-ups.
 - Phase 8 records (`PRP-028`, `PRP-029`, and `WI-008-001` to `WI-008-004`) are closed history. Load them only when a later approved task touches Concern or Incident behavior.
 - `core/product-contract.md`, `core/privacy-safety-contract.md`, `core/ux-contract.md`, and `workflows/safety.md` — controlling Safety, privacy, uncertainty, and UX rules.
 - `decision-log.md#open-product-decisions` and `workflows/sharing-checkins.md` — unresolved location decision and separation of Check-In/Sharing permissions when relevant.
+- `workflows/plans-trips.md` (including `REQ-PLAN-007`, added in `CTX-1.29`) and `workflows/events.md` — load when later work touches Plans, Trips, or Events.
 
 Load only the context needed for the next owner-approved task. Bootstrap, archive, and unrelated historical verification remain out of scope unless specifically needed.
+
+*Historical notes from earlier checkpoints follow. A baseline they call active (for example `CTX-1.24`) was active when written; `CTX-1.29` is active now.*
 
 The bootstrap source is extraction evidence only and is not normal canonical context. `WI-007-001` through `WI-007-005` are complete, and Phase 7 is closed under `DEC-063` with passing closure evidence in `planning/verification/VER-PH-007.md`. Trip reconciliation `DEC-057`, Trip Notes clarification `DEC-060`, and audience-editing clarification `DEC-061` remain in force under active `CTX-1.24`. The earlier Phase 7 verification reports remain valid. `DEC-062` records the approved Phase 7.5 priority; `DEC-063` closed Phase 7 and advanced Phase 7.5 to current without changing product requirements. `DEC-065` subsequently closed Phase 7.5 and PRP-027.
 
@@ -106,7 +111,7 @@ Phase 7 is closed by `DEC-063` after the closure review recorded `READY TO CLOSE
 
 ## Do not do yet
 
-- Do not infer unspecified UX, architecture, permission, notification, retention, or membership behavior in Phase 7 work.
+- Do not infer unspecified UX, architecture, permission, notification, retention, or membership behavior in any work. (This rule was first recorded for Phase 7 work.)
 - Do not choose paid providers, production hosting, production database licensing, deployment infrastructure, or vendors.
 - Do not invent relationships, household behavior, identity-provider behavior, operator processes, invitation-history retention, or minor/guardian behavior.
 - Do not expand the MVP or resolve open decisions implicitly.

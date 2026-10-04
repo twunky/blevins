@@ -1,4 +1,4 @@
-<section class="incident-card" aria-labelledby="incident-timeline-heading">
+<section class="card incident-card" aria-labelledby="incident-timeline-heading">
   <h3 id="incident-timeline-heading">Timeline</h3>
   <p class="incident-meta">Categories describe how information is known. They do not say whether anyone is safe.
     Items are ordered by event time when known, otherwise by recorded time.</p>
@@ -20,7 +20,7 @@
           @if (entry) {
             <h4>
               {{ entry.kind === 'ContactAttempt' ? contactLine(entry) : entry.contributorName }}
-              <span class="incident-pill incident-pill--category">{{ categoryText(entry.category, entry.isOutdated) }}</span>
+              <span class="status-pill incident-pill incident-pill--category">{{ categoryText(entry.category, entry.isOutdated) }}</span>
             </h4>
             @if (entry.text) { <p class="incident-text">{{ entry.text }}</p> }
             @if (relatedTask(entry); as resultTask) { <p class="incident-meta">Result for the task “{{ resultTask.description }}”</p> }

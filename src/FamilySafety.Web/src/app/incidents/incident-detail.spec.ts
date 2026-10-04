@@ -123,6 +123,8 @@ describe('Incident detail', () => {
   describe('header and lineage', () => {
     it('shows subject, state, reason with provenance, coordinator, started-by, and times as cards without tabs', () => {
       const { root } = open(incident());
+      expect(root.querySelector<HTMLAnchorElement>('a[href="/incidents"]')?.textContent?.trim()).toBe('Back to Incidents');
+      expect(button(root, 'Back to Incidents')).toBeUndefined();
       expect(heading(root, 'Incident about Adult B')).toBeDefined();
       const header = heading(root, 'Incident about Adult B')!.closest('section')!;
       expect(text(header)).toContain('Open Coordination is open');
@@ -287,7 +289,7 @@ describe('Incident detail', () => {
     it('offers summary updates only to the coordinator and redraws the current summary', () => {
       expect(button(open(incident(), cId).root, 'Post a summary update')).toBeUndefined();
       TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+      TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])] });
       http = TestBed.inject(HttpTestingController);
       const { fixture, root } = open(incident(), aId);
       button(root, 'Post a summary update').click();
@@ -425,7 +427,7 @@ describe('Incident detail', () => {
       const value = incident({ tasks: [task({})] });
       expect(button(open(value, aId).root, /^Complete…/)).toBeUndefined();
       TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+      TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])] });
       http = TestBed.inject(HttpTestingController);
       const { fixture, root } = open(value, cId);
       button(root, /^Complete…/).click();
@@ -450,7 +452,7 @@ describe('Incident detail', () => {
       const participant = open(incident({ tasks }), cId).root;
       expect(buttons(participant, /^Cancel task…/).map(item => text(item))).toEqual(['Cancel task… My own check']);
       TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+      TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])] });
       http = TestBed.inject(HttpTestingController);
       const { fixture, root } = open(incident({ tasks }), aId);
       expect(buttons(root, /^Cancel task…/)).toHaveLength(2);
@@ -667,6 +669,38 @@ describe('Incident detail', () => {
       http.expectNone(() => true);
       fixture.detectChanges();
       expect(heading(root, 'This Incident is unavailable')).toBeDefined();
+      expect(calls).toEqual([]);
+    });
+
+    it('offers Retry for a transient read failure and repeats the same read before any Family decision', async () => {
+      const { fixture, calls, root } = openWithAdopt(Promise.resolve('current'));
+      http.expectOne(`/api/incidents/${id}`).flush({}, { status: 503, statusText: 'Unavailable' });
+      fixture.detectChanges();
+      expect(text(root)).toContain('This Incident could not be opened. Please try again.');
+      expect(heading(root, 'This Incident is unavailable')).toBeUndefined();
+      expect(calls).toEqual([]);
+
+      button(root, 'Retry loading Incident').click();
+      fixture.detectChanges();
+      expect(text(root)).toContain('Loading Incident…');
+      expect(calls).toEqual([]);
+      http.expectOne(`/api/incidents/${id}`).flush(incident());
+      await fixture.whenStable();
+      fixture.detectChanges();
+      expect(calls).toEqual([[groupId, 'incident']]);
+      expect(heading(root, 'Incident about Adult B')).toBeDefined();
+      expect(button(root, 'Retry loading Incident')).toBeUndefined();
+    });
+
+    it('shows the same generic unavailable state, with no Retry, when a Retry returns 404', () => {
+      const { fixture, calls, root } = openWithAdopt(Promise.resolve('current'));
+      http.expectOne(`/api/incidents/${id}`).flush({}, { status: 503, statusText: 'Unavailable' });
+      fixture.detectChanges();
+      button(root, 'Retry loading Incident').click();
+      http.expectOne(`/api/incidents/${id}`).flush({}, { status: 404, statusText: 'Not Found' });
+      fixture.detectChanges();
+      expect(heading(root, 'This Incident is unavailable')).toBeDefined();
+      expect(button(root, 'Retry loading Incident')).toBeUndefined();
       expect(calls).toEqual([]);
     });
 

@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { displayDateTime } from '../date-format';
 import { ItemFamilyOutcome } from '../item-route';
 import { Trips } from './trips';
 
@@ -70,7 +71,7 @@ describe('Trips', () => {
     const element = fixture.nativeElement as HTMLElement;
     expect(element.textContent).toContain('Trips you created outside your active Families');
     expect(element.textContent).toContain('Family visit');
-    expect(element.textContent).not.toContain('Create Trip');
+    expect(element.textContent).not.toContain('Create trip');
     expect(element.querySelector('#trip-group')).toBeNull();
   });
 
@@ -117,6 +118,71 @@ describe('Trips', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Current recipients:');
   });
 
+  it('shows the selected Family as read-only context when creating a Trip, and creates it in that Family', () => {
+    const selected = { familyGroupId: group.familyGroupId, name: 'Rivera Family' };
+    const fixture = TestBed.createComponent(Trips);
+    fixture.componentRef.setInput('activeGroups', [selected]);
+    fixture.componentRef.setInput('ownProfileId', creator.profileId);
+    fixture.detectChanges();
+    http.expectOne('/api/trips').flush([]);
+    const component = fixture.componentInstance as unknown as {
+      openCreate: () => void;
+      tripForm: { patchValue: (value: object) => void };
+      toggleTraveler: (id: string, selected: boolean) => void;
+      saveTrip: () => void;
+    };
+    component.openCreate();
+    http.expectOne(`/api/family-groups/${group.familyGroupId}/members`).flush([creator, traveler]);
+    fixture.detectChanges();
+
+    const form = (fixture.nativeElement as HTMLElement).querySelector('form')!;
+    const essentials = form.querySelector<HTMLElement>('section[aria-labelledby="trip-essentials-heading"]')!;
+    expect(essentials.textContent).toContain('Family: Rivera Family');
+    // No user-editable Family choice: no dropdown in the form, and no essentials control labelled "Family".
+    expect(form.querySelector('select')).toBeNull();
+    expect(Array.from(essentials.querySelectorAll('label')).some(label => label.textContent?.includes('Family'))).toBe(false);
+
+    component.tripForm.patchValue({
+      title: 'Family visit', primaryDestination: 'Atlanta', startDate: '2026-10-01', endDate: '2026-10-05',
+      audienceType: 'FamilyGroup',
+    });
+    component.toggleTraveler(traveler.profileId, true);
+    component.saveTrip();
+    const request = http.expectOne(`/api/family-groups/${group.familyGroupId}/trips`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body.audienceType).toBe('FamilyGroup');
+  });
+
+  it('shows expected arrival with the shared date and time display and keeps the time zone label and stored values', () => {
+    const fixture = TestBed.createComponent(Trips);
+    fixture.componentRef.setInput('activeGroups', [group]);
+    fixture.detectChanges();
+    http.expectOne('/api/trips').flush([trip(true)]);
+    const component = fixture.componentInstance as unknown as {
+      openRoutedTrip: (id: string) => void;
+      beginEdit: () => void;
+      tripForm: { getRawValue: () => Record<string, unknown> };
+    };
+    component.openRoutedTrip(trip(true).tripId);
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(trip(true));
+    http.expectOne(`/api/trips/${trip(true).tripId}/notes`).flush([]);
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    // The same calendar date and wall-clock time, formatted by displayDateTime; no time-zone conversion.
+    expect(text).toContain(`Expected arrival: ${displayDateTime('2026-10-01', '17:00:00')} (America/New_York)`);
+    expect(text).toContain('Thu, Oct 1, 2026 · 5:00 PM (America/New_York)');
+    expect(text).not.toContain('2026-10-01 at 17:00:00');
+
+    // Presentation only: editing still starts from the stored values.
+    component.beginEdit();
+    http.expectOne(`/api/family-groups/${group.familyGroupId}/members`).flush([creator, traveler, recipient]);
+    const value = component.tripForm.getRawValue();
+    expect(value['expectedArrivalDate']).toBe('2026-10-01');
+    expect(value['expectedArrivalTime']).toBe('17:00');
+    expect(value['expectedArrivalTimeZone']).toBe('America/New_York');
+  });
+
   it('shows a viewer a generic selected audience label without recipient identities or edit controls', () => {
     const fixture = TestBed.createComponent(Trips);
     fixture.detectChanges();
@@ -130,7 +196,7 @@ describe('Trips', () => {
     expect(text).toContain('Shared with selected people');
     expect(text).not.toContain('Emma');
     expect(text).not.toContain('Selected recipients:');
-    expect(text).not.toContain('Edit Trip details');
+    expect(text).not.toContain('Edit trip details');
   });
 
   it('renders optional free text as text rather than markup', () => {
@@ -310,7 +376,7 @@ describe('Trips', () => {
     fixture.detectChanges();
     expect(notesSection.querySelector('[role="status"]')).toBeNull();
     expect(notesSection.textContent).toContain('No Notes yet.');
-    expect(notesSection.querySelector('button')?.textContent).toContain('Add Note');
+    expect(notesSection.querySelector('button')?.textContent).toContain('Add note');
   });
 
   it('shows a Notes read failure and retries the Notes request to display returned Notes', () => {
@@ -468,7 +534,7 @@ describe('Trips — item URL /trips/:tripId (REQ-UX-014, WI-009-005)', () => {
     expect(element.querySelector('h2')?.textContent).toContain('Family visit');
     const back = Array.from(element.querySelectorAll('a')).find(link => link.textContent?.trim() === 'Back to Trips');
     expect(back?.getAttribute('href')).toBe('/trips');
-    expect(element.textContent).not.toContain('Create Trip');
+    expect(element.textContent).not.toContain('Create trip');
   });
 
   it('renders a retained creator Trip with no Family switch (OD-A)', async () => {
@@ -491,6 +557,73 @@ describe('Trips — item URL /trips/:tripId (REQ-UX-014, WI-009-005)', () => {
     expect(element.textContent).toContain('Only Trips currently shared with you can be opened.');
     expect(element.querySelector('a')?.getAttribute('href')).toBe('/trips');
     expect(document.activeElement).toBe(element.querySelector('h2'));
+  });
+
+  const retryTrip = (element: HTMLElement) =>
+    Array.from(element.querySelectorAll('button')).find(button => button.textContent?.trim() === 'Retry loading Trip');
+
+  it('shows a transient Trip read failure as a read error with Retry, not as the unavailable card or the Trips list', async () => {
+    let decide!: (value: ItemFamilyOutcome) => void;
+    const { fixture, calls, element } = openRouted(trip(true).tripId, new Promise(resolve => decide = resolve));
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(null, { status: 503, statusText: 'Unavailable' });
+    fixture.detectChanges();
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain('This Trip could not be opened. Please try again.');
+    expect(element.textContent).not.toContain('This Trip is unavailable');
+    expect(element.querySelector('app-item-unavailable')).toBeNull();
+    expect(element.textContent).not.toContain('No Trips are currently available');
+    expect(calls).toEqual([]);
+
+    // Retry repeats the same item read; the Family is decided only after its 200.
+    retryTrip(element)!.click();
+    fixture.detectChanges();
+    expect(element.textContent).toContain('Loading Trip…');
+    expect(element.textContent).not.toContain('could not be opened');
+    http.expectNone('/api/trips');
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(trip(true));
+    fixture.detectChanges();
+    expect(calls).toEqual([[group.familyGroupId, 'trip']]);
+    expect(element.textContent).not.toContain('Family visit');
+    decide('switched');
+    await fixture.whenStable();
+    http.expectOne(`/api/trips/${trip(true).tripId}/notes`).flush([]);
+    fixture.detectChanges();
+    expect(element.querySelector('h2')?.textContent).toContain('Family visit');
+    expect(retryTrip(element)).toBeUndefined();
+  });
+
+  it('keeps Retry after a second transient failure, then shows the generic card with no Retry when a Retry returns 404', async () => {
+    const { fixture, calls, element } = openRouted(trip(true).tripId, Promise.resolve('switched'));
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(null, { status: 503, statusText: 'Unavailable' });
+    fixture.detectChanges();
+    retryTrip(element)!.click();
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(null, { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+    expect(element.textContent).toContain('This Trip could not be opened. Please try again.');
+    expect(retryTrip(element)).toBeDefined();
+
+    retryTrip(element)!.click();
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(null, { status: 404, statusText: 'Not Found' });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(element.querySelector('h2')?.textContent).toBe('This Trip is unavailable');
+    expect(element.textContent).toContain('Only Trips currently shared with you can be opened.');
+    expect(element.textContent).not.toContain('could not be opened');
+    expect(retryTrip(element)).toBeUndefined();
+    expect(calls).toEqual([]);
+  });
+
+  it('renders a retained creator Trip after a Retry, still with no Family switch (OD-A)', async () => {
+    const { fixture, calls, element } = openRouted(trip(true).tripId, Promise.resolve('retained'));
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(null, { status: 503, statusText: 'Unavailable' });
+    fixture.detectChanges();
+    retryTrip(element)!.click();
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(trip(true));
+    await fixture.whenStable();
+    http.expectOne(`/api/trips/${trip(true).tripId}/notes`).flush([]);
+    fixture.detectChanges();
+    expect(calls).toEqual([[group.familyGroupId, 'trip']]);
+    expect(element.querySelector('h2')?.textContent).toContain('Family visit');
+    expect(element.textContent).not.toContain('This Trip is unavailable');
   });
 
   it('shows the same unavailable card for a non-GUID ID without any request', () => {

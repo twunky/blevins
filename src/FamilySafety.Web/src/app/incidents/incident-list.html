@@ -1,4 +1,4 @@
-<section class="incident-card" aria-labelledby="incident-list-heading">
+<section class="card incident-card" aria-labelledby="incident-list-heading">
   <div class="incident-card-heading">
     <span class="card-icon"><app-icon name="shield" /></span>
     <div class="incident-list-intro">
@@ -37,7 +37,7 @@
                   <span class="incident-row-body">
                     <span class="incident-row-top">
                       <strong>{{ row.subjectName }}</strong>
-                      <span [class]="'incident-pill incident-pill--' + row.state.toLowerCase()">{{ row.state }}</span>
+                      <span [class]="'status-pill incident-pill incident-pill--' + row.state.toLowerCase()">{{ row.state }}</span>
                     </span>
                     <span class="incident-meta">{{ row.coordinatorProfileId === ownProfileId ? 'You coordinate this Incident' : 'Coordinated by ' + row.coordinatorName }}</span>
                     @if (showFamilyName) { <span class="incident-meta">{{ row.familyGroupName }}</span> }

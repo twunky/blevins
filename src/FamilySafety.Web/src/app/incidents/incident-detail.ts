@@ -11,6 +11,8 @@ import {
   categoryText, dateOnlyFormat, dateTimeFormat, focusById, initials, isStatus, sessionEndedMessage, sourceText, stateDescription,
 } from './incident-shared';
 import { AdoptItemFamily, isItemId } from '../item-route';
+import { AppIcon } from '../icon';
+import { focusHeadingState } from '../navigation';
 
 /**
  * Incident detail as cards (no tabs): header, resolution, timeline, people, contribute, tasks, and
@@ -18,7 +20,7 @@ import { AdoptItemFamily, isItemId } from '../item-route';
  */
 @Component({
   selector: 'app-incident-detail',
-  imports: [DatePipe, RouterLink, IncidentTimeline, IncidentComposer, IncidentPeople, IncidentTasks, IncidentCoordination],
+  imports: [DatePipe, RouterLink, AppIcon, IncidentTimeline, IncidentComposer, IncidentPeople, IncidentTasks, IncidentCoordination],
   templateUrl: './incident-detail.html',
   styleUrls: ['./incident-common.scss', './incident-detail.scss'],
 })
@@ -49,6 +51,7 @@ export class IncidentDetail implements OnInit {
   protected readonly categoryText = categoryText;
   protected readonly sourceText = sourceText;
   protected readonly stateDescription = stateDescription;
+  protected readonly focusHeadingState = focusHeadingState;
 
   ngOnInit(): void {
     if (this.initial && this.initial.incidentId === this.incidentId) {

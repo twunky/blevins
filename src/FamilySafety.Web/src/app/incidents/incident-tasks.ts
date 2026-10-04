@@ -64,8 +64,8 @@ export class IncidentTasks {
   }
 
   protected statusClass(task: IncidentTask): string {
-    if (task.notCompleted) return 'incident-pill incident-pill--cancelled';
-    return task.status === 'Open' ? 'incident-pill incident-pill--open-task' : `incident-pill incident-pill--${task.status.toLowerCase()}`;
+    if (task.notCompleted) return 'status-pill incident-pill incident-pill--cancelled';
+    return task.status === 'Open' ? 'status-pill incident-pill incident-pill--open-task' : `status-pill incident-pill incident-pill--${task.status.toLowerCase()}`;
   }
 
   protected canComplete(task: IncidentTask): boolean {

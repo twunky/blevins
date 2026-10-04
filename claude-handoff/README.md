@@ -1,6 +1,6 @@
 # Claude Handoff — Blevins / Family Safety
 
-**Phase 9 closure (2026-10-03):** WI-009-011 is `DONE / PASS — OWNER APPROVED`; VER-WI-009-011 is `DONE / PASS`; [VER-PH-009](../ai-context/planning/verification/VER-PH-009.md) is `PASS / PHASE CLOSURE VERIFIED`, all 15 exits PASS. DEC-081 records explicit conditional owner closure after Plan filtering, focused verification, one final build, sole final full Playwright 34/34 and artifact health passed. Phase 9 `COMPLETE / CLOSED`; CTX-1.28 ACTIVE; Development user testing READY; Phase 9.5 READY TO BEGIN. No implementation work item remains authorized; no new CTX, out-of-scope feature, commit or push.
+**Current state (2026-10-04):** Phase 9 is `COMPLETE / CLOSED` (`DEC-081`; [VER-PH-009](../ai-context/planning/verification/VER-PH-009.md)). `CTX-1.29` is ACTIVE (`DEC-082` / `REQ-PLAN-007`). Phase 9.5 is `READY TO BEGIN` and has not started. No implementation work item is authorized. The post-Phase-9 follow-ups are committed (`9140349`); see [CURRENT-TASK.md](CURRENT-TASK.md). The Phase 9 closure banner that used to be here is in [HISTORY.md § Part D](HISTORY.md#part-d).
 
 > ## PRIMARY VISUAL REFERENCES: `C:\Dev\blevins\claude-handoff\reference`
 >
@@ -28,7 +28,7 @@ Session and task guidance for Claude coding sessions working in this repository.
 - **Project root:** `C:\Dev\blevins`
 - **Product:** Family Safety, Coordination & Planning Application (local-first MVP; .NET 10 API + Angular 22 web client)
 - **Canonical context:** `C:\Dev\blevins\ai-context`
-- **Prepared:** 2026-10-01. Current guidance reconciled after Phase 9 closure (`DEC-081`; `VER-PH-009`) against active baseline `CTX-1.28`. Repository Cleanup Waves 1–5 are complete; no additional broad cleanup or reorganization and no product implementation item are authorized.
+- **Prepared:** 2026-10-01. Current guidance reconciled after Phase 9 closure (`DEC-081`; `VER-PH-009`), and on 2026-10-04 against active baseline `CTX-1.29` (`DEC-082`). Repository Cleanup Waves 1–5 are complete; no additional broad cleanup or reorganization and no product implementation item are authorized.
 
 ## Source of truth
 
@@ -63,27 +63,23 @@ Read in this order. Stop reading once you have what you need.
 7. [VALIDATION.md](VALIDATION.md) — commands and rendered-review expectations after changes.
 8. [SESSION-CLOSEOUT.md](SESSION-CLOSEOUT.md) — the format for handing work back.
 
+Before adding or moving Angular folders, read the client's [structure and extraction rule](../src/FamilySafety.Web/README.md#structure-and-extraction).
+
+Do not load [HISTORY.md](HISTORY.md) for normal work. It keeps earlier checkpoints, closed work-item scopes, and old closeout templates word-for-word for audit only.
+
 ## Current phase (one line)
 
-Phase 9 — Integration & UX Refinement is `COMPLETE / CLOSED` (`DEC-081`, 2026-10-03). WI-009-011 is DONE / PASS — OWNER APPROVED; all 15 exits pass. CTX-1.28 ACTIVE; Development testing READY; Phase 9.5 READY TO BEGIN. No implementation work item is authorized (see [CURRENT-TASK.md](CURRENT-TASK.md)). Earlier closed items remain:
-
-- `WI-009-011 — Phase 9 Exit Criteria Verification` (`DEC-081`): approved Plan/Trip Home freshness, explicit Safety substitution, consistency/journey/axe/keyboard evidence, final build/full regression and guarded artifact cleanup.
-- `WI-009-005 — Refresh-Safe Item URLs and Authorize-First Deep Links`;
-- `WI-009-007 — Family Dashboard Prototype Alignment` (`DEC-077`): the `/family` dashboard and `/family/settings` split, presentation only.
-- `WI-009-008 — Events Dashboard Prototype Alignment` (`DEC-078`): the `/events` dashboard, `/events/new`, and `/events/all`, presentation and client routing only.
-- `WI-009-009 — Safety Dashboard Prototype Alignment` (`DEC-079`): the read-only `/safety` dashboard with separate Open Concerns and Open Safety Incidents summaries, a Recent Check-Ins placeholder, and Back to Safety links; presentation and client composition only.
-- `WI-009-010 — First-Use and Invitation Arrival Workflow` (`DEC-080`): invitation arrival on `/home` with a one-time join announcement, Go to Home exits, plain no-Family guidance with one Family-required message per page, a first Family choice that keeps the page, and Invite feedback in the Invite card; client only.
-- `WI-009-006 — Home Dashboard Prototype Alignment` (`DEC-076`). It is a presentation-only Home redesign that supersedes the `WI-009-005` `AC-16` Home-presentation clause. `CTX-1.28` amends `REQ-UX-014` (no fabricated Family context; one-time Family-list refresh). `WI-009-001 — Playwright Per-Spec Scenario Isolation`, `WI-009-002 — Test Artifact Lifecycle and Cleanup`, `WI-009-003 — Six-Area Navigation and Safety Discoverability`, and `WI-009-004 — Event and Plan Single-Item Read Foundation` are `DONE / PASS` — `OWNER APPROVED` (2026-10-02). `PRP-030` is `APPROVED` (`DEC-074`), `OD-001` is resolved (six-area navigation, `REQ-UX-013`), and `CTX-1.28` is active (`DEC-075`). Unbuilt approved MVP capabilities belong to Phase 9.5 — MVP Feature Completion, not Phase 9. Phase 8 history: Phase 8 — Safety Coordination is `COMPLETE / CLOSED` (`DEC-072`, 2026-10-02; `VER-PH-008`). `WI-008-002` is `DONE / PASS`. The site-wide mockup alignment to `claude-handoff\reference` is **complete and owner-approved** (`DEC-070`: blue palette, sidebar + slim top bar, card system). The Safety Incident workflow is approved (`PRP-029`, `DEC-071`, `OD-004` resolved) and canonical in `CTX-1.26`. `WI-008-003 — Safety Incident Domain and Access Foundation` is `DONE / PASS`, owner approved 2026-10-01; the Incident server foundation is complete. `WI-008-004 — Incident UI and Start-an-Incident Flow` is `DONE / PASS` — `OWNER APPROVED` (2026-10-02). See [CURRENT-TASK.md](CURRENT-TASK.md). Any future UI work should follow the approved visual system in `src/FamilySafety.Web/src/styles.scss`.
+Phase 9 — Integration & UX Refinement is `COMPLETE / CLOSED` (`DEC-081`, 2026-10-03); `CTX-1.29` is ACTIVE (`DEC-082`); Phase 9.5 is `READY TO BEGIN`, not started, and no implementation work item is authorized (see [CURRENT-TASK.md](CURRENT-TASK.md)). Closed Phase 9 work items are summarized in [PROJECT-STATE.md](PROJECT-STATE.md); the earlier version of this section is in [HISTORY.md § Part D](HISTORY.md#part-d). Any future UI work should follow the approved visual system in `src/FamilySafety.Web/src/styles.scss`.
 
 ## Workflow
 
-**Server work (historical: WI-008-003, now `DONE / PASS`):**
+**Server work (last used for WI-008-003, now `DONE / PASS`):**
 
 1. Orient (entry files, this handoff, the story).
 2. Implement the story's tasks within its authorized scope.
 3. Validate with `VALIDATION.md` § 4, with the SQL gate on.
-4. Write `VER-WI-008-003`.
-5. Hand back using the server format in `SESSION-CLOSEOUT.md`, with the work item left in `VERIFYING / OWNER REVIEW`.
+4. Write the work item's `VER` record.
+5. Hand back using `SESSION-CLOSEOUT.md` (including its server-work items), with the work item left in `VERIFYING / OWNER REVIEW`.
 
 **UI work (historical example: WI-008-004, now `DONE / PASS`):**
 

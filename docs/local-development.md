@@ -66,7 +66,7 @@ The current UI includes:
 - Adult profile display and editing, including profile-field visibility.
 - Family dashboard, Family Settings, adult relationships, and invitations.
 - Events dashboard, creation, list/detail viewing, and authorized detail editing.
-- Plan creation and viewing with audience selection and optional notes.
+- Plan creation and viewing with audience selection and optional notes; the Plan's creator can edit or clear its note from the Plan page.
 - Trip creation and viewing, creator editing of core Trip details, and collaborative Trip Notes.
 - Read-only Safety dashboard and separate private Concern and Safety Incident workflows.
 
@@ -87,13 +87,13 @@ This starts the API in Development using a new isolated `FamilySafety_Invitation
 Start Angular with `npm start` as above and open **http://localhost:4200** in one tab. Use that host consistently so opening an outbox link remains in the same page session.
 
 1. Confirm **Active test identity: Adult A — Family administrator** in the Development banner.
-2. Open **Family**. Enter `development-recipient@example.invalid` as recipient email and choose **Send or resend invitation**.
+2. Open **Family**, then choose the **Family settings** gear. In **Invite an adult family member**, enter `development-recipient@example.invalid` as recipient email and choose **Send or resend invitation**.
 3. Choose **Show Development invitation links** to inspect the in-memory outbox. This is local test delivery, not a sent production email.
 4. Select **Adult B — invited adult**. The previous workspace and its pending reads are discarded. Confirm Home says there is no active Family.
 5. Choose **Show Development invitation links** again, then **Open invitation** for the message. Switching clears the prior outbox display as well as user data.
 6. Confirm the Family and inviter names, then choose **Accept invitation**. Membership and dependent Family data reload automatically. If loading fails after acceptance, use **Retry loading family**; do not accept the consumed token again.
 7. Review the existing profile and privacy choices. Save changes if desired, or choose **Continue to Home without changes**. Review is optional and does not gate membership.
-8. Confirm arrival on **Home** with the one-time joined-Family announcement. Open **Family** to confirm the directory includes A and B and the existing relationship controls are available.
+8. Confirm arrival on **Home** with the one-time joined-Family announcement. Open **Family** to confirm the directory includes A and B, then open **Family settings** to confirm the existing relationship controls are available.
 
 For a fresh test, stop the scenario API and run the script again without a scenario name. Each run gets a fresh database; the script never drops a database. To resume an existing scenario, use `-ScenarioName <the name printed by the script>`. B remains a member after acceptance in that database. The outbox is in memory and is cleared by API restart; resend as A if a pending link is needed. A new scenario can also exercise Decline and used/unavailable links.
 

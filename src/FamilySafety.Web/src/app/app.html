@@ -132,6 +132,9 @@
                 <p role="status">Checking Family suggestions…</p>
               } @else if (relationshipError()) {
                 <p class="message message--error" role="alert">{{ relationshipError() }}</p>
+                @if (relationshipsLoadFailed()) {
+                  <button type="button" class="button--secondary" (click)="retryRelationships()">Retry loading relationships</button>
+                }
               } @else if (hasRelationshipSuggestions()) {
                 <div class="attention-list">
                   <div class="attention-row">
@@ -157,7 +160,10 @@
                 }
               </div>
               @if (eventsLoading()) { <p role="status">Loading Events…</p> }
-              @else if (eventsLoadError()) { <p class="message message--error" role="alert">{{ eventsLoadError() }}</p> }
+              @else if (eventsLoadError()) {
+                <p class="message message--error" role="alert">{{ eventsLoadError() }}</p>
+                <button type="button" class="button--secondary" (click)="retryEvents()">Retry loading Events</button>
+              }
               @else if (homeEvents().length > 0) {
                 <ul class="home-preview-list row-list">
                   @for (event of homeEvents(); track event.eventId) {
@@ -185,7 +191,10 @@
                 }
               </div>
               @if (homeTripsLoading()) { <p role="status">Loading Trips…</p> }
-              @else if (homeTripsError()) { <p class="message message--error" role="alert">{{ homeTripsError() }}</p> }
+              @else if (homeTripsError()) {
+                <p class="message message--error" role="alert">{{ homeTripsError() }}</p>
+                <button type="button" class="button--secondary" (click)="retryHomeTrips()">Retry loading Trips</button>
+              }
               @else if (homeTrips().length > 0) {
                 <ul class="home-preview-list row-list">
                   @for (trip of homeTrips(); track trip.tripId) {
@@ -213,7 +222,10 @@
                 }
               </div>
               @if (plansLoading()) { <p role="status">Loading Plans…</p> }
-              @else if (plansLoadError()) { <p class="message message--error" role="alert">{{ plansLoadError() }}</p> }
+              @else if (plansLoadError()) {
+                <p class="message message--error" role="alert">{{ plansLoadError() }}</p>
+                <button type="button" class="button--secondary" (click)="retryPlans()">Retry loading Plans</button>
+              }
               @else if (homePlans().length > 0) {
                 <ul class="home-preview-list row-list">
                   @for (plan of homePlans(); track plan.planId) {
@@ -328,6 +340,12 @@
     } @else {
       @if (errorMessage()) {
         <p class="message message--error" role="alert">{{ errorMessage() }}</p>
+        @if (profileLoadFailed()) {
+          <div class="button-row"><button type="button" class="button--secondary" (click)="retryProfile()">Retry loading profile</button></div>
+        }
+      }
+      @if (profileReloading()) {
+        <p role="status">Loading your profile…</p>
       }
       @if (successMessage()) {
         <p class="message message--success" role="status">{{ successMessage() }}</p>
@@ -507,7 +525,10 @@
                   <a class="link-button events-view-all" routerLink="/events/all" [state]="focusHeadingState" aria-label="View all Events">View all</a>
                 </div>
                 @if (eventsLoading()) { <p role="status">Loading Events…</p> }
-                @else if (eventsLoadError()) { <p class="message message--error" role="alert">{{ eventsLoadError() }}</p> }
+                @else if (eventsLoadError()) {
+                <p class="message message--error" role="alert">{{ eventsLoadError() }}</p>
+                <button type="button" class="button--secondary" (click)="retryEvents()">Retry loading Events</button>
+              }
                 @else if (dashboardEvents().length > 0) {
                   <ul class="events-preview-list row-list">
                     @for (event of dashboardEvents(); track event.eventId) {
@@ -530,7 +551,10 @@
                   <a class="link-button events-view-all" routerLink="/trips" [state]="focusHeadingState" aria-label="View all Trips">View all</a>
                 </div>
                 @if (homeTripsLoading()) { <p role="status">Loading Trips…</p> }
-                @else if (homeTripsError()) { <p class="message message--error" role="alert">{{ homeTripsError() }}</p> }
+                @else if (homeTripsError()) {
+                <p class="message message--error" role="alert">{{ homeTripsError() }}</p>
+                <button type="button" class="button--secondary" (click)="retryHomeTrips()">Retry loading Trips</button>
+              }
                 @else if (homeTrips().length > 0) {
                   <ul class="events-preview-list row-list">
                     @for (trip of homeTrips(); track trip.tripId) {
@@ -579,10 +603,15 @@
               <h2 id="upcoming-events-heading">Events you can see</h2>
               @if (familyEvents().length > 0) { <span class="card-count">{{ familyEvents().length }}</span> }
             </div>
+            <!-- The existing Event message, e.g. "Event details updated." after an inline edit on this page. -->
+            @if (eventMessage()) {
+              <p class="message message--success events-feedback" role="status">{{ eventMessage() }}</p>
+            }
             @if (eventsLoading()) {
               <p class="events-state events-state--loading" role="status">Loading events…</p>
             } @else if (eventsLoadError()) {
               <p class="message message--error events-state" role="alert">{{ eventsLoadError() }}</p>
+              <button type="button" class="button--secondary" (click)="retryEvents()">Retry loading Events</button>
             } @else if (familyEvents().length === 0) {
               <p class="empty-state events-state events-state--empty">No Events are currently shared with you in this Family. Events are for coordinating family gatherings and activities.</p>
             } @else {
@@ -647,7 +676,11 @@
                   />
                 </div>
               }
-              @if (availableEventAudienceMembers().length === 0) {
+              <!-- The audience choices come from the Family member read; a failed read is not "no other adults". -->
+              @if (directoryLoadFailed()) {
+                <p class="message message--error" role="alert">{{ directoryError() }}</p>
+                <button type="button" class="button--secondary" (click)="retryDirectory()">Retry loading Family members</button>
+              } @else if (availableEventAudienceMembers().length === 0) {
                 <div class="events-audience-state">
                   <p>This Family has no other active adult members yet. An event needs at least one other active adult to be created.</p>
                 </div>
@@ -715,6 +748,7 @@
               <p class="plans-state" role="status">Loading plans…</p>
             } @else if (plansLoadError()) {
               <p class="plans-state plans-state--error message message--error" role="alert">{{ plansLoadError() }}</p>
+              <button type="button" class="button--secondary" (click)="retryPlans()">Retry loading Plans</button>
             } @else if (familyPlans().length === 0) {
               <p class="empty-state plans-state plans-state--empty">No Plans are currently visible to you in this Family. A Plan is a lightweight way to share a future activity or destination.</p>
             } @else {
@@ -805,7 +839,10 @@
                     />
                   </div>
                 }
-                @if (availablePlanAudienceMembers().length === 0) {
+                @if (directoryLoadFailed()) {
+                  <p class="message message--error" role="alert">{{ directoryError() }}</p>
+                  <button type="button" class="button--secondary" (click)="retryDirectory()">Retry loading Family members</button>
+                } @else if (availablePlanAudienceMembers().length === 0) {
                   <p>No other active adult family members are available to select.</p>
                 } @else if (visiblePlanAudienceMembers().length === 0) {
                   <p>No matching Family members.</p>
@@ -877,10 +914,13 @@
         @switch (itemStatus()) {
           @case ('loading') { <p role="status">Loading {{ kind === 'event' ? 'Event' : 'Plan' }}…</p> }
           @case ('unavailable') { <app-item-unavailable [kind]="kind" /> }
-          @case ('error') { <p class="message message--error" role="alert">{{ itemError() }}</p> }
+          @case ('error') {
+            <p class="message message--error" role="alert">{{ itemError() }}</p>
+            <button type="button" class="button--secondary" (click)="retryRoutedItem()">Retry loading {{ kind === 'event' ? 'Event' : 'Plan' }}</button>
+          }
           @case ('ready') {
             @if (kind === 'event') {
-              <a class="button-link button--secondary item-back" routerLink="/events" [state]="focusHeadingState">Back to Events</a>
+              <a class="detail-back-link item-back" routerLink="/events" [state]="focusHeadingState"><app-icon name="back" />Back to Events</a>
               @if (itemEvent(); as event) {
                 <article class="card events-card item-detail" aria-label="Event details">
                   <ng-container *ngTemplateOutlet="eventCard; context: { $implicit: event, detail: true }" />
@@ -888,7 +928,7 @@
                 </article>
               }
             } @else {
-              <a class="button-link button--secondary item-back" routerLink="/plans" [state]="focusHeadingState">Back to Plans</a>
+              <a class="detail-back-link item-back" routerLink="/plans" [state]="focusHeadingState"><app-icon name="back" />Back to Plans</a>
               @if (itemPlan(); as plan) {
                 <article class="card plans-card item-detail" aria-label="Plan details">
                   <ng-container *ngTemplateOutlet="planCard; context: { $implicit: plan, detail: true }" />
@@ -984,6 +1024,9 @@
 
               @if (directoryError()) {
                 <p class="message message--error" role="alert">{{ directoryError() }}</p>
+                @if (directoryLoadFailed()) {
+                  <button type="button" class="button--secondary" (click)="retryDirectory()">Retry loading Family members</button>
+                }
               }
               @if (directoryLoading()) {
                 <p role="status">Loading family members…</p>
@@ -1077,6 +1120,9 @@
               </div>
               @if (relationshipError()) {
                 <p class="message message--error" role="alert">{{ relationshipError() }}</p>
+                @if (relationshipsLoadFailed()) {
+                  <button type="button" class="button--secondary" (click)="retryRelationships()">Retry loading relationships</button>
+                }
               }
               @if (relationshipMessage()) {
                 <p class="message message--success" role="status">{{ relationshipMessage() }}</p>
@@ -1210,6 +1256,9 @@
 
             @if (relationshipError()) {
               <p class="message message--error" role="alert">{{ relationshipError() }}</p>
+              @if (relationshipsLoadFailed()) {
+                <button type="button" class="button--secondary" (click)="retryRelationships()">Retry loading relationships</button>
+              }
             }
             @if (relationshipMessage()) {
               <p class="message message--success" role="status">{{ relationshipMessage() }}</p>
@@ -1243,9 +1292,20 @@
                 The other adult must accept. A relationship describes family context only; it does
                 not establish legal, caregiving, guardian, or emergency authority.
               </p>
+              <!-- Shown only after the member list loads; eligibility is unchanged (the server and this list decide). -->
+              @let noRelationshipMembers = !directoryLoading() && !directoryError() && availableRelationshipMembers().length === 0;
+              @if (noRelationshipMembers) {
+                <p id="relationship-no-members" class="help">
+                  This Family has no other active adult member to suggest a relationship with yet. A Family administrator may invite another adult.
+                </p>
+              } @else if (directoryLoadFailed()) {
+                <p class="message message--error" role="alert">{{ directoryError() }}</p>
+                <button type="button" class="button--secondary" (click)="retryDirectory()">Retry loading Family members</button>
+              }
               <button
                 type="submit"
                 [disabled]="relationshipSubmitting() || availableRelationshipMembers().length === 0"
+                [attr.aria-describedby]="noRelationshipMembers ? 'relationship-no-members' : null"
               >
                 Suggest relationship
               </button>
@@ -1413,7 +1473,7 @@
         <button type="submit" [disabled]="eventUpdating()">
           {{ eventUpdating() ? 'Saving…' : 'Save event details' }}
         </button>
-        <button type="button" class="secondary-button" (click)="cancelEventEdit()">Cancel</button>
+        <button type="button" class="button--secondary" (click)="cancelEventEdit()">Cancel</button>
       </div>
     </form>
   } @else {
@@ -1430,7 +1490,7 @@
         <p class="item-meta"><span class="visually-hidden">Location: </span>{{ event.location }}</p>
       </div>
       @if (event.canEdit) {
-        <button type="button" class="secondary-button" (click)="beginEventEdit(event)">
+        <button type="button" class="button--secondary" (click)="beginEventEdit(event)">
           Edit event details
         </button>
       }
