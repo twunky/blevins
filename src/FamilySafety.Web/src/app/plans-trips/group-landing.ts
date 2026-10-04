@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AppIcon, IconName } from './icon';
-import { focusHeadingState } from './navigation';
+import { AppIcon, IconName } from '../icon';
+import { focusHeadingState } from '../navigation';
 
 interface LandingChoice {
   readonly id: string;

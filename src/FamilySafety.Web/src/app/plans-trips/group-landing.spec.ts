@@ -3,8 +3,8 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { App } from './app';
-import { routes } from './app.routes';
+import { App } from '../app';
+import { routes } from '../app.routes';
 import { GroupLanding } from './group-landing';
 
 const profile = {

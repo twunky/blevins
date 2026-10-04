@@ -3,10 +3,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { Concern, ConcernApi } from './concerns/concern-api';
-import { AppIcon } from './icon';
-import { IncidentApi, IncidentSummary } from './incidents/incident-api';
-import { focusHeadingState } from './navigation';
+import { Concern, ConcernApi } from '../concerns/concern-api';
+import { AppIcon } from '../icon';
+import { IncidentApi, IncidentSummary } from '../incidents/incident-api';
+import { focusHeadingState } from '../navigation';
 
 /** Rows shown per card; the rest stay on the full list behind View all. */
 const dashboardRows = 3;

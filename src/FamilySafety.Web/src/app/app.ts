@@ -17,8 +17,8 @@ import { Concerns } from './concerns/concerns';
 import { Incidents } from './incidents/incidents';
 import { AppIcon, IconName } from './icon';
 import { dateTile, displayDateTime, displayRange } from './date-format';
-import { GroupLanding } from './group-landing';
-import { SafetyDashboard } from './safety-dashboard';
+import { GroupLanding } from './plans-trips/group-landing';
+import { SafetyDashboard } from './safety/safety-dashboard';
 import { ItemUnavailable } from './item-unavailable';
 import { AdoptItemFamily, ItemKind, isItemId } from './item-route';
 import {

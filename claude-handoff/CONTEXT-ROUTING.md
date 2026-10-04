@@ -58,6 +58,8 @@ Current approved panel mapping: ① Home (`DEC-076`), ② Family (`DEC-077`), �
 |---|---|
 | Concern feature (component, template, styles, spec, API client) | `src/FamilySafety.Web/src/app/concerns/` — `concerns.ts`, `concerns.html`, `concerns.scss`, `concerns.spec.ts`, `concern-api.ts` |
 | Shell, routes, Home entry card | `src/FamilySafety.Web/src/app/app.html`, `app.ts`, `app.routes.ts`, `app.scss` |
+| Plans & Trips navigation landing | `src/FamilySafety.Web/src/app/plans-trips/` — `group-landing.ts`, `group-landing.spec.ts` |
+| Safety dashboard | `src/FamilySafety.Web/src/app/safety/` — `safety-dashboard.ts`, `.html`, `.scss`, `.spec.ts` |
 | Design tokens (colors, radii, shadow) and global styles | `src/FamilySafety.Web/src/styles.scss` |
 | Other screen styles for consistency reference | `src/FamilySafety.Web/src/app/family.scss`, `events.scss`, `plans.scss`, `trips/` |
 | Concern E2E journey | `src/FamilySafety.Web/e2e/concern-workflow.spec.ts`; config `e2e/playwright.config.ts`; fixtures `e2e/fixtures/` |
