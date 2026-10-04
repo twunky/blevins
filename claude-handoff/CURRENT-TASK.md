@@ -1,8 +1,12 @@
-# Current Task — No Implementation Work Item Authorized
+# Current Task — WI-095-001 Scope Approved; Execution Not Authorized
 
 ## Current state and authorization
 
-Phase 9 is `COMPLETE / CLOSED` under [DEC-081](../ai-context/decision-log.md), with all exits mapped in [VER-PH-009](../ai-context/planning/verification/VER-PH-009.md). `CTX-1.29` is active under DEC-082 / REQ-PLAN-007 for the separately approved creator edit/clear of the existing optional Plan note. Development user testing is `READY`; Phase 9.5 is `READY TO BEGIN`. **No further product implementation work item is authorized.** Phase 9.5 requires separate scope and approval.
+`CTX-1.30` is ACTIVE under DEC-083 after [VER-CTX-1.30](../ai-context/planning/verification/VER-CTX-1.30.md) PASS. Phase 9.5 is CURRENT / IN PROGRESS for only [WI-095-001 — Event Invitations and RSVP](../ai-context/planning/stories/WI-095-001-event-invitations-and-rsvp.md), APPROVED scope with **execution authorized NO**. Context/governance preparation is complete; do not edit application code, migrations, endpoints, UI or tests until separate explicit owner execution authorization. Later Phase 9.5 items require separate gates; OD-002 OPEN. Phase 9 remains COMPLETE / CLOSED under DEC-081 and VER-PH-009, unchanged.
+
+## First approved scope
+
+In-app organizer invitations and invitee self-RSVP; Events dashboard own active Pending discovery and existing Event detail actions. No Home/outbound notifications, Needs or Updates. Use the WI manifest, acceptance checks, approved single-record data intent, small new participation boundary, exclusions and stop conditions. No existing App detail/edit extraction. Implementation and future WI verification remain PENDING. Next action is owner review and separate execution authorization, not automatic implementation.
 
 ## Completed post-Phase-9 follow-ups
 
@@ -12,6 +16,8 @@ Each was separately owner-authorized and is committed by the owner in `9140349` 
 - The Plan create `Location` header now points to `/api/plans/{planId}`.
 - The one-person Event explanation on Event creation; Event audience eligibility is unchanged.
 - Trip Notes loading, empty, failure, and Retry states for the existing Notes read (`SELF-VERIFIED`: focused Angular tests, the full Angular suite, Angular compilation, and the production web build). No requirement or baseline change.
+
+The later post-Phase-9 confirmation work is committed by the owner in `02ebce3`; the tree was clean before this governance task.
 
 ## Current maintenance activity
 

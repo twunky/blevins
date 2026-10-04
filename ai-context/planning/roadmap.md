@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap records approved phase status only. Phase 9 is COMPLETE / CLOSED under DEC-081; Phase 9.5 is READY TO BEGIN. The separately approved post-Phase-9 Plan note edit/clear follow-up is complete under DEC-082 / REQ-PLAN-007; CTX-1.29 is active. No further implementation item is authorized.
+This roadmap records approved phase status only. Phase 9 remains COMPLETE / CLOSED under DEC-081. CTX-1.30 is ACTIVE after VER-CTX-1.30 PASS under DEC-083; Phase 9.5 is CURRENT / IN PROGRESS for only [WI-095-001](stories/WI-095-001-event-invitations-and-rsvp.md) — Event Invitations and RSVP, APPROVED scope with execution authorized NO. Product execution and later Phase 9.5 items require separate explicit owner/work-item gates. Existing Phase 9 and post-Phase-9 records below are historical.
 
 | Phase | Name | Status |
 |---|---|---|
@@ -14,7 +14,7 @@ This roadmap records approved phase status only. Phase 9 is COMPLETE / CLOSED un
 | Phase 7.5 | End-to-End UX & User-Test Readiness | `COMPLETE / CLOSED` |
 | Phase 8 | Safety Coordination | `COMPLETE / CLOSED` |
 | Phase 9 | Integration & UX Refinement | `COMPLETE / CLOSED` |
-| Phase 9.5 | MVP Feature Completion | `READY TO BEGIN` |
+| Phase 9.5 | MVP Feature Completion | `CURRENT / IN PROGRESS` — only WI-095-001 APPROVED; execution NO |
 | Phase 10 | Testing & Verification | `FUTURE` |
 | Phase 11 | Pilot & Release Readiness | `FUTURE` |
 
@@ -36,11 +36,11 @@ This roadmap records approved phase status only. Phase 9 is COMPLETE / CLOSED un
 
 ## Phase 9.5 — MVP Feature Completion
 
-**Status:** `READY TO BEGIN` under DEC-081 and the owner's conditional continuation instruction. Added under DEC-073; Phase 9.5 follows the Phase 7.5 precedent so Phases 10/11 keep their numbers. Readiness does not authorize feature implementation.
+**Status:** `CURRENT / IN PROGRESS` under DEC-083 after CTX-1.30 verified activation. Added under DEC-073, following the Phase 7.5 numbering precedent; Phases 10/11 keep their numbers. Only [WI-095-001 — Event Invitations and RSVP](stories/WI-095-001-event-invitations-and-rsvp.md) is APPROVED. **Execution authorized: NO** — this task authorizes canonical context and planning preparation only; a separate explicit owner execution instruction is required.
 
 **Purpose:** implement the approved MVP capabilities that are not yet built. They remain in the MVP. They are: Event RSVP, Event Needs, Event Updates, Check-In, Sharing Sessions, Trusted Contacts, Shared Family Dates, Safety Circles, Household grouping, and notifications. `OD-002` (persistent or indefinite location sharing) is decided within this phase, alongside Sharing Sessions and Check-In.
 
-`DEC-073` defines no behavior, order, or scope for these capabilities. Each still needs its own proposal or work item and any required canonical update before implementation.
+`DEC-073` defines no behavior, order, or scope for these capabilities. DEC-083 approves only the first in-app invitation/self-RSVP scope, without Home/outbound/notification delivery or existing detail/edit extraction. Event Needs, Event Updates and every other listed capability remain behind separate owner/work-item approval, canonical updates where required, and execution authorization. No blanket Phase 9.5 implementation approval; OD-002 remains OPEN.
 
 ## Later phases
 

@@ -1,14 +1,14 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.27
-Version: 1.20
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074
+Context-Baseline: CTX-1.30
+Version: 1.21
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083
 ---
 
 # Privacy and Safety Contract
 
-Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.27`.
+Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.30`.
 
 ## Consent and sharing control
 
@@ -325,6 +325,16 @@ An item URL, a navigation area, and the selected Family are never authorization.
 - The item's Family, name, existence, or any other attribute is disclosed to the client only after that authorization succeeds. The client must not switch the selected Family, or show a Family name, based on the URL or client state alone.
 - A nonexistent item and an item the user may not read produce the same unavailable result. It must not reveal whether the item exists, which Family it belongs to, or whether that Family exists. The selected Family does not change.
 - This adds no access path. Each domain's existing audience, participant, and access rules stay authoritative, including `REQ-PRIV-025` and `REQ-PRIV-026`.
+
+## Event invitation eligibility and named RSVP privacy
+
+### REQ-PRIV-028
+
+Invitation and RSVP reads and writes require current server-authorized Event visibility and active membership in the applicable Family. An invitation itself grants no Event access. If the invitee loses either eligibility condition, retain the record but deny that invitee normal invitation/RSVP reads and actions. Do not automatically revoke the invitation solely for temporary eligibility loss. If the same profile regains both conditions, an otherwise unrevoked invitation becomes usable again. Selected Family, Account similarity, a different or new profile, or knowledge of an invitation ID never restores eligibility. Re-evaluate authorization on every request and write; `REQ-PRIV-027` nondisclosing item semantics remain controlling.
+
+While retaining current Event access and active membership, the sole organizer under `REQ-EVT-009` may see invitation identity, invited person, unrevoked (active) or revoked state, and current RSVP, including retained revoked records. The eligible invited adult may read only their own invitation and RSVP; a retained revoked record is historical and never actionable. Other Event viewers and Event detail editors receive no named invitation/RSVP information. Detail edit permission provides neither invitation management nor additional RSVP visibility; an editor sees their own invitation only if independently invited and eligible. Family Administrator status grants no override.
+
+If the organizer loses current Event access or active membership, they cannot read organizer invitation data, issue, or revoke invitations. Being the original creator in client state supplies no authority. Independently eligible invitees with unrevoked invitations may continue reading and updating their own RSVP; organizer access loss does not freeze or revoke all invitations. These rules add no authority over Needs, Updates, location, Sharing Sessions, Plans, or Trips. Historical retention under `REQ-EVT-014` does not weaken current privacy or authorization.
 
 ## Safety information invariants
 

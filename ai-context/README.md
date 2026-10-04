@@ -1,6 +1,6 @@
 # Family Safety, Coordination & Planning Application
 
-**Current context (2026-10-04):** `CTX-1.29` is active under `DEC-082` and `VER-CTX-1.29` for the separately approved creator edit/clear of the existing optional Plan note (`REQ-PLAN-007`). Phase 9 remains `COMPLETE / CLOSED` under `DEC-081` and [VER-PH-009](planning/verification/VER-PH-009.md); its `CTX-1.28` baseline remains historical. Phase 9.5 is `READY TO BEGIN` and requires separate approval.
+**Current context (2026-10-04):** `CTX-1.30` is ACTIVE under `DEC-083` after [VER-CTX-1.30](planning/verification/VER-CTX-1.30.md) PASS. Phase 9 remains `COMPLETE / CLOSED` under `DEC-081` and [VER-PH-009](planning/verification/VER-PH-009.md), with historical closure baseline `CTX-1.28`. Phase 9.5 is `CURRENT / IN PROGRESS` for only [WI-095-001](planning/stories/WI-095-001-event-invitations-and-rsvp.md) — Event Invitations and RSVP (`APPROVED`; **execution authorized: NO**). Canonical context/work-item preparation is complete; product execution requires a separate explicit owner instruction. Later Phase 9.5 capabilities require separate owner/work-item gates. `CTX-1.29` remains the historical Plan-note amendment.
 
 AI Context Foundation v1.0 operating guide.
 

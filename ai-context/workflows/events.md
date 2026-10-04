@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL WORKFLOW
-Context-Baseline: CTX-1.19
-Version: 1.3
-Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-051; DEC-058
+Context-Baseline: CTX-1.30
+Version: 1.4
+Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-051; DEC-058; DEC-083
 Constrained-By:
   - ../core/product-contract.md
   - ../core/ux-contract.md
@@ -78,6 +78,16 @@ MVP Event Updates are meaningful, time-ordered coordination announcements, not g
 
 Event-context Check-Ins reuse the generic Check-In model rather than introducing Event-specific states. Event association and recipients require separate scope; a Check-In does not automatically start location sharing. Home may surface restrained, relevant Event attention such as RSVP requested, a Need assigned to the current user, a meaningful Event change, or an upcoming Event, rather than every open Need or action. Notifications are introduced with their owning capability and remain actionable and restrained under `REQ-NOTIFY-001`; this requirement approves no specific notification trigger or Event Sharing Session implementation.
 
+### REQ-EVT-014
+
+The first Event Invitations and Self RSVP slice is in-app only. It supplements `REQ-EVT-010`; current eligibility and named-data visibility are governed by `REQ-PRIV-028`. Event creation and audience selection create zero invitations. Only the organizer may issue or revoke invitations to eligible existing in-system adult Event viewers. The organizer may not invite themselves and receives no RSVP merely by creating the Event. At most one unrevoked invitation may exist for the same Event and invitee profile; temporary eligibility loss does not permit a duplicate.
+
+A new invitation starts with RSVP Pending: a response has been requested, but creation is not an invitee response. The deliberate RSVP-updated timestamp (for example, `RsvpUpdatedAtUtc`) is absent until the invitee deliberately submits an RSVP. While currently eligible and unrevoked, the invited adult may freely choose or change their own RSVP among Pending, Going, Maybe, and Not Going, including deliberately selecting Pending. Revoked invitations cannot receive further RSVP changes.
+
+Revoked invitations and their final RSVP remain inactive historical records retained for the parent Event record's lifecycle. A later re-invitation creates a new invitation record and ID. There is no independent RSVP revision-history table, public RSVP history, or separate invitation-retention timer. Future Event-level disposal/retention governs invitations unless a later explicit rule says otherwise; this does not define Event completion or a new parent retention policy. Retention supplies no alternate access path.
+
+The existing Events dashboard RSVP/attention area is the discovery surface: it shows the signed-in adult's own currently eligible, active Pending invitations for the selected Family, each linking to the existing Event item URL. Event detail is the self-RSVP action surface and organizer invitation-management surface. Pending invitations remain discoverable after the Event date because dates do not expire invitations. This slice adds no Home attention, outbound email, push, SMS, notification infrastructure or center, preferences, or generic activity feed. `REQ-EVT-013` remains a future capability boundary rather than authorization for those surfaces.
+
 ## Completion
 
-An event completes after it occurs and its active coordination needs are concluded. Invitation and RSVP handling at Event completion remains deferred under `REQ-EVT-010`. Apart from retained Update history under `REQ-EVT-012` while the Event record exists, no additional archival or retention behavior is approved by this workflow.
+An event completes after it occurs and its active coordination needs are concluded. Invitation and RSVP handling at Event completion remains deferred under `REQ-EVT-010`. Retained Update history under `REQ-EVT-012` and invitation records under `REQ-EVT-014` follow the Event record lifecycle. No other archival or retention behavior is approved by this workflow.

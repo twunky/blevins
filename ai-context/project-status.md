@@ -1,5 +1,9 @@
 # Project Status
 
+**Current checkpoint (2026-10-04):** `CTX-1.30` ACTIVE after `VER-CTX-1.30` PASS under `DEC-083`. Phase 9.5 is `CURRENT / IN PROGRESS` for only [WI-095-001](planning/stories/WI-095-001-event-invitations-and-rsvp.md) (`APPROVED`; **execution authorized: NO**). This governance task implements no product capability. Later Phase 9.5 items require separate owner/work-item approval and execution authorization; Phase 9 stays closed.
+
+*The following post-Phase-9 and closure checkpoint banners are historical, preserved as written; current status is the checkpoint above and continuation table below.*
+
 **Post-Phase-9 Trip Notes read-state follow-up (2026-10-04):** The owner authorized a bounded loading, empty, failure, and Retry presentation fix for the existing Trip Notes read. It is implemented and `SELF-VERIFIED` with focused Angular tests, the full Angular suite, Angular compilation, and a production web build. The owner has committed it (`9140349`). No requirement or context-baseline change; Phase 9 remains closed and `CTX-1.29` remains active.
 
 **Phase 9 closure (2026-10-03):** WI-009-011 is `DONE / PASS — OWNER APPROVED`; VER-WI-009-011 is `DONE / PASS`; [VER-PH-009](planning/verification/VER-PH-009.md) is `PASS / PHASE CLOSURE VERIFIED`, all 15 exits PASS. DEC-081 records explicit conditional owner closure after Plan filtering, focused verification, one final build, sole final full Playwright 34/34 and artifact health passed. Phase 9 `COMPLETE / CLOSED`; CTX-1.28 ACTIVE at closure (`CTX-1.29` is now active under `DEC-082`); Development user testing READY; Phase 9.5 READY TO BEGIN. No implementation work item remains authorized; no new CTX, out-of-scope feature, commit or push.
@@ -8,26 +12,30 @@
 
 **As of:** 2026-10-04<br>
 **Project:** Family Safety, Coordination & Planning Application  
-**Current mode:** PROPOSAL / awaiting the owner's next scoped work. Phase 9 is `COMPLETE / CLOSED` under `DEC-081`; Phase 9.5 is `READY TO BEGIN`. CTX-1.29 ACTIVE; no further implementation authorized. Development testing READY; closure does not certify deployment.
+**Current mode:** Approved context/governance preparation complete; awaiting explicit owner execution authorization for WI-095-001. CTX-1.30 ACTIVE; Phase 9.5 CURRENT / IN PROGRESS only for the first approved scope. No product execution authorized. Development testing READY; Phase 9 closure does not certify deployment.
 
 ## Continuation checkpoint
 
 | Field | Current value |
 |---|---|
-| Previous phase | Phase 8 — Safety Coordination — `COMPLETE / CLOSED` under `DEC-072` (2026-10-02; `VER-PH-008`). Phase 7.5 closed earlier under `DEC-065`. |
-| Current phase | Phase 9 — Integration & UX Refinement — `COMPLETE / CLOSED` under `DEC-081`; [VER-PH-009](planning/verification/VER-PH-009.md), 15/15 formal exits PASS. |
-| Next phase | Phase 9.5 — MVP Feature Completion — `READY TO BEGIN`. Requires separately scoped/approved work; OD-002 remains OPEN. Phases 10/11 keep their numbers; predeployment gates remain separate. |
-| Current objective | **None further authorized.** The separately approved Plan note edit/clear follow-up is implemented under DEC-082 / REQ-PLAN-007. WI-009-011 and Phase 9 remain closed under DEC-081. |
-| Active baseline | `CTX-1.29` — `APPROVED` (`DEC-082`: `REQ-PLAN-007` creator edit/clear of the existing optional Plan note). |
-| Candidate baseline | None |
-| Previous baseline | `CTX-1.28` — approved historical Phase 9 baseline; `CTX-1.27` remains earlier history. |
+| Previous phase | Phase 9 — Integration & UX Refinement — `COMPLETE / CLOSED` under `DEC-081`; [VER-PH-009](planning/verification/VER-PH-009.md), 15/15 formal exits PASS. |
+| Current phase | Phase 9.5 — MVP Feature Completion — `CURRENT / IN PROGRESS` under `DEC-083`, only WI-095-001 approved; execution NO. |
+| Next phase | Phases 10/11 retain numbering; later Phase 9.5 capabilities require separate approval/execution gates. OD-002 remains OPEN; predeployment gates separate. |
+| Current objective | [WI-095-001](planning/stories/WI-095-001-event-invitations-and-rsvp.md) — Event Invitations and RSVP; approved scope only, awaiting explicit product execution authorization. Canonical preparation complete, implementation PENDING. |
+| Active baseline | `CTX-1.30` — `APPROVED / ACTIVE` (`DEC-083`: REQ-EVT-014 and REQ-PRIV-028), verified before activation. |
+| Candidate baseline | None pending; [CTX-1.30](planning/candidates/CTX-1.30-event-invitations-and-rsvp.md) is ACTIVATED. |
+| Previous baseline | `CTX-1.29` — historical Plan-note amendment; `CTX-1.28` remains historical Phase 9 closure baseline. |
 | Canonical extraction | `COMPLETE` from the curated bootstrap source |
-| Verification | `VER-CTX-1.29` — `PASS / SELF-VERIFIED`; `VER-CTX-1.28` and earlier reports remain historical evidence. |
+| Verification | [VER-CTX-1.30](planning/verification/VER-CTX-1.30.md) — PASS / SELF-VERIFIED; earlier reports remain historical. No WI-095-001 implementation verification claimed. |
 | Standing authorization | `DEC-032` — routine, reversible `ROUTINE`/`STANDARD` work may use bounded auto-approval; high-impact work still requires explicit approval |
-| Primary blocker | None. Backup-aging and restore-operation evidence remains a production deployment dependency. |
-| Next action | Owner selects and scopes the next work. The post-Phase-9 follow-ups (Plan note edit/clear, the Plan create `Location` header, the one-person Event explanation, and Trip Notes read states) are committed (`9140349`, 2026-10-04); Event audience eligibility is unchanged. Further Phase 9.5 work requires separate approval. Existing technical/budget and predeployment follow-ups remain separate. OD-001/004 resolved, OD-002 open for Phase 9.5, OD-003 outside MVP. |
+| Primary blocker | Product execution requires separate explicit owner authorization. Backup-aging/restore evidence remains a production deployment dependency. |
+| Next action | Owner reviews uncommitted governance documents and separately authorizes WI-095-001 execution if desired. Prior follow-ups committed by owner (`9140349`); confirmation work committed `02ebce3`. Later Phase 9.5 capabilities/OD-002 remain separately gated. No Git staging/commit/push/PR by agent. |
 
 ## Current phase
+
+**Phase 9.5 — MVP Feature Completion** is `CURRENT / IN PROGRESS` under DEC-083 for only WI-095-001 — Event Invitations and RSVP. The work item is APPROVED, implementation PENDING, execution authorized NO. Existing Event rules remain; only the new in-app invitation/RSVP scope is approved. Needs/Updates and all other DEC-073 capabilities require separate owner/work-item gates. OD-002 remains OPEN.
+
+## Historical Phase 9 closure checkpoint
 
 **Phase 9 — Integration & UX Refinement** is `COMPLETE / CLOSED` under DEC-081 (2026-10-03). All 15 exits PASS; WI-009-011 DONE / PASS — OWNER APPROVED. `CTX-1.28` was active at closure; `CTX-1.29` is active now for the separate Plan note follow-up. Development user testing READY; Phase 9.5 READY TO BEGIN. No further implementation work item is authorized. Phase closure does not establish deployment readiness.
 
@@ -69,7 +77,7 @@ Resolved: `OD-001` mobile navigation is resolved by `DEC-074` and `REQ-UX-013` (
 ## Required context for the next action
 
 - `README.md` and `project-status.md` — mandatory operating rules and current checkpoint.
-- No implementation work item is authorized. The next action is owner selection/scoping of Phase 9.5 work; load DEC-081 and VER-PH-009 for closure/boundaries.
+- Load `planning/stories/WI-095-001-event-invitations-and-rsvp.md`, DEC-083, `planning/candidates/CTX-1.30-event-invitations-and-rsvp.md`, and `planning/verification/VER-CTX-1.30.md` for the only approved Phase 9.5 scope. Execution is NO until separately authorized. Its required-context manifest controls loading. DEC-081/VER-PH-009 retain Phase 9 closure boundaries.
 - `planning/stories/WI-009-005-refresh-safe-item-urls-and-authorize-first-deep-links.md` with `VER-WI-009-005`, and `planning/stories/WI-009-006-home-dashboard-prototype-alignment.md` with `VER-WI-009-006` — closed item-link and Home work (`DEC-075`, `DEC-076`). Load them when later work touches item routes, Family switching, or Home.
 - `planning/stories/WI-009-007-family-dashboard-prototype-alignment.md` with `VER-WI-009-007` — closed Family dashboard and Family Settings work (`DEC-077`). Load them when later work touches the Family page.
 - `planning/stories/WI-009-004-event-and-plan-single-item-read-foundation.md` and `planning/verification/VER-WI-009-004.md` — the closed server item-read foundation. They record the `GET /api/events/{eventId}` and `GET /api/plans/{planId}` contract. Load them when later work touches Event or Plan item reads (the `REQ-UX-014` client item is closed as `WI-009-005`).
@@ -83,7 +91,7 @@ Resolved: `OD-001` mobile navigation is resolved by `DEC-074` and `REQ-UX-013` (
 
 Load only the context needed for the next owner-approved task. Bootstrap, archive, and unrelated historical verification remain out of scope unless specifically needed.
 
-*Historical notes from earlier checkpoints follow. A baseline they call active (for example `CTX-1.24`) was active when written; `CTX-1.29` is active now.*
+*Historical notes from earlier checkpoints follow. Baselines called active below were active when written; `CTX-1.30` is active now.*
 
 The bootstrap source is extraction evidence only and is not normal canonical context. `WI-007-001` through `WI-007-005` are complete, and Phase 7 is closed under `DEC-063` with passing closure evidence in `planning/verification/VER-PH-007.md`. Trip reconciliation `DEC-057`, Trip Notes clarification `DEC-060`, and audience-editing clarification `DEC-061` remain in force under active `CTX-1.24`. The earlier Phase 7 verification reports remain valid. `DEC-062` records the approved Phase 7.5 priority; `DEC-063` closed Phase 7 and advanced Phase 7.5 to current without changing product requirements. `DEC-065` subsequently closed Phase 7.5 and PRP-027.
 

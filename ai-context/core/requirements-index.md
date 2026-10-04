@@ -1,6 +1,6 @@
 # Requirements Index
 
-**Status:** APPROVED — `CTX-1.29`
+**Status:** APPROVED — `CTX-1.30`
 **Purpose:** Traceability index only; normative wording lives at each canonical source.
 
 ## ID and lifecycle rules
@@ -100,6 +100,7 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-PRIV-025` | Concern access, retention, audit, and backup privacy | `privacy-safety-contract.md#req-priv-025` | `APPROVED` | `CTX-1.25` | — |
 | `REQ-PRIV-026` | Safety Incident access, lineage, retention, audit, and backup privacy | `privacy-safety-contract.md#req-priv-026` | `APPROVED` | `CTX-1.26` | — |
 | `REQ-PRIV-027` | Item URLs, navigation, and selected Family are not authorization; nondisclosing unavailable result | `privacy-safety-contract.md#req-priv-027` | `APPROVED` | `CTX-1.27` | — |
+| `REQ-PRIV-028` | Event invitation eligibility, same-profile restoration, and named RSVP privacy | `privacy-safety-contract.md#req-priv-028` | `APPROVED` | `CTX-1.30` | — |
 
 ## Family and profiles
 
@@ -138,6 +139,7 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-EVT-011` | Unified Event Needs and eligibility lifecycle | `../workflows/events.md#req-evt-011` | `APPROVED` | `CTX-1.19` | — |
 | `REQ-EVT-012` | Meaningful Event Updates and retained history | `../workflows/events.md#req-evt-012` | `APPROVED` | `CTX-1.19` | — |
 | `REQ-EVT-013` | Event Check-In, Home, and notification boundaries | `../workflows/events.md#req-evt-013` | `APPROVED` | `CTX-1.19` | — |
+| `REQ-EVT-014` | First in-app invitation and self-RSVP lifecycle and discovery | `../workflows/events.md#req-evt-014` | `APPROVED` | `CTX-1.30` | — |
 
 ## Lightweight plans
 

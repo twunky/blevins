@@ -20,16 +20,16 @@ Current approved panel mapping: ① Home (`DEC-076`), ② Family (`DEC-077`), �
 |---|---|
 | AI operating rules, authority, work modes, auto-approval limits | `ai-context/README.md` |
 | Current state, next action, open decisions | `ai-context/project-status.md` |
-| Active context baseline | `CTX-1.29` (`DEC-082`, `REQ-PLAN-007`); confirm in `ai-context/project-status.md` |
-| Phase 9 closure, Phase 9.5 readiness, and other phase status | `ai-context/planning/roadmap.md`, `ai-context/decision-log.md` → `DEC-081`, `ai-context/planning/verification/VER-PH-009.md` |
+| Active context baseline | CTX-1.30 (DEC-083; REQ-EVT-014 / REQ-PRIV-028; VER-CTX-1.30 PASS); confirm in `ai-context/project-status.md` |
+| Phase 9 closure and first Phase 9.5 item | `ai-context/planning/roadmap.md`, `ai-context/decision-log.md` → DEC-081 / DEC-083; VER-PH-009 historical, VER-CTX-1.30 current |
 | Historical Phase 9 scope and exit criteria; current navigation and deep-link rules | `ai-context/planning/proposals/PRP-030-phase-9-scope-themes-and-exit-criteria.md` (closed Phase 9 planning basis), `ai-context/decision-log.md` → `DEC-074`, `DEC-075`, `DEC-081`; canonical `REQ-UX-011`, `REQ-UX-013`, `REQ-UX-014` (`ai-context/core/ux-contract.md`) and `REQ-PRIV-027` |
-| Current implementation authorization | None. Repository Cleanup Waves 1–5 are complete; no additional broad cleanup or reorganization is authorized. See `claude-handoff/CURRENT-TASK.md` and `ai-context/project-status.md`. |
+| Current implementation authorization | WI-095-001 scope APPROVED, execution NO. Read `ai-context/planning/stories/WI-095-001-event-invitations-and-rsvp.md` and its manifest; separate explicit owner execution authorization required. Later Phase 9.5 capabilities and broad cleanup remain unauthorized. |
 | Product behavior, boundaries, permissions | `ai-context/core/product-contract.md` (`REQ-PROD-004`, `REQ-PROD-007`–`012` for Concern) |
 | Privacy and safety rules, protected data, Concern and Incident access and retention | `ai-context/core/privacy-safety-contract.md` (`REQ-PRIV-005`–`008`, `011`, `025`, `026`) |
 | UX rules: calm presentation, accessibility, uncertainty, provenance | `ai-context/core/ux-contract.md` (`REQ-UX-001`, `003`–`008`, `010`–`012`) |
 | Concern and Incident workflow, categories, correction, resolution | `ai-context/workflows/safety.md` (`REQ-SAFE-001`–`016`; Concern `015`, Incident `016`) |
 | Plan and Trip behavior, including the current Plan note edit/clear rule | `ai-context/workflows/plans-trips.md` (`REQ-PLAN-001`–`007`, with `REQ-PLAN-007` added in `CTX-1.29`; `REQ-TRIP-*`) |
-| Event behavior, audience, and editing | `ai-context/workflows/events.md` (`REQ-EVT-*`) |
+| Event behavior, audience, editing and first invitation/self-RSVP scope | `ai-context/workflows/events.md` (REQ-EVT-014 supplements settled rules), `ai-context/core/privacy-safety-contract.md` (REQ-PRIV-028); DEC-083 and WI-095-001 |
 | Requirement ID lookup and traceability | `ai-context/core/requirements-index.md` |
 | Terms (Concern, Participant, Frozen, …) | `ai-context/core/domain-glossary.md` |
 | Check-In / Sharing separation (only if a mockup idea touches it) | `ai-context/workflows/sharing-checkins.md` |

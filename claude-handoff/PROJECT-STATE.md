@@ -1,19 +1,19 @@
 # Project State — Orientation Summary
 
-Snapshot reconciled after the **2026-10-04 post-Phase-9 Plan note follow-up**. This is a summary for orientation only. The authoritative state is `ai-context/project-status.md` and `ai-context/planning/roadmap.md`; re-check them at the start of each session, because this file can go stale.
+Snapshot reconciled after CTX-1.30 verified activation and first Phase 9.5 work-item scope approval (2026-10-04). Orientation only; authoritative state is `ai-context/project-status.md` and `ai-context/planning/roadmap.md`. Re-check each session.
 
 ## Baseline and phase
 
 | Field | Value |
 |---|---|
-| Active context baseline | `CTX-1.29` — `APPROVED` (`DEC-082` / `REQ-PLAN-007`: creator edit/clear of the existing optional Plan note). `CTX-1.28` remains the historical Phase 9 baseline. |
-| Previous phase | Phase 8 — Safety Coordination — `COMPLETE / CLOSED` (`DEC-072`, 2026-10-02; `VER-PH-008`). Phase 7.5 closed earlier (`DEC-065`). |
-| Current phase | Phase 9 — Integration & UX Refinement — `COMPLETE / CLOSED` (`DEC-081`; `VER-PH-009`, all 15 exits PASS) |
+| Active context baseline | CTX-1.30 APPROVED / ACTIVE (DEC-083; VER-CTX-1.30 PASS). CTX-1.29 historical Plan-note amendment; CTX-1.28 historical Phase 9 closure baseline. |
+| Previous phase | Phase 9 — Integration & UX Refinement — COMPLETE / CLOSED (DEC-081; VER-PH-009, 15/15 exits PASS). Phase 8 closed under DEC-072. |
+| Current phase | Phase 9.5 — MVP Feature Completion — CURRENT / IN PROGRESS, only WI-095-001 scope APPROVED; execution NO (DEC-083) |
 | Phase 9 planning basis | `PRP-030 — Phase 9 Scope, Themes and Exit Criteria` — `APPROVED` (`DEC-074`; 15 exit criteria) |
-| Next phase | Phase 9.5 — MVP Feature Completion — `READY TO BEGIN` (separately scoped approval required; `OD-002` remains open), then Phases 10 and 11, numbering unchanged |
+| Next phase | Phases 10/11 retain numbers; all later Phase 9.5 capabilities separately gated, OD-002 OPEN |
 | Phase 8 planning basis | `PRP-028` — `APPROVED` (`DEC-067`, `DEC-068`) |
 | Incident planning basis | `PRP-029` — `APPROVED` (`DEC-071`); canonical as `REQ-SAFE-016` and `REQ-PRIV-026`. `OD-004` resolved. |
-| **Current implementation objective** | **None further authorized.** The separately approved Plan note edit/clear follow-up is implemented; Repository Cleanup Waves 1–5 remain `COMPLETE`. See [CURRENT-TASK.md](CURRENT-TASK.md). |
+| **Current implementation objective** | WI-095-001 — Event Invitations and RSVP: approved scope, implementation PENDING, execution authorized NO. Await separate explicit owner instruction; see [CURRENT-TASK.md](CURRENT-TASK.md). No broad cleanup authorized. |
 | Home dashboard | **Complete.** `WI-009-006 — Home Dashboard Prototype Alignment` is `DONE / PASS` — `OWNER APPROVED` (2026-10-03; `VER-WI-009-006`; `DEC-076`). <ul><li>Presentation-only Home after `references/ux/home-dashboard` panel ①:<ul><li>a time-of-day greeting, with the Family in the subtitle;</li><li>real Events, Trips, and Plans cards with compact empty states;</li><li>a compact Safety coordination card and a View Family action;</li><li>text-only placeholders for Recent Family Updates, My Tasks, and Active Sharing.</li></ul></li><li>Styles are in `src/FamilySafety.Web/src/app/home.scss`.</li><li>No Phase 9.5 capability.</li></ul> |
 | Family dashboard | **Complete.** `WI-009-007 — Family Dashboard Prototype Alignment` is `DONE / PASS` — `OWNER APPROVED` (2026-10-03; `VER-WI-009-007`; `DEC-077`). <ul><li>`/family` is the coordination dashboard after panel ②:<ul><li>members and member detail;</li><li>Waiting for you;</li><li>text-only placeholders for birthdays, updates, and check-ins.</li></ul></li><li>`/family/settings` holds Family details, relationships, and the administrator-only Invite card. The gear is visible to all members and is navigation only.</li><li>Styles are in `family.scss` and `family-settings.scss`.</li><li>No Phase 9.5 capability.</li></ul> |
 | Safety dashboard | **Complete.** `WI-009-009 — Safety Dashboard Prototype Alignment` is `DONE / PASS` — `OWNER APPROVED` (2026-10-03; `VER-WI-009-009`; `DEC-079`). <ul><li>`/safety` is a read-only dashboard after panel ④: separate Open Concerns and Open Safety Incidents summaries (existing list reads, Open only, no reason or workspace detail), a Recent Check-Ins placeholder, and an About Concerns and Incidents card.</li><li>No create, resolve, contact, settings, or emergency control; no selected Family needed; Family labels for multi-Family callers.</li><li>Back to Safety on `/concerns` and `/incidents`. It revisits `WI-009-003` D1 / `AC-15` for `/safety` only.</li><li>Standalone deferred component; current location: `src/FamilySafety.Web/src/app/safety/safety-dashboard.ts`. No Phase 9.5 capability.</li></ul> |
