@@ -18,6 +18,7 @@
 Thumbs.db
 
 # Local configuration and secrets
+.claude/settings.local.json
 appsettings.*.local.json
 .env
 .env.*

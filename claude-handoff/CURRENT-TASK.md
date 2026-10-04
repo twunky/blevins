@@ -1,4 +1,4 @@
-# Current Task — Repository Cleanup Wave 4
+# Current Task — Repository Cleanup Complete
 
 ## Current state and authorization
 
@@ -6,7 +6,7 @@ Phase 9 is `COMPLETE / CLOSED` under [DEC-081](../ai-context/decision-log.md), w
 
 ## Current maintenance activity
 
-The owner approved repository cleanup Wave 4: current discoverability, decision indexing only if needed, and stale-reference cleanup. This maintenance includes the comment-only correction in `app.routes.ts`; it does not authorize product behavior, tests, builds, file moves or deletions, commits, or pushes. Wave 5 and owner-review items remain outside this authorization. Plan Location and the one-person Event remain separate product follow-ups; production authentication, hosting, and backup evidence remain separate predeployment work.
+Repository Cleanup Waves 1–5 are `COMPLETE`. No additional broad repository cleanup or reorganization is authorized. The owner still needs to run `git rm --cached .claude/settings.local.json` before committing to stop tracking that unchanged local file. Plan Location and the one-person Event remain separate product follow-ups; production authentication, hosting, and backup evidence remain separate predeployment work.
 
 ## Historical checkpoints — reference only
 

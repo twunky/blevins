@@ -2,7 +2,7 @@
 
 Hand work back with a single message. Be factual. If something was not run, say so. If something failed, include the output.
 
-The WI-008 examples below are historical templates, not current work or authorization. For repository cleanup Wave 4, report the current-guidance and comment-only changes with link checks; no application tests or builds are authorized. The repository has Git, and the owner performs commits.
+The WI-008 examples below are historical templates, not current work or authorization. Repository Cleanup Waves 1–5 are complete. Future work requires separate authorization. The repository has Git, and the owner performs commits; the remaining cleanup source-control step is `git rm --cached .claude/settings.local.json`, performed by the owner.
 
 **Server work (last used for WI-008-003, now `DONE / PASS`).** Use this structure:
 

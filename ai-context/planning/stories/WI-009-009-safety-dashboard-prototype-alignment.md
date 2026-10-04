@@ -9,6 +9,8 @@ Version: 1.0
 
 ## Metadata
 
+**Repository cleanup note:** Historical owner-review captures originally under `src/FamilySafety.Web/e2e/captures/safety-dashboard-review/` were later retained in [artifacts/reviews/WI-009-009/](../../../artifacts/reviews/WI-009-009/) with filenames and bytes unchanged. Canonical verification evidence remains separate.
+
 - **Work Item ID:** `WI-009-009`
 - **Status:** `DONE / PASS` — `OWNER APPROVED` (owner review 2026-10-03; `VER-WI-009-009`; `DEC-079`). AC-01 to AC-13 `PASS`.
   - Status history:

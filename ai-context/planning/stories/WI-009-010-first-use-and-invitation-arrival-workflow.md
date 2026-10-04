@@ -9,6 +9,8 @@ Version: 1.0
 
 ## Metadata
 
+**Repository cleanup note:** Historical owner-review captures originally under `src/FamilySafety.Web/e2e/captures/first-use-review/` were later retained in [artifacts/reviews/WI-009-010/](../../../artifacts/reviews/WI-009-010/) with filenames and bytes unchanged. Canonical verification evidence remains separate.
+
 - **Work Item ID:** `WI-009-010`
 - **Status:** `DONE / PASS` — `OWNER APPROVED` (2026-10-03; owner review `PASS`; O10–O11). Verification: `ai-context/planning/verification/VER-WI-009-010.md`.
 - **Phase:** `9 — Integration & UX Refinement`

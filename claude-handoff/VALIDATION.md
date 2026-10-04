@@ -1,6 +1,6 @@
 # Validation
 
-This is validation guidance for a separately authorized product work item. Repository cleanup Wave 4 is maintenance only; no application tests or builds are authorized for it. For future product work, follow the approved work item's acceptance checks and record exact commands, counts, and warnings. WI-008 examples and numeric baselines below are historical, not current results.
+This is validation guidance for a separately authorized product work item. Repository Cleanup Waves 1–5 are complete and authorize no further tests or builds. For future product work, follow the approved work item's acceptance checks and record exact commands, counts, and warnings. WI-008 examples and numeric baselines below are historical, not current results.
 
 - **Server work (for example WI-008-003, now `DONE / PASS`):** § 4 is required, with the SQL gate on. Sections 1–3 and 5–6 are not required, because WI-008-003 makes no Web changes. State that explicitly rather than implying they ran.
 - **UI work:** §§ 1–3 and 5–6; § 4 only if server code was touched.
