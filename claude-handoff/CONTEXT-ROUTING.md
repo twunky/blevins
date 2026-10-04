@@ -11,7 +11,8 @@ Current approved panel mapping: ① Home (`DEC-076`), ② Family (`DEC-077`), �
 | **What should the app look like?** | **`claude-handoff/reference/*.png` — the primary visual target.** Open the images directly. |
 | Which reference maps to which screen, and what to KEEP / ALIGN / ADAPT / DROP | `claude-handoff/MOCKUP-ALIGNMENT.md` |
 | Screens with no primary reference | Secondary layout hints in `ai-context/references/ux/` (`events/`, `plans-trips/`, `family/`, `safety/`, `admin-settings/`, `home-dashboard/`). Use them only where the primary set has no coverage. |
-| What the app looked like before (comparison only, **not** a target) | `ai-context/planning/verification/evidence/**`, `src/FamilySafety.Web/*-review-*.png` |
+| Canonical verification evidence (what a completed work item verified) | `ai-context/planning/verification/evidence/<WI-ID>/` |
+| Historical owner/design review images (comparison only, **not** a target or canonical evidence) | `artifacts/reviews/<WI-ID>/` |
 
 ## Authoritative project context
 

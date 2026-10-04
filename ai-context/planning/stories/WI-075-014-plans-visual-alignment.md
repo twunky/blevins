@@ -8,6 +8,8 @@ Execution-Authorization: YES
 
 # WI-075-014 — Plans Visual Alignment
 
+**Repository cleanup relocation note:** The four review captures listed in the execution record were originally under `src/FamilySafety.Web/`. They are retained, with filenames and bytes unchanged, in [artifacts/reviews/WI-075-014/](../../../artifacts/reviews/WI-075-014/). The execution record below preserves their original location.
+
 ## Metadata
 
 - **Work Item ID:** `WI-075-014`
