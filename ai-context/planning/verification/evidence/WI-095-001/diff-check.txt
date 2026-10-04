@@ -1,0 +1,1 @@
+﻿PASS: git diff --check; zero staged files; no generated source JavaScript; no staging, commit, push or PR.

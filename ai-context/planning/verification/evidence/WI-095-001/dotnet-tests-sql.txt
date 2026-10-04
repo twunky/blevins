@@ -1,0 +1,6 @@
+Result excerpt from the captured command output. SQL gate: RUN_FAMILYSAFETY_SQL_TESTS=1.
+Command: dotnet test FamilySafety.slnx --no-build --logger console;verbosity=normal
+
+
+
+Summary from the retained named results: 0 passed, 0 failed, 0 skipped.

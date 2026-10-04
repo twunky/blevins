@@ -1,0 +1,70 @@
+<section class="card participation" aria-labelledby="event-participation-heading">
+  <div class="card-header"><h2 id="event-participation-heading">{{ isOrganizer() ? 'Event invitations' : 'Your invitation' }}</h2></div>
+  @if (message()) { <p class="message message--success" role="status">{{ message() }}</p> }
+  @if (status() === 'loading') { <p role="status">Loading invitations…</p> }
+  @else if (status() === 'error') {
+    <p class="message message--error" role="alert">{{ error() }}</p>
+    <button type="button" class="button--secondary" (click)="reload()">Retry loading invitations</button>
+  } @else if (status() === 'unavailable') {
+    <p role="status">Invitations are currently unavailable.</p>
+    @if (error()) { <p class="message message--error" role="alert">{{ error() }}</p> }
+    <button type="button" class="button--secondary" (click)="reload()">Refresh invitations</button>
+  } @else {
+    @if (error()) {
+      <p class="message message--error" role="alert">{{ error() }}</p>
+      <button type="button" class="button--secondary" (click)="reload()">Refresh invitations</button>
+    }
+    @if (organizer(); as data) {
+      <p class="help">Invitations request participation. They do not change who can see this Event.</p>
+      <h3>Eligible Event viewers</h3>
+      @if (data.eligibleViewers.length === 0) { <p>No eligible viewers are available to invite.</p> }
+      <ul class="row-list">
+        @for (viewer of data.eligibleViewers; track viewer.profileId) {
+          @if (viewer.profileId !== ownProfileId) {
+            <li class="item-row"><strong>{{ viewer.displayName }}</strong>
+              @if (canInvite(viewer.profileId)) {
+                <button type="button" [disabled]="busy() || needsRefresh()" (click)="invite(viewer.profileId)" [attr.aria-label]="'Invite ' + viewer.displayName">Invite</button>
+              } @else { <span class="status-pill">Invited</span> }
+            </li>
+          }
+        }
+      </ul>
+      <h3>Invitation state</h3>
+      @if (data.invitations.length === 0) { <p>No invitations have been issued.</p> }
+      <ul class="row-list">
+        @for (row of data.invitations; track row.invitation.invitationId) {
+          <li class="invitation-row">
+            <div class="item-row"><strong>{{ row.displayName }}</strong>
+              <span class="status-pill">{{ row.invitation.revokedAtUtc ? 'Revoked' : 'Active' }} · {{ label(row.invitation.rsvpStatus) }}</span>
+              @if (!row.invitation.revokedAtUtc && revokePending() !== row.invitation.invitationId) {
+                <button type="button" class="button--secondary" [disabled]="busy() || needsRefresh()" (click)="revokePending.set(row.invitation.invitationId)" [attr.aria-label]="'Revoke invitation for ' + row.displayName">Revoke</button>
+              }
+            </div>
+            @if (revokePending() === row.invitation.invitationId) {
+              <p role="status">Revoke {{ row.displayName }}'s invitation? Their final RSVP stays with the Event. Event visibility is unchanged.</p>
+              <div class="button-row">
+                <button type="button" [disabled]="busy() || needsRefresh()" (click)="confirmRevoke(row.invitation)">Confirm revoke</button>
+                <button type="button" class="button--secondary" [disabled]="busy()" (click)="revokePending.set(null)">Cancel</button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    } @else if (own(); as invitation) {
+      <p>Current RSVP: <strong>{{ label(invitation.rsvpStatus) }}</strong></p>
+      @if (!invitation.rsvpUpdatedAtUtc) { <p class="help">You have not submitted a response yet.</p> }
+      <form (submit)="$event.preventDefault(); submitResponse()">
+        <fieldset [disabled]="busy() || needsRefresh()">
+          <legend>Your RSVP</legend>
+          <div class="rsvp-choices">
+            @for (state of states; track state) {
+              <label><input type="radio" name="event-rsvp" [value]="state" [checked]="response() === state" (change)="response.set(state)" />{{ label(state) }}</label>
+            }
+          </div>
+        </fieldset>
+        <button type="submit" [disabled]="busy() || needsRefresh()">Save RSVP</button>
+      </form>
+    } @else { <p>You have no active invitation to this Event.</p> }
+    @if (busy()) { <p role="status">Saving invitation…</p> }
+  }
+</section>

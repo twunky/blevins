@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Work Item ID:** `WI-095-001`
-- **Status:** `APPROVED` — scope approved; execution not authorized
+- **Status:** `VERIFYING / OWNER REVIEW` — implementation execution explicitly authorized by owner on 2026-10-04; owner visual approval and explicit closure pending
 - **Phase:** Phase 9.5 — MVP Feature Completion; first approved item only
 - **Context baseline:** `CTX-1.30` (execution depends on verified activation)
 - **Requirement references:** `REQ-EVT-001`, `REQ-EVT-005`, `REQ-EVT-008`, `REQ-EVT-009`, `REQ-EVT-010`, `REQ-EVT-014`; `REQ-PRIV-011`, `REQ-PRIV-020`, `REQ-PRIV-021`, `REQ-PRIV-023`, `REQ-PRIV-027`, `REQ-PRIV-028`; `REQ-UX-011`, `REQ-UX-014`; `REQ-VERIFY-001`, `REQ-VERIFY-002`, `REQ-VERIFY-003`.
@@ -58,7 +58,7 @@ Later Needs may consume invitation ID/profile, unrevoked status/current RSVP, cr
 
 ## Acceptance checks
 
-All checks below concern future implementation and remain PENDING; context verification does not satisfy them.
+The checks below govern implementation. [VER-WI-095-001](../verification/VER-WI-095-001.md) maps actual evidence; context verification alone does not satisfy them. Owner visual approval and explicit closure remain pending.
 
 1. `AC-01` — Creating an Event and selecting its audience create zero invitations and no organizer RSVP; existing five-field detail editing and fixed audience/editor permissions remain. (`REQ-EVT-005/008/014`, `REQ-PRIV-020/021`)
 2. `AC-02` — Only the currently authorized sole organizer with active Family membership can issue invitations, from Event detail, to existing active adult profiles with current canonical Event visibility; self-invite and ineligible/non-system targets are rejected server-side without expanding audience. (`REQ-EVT-009/010/014`, `REQ-PRIV-011/028`)
@@ -88,11 +88,11 @@ All checks below concern future implementation and remain PENDING; context verif
 
 ## Tasks
 
-- [ ] `TASK-001` — Obtain explicit owner execution authorization after verified CTX activation; re-read checkpoint and inspect current relevant code/conventions.
-- [ ] `TASK-002` — Implement the bounded invitation domain, actor-specific contracts, server access, persistence/additive migration and concurrency constraints; focused .NET/SQL verification.
-- [ ] `TASK-003` — Add new participation presentation/state and minimal Events dashboard discovery integration, preserving App ownership; focused Angular verification.
+- [x] `TASK-001` — Obtain explicit owner execution authorization after verified CTX activation; re-read checkpoint and inspect current relevant code/conventions.
+- [x] `TASK-002` — Implement the bounded invitation domain, actor-specific contracts, server access, persistence/additive migration and concurrency constraints; focused .NET/SQL verification.
+- [x] `TASK-003` — Add new participation presentation/state and minimal Events dashboard discovery integration, preserving App ownership; focused Angular verification.
 - [ ] `TASK-004` — Verify focused end-to-end privacy/lifecycle/recovery, desktop/narrow render and accessibility; obtain owner visual review.
-- [ ] `TASK-005` — Run required final regressions, verify artifact health, prepare AC/requirement evidence and propose closure for owner review. Leave Git changes uncommitted.
+- [x] `TASK-005` — Run required final regressions, verify artifact health, prepare AC/requirement evidence and propose closure for owner review. Leave Git changes uncommitted.
 
 ## Stop conditions / dependencies
 
@@ -105,19 +105,28 @@ All checks below concern future implementation and remain PENDING; context verif
 ## Execution authorization
 
 - **Approved work item:** `YES`
-- **Execution authorized:** `NO`
-- **Authorized by:** Project owner for canonical context/governance preparation only.
+- **Execution authorized:** `YES`
+- **Authorized by:** Project owner's explicit APPROVED IMPLEMENTATION continuation instruction, supplied as Pasted text.txt in the new chat.
 - **Authorized at:** 2026-10-04
-- **Authorized scope:** Record approved WI-095-001 scope and canonical decisions, verify/activate context, and synchronize current-state routing. No product code, API, schema/migration, Angular or test implementation. Separate explicit owner authorization is required to execute TASK-001 through TASK-005 beyond their read-only preparation.
+- **Authorized scope:** Implement exactly WI-095-001 under active CTX-1.30: invitation model, additive migration, service/repository/API, small new participation component, selected-Family own-Pending discovery, focused and final verification, and current-context reconciliation. Needs, Updates, notifications, Home attention and every sibling capability remain excluded. No staging, commits, push or PR; owner performs all commits. Prior governance-only authorization is superseded for execution by this explicit instruction; canonical product decisions remain unchanged.
 
 ## Evidence / verification
 
 | Check | Evidence | Result |
 |---|---|---|
 | Context readiness | [VER-CTX-1.30](../verification/VER-CTX-1.30.md) | Separate context verification; not implementation evidence |
-| AC-01 through AC-25 | No implementation authorized or executed | PENDING |
-| Future implementation regression, rendered review and owner review | Not executed | PENDING |
+| AC-01 through AC-23 | [VER-WI-095-001](../verification/VER-WI-095-001.md): bounded implementation, focused backend/API/SQL/Angular/E2E, rendered/axe review | See individual evidence/results |
+| AC-24 / AC-25 | Same record: actual final gates, independence and review-order disclosure | Owner visual review/explicit closure PENDING |
 
-- **Verification report:** Future `VER-WI-095-001`, to be created during authorized execution; no implementation verification record is fabricated now.
-- **Independence:** `SELF-VERIFIED` for context preparation only; future implementation evidence must declare its actual independence.
-- **Outcome:** `PENDING` — approved scope, unimplemented.
+- **Verification report:** [VER-WI-095-001](../verification/VER-WI-095-001.md).
+- **Independence:** `SELF-VERIFIED` — the implementing agent also tested/reviewed this implementation. No independent or owner visual approval is inferred.
+- **Outcome:** Implemented; `VERIFYING / OWNER REVIEW`. TASK-004 retains its owner visual-review requirement; final automated gates, evidence and closure proposal are recorded under TASK-005. Actual results and the latest-instruction validation order are disclosed in VER-WI-095-001; no owner approval or closure is inferred. No next item is authorized.
+
+## Implementation record (2026-10-04)
+
+- One `FamilyEventInvitation` entity/table; Guid identity/Event/profile/version, UTC creation/revocation/response times, current four-state RSVP. Organizer derives from Event creator. Pending has no initial response timestamp; new invitations after revocation get new IDs.
+- Additive migration `20261004220426_EventInvitationsAndRsvp`: filtered active uniqueness, parent-history and own-Pending query indexes, restricted FKs and four-state SQL check. Existing Event/audience schema untouched.
+- Actor-specific application/repository/API operations use canonical Event visibility, exact active membership/profile identity, serializable transactions and the existing Family-lock convention. GUID concurrency token changes on every response/revocation; stale writes return nondisclosing conflict after current access checks.
+- New `src/app/events/event-participation` owns protected participation reads/actions/state/UI. App retains existing create/detail/edit/list/routing/Family-adoption ownership and adds only dashboard own-Pending discovery/reset.
+- Focused evidence: 7 domain, 12 application, 12 API, 10 SQL invitation tests; 30 participation/dashboard Angular tests and 35 existing item-route tests. Two new integrated invitation journeys plus the two existing dashboard journeys verified. Exact final results and initial failures are in VER-WI-095-001.
+- Only regression-test adaptation outside Event code: the Incident additive-migration test now explicitly targets its named Incident migration instead of assuming it is forever the latest migration. No Incident behavior or migration changed.

@@ -326,6 +326,53 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.ToTable("FamilyEventAudienceMembers", (string)null);
                 });
 
+            modelBuilder.Entity("FamilySafety.Domain.Events.FamilyEventInvitation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("InviteeProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("RevokedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("RsvpStatus")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<DateTimeOffset?>("RsvpUpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("EventId", "InviteeProfileId")
+                        .IsUnique()
+                        .HasFilter("[RevokedAtUtc] IS NULL");
+
+                    b.HasIndex("InviteeProfileId", "RsvpStatus", "EventId")
+                        .HasFilter("[RevokedAtUtc] IS NULL");
+
+                    b.ToTable("FamilyEventInvitations", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_FamilyEventInvitations_RsvpStatus", "[RsvpStatus] IN ('Pending', 'Going', 'Maybe', 'NotGoing')");
+                        });
+                });
+
             modelBuilder.Entity("FamilySafety.Domain.Incidents.IncidentAuditEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1332,6 +1379,21 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
                         .WithMany()
                         .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Events.FamilyEventInvitation", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Events.FamilyEvent", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("InviteeProfileId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

@@ -1,12 +1,12 @@
-# Current Task — WI-095-001 Scope Approved; Execution Not Authorized
+# Current Task - WI-095-001 Implemented; Verifying / Owner Review
 
 ## Current state and authorization
 
-`CTX-1.30` is ACTIVE under DEC-083 after [VER-CTX-1.30](../ai-context/planning/verification/VER-CTX-1.30.md) PASS. Phase 9.5 is CURRENT / IN PROGRESS for only [WI-095-001 — Event Invitations and RSVP](../ai-context/planning/stories/WI-095-001-event-invitations-and-rsvp.md), APPROVED scope with **execution authorized NO**. Context/governance preparation is complete; do not edit application code, migrations, endpoints, UI or tests until separate explicit owner execution authorization. Later Phase 9.5 items require separate gates; OD-002 OPEN. Phase 9 remains COMPLETE / CLOSED under DEC-081 and VER-PH-009, unchanged.
+CTX-1.30 remains ACTIVE under DEC-083. Phase 9.5 is CURRENT / IN PROGRESS only for [WI-095-001](../ai-context/planning/stories/WI-095-001-event-invitations-and-rsvp.md). The owner explicitly authorized implementation on 2026-10-04. Implementation is now VERIFYING / OWNER REVIEW; see [VER-WI-095-001](../ai-context/planning/verification/VER-WI-095-001.md) for exact results and pending owner visual review/closure. Phase 9 remains closed; OD-002 OPEN. No sibling execution authorized. No staging, commit, push or PR.
 
-## First approved scope
+## Implemented first scope
 
-In-app organizer invitations and invitee self-RSVP; Events dashboard own active Pending discovery and existing Event detail actions. No Home/outbound notifications, Needs or Updates. Use the WI manifest, acceptance checks, approved single-record data intent, small new participation boundary, exclusions and stop conditions. No existing App detail/edit extraction. Implementation and future WI verification remain PENDING. Next action is owner review and separate execution authorization, not automatic implementation.
+One invitation record/table, organizer-only issue/list/revoke, eligible invitee self-RSVP, version/transaction protection, selected-Family own active Pending discovery and the new src/app/events/event-participation boundary. App retains Event create/detail/edit/list and authorize-first routing/Family adoption. Needs, Updates, Home attention, notifications and every other sibling remain untouched. Owner review is next; do not start the next item or repeat broad gates without a concrete reason.
 
 ## Completed post-Phase-9 follow-ups
 

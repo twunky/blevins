@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap records approved phase status only. Phase 9 remains COMPLETE / CLOSED under DEC-081. CTX-1.30 is ACTIVE after VER-CTX-1.30 PASS under DEC-083; Phase 9.5 is CURRENT / IN PROGRESS for only [WI-095-001](stories/WI-095-001-event-invitations-and-rsvp.md) — Event Invitations and RSVP, APPROVED scope with execution authorized NO. Product execution and later Phase 9.5 items require separate explicit owner/work-item gates. Existing Phase 9 and post-Phase-9 records below are historical.
+This roadmap records approved phase status only. Phase 9 remains COMPLETE / CLOSED. CTX-1.30 remains ACTIVE; Phase 9.5 CURRENT / IN PROGRESS only for [WI-095-001](stories/WI-095-001-event-invitations-and-rsvp.md), implemented under explicit owner execution authorization and now VERIFYING / OWNER REVIEW ([VER-WI-095-001](verification/VER-WI-095-001.md)). Owner visual review/closure pending; later capabilities separately gated. Existing Phase 9 and post-Phase-9 records below are historical.
 
 | Phase | Name | Status |
 |---|---|---|
@@ -14,7 +14,7 @@ This roadmap records approved phase status only. Phase 9 remains COMPLETE / CLOS
 | Phase 7.5 | End-to-End UX & User-Test Readiness | `COMPLETE / CLOSED` |
 | Phase 8 | Safety Coordination | `COMPLETE / CLOSED` |
 | Phase 9 | Integration & UX Refinement | `COMPLETE / CLOSED` |
-| Phase 9.5 | MVP Feature Completion | `CURRENT / IN PROGRESS` — only WI-095-001 APPROVED; execution NO |
+| Phase 9.5 | MVP Feature Completion | `CURRENT / IN PROGRESS` — only WI-095-001 implemented; VERIFYING / OWNER REVIEW; execution YES |
 | Phase 10 | Testing & Verification | `FUTURE` |
 | Phase 11 | Pilot & Release Readiness | `FUTURE` |
 
@@ -36,7 +36,7 @@ This roadmap records approved phase status only. Phase 9 remains COMPLETE / CLOS
 
 ## Phase 9.5 — MVP Feature Completion
 
-**Status:** `CURRENT / IN PROGRESS` under DEC-083 after CTX-1.30 verified activation. Added under DEC-073, following the Phase 7.5 numbering precedent; Phases 10/11 keep their numbers. Only [WI-095-001 — Event Invitations and RSVP](stories/WI-095-001-event-invitations-and-rsvp.md) is APPROVED. **Execution authorized: NO** — this task authorizes canonical context and planning preparation only; a separate explicit owner execution instruction is required.
+**Status:** `CURRENT / IN PROGRESS` under DEC-083 and active CTX-1.30. Phases 10/11 keep their numbers. Only [WI-095-001](stories/WI-095-001-event-invitations-and-rsvp.md) is execution-authorized by the separate owner instruction of 2026-10-04 and implemented in-app. **VERIFYING / OWNER REVIEW**; owner visual review and explicit closure pending. No next item is authorized.
 
 **Purpose:** implement the approved MVP capabilities that are not yet built. They remain in the MVP. They are: Event RSVP, Event Needs, Event Updates, Check-In, Sharing Sessions, Trusted Contacts, Shared Family Dates, Safety Circles, Household grouping, and notifications. `OD-002` (persistent or indefinite location sharing) is decided within this phase, alongside Sharing Sessions and Check-In.
 

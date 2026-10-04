@@ -134,14 +134,14 @@ test('direct entry, privacy, item links, Quick Links, All events, create → ite
   await expect(rows(card(page, 'trips'))).toHaveText(['Lantern Trip']);
   // Privacy: an Event outside C's audience and items of a Family C does not belong to never appear.
   await expect(page.locator('main')).not.toContainText(/Private Supper|Second Family/);
-  // RSVPs Needed: text only; no invitation or RSVP implied, requested, or derived from audience.
-  await expect(card(page, 'rsvps').locator('p')).toHaveText('Event invitations that need your response will appear here.');
+  // Audience creation issues zero invitations; the protected own-Pending query is empty.
+  await expect(card(page, 'rsvps').locator('p')).toHaveText('You have no pending Event invitations in this Family.');
   await expect(card(page, 'rsvps').locator('button, a, input, select, img, li')).toHaveCount(0);
   await expect(card(page, 'rsvps')).not.toContainText(/\d/);
   await expect(page.locator('main')).not.toContainText(/Going|Maybe|Respond/);
   await page.waitForLoadState('networkidle');
-  expect(apiPaths.filter(path => /rsvp|invitation(?!s\/accept)/i.test(path) && !path.startsWith('/api/development/')),
-    'the dashboard requests no RSVP or invitation data').toEqual([]);
+  expect(apiPaths.filter(path => /event-invitations/i.test(path)),
+    'the dashboard uses the protected selected-Family own-Pending read').toEqual([`/api/family-groups/${w.family1.familyGroupId}/event-invitations/mine`]);
   // Quick Links: six real destinations.
   const quick = card(page, 'links').getByRole('link');
   await expect(quick).toHaveCount(6);

@@ -136,14 +136,10 @@ public sealed class EfFamilyEventRepository(FamilySafetyDbContext dbContext) : I
     private IQueryable<VisibleEventRow> QueryVisibleEvents(Guid accountId) =>
         from membership in dbContext.FamilyGroupMemberships.AsNoTracking()
         where membership.AccountId == accountId && membership.IsActive
-        join familyEvent in dbContext.FamilyEvents.AsNoTracking()
+        join familyEvent in EventVisibilityQuery.ForAccount(dbContext, accountId)
             on membership.FamilyGroupId equals familyEvent.FamilyGroupId
         join creator in dbContext.AdultProfiles.AsNoTracking()
             on familyEvent.CreatorProfileId equals creator.Id
-        where familyEvent.CreatorProfileId == membership.AdultProfileId
-            || dbContext.FamilyEventAudienceMembers.Any(audienceMember =>
-                audienceMember.EventId == familyEvent.Id
-                && audienceMember.ProfileId == membership.AdultProfileId)
         select new VisibleEventRow
         {
             EventId = familyEvent.Id,

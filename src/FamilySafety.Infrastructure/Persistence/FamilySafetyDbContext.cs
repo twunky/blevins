@@ -30,6 +30,7 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
     public DbSet<FamilyEvent> FamilyEvents => Set<FamilyEvent>();
 
     public DbSet<FamilyEventAudienceMember> FamilyEventAudienceMembers => Set<FamilyEventAudienceMember>();
+    public DbSet<FamilyEventInvitation> FamilyEventInvitations => Set<FamilyEventInvitation>();
 
     public DbSet<FamilyPlan> FamilyPlans => Set<FamilyPlan>();
 
@@ -188,6 +189,22 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
         eventAudienceMember.HasOne<AdultProfile>()
             .WithMany()
             .HasForeignKey(entity => entity.ProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        var eventInvitation = modelBuilder.Entity<FamilyEventInvitation>();
+        eventInvitation.ToTable("FamilyEventInvitations", table => table.HasCheckConstraint(
+            "CK_FamilyEventInvitations_RsvpStatus", "[RsvpStatus] IN ('Pending', 'Going', 'Maybe', 'NotGoing')"));
+        eventInvitation.HasKey(entity => entity.Id);
+        eventInvitation.Property(entity => entity.RsvpStatus).HasConversion<string>().HasMaxLength(16).IsRequired();
+        eventInvitation.Property(entity => entity.Version).IsConcurrencyToken();
+        eventInvitation.HasIndex(entity => entity.EventId);
+        eventInvitation.HasIndex(entity => new { entity.EventId, entity.InviteeProfileId })
+            .IsUnique().HasFilter("[RevokedAtUtc] IS NULL");
+        eventInvitation.HasIndex(entity => new { entity.InviteeProfileId, entity.RsvpStatus, entity.EventId })
+            .HasFilter("[RevokedAtUtc] IS NULL");
+        eventInvitation.HasOne<FamilyEvent>().WithMany().HasForeignKey(entity => entity.EventId)
+            .OnDelete(DeleteBehavior.Restrict);
+        eventInvitation.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.InviteeProfileId)
             .OnDelete(DeleteBehavior.Restrict);
 
         var familyPlan = modelBuilder.Entity<FamilyPlan>();

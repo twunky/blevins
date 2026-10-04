@@ -20,6 +20,7 @@ import { dateTile, displayDateTime, displayRange } from './date-format';
 import { GroupLanding } from './plans-trips/group-landing';
 import { SafetyDashboard } from './safety/safety-dashboard';
 import { ItemUnavailable } from './item-unavailable';
+import { EventParticipation, PendingEventInvitation } from './events/event-participation';
 import { AdoptItemFamily, ItemKind, isItemId } from './item-route';
 import {
   NavigableView, PrimaryDestination, areaForView, focusHeadingState, matchedAreas, matchedPath, pathForView, primaryDestinations, viewForPath,
@@ -126,7 +127,7 @@ interface HomeTripPreview {
 
 @Component({
   selector: 'app-workspace',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, Trips, Concerns, Incidents, AppIcon, GroupLanding, SafetyDashboard, ItemUnavailable],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, Trips, Concerns, Incidents, AppIcon, GroupLanding, SafetyDashboard, ItemUnavailable, EventParticipation],
   styleUrls: ['./app.scss', './home.scss', './family.scss', './family-settings.scss', './events.scss', './events-dashboard.scss', './plans.scss'],
   templateUrl: './app.html',
 })
@@ -492,6 +493,10 @@ export class App implements OnInit {
   protected readonly relationshipBusyId = signal('');
   protected readonly relationshipRemovalPendingId = signal('');
   protected readonly familyEvents = signal<readonly FamilyEventView[]>([]);
+  protected readonly pendingEventInvitations = signal<readonly PendingEventInvitation[]>([]);
+  protected readonly pendingEventInvitationsLoading = signal(false);
+  protected readonly pendingEventInvitationsError = signal('');
+  private pendingEventInvitationsVersion = 0;
   protected readonly eventAudienceMembers = signal<readonly FamilyDirectoryEntry[]>([]);
   protected readonly eventAudienceProfileIds = signal<readonly string[]>([]);
   protected readonly eventEditorProfileIds = signal<readonly string[]>([]);
@@ -778,6 +783,7 @@ export class App implements OnInit {
     this.loadRelationships();
     this.loadEvents();
     this.loadEventAudienceMembers();
+    if (this.view() === 'events') this.loadPendingEventInvitations();
     this.loadPlans();
     this.loadPlanAudienceMembers();
     // Home and the Events dashboard Trips card (WI-009-008 D3) share one read and one current-Family filter.
@@ -789,6 +795,10 @@ export class App implements OnInit {
     ++this.directoryRequestVersion;
     ++this.relationshipRequestVersion;
     ++this.eventsRequestVersion;
+    ++this.pendingEventInvitationsVersion;
+    this.pendingEventInvitations.set([]);
+    this.pendingEventInvitationsLoading.set(false);
+    this.pendingEventInvitationsError.set('');
     ++this.plansRequestVersion;
     ++this.eventAudienceRequestVersion;
     ++this.planAudienceRequestVersion;
@@ -1470,6 +1480,28 @@ export class App implements OnInit {
           this.directoryMembers.set([]);
           this.directoryError.set('Your family directory could not be loaded. Please try again.');
           this.directoryLoadFailed.set(true);
+        },
+      });
+  }
+
+  protected loadPendingEventInvitations(): void {
+    const familyId = this.currentFamilyId();
+    if (!familyId || this.view() !== 'events') return;
+    const version = ++this.pendingEventInvitationsVersion;
+    this.pendingEventInvitations.set([]);
+    this.pendingEventInvitationsLoading.set(true);
+    this.pendingEventInvitationsError.set('');
+    this.http.get<PendingEventInvitation[]>(`/api/family-groups/${encodeURIComponent(familyId)}/event-invitations/mine`)
+      .pipe(takeUntil(this.familyScopeChanged), takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: rows => {
+          if (version !== this.pendingEventInvitationsVersion || familyId !== this.currentFamilyId()) return;
+          this.pendingEventInvitations.set(rows);
+          this.pendingEventInvitationsLoading.set(false);
+        },
+        error: () => {
+          if (version !== this.pendingEventInvitationsVersion || familyId !== this.currentFamilyId()) return;
+          this.pendingEventInvitationsLoading.set(false);
+          this.pendingEventInvitationsError.set('Your pending Event invitations could not be loaded. Please try again.');
         },
       });
   }

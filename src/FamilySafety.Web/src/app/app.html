@@ -585,12 +585,22 @@
                 </ul>
               </nav>
 
-              <section class="card events-dash-card home-future events-dash--rsvps" aria-labelledby="events-rsvps-heading">
+              <section class="card events-dash-card events-dash--rsvps" aria-labelledby="events-rsvps-heading">
                 <div class="card-header">
                   <span class="card-icon"><app-icon name="check" /></span>
                   <h2 id="events-rsvps-heading">RSVPs Needed</h2>
                 </div>
-                <p class="home-future-note">Event invitations that need your response will appear here.</p>
+                @if (pendingEventInvitationsLoading()) { <p role="status">Loading your pending invitations…</p> }
+                @else if (pendingEventInvitationsError()) {
+                  <p class="message message--error" role="alert">{{ pendingEventInvitationsError() }}</p>
+                  <button type="button" class="button--secondary" (click)="loadPendingEventInvitations()">Retry loading pending invitations</button>
+                } @else if (pendingEventInvitations().length > 0) {
+                  <ul class="events-preview-list row-list">
+                    @for (invitation of pendingEventInvitations(); track invitation.invitationId) {
+                      <li class="item-row"><span class="item-main"><strong><a class="item-link" [routerLink]="['/events', invitation.eventId]" [state]="focusHeadingState">{{ invitation.name }}</a></strong><span class="item-meta">{{ displayDateTime(invitation.date, invitation.time) }}</span><span class="item-meta">Pending · Open Event to respond</span></span></li>
+                    }
+                  </ul>
+                } @else { <p class="events-dash-empty">You have no pending Event invitations in this Family.</p> }
               </section>
             </div>
           }
@@ -926,6 +936,7 @@
                   <ng-container *ngTemplateOutlet="eventCard; context: { $implicit: event, detail: true }" />
                   @if (eventMessage()) { <p class="message message--success events-feedback" role="status">{{ eventMessage() }}</p> }
                 </article>
+                <app-event-participation [event]="event" [ownProfileId]="ownerProfile()?.profileId ?? null" [currentFamilyId]="currentFamilyId()" />
               }
             } @else {
               <a class="detail-back-link item-back" routerLink="/plans" [state]="focusHeadingState"><app-icon name="back" />Back to Plans</a>

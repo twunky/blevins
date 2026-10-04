@@ -14,9 +14,9 @@
 
 Confirm the authorizing work item and its scope before editing `src/` or `tests/`. If no current work item authorizes a change, do not make it; ask the owner.
 
-### Current approved work item: WI-095-001; execution authorized NO
+### Current approved work item: WI-095-001; execution authorized YES
 
-CTX-1.30 is ACTIVE after VER-CTX-1.30 PASS under DEC-083. Phase 9.5 is CURRENT / IN PROGRESS for only WI-095-001 — Event Invitations and RSVP, approved scope with execution NO. This task authorizes canonical context/governance preparation only; separate explicit owner authorization is required before application, migration, API, UI or test work. Later capabilities are separately gated. Phase 9 remains COMPLETE / CLOSED under DEC-081. Cleanup Waves 1–5 COMPLETE; no broad cleanup/reorganization. Owner performs commits; do not stage, commit, push or create/complete a PR.
+The separate 2026-10-04 owner instruction authorizes exactly WI-095-001 under active CTX-1.30. Its bounded in-app invitation/self-RSVP implementation is VERIFYING / OWNER REVIEW. The work item and VER-WI-095-001 record exact evidence and pending owner visual review/closure. Phase 9.5 remains CURRENT / IN PROGRESS; all later items separately gated. Phase 9 closed; OD-002 OPEN. Cleanup Waves 1-5 authorize no broad cleanup. Owner performs all commits; no staging, commit, push or PR.
 
 Closed work-item scopes and exclusions (WI-009-010 back to WI-008-003) are kept word-for-word in [HISTORY.md § Part B](HISTORY.md#part-b). They authorize nothing.
 

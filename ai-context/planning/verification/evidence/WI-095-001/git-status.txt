@@ -1,0 +1,79 @@
+﻿ M ai-context/README.md
+ M ai-context/planning/roadmap.md
+ M ai-context/planning/stories/WI-095-001-event-invitations-and-rsvp.md
+ M ai-context/project-status.md
+ M claude-handoff/CURRENT-TASK.md
+ M claude-handoff/PROJECT-STATE.md
+ M claude-handoff/WORKING-RULES.md
+ M src/FamilySafety.Api/Program.cs
+ M src/FamilySafety.Infrastructure/DependencyInjection.cs
+ M src/FamilySafety.Infrastructure/Persistence/EfFamilyEventRepository.cs
+ M src/FamilySafety.Infrastructure/Persistence/FamilySafetyDbContext.cs
+ M src/FamilySafety.Infrastructure/Persistence/Migrations/FamilySafetyDbContextModelSnapshot.cs
+ M src/FamilySafety.Web/README.md
+ M src/FamilySafety.Web/e2e/events-dashboard.spec.ts
+ M src/FamilySafety.Web/src/app/app.html
+ M src/FamilySafety.Web/src/app/app.ts
+ M src/FamilySafety.Web/src/app/events-dashboard.spec.ts
+ M tests/FamilySafety.Foundation.Tests/IncidentRetentionAuditTests.cs
+?? ai-context/planning/verification/VER-WI-095-001.md
+?? ai-context/planning/verification/evidence/WI-095-001/angular-full.txt
+?? ai-context/planning/verification/evidence/WI-095-001/artifact-health.txt
+?? ai-context/planning/verification/evidence/WI-095-001/context-checks.txt
+?? ai-context/planning/verification/evidence/WI-095-001/diff-check.txt
+?? ai-context/planning/verification/evidence/WI-095-001/dotnet-build.txt
+?? ai-context/planning/verification/evidence/WI-095-001/dotnet-tests-sql-final.txt
+?? ai-context/planning/verification/evidence/WI-095-001/dotnet-tests-sql.txt
+?? ai-context/planning/verification/evidence/WI-095-001/git-status.txt
+?? ai-context/planning/verification/evidence/WI-095-001/playwright-full.txt
+?? ai-context/planning/verification/evidence/WI-095-001/rendered-review.md
+?? ai-context/planning/verification/evidence/WI-095-001/screenshot-sha256.txt
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/editor-no-invitation-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/editor-no-invitation-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-conflict-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-conflict-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-going-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-going-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-loading-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-pending-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-pending-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-read-error-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-read-error-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-revoked-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/invitee-revoked-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/organizer-empty-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/organizer-empty-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/organizer-going-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/organizer-going-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/organizer-pending-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/organizer-pending-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/organizer-read-error-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/organizer-read-error-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/organizer-revoked-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/organizer-revoked-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/pending-dashboard-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/pending-dashboard-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/revoke-confirmation-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/revoke-confirmation-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/unauthorized-event-1440.png
+?? ai-context/planning/verification/evidence/WI-095-001/screenshots/unauthorized-event-390.png
+?? ai-context/planning/verification/evidence/WI-095-001/sql-focused.txt
+?? ai-context/planning/verification/evidence/WI-095-001/type-template.txt
+?? ai-context/planning/verification/evidence/WI-095-001/web-build.txt
+?? src/FamilySafety.Api/Events/EventInvitationEndpoints.cs
+?? src/FamilySafety.Application/Events/EventInvitationContracts.cs
+?? src/FamilySafety.Application/Events/EventInvitationService.cs
+?? src/FamilySafety.Domain/Events/FamilyEventInvitation.cs
+?? src/FamilySafety.Infrastructure/Persistence/EfEventInvitationRepository.cs
+?? src/FamilySafety.Infrastructure/Persistence/EventVisibilityQuery.cs
+?? src/FamilySafety.Infrastructure/Persistence/Migrations/20261004220426_EventInvitationsAndRsvp.Designer.cs
+?? src/FamilySafety.Infrastructure/Persistence/Migrations/20261004220426_EventInvitationsAndRsvp.cs
+?? src/FamilySafety.Web/e2e/event-invitations.spec.ts
+?? src/FamilySafety.Web/src/app/events/event-participation.html
+?? src/FamilySafety.Web/src/app/events/event-participation.scss
+?? src/FamilySafety.Web/src/app/events/event-participation.spec.ts
+?? src/FamilySafety.Web/src/app/events/event-participation.ts
+?? tests/FamilySafety.Foundation.Tests/EventInvitationApiTests.cs
+?? tests/FamilySafety.Foundation.Tests/EventInvitationDomainTests.cs
+?? tests/FamilySafety.Foundation.Tests/EventInvitationPersistenceTests.cs
+?? tests/FamilySafety.Foundation.Tests/EventInvitationServiceTests.cs

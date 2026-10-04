@@ -1,0 +1,14 @@
+:host { display: block; margin-top: var(--space-4); }
+.participation { display: grid; gap: var(--space-3); }
+.participation h3 { margin: 0; }
+.item-row { flex-wrap: wrap; gap: var(--space-3); }
+.item-row > strong { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.status-pill { padding: 0.25rem 0.65rem; background: var(--color-primary-soft); color: var(--color-primary-strong); }
+.invitation-row { padding-block: var(--space-3); border-bottom: 1px solid var(--color-border); }
+.invitation-row:last-child { border-bottom: 0; }
+.rsvp-choices { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+.rsvp-choices label { display: flex; align-items: center; gap: var(--space-2); min-height: 2.75rem; }
+.rsvp-choices input { width: auto; }
+form { display: grid; gap: var(--space-3); }
+form > button { justify-self: start; }
+fieldset { min-width: 0; }

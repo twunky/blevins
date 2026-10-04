@@ -619,7 +619,7 @@ public sealed class IncidentRetentionAuditTests
             var schemaBefore = await ExistingSchemaAsync(db);
             var dataBefore = await ExistingDataAsync(db, concern.ConcernId);
 
-            await migrator.MigrateAsync();
+            await migrator.MigrateAsync("20261002013148_SafetyIncidentDomainAndAccessFoundation");
             Assert.Equal("20261002013148_SafetyIncidentDomainAndAccessFoundation",
                 (await db.Database.GetAppliedMigrationsAsync()).Last());
             Assert.Equal(["IncidentAuditEvents", "IncidentCoordinatorChanges", "IncidentEntries",

@@ -60,12 +60,13 @@ describe('Events dashboard, Create event, and All events (WI-009-008)', () => {
     http.expectOne(`/api/family-groups/${familyId}/plans`).flush([]);
   }
 
-  async function open(path: string, events: object[] = [], trips: object[] | null = []) {
+  async function open(path: string, events: object[] = [], trips: object[] | null = [], pending: object[] | null = []) {
     const harness = await RouterTestingHarness.create();
     await harness.navigateByUrl(path, App);
     shellReads();
     familyReads(familyA.familyGroupId, events);
     if (trips) http.expectOne('/api/trips').flush(trips);
+    if (path === '/events' && pending) http.expectOne(`/api/family-groups/${familyA.familyGroupId}/event-invitations/mine`).flush(pending);
     harness.detectChanges();
     return harness;
   }
@@ -122,14 +123,64 @@ describe('Events dashboard, Create event, and All events (WI-009-008)', () => {
     expect(tripsCard.textContent).not.toMatch(/Planning|Considering|audience/i);
   });
 
-  it('renders RSVPs Needed as a text-only placeholder with no controls, digits, or request', async () => {
+  it('renders an empty authorized Pending read without deriving invitations from Event audience', async () => {
     const harness = await open('/events', [event(1, 'Upcoming picnic', 4)]);
     const rsvps = card(harness, 'rsvps');
     expect(rsvps.querySelector('h2')?.textContent?.trim()).toBe('RSVPs Needed');
-    expect(rsvps.querySelector('p')?.textContent?.trim()).toBe('Event invitations that need your response will appear here.');
+    expect(rsvps.querySelector('p')?.textContent?.trim()).toBe('You have no pending Event invitations in this Family.');
     expect(rsvps.querySelectorAll('button, a, input, select, img, li')).toHaveLength(0);
     expect(rsvps.textContent).not.toMatch(/\d/);
     expect(http.match(request => /rsvp|invitation/i.test(request.url))).toHaveLength(0);
+  });
+
+  it('shows invitation loading separately from empty success', async () => {
+    const harness = await open('/events', [], [], null);
+    expect(card(harness, 'rsvps').textContent).toContain('Loading your pending invitations');
+    expect(card(harness, 'rsvps').textContent).not.toContain('no pending');
+    http.expectOne('/api/family-groups/family-a/event-invitations/mine').flush([]);
+    harness.detectChanges();
+    expect(card(harness, 'rsvps').textContent).toContain('no pending Event invitations');
+  });
+
+  it('shows past-dated own Pending invitations from the protected read and links to Event detail', async () => {
+    const harness = await open('/events', [], [], [{ invitationId: 'invitation', eventId: guid(9), name: 'Past gathering', date: '2020-01-01', time: '18:00' }]);
+    expect(rowNames(card(harness, 'rsvps'))).toEqual(['Past gathering']);
+    expect(card(harness, 'rsvps').querySelector('a')?.getAttribute('href')).toBe(`/events/${guid(9)}`);
+    expect(card(harness, 'rsvps').textContent).toContain('Pending');
+  });
+
+  it('shows read failure and Retry repeats only the protected invitation read', async () => {
+    const harness = await open('/events', [], [], null);
+    http.expectOne('/api/family-groups/family-a/event-invitations/mine').flush({}, { status: 500, statusText: 'Failed' });
+    harness.detectChanges();
+    expect(card(harness, 'rsvps').querySelector('[role="alert"]')).not.toBeNull();
+    expect(card(harness, 'rsvps').textContent).not.toContain('no pending');
+    card(harness, 'rsvps').querySelector<HTMLButtonElement>('button')!.click();
+    http.expectOne('/api/family-groups/family-a/event-invitations/mine').flush([]);
+    harness.detectChanges();
+    expect(card(harness, 'rsvps').textContent).toContain('no pending');
+  });
+
+  it('cancels pending invitation reads and clears prior data on Family switch', async () => {
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/events', App);
+    shellReads([familyA, familyB]);
+    const context = TestBed.inject(CurrentFamilyContext);
+    const app = harness.routeDebugElement!.componentInstance as App;
+    (app as any).switchCurrentFamily('family-a');
+    familyReads('family-a', []);
+    http.expectOne('/api/trips').flush([]);
+    const old = http.expectOne('/api/family-groups/family-a/event-invitations/mine');
+    (app as any).switchCurrentFamily('family-b');
+    expect(old.cancelled).toBe(true);
+    expect(context.familyId()).toBe('family-b');
+    harness.detectChanges();
+    expect(card(harness, 'rsvps').querySelectorAll('li')).toHaveLength(0);
+    familyReads('family-b', []);
+    http.expectOne('/api/trips').flush([]);
+    http.expectOne('/api/family-groups/family-b/event-invitations/mine').flush([{ invitationId: 'b', eventId: guid(8), name: 'Family B gathering', date: '2020-01-01', time: '18:00' }]);
+    harness.detectChanges();
+    expect(rowNames(card(harness, 'rsvps'))).toEqual(['Family B gathering']);
   });
 
   it('offers exactly the six approved Quick Links as real routes', async () => {
