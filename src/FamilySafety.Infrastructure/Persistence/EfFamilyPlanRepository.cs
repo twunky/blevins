@@ -94,6 +94,37 @@ public sealed class EfFamilyPlanRepository(FamilySafetyDbContext dbContext) : IF
         return await GetPlanViewAsync(planId, cancellationToken);
     }
 
+    public async Task<FamilyPlanView?> UpdateNotesAsync(
+        Guid accountId,
+        Guid planId,
+        string? notes,
+        CancellationToken cancellationToken)
+    {
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(
+            IsolationLevel.Serializable, cancellationToken);
+
+        // Resolve the Plan and current creator membership together for every write.
+        // Missing, non-creator, and inactive-creator requests share the same result.
+        var plan = await (from item in dbContext.FamilyPlans
+                          join membership in dbContext.FamilyGroupMemberships
+                              on item.FamilyGroupId equals membership.FamilyGroupId
+                          where item.Id == planId
+                              && item.CreatorProfileId == membership.AdultProfileId
+                              && membership.AccountId == accountId
+                              && membership.IsActive
+                          select item).SingleOrDefaultAsync(cancellationToken);
+        if (plan is null)
+        {
+            return null;
+        }
+
+        plan.UpdateNotes(notes);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        var updated = await GetPlanViewAsync(planId, cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        return updated;
+    }
+
     // The only definition of Plan read visibility (REQ-PLAN-005): the caller has an
     // active membership in the Plan's Family and is its creator, or the Plan is
     // shared with the whole Family, or the caller was individually selected. A

@@ -29,6 +29,8 @@ public sealed record CreateFamilyPlanRequest(
     IReadOnlyList<Guid> AudienceProfileIds,
     string? Notes = null);
 
+public sealed record UpdateFamilyPlanNotesRequest(string? Notes);
+
 public sealed class FamilyPlanValidationException(IReadOnlyDictionary<string, string[]> errors)
     : Exception("The plan request is invalid.")
 {

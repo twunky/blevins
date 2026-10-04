@@ -108,6 +108,30 @@ public sealed class FamilyPlanService(
             ?? throw new FamilyPlanUnavailableException();
     }
 
+    public async Task<FamilyPlanView> UpdateNotesAsync(
+        Guid planId,
+        UpdateFamilyPlanNotesRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (planId == Guid.Empty)
+        {
+            throw new FamilyPlanUnavailableException();
+        }
+
+        ArgumentNullException.ThrowIfNull(request);
+        if (request.Notes?.Length > 1000)
+        {
+            throw new FamilyPlanValidationException(new Dictionary<string, string[]>
+            {
+                [nameof(request.Notes)] = ["Notes cannot exceed 1,000 characters."],
+            });
+        }
+
+        return await repository.UpdateNotesAsync(
+            RequireAccountId(), planId, request.Notes, cancellationToken)
+            ?? throw new FamilyPlanUnavailableException();
+    }
+
     private Guid RequireAccountId() => currentAccountAccessor.Current?.AccountId
         ?? throw new CurrentAccountUnavailableException();
 

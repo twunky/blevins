@@ -1,6 +1,6 @@
 # Family Safety, Coordination & Planning Application
 
-**Phase 9 closure (2026-10-03):** WI-009-011 is `DONE / PASS — OWNER APPROVED`; VER-WI-009-011 is `DONE / PASS`; [VER-PH-009](planning/verification/VER-PH-009.md) is `PASS / PHASE CLOSURE VERIFIED`, all 15 exits PASS. DEC-081 records explicit conditional owner closure after Plan filtering, focused verification, one final build, sole final full Playwright 34/34 and artifact health passed. Phase 9 `COMPLETE / CLOSED`; CTX-1.28 ACTIVE; Development user testing READY; Phase 9.5 READY TO BEGIN. No implementation work item remains authorized; no new CTX, out-of-scope feature, commit or push.
+**Current context (2026-10-04):** `CTX-1.29` is active under `DEC-082` and `VER-CTX-1.29` for the separately approved creator edit/clear of the existing optional Plan note (`REQ-PLAN-007`). Phase 9 remains `COMPLETE / CLOSED` under `DEC-081` and [VER-PH-009](planning/verification/VER-PH-009.md); its `CTX-1.28` baseline remains historical. Phase 9.5 is `READY TO BEGIN` and requires separate approval.
 
 AI Context Foundation v1.0 operating guide.
 

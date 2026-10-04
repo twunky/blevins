@@ -1,6 +1,6 @@
 # Requirements Index
 
-**Status:** APPROVED — `CTX-1.28`  
+**Status:** APPROVED — `CTX-1.29`
 **Purpose:** Traceability index only; normative wording lives at each canonical source.
 
 ## ID and lifecycle rules
@@ -149,6 +149,7 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-PLAN-004` | Plan update, check-in, and completion | `../workflows/plans-trips.md#req-plan-004` | `APPROVED` | `CTX-1.0` | — |
 | `REQ-PLAN-005` | Plan audience choices, current-group access, and creator-departure retention | `../workflows/plans-trips.md#req-plan-005` | `APPROVED` | `CTX-1.16` | — |
 | `REQ-PLAN-006` | Optional Plan notes at creation | `../workflows/plans-trips.md#req-plan-006` | `APPROVED` | `CTX-1.17` | — |
+| `REQ-PLAN-007` | Creator edit or clear of existing optional Plan note | `../workflows/plans-trips.md#req-plan-007` | `APPROVED` | `CTX-1.29` | — |
 
 ## Trips
 

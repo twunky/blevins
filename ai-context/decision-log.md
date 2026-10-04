@@ -1160,3 +1160,15 @@ These questions are intentionally unresolved and are not requirements.
 - **Affected context:** this decision log, README, project-status, planning/roadmap, WI-009-011, VER-WI-009-011, VER-PH-009 and synchronized claude-handoff current-state files.
 - **Execution authorization:** WI-009-011 is complete. No implementation work item remains authorized. Next work requires the owner's scoped approval. No commit/push or Git initialization.
 - **Approved by:** Explicit project-owner WI-009-011 authorization and conditional closure request, followed by the owner D2 Plan filtering decision and continuation instruction dated 2026-10-03. Created only after all remaining verification and artifact gates passed; this does not claim a later separate owner review.
+
+## DEC-082 — Creator edit and clear of the existing optional Plan note
+
+- **Status:** ACCEPTED — separately owner-authorized post-Phase-9 follow-up
+- **Date:** 2026-10-04
+- **Decision:** The Plan creator may edit or clear the Plan's existing optional note after creation while they retain current Plan access. Continue using `FamilyPlan.Notes`, with plain-text semantics, the 1,000-character maximum, and blank-as-absent behavior. The write is server-authorized for the active creator; existing Plan reads and audience rules do not change.
+- **Rationale:** Let the creator correct or remove the one optional Plan note without broadening Plan editing or adding a separate Notes capability.
+- **Canonical effect:** Add `REQ-PLAN-007` under `CTX-1.29`; `REQ-PLAN-006` remains the creation requirement and historical `DEC-056` remains intact. Phase 9 remains `COMPLETE / CLOSED` under `DEC-081`, and `VER-PH-009` remains its historical closure evidence.
+- **Boundary:** No general Plan editing, multiple authored notes, note-specific author metadata, revision history, Tasks, Check-Ins, or other Phase 9.5 capability is approved here.
+- **Affected context:** `workflows/plans-trips.md`, `core/requirements-index.md`, `planning/candidates/CTX-1.29-plan-note-edit.md`, `planning/verification/VER-CTX-1.29.md`, `README.md`, `project-status.md`, `planning/roadmap.md`, and current `claude-handoff` summaries.
+- **Supersedes:** None.
+- **Approved by:** Explicit project-owner implementation request dated 2026-10-04.

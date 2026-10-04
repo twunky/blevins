@@ -288,7 +288,7 @@ test('AC-01 to AC-10, AC-29, AC-41 — each item URL renders on direct entry and
   await page.goto(`/plans/${w.family1Items.plan}`);
   const plan = page.getByRole('article', { name: 'Plan details' });
   await expect(plan).toContainText('Planned by Development Adult');
-  await expect(plan.locator('button, a')).toHaveCount(0);
+  await expect(plan.getByRole('button', { name: 'Add note' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Back to Plans' })).toHaveAttribute('href', '/plans');
 
   await page.goto(`/trips/${w.family1Items.trip}`);
@@ -313,6 +313,27 @@ test('AC-01 to AC-10, AC-29, AC-41 — each item URL renders on direct entry and
   sawPrompt.push(await page.getByText('Choose your current Family').isVisible());
   await expect(itemHeading(page)).toHaveText('Incident about Development Recipient');
   expect(sawPrompt).toEqual([false, false]);
+});
+
+test('Plan creator can add, edit, and clear the existing note on the item page', async ({ page, request }) => {
+  const world = await setUpWorld(request);
+  const planId = world.family1Items.plan;
+  await page.goto(`/plans/${planId}`);
+  const detail = page.getByRole('article', { name: 'Plan details' });
+  await detail.getByRole('button', { name: 'Add note' }).click();
+  await detail.getByRole('textbox', { name: 'Plan note' }).fill('Meet at the north entrance.');
+  await detail.getByRole('button', { name: 'Save note' }).click();
+  await expect(detail).toContainText('Meet at the north entrance.');
+  await page.reload();
+  await expect(detail).toContainText('Meet at the north entrance.');
+  await detail.getByRole('button', { name: 'Edit note' }).click();
+  await detail.getByRole('textbox', { name: 'Plan note' }).fill('Bring water.');
+  await detail.getByRole('button', { name: 'Save note' }).click();
+  await expect(detail).toContainText('Bring water.');
+  await detail.getByRole('button', { name: 'Clear note' }).click();
+  await expect(detail.getByRole('button', { name: 'Add note' })).toBeVisible();
+  await page.reload();
+  await expect(detail).not.toContainText('Bring water.');
 });
 
 test('AC-17 to AC-21, AC-32, AC-33, AC-41 — authorized cross-Family links switch only after the item read, and announce once', async ({ page, request }) => {

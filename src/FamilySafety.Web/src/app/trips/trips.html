@@ -297,7 +297,14 @@
         <h3 id="trip-notes-heading">Trip Notes</h3>
         <p class="trip-help">Share useful trip details with this Trip's audience.</p>
         @if (noteError()) { <p class="trip-error" role="alert">{{ noteError() }}</p> }
-        @if (notes().length === 0) { <p class="trip-notes-empty">No Notes yet.</p> }
+        @if (notesReadState() === 'loading') { <p role="status">Loading Notes…</p> }
+        @else if (notesReadState() === 'error') {
+          <p class="trip-error" role="alert">We couldn’t load Notes.</p>
+          <button type="button" class="trip-secondary" (click)="retryNotes()">Retry loading Notes</button>
+        }
+        @else if (notesReadState() === 'loaded' && notes().length === 0) {
+          <p class="trip-notes-empty">No Notes yet.</p>
+        }
         <ul class="trip-note-list">
           @for (note of notes(); track note.noteId) {
             <li>

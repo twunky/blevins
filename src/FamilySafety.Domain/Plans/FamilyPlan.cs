@@ -57,4 +57,14 @@ public sealed class FamilyPlan
     public TimeOnly? ExpectedCheckInTime { get; private set; }
     public PlanAudienceType AudienceType { get; private set; }
     public string? Notes { get; private set; }
+
+    public void UpdateNotes(string? notes)
+    {
+        if (notes?.Length > 1000)
+        {
+            throw new ArgumentOutOfRangeException(nameof(notes));
+        }
+
+        Notes = string.IsNullOrWhiteSpace(notes) ? null : notes;
+    }
 }

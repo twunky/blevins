@@ -390,6 +390,101 @@ describe('App', () => {
     expect(renderedNotes?.innerHTML).not.toContain('<br>');
   });
 
+  it('keeps Plan recipient search available and selection valid through one and zero matches', () => {
+    const groupId = '33333333-3333-3333-3333-333333333333';
+    const blairId = '77777777-7777-7777-7777-777777777777';
+    const caseyId = '99999999-9999-9999-9999-999999999999';
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    http.expectOne('/api/profile').flush(profile);
+    http.expectOne('/api/family-groups/administered').flush([]);
+    http.expectOne('/api/family-groups/mine').flush([{ familyGroupId: groupId, name: 'Development Family' }]);
+    http.expectOne(`/api/family-groups/${groupId}/members`).flush([
+      { profileId: profile.profileId, displayName: profile.displayName },
+      { profileId: blairId, displayName: 'Blair' },
+      { profileId: caseyId, displayName: 'Casey' },
+    ]);
+    http.expectOne(`/api/family-groups/${groupId}/relationships`).flush([]);
+    http.expectOne(`/api/family-groups/${groupId}/events`).flush([]);
+    http.expectOne(`/api/family-groups/${groupId}/plans`).flush([]);
+    showView(fixture, 'plans');
+    fixture.detectChanges();
+
+    const form = (fixture.nativeElement as HTMLElement).querySelector<HTMLFormElement>('form.plans-form')!;
+    form.querySelector<HTMLInputElement>('#plan-audience-people')!.click();
+    fixture.detectChanges();
+    const search = () => form.querySelector<HTMLInputElement>('#plan-audience-search');
+    const create = () => form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const filter = (value: string) => {
+      const input = search()!;
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+    };
+    expect(search()?.labels?.[0]?.textContent).toContain('Filter family members');
+    expect(create().disabled).toBe(true);
+    form.querySelector<HTMLInputElement>(`#plan-recipient-${blairId}`)!.click();
+    fixture.detectChanges();
+
+    filter('Casey');
+    expect(search()).not.toBeNull();
+    expect(form.querySelector(`#plan-recipient-${blairId}`)).toBeNull();
+    expect(form.querySelector(`#plan-recipient-${caseyId}`)).not.toBeNull();
+    expect(create().disabled).toBe(false);
+
+    filter('nobody');
+    expect(search()).not.toBeNull();
+    expect(form.textContent).toContain('No matching Family members.');
+    expect(form.textContent).not.toContain('No other active adult family members are available');
+    expect(create().disabled).toBe(false);
+
+    filter('Blair');
+    expect(form.querySelector<HTMLInputElement>(`#plan-recipient-${blairId}`)?.checked).toBe(true);
+    filter('');
+    expect(form.querySelectorAll('ul[aria-label="Active adult plan recipients"] input[type="checkbox"]')).toHaveLength(2);
+
+    const component = fixture.componentInstance as unknown as {
+      planForm: { patchValue: (value: object) => void };
+    };
+    component.planForm.patchValue({
+      activityOrDestination: 'Visit the lake', date: '2026-10-10', time: '10:00', audienceType: 'SelectedPeople',
+    });
+    filter('nobody');
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    const request = http.expectOne(`/api/family-groups/${groupId}/plans`);
+    expect(request.request.body.audienceProfileIds).toEqual([blairId]);
+    request.flush({}, { status: 400, statusText: 'Bad Request' });
+  });
+
+  it('keeps the true no-eligible-recipient Plan state distinct from search with no matches', () => {
+    const groupId = '33333333-3333-3333-3333-333333333333';
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    http.expectOne('/api/profile').flush(profile);
+    http.expectOne('/api/family-groups/administered').flush([]);
+    http.expectOne('/api/family-groups/mine').flush([{ familyGroupId: groupId, name: 'Development Family' }]);
+    http.expectOne(`/api/family-groups/${groupId}/members`).flush([
+      { profileId: profile.profileId, displayName: profile.displayName },
+    ]);
+    http.expectOne(`/api/family-groups/${groupId}/relationships`).flush([]);
+    http.expectOne(`/api/family-groups/${groupId}/events`).flush([]);
+    http.expectOne(`/api/family-groups/${groupId}/plans`).flush([]);
+    showView(fixture, 'plans');
+    fixture.detectChanges();
+
+    const form = (fixture.nativeElement as HTMLElement).querySelector<HTMLFormElement>('form.plans-form')!;
+    form.querySelector<HTMLInputElement>('#plan-audience-people')!.click();
+    fixture.detectChanges();
+    expect(form.querySelector('#plan-audience-search')).toBeNull();
+    expect(form.textContent).toContain('No other active adult family members are available to select.');
+    expect(form.textContent).not.toContain('No matching Family members.');
+    expect(form.querySelector<HTMLButtonElement>('button[type="submit"]')?.disabled).toBe(true);
+
+    form.querySelector<HTMLInputElement>('#plan-audience-group')!.click();
+    fixture.detectChanges();
+    expect(form.querySelector<HTMLButtonElement>('button[type="submit"]')?.disabled).toBe(false);
+  });
+
   it('does not offer event editing to a view-only audience member', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();

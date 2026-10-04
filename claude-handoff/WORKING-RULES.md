@@ -16,7 +16,7 @@ Confirm the authorizing work item and its scope before editing `src/` or `tests/
 
 ### Current authorized work item: none
 
-Phase 9 is `COMPLETE / CLOSED` under `DEC-081`; Phase 9.5 is `READY TO BEGIN` but no product implementation work item is authorized. Repository Cleanup Waves 1–5 are `COMPLETE`; no additional broad repository cleanup or reorganization is authorized. Application behavior, tests, and scripts require a separately authorized work item. The owner performs commits; do not commit or push.
+Phase 9 is `COMPLETE / CLOSED` under `DEC-081`; Phase 9.5 is `READY TO BEGIN`. The separately approved Plan note edit/clear follow-up is complete under `DEC-082` / `REQ-PLAN-007`; `CTX-1.29` is active. No further product implementation work item is authorized. Repository Cleanup Waves 1–5 are `COMPLETE`; no additional broad repository cleanup or reorganization is authorized. Application behavior, tests, and scripts require a separately authorized work item. The owner performs commits; do not commit or push.
 
 ### Historical: WI-009-010 — First-Use and Invitation Arrival Workflow — `DONE / PASS`, owner approved 2026-10-03
 

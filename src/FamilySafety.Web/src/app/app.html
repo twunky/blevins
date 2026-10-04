@@ -649,8 +649,7 @@
               }
               @if (availableEventAudienceMembers().length === 0) {
                 <div class="events-audience-state">
-                  <p>No other active adult family members are available to select.</p>
-                  <p>To create an Event, choose at least one other active adult to share it with.</p>
+                  <p>This Family has no other active adult members yet. An event needs at least one other active adult to be created.</p>
                 </div>
               } @else if (visibleEventAudienceMembers().length === 0) {
                 <p class="events-state events-state--no-match">No family members match that filter.</p>
@@ -795,7 +794,7 @@
               </label>
 
               @if (planForm.controls.audienceType.value === 'SelectedPeople') {
-                @if (visiblePlanAudienceMembers().length > 1) {
+                @if (availablePlanAudienceMembers().length > 1) {
                   <div class="field">
                     <label for="plan-audience-search">Filter family members</label>
                     <input
@@ -806,9 +805,11 @@
                     />
                   </div>
                 }
-                @if (visiblePlanAudienceMembers().length === 0) {
+                @if (availablePlanAudienceMembers().length === 0) {
                   <p>No other active adult family members are available to select.</p>
-                } @else if (visiblePlanAudienceMembers().length > 0) {
+                } @else if (visiblePlanAudienceMembers().length === 0) {
+                  <p>No matching Family members.</p>
+                } @else {
                   <ul class="checkbox-list" aria-label="Active adult plan recipients">
                     @for (member of visiblePlanAudienceMembers(); track member.profileId) {
                       <li>
@@ -860,7 +861,7 @@
             }
             <button
               type="submit"
-              [disabled]="planSubmitting() || (planForm.controls.audienceType.value === 'SelectedPeople' && visiblePlanAudienceMembers().length === 0)"
+              [disabled]="planSubmitting() || (planForm.controls.audienceType.value === 'SelectedPeople' && planAudienceProfileIds().length === 0)"
             >
               {{ planSubmitting() ? 'Creating plan…' : 'Create plan' }}
             </button>
@@ -891,6 +892,33 @@
               @if (itemPlan(); as plan) {
                 <article class="card plans-card item-detail" aria-label="Plan details">
                   <ng-container *ngTemplateOutlet="planCard; context: { $implicit: plan, detail: true }" />
+                  @if (plan.creatorProfileId === ownerProfile()?.profileId) {
+                    @if (editingPlanNoteId() === plan.planId) {
+                      <form class="plans-note-editor" [formGroup]="planNoteForm" (ngSubmit)="savePlanNote(plan)" novalidate>
+                        <div class="field">
+                          <label for="item-plan-note">Plan note <span class="help">(optional, up to 1,000 characters)</span></label>
+                          <textarea id="item-plan-note" formControlName="notes" rows="4" maxlength="1000"></textarea>
+                        </div>
+                        @if (planNoteError()) { <p class="message message--error" role="alert">{{ planNoteError() }}</p> }
+                        <div class="button-row">
+                          <button type="submit" [disabled]="planNoteSaving()">Save note</button>
+                          <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="cancelPlanNoteEdit()">Cancel</button>
+                          @if (plan.notes) {
+                            <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="savePlanNote(plan, true)">Clear note</button>
+                          }
+                        </div>
+                      </form>
+                    } @else {
+                      <div class="plans-note-actions">
+                        <button type="button" class="button--secondary" (click)="beginPlanNoteEdit(plan)">{{ plan.notes ? 'Edit note' : 'Add note' }}</button>
+                        @if (plan.notes) {
+                          <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="savePlanNote(plan, true)">Clear note</button>
+                        }
+                      </div>
+                    }
+                    @if (planNoteMessage()) { <p class="message message--success" role="status">{{ planNoteMessage() }}</p> }
+                    @if (editingPlanNoteId() !== plan.planId && planNoteError()) { <p class="message message--error" role="alert">{{ planNoteError() }}</p> }
+                  }
                 </article>
               }
             }
@@ -1412,7 +1440,7 @@
   }
 </ng-template>
 
-<!-- One read-only Plan card for the Plans list and the Plan item page (WI-009-005, OD-C). -->
+<!-- One Plan display card for the Plans list and the Plan item page (WI-009-005, OD-C). -->
 <ng-template #planCard let-plan let-detail="detail">
   @let tile = dateTile(plan.date);
   <div class="item-row">

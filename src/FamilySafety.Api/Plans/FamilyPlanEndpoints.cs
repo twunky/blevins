@@ -14,6 +14,7 @@ public static class FamilyPlanEndpoints
         // Item read by ID alone: the server finds and authorizes the Plan before its
         // Family is disclosed (REQ-PRIV-027). Missing and unauthorized are both 404.
         endpoints.MapGet("/api/plans/{planId:guid}", GetAsync);
+        endpoints.MapPut("/api/plans/{planId:guid}/notes", UpdateNotesAsync);
         return endpoints;
     }
 
@@ -55,6 +56,31 @@ public static class FamilyPlanEndpoints
         }
     }
 
+    private static async Task<IResult> UpdateNotesAsync(
+        Guid planId,
+        UpdateFamilyPlanNotesRequest request,
+        IFamilyPlanService service,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return Results.Ok(await service.UpdateNotesAsync(planId, request, cancellationToken));
+        }
+        catch (CurrentAccountUnavailableException)
+        {
+            return Results.Unauthorized();
+        }
+        catch (FamilyPlanUnavailableException)
+        {
+            return Results.NotFound();
+        }
+        catch (FamilyPlanValidationException exception)
+        {
+            return Results.ValidationProblem(exception.Errors.ToDictionary(
+                error => error.Key, error => error.Value));
+        }
+    }
+
     private static async Task<IResult> CreateAsync(
         Guid familyGroupId,
         CreateFamilyPlanRequest request,
@@ -64,7 +90,7 @@ public static class FamilyPlanEndpoints
         try
         {
             var created = await service.CreateAsync(familyGroupId, request, cancellationToken);
-            return Results.Created($"/api/family-groups/{familyGroupId:D}/plans/{created.PlanId:D}", created);
+            return Results.Created($"/api/plans/{created.PlanId:D}", created);
         }
         catch (CurrentAccountUnavailableException)
         {

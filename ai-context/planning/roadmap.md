@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap records approved phase status only. Phase 9 is COMPLETE / CLOSED under DEC-081; Phase 9.5 is READY TO BEGIN. No implementation item is authorized.
+This roadmap records approved phase status only. Phase 9 is COMPLETE / CLOSED under DEC-081; Phase 9.5 is READY TO BEGIN. The separately approved post-Phase-9 Plan note edit/clear follow-up is complete under DEC-082 / REQ-PLAN-007; CTX-1.29 is active. No further implementation item is authorized.
 
 | Phase | Name | Status |
 |---|---|---|

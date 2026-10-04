@@ -89,6 +89,8 @@ export class Trips implements OnInit, OnChanges {
   protected readonly trips = signal<readonly Trip[]>([]);
   protected readonly selectedTrip = signal<Trip | null>(null);
   protected readonly notes = signal<readonly TripNote[]>([]);
+  protected readonly notesReadState = signal<'idle' | 'loading' | 'loaded' | 'error'>('idle');
+  private notesTripId: string | null = null;
   protected readonly noteDraft = this.formBuilder.control('', [Validators.required, Validators.maxLength(1000)]);
   protected readonly noteEditDraft = this.formBuilder.control('', [Validators.required, Validators.maxLength(1000)]);
   protected readonly editingNoteId = signal<string | null>(null);
@@ -240,7 +242,12 @@ export class Trips implements OnInit, OnChanges {
     });
   }
 
-  protected closeDetail(): void { this.selectedTrip.set(null); this.notes.set([]); }
+  protected closeDetail(): void {
+    this.selectedTrip.set(null);
+    this.notes.set([]);
+    this.notesTripId = null;
+    this.notesReadState.set('idle');
+  }
 
   protected readonly dateTile = dateTile;
   protected readonly displayRange = displayRange;
@@ -352,16 +359,28 @@ export class Trips implements OnInit, OnChanges {
   }
 
   private loadNotes(tripId: string): void {
-    this.noteError.set('');
+    if (this.notesTripId !== tripId) {
+      this.notes.set([]);
+      this.notesTripId = tripId;
+    }
+    this.notesReadState.set('loading');
     this.http.get<TripNote[]>(`/api/trips/${encodeURIComponent(tripId)}/notes`).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: notes => { if (this.selectedTrip()?.tripId === tripId) this.notes.set(notes); },
+      next: notes => {
+        if (this.selectedTrip()?.tripId !== tripId) return;
+        this.notes.set(notes);
+        this.notesReadState.set('loaded');
+      },
       error: () => {
         if (this.selectedTrip()?.tripId === tripId) {
-          this.notes.set([]);
-          this.noteError.set('Trip Notes could not be loaded.');
+          this.notesReadState.set('error');
         }
       },
     });
+  }
+
+  protected retryNotes(): void {
+    const trip = this.selectedTrip();
+    if (trip && this.notesReadState() === 'error') this.loadNotes(trip.tripId);
   }
 
   protected addNote(): void {

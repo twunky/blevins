@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL WORKFLOW
-Context-Baseline: CTX-1.21
-Version: 1.6
-Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-054; DEC-055; DEC-056; DEC-057; DEC-060
+Context-Baseline: CTX-1.29
+Version: 1.7
+Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-054; DEC-055; DEC-056; DEC-057; DEC-060; DEC-082
 Constrained-By:
   - ../core/product-contract.md
   - ../core/ux-contract.md
@@ -56,6 +56,10 @@ Optional Plan notes at creation:
 - Show that the note follows the Plan audience. For a whole-group audience, explain that future active adult members may also see the Plan and its note.
 - A note does not create access beyond the Plan's existing audience and access enforcement.
 - Editing or removing a note after creation is not included in this requirement.
+
+### REQ-PLAN-007
+
+The Plan creator may edit or clear the existing optional Plan note after creation. Only the creator with current Plan access may write it; losing active membership in the Plan's Family also removes this write access. The same Plan `Notes` field is used, with the existing plain-text, 1,000-character, line-break, blank-as-absent, and Plan-audience read rules. No separate authored notes, note author metadata, revision history, or general Plan editing is introduced.
 
 ## Trips
 

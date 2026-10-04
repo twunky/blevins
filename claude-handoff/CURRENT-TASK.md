@@ -1,12 +1,14 @@
 # Current Task — Repository Cleanup Complete
 
+**Trip Notes read-state follow-up (2026-10-04):** The owner authorized and the implementation completed a bounded UI fix for loading, empty, failure, and Retry states of the existing Notes read. Focused Angular tests, the full Angular suite, Angular compilation, and the production web build pass (`SELF-VERIFIED`); owner review and commit remain pending. `CTX-1.29` stays active, and Phase 9 stays closed.
+
 ## Current state and authorization
 
-Phase 9 is `COMPLETE / CLOSED` under [DEC-081](../ai-context/decision-log.md), with all exits mapped in [VER-PH-009](../ai-context/planning/verification/VER-PH-009.md). `CTX-1.28` is active. Development user testing is `READY`; Phase 9.5 is `READY TO BEGIN`. **No product implementation work item is authorized.** Phase 9.5 requires separate scope and approval.
+Phase 9 is `COMPLETE / CLOSED` under [DEC-081](../ai-context/decision-log.md), with all exits mapped in [VER-PH-009](../ai-context/planning/verification/VER-PH-009.md). `CTX-1.29` is active under DEC-082 / REQ-PLAN-007 for the separately approved creator edit/clear of the existing optional Plan note. Development user testing is `READY`; Phase 9.5 is `READY TO BEGIN`. **No further product implementation work item is authorized.** Phase 9.5 requires separate scope and approval.
 
 ## Current maintenance activity
 
-Repository Cleanup Waves 1–5 are `COMPLETE`. No additional broad repository cleanup or reorganization is authorized. The owner still needs to run `git rm --cached .claude/settings.local.json` before committing to stop tracking that unchanged local file. Plan Location and the one-person Event remain separate product follow-ups; production authentication, hosting, and backup evidence remain separate predeployment work.
+Repository Cleanup Waves 1–5 are `COMPLETE`. No additional broad repository cleanup or reorganization is authorized. The owner still needs to run `git rm --cached .claude/settings.local.json` before committing to stop tracking that unchanged local file. The Plan create `Location` header and one-person Event explanation were resolved in a separately owner-authorized post-Phase-9 follow-up on 2026-10-04; production authentication, hosting, and backup evidence remain separate predeployment work.
 
 ## Historical checkpoints — reference only
 

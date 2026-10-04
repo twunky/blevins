@@ -99,6 +99,72 @@ public sealed class FamilyPlanServiceTests
     }
 
     [Fact]
+    public void PlanUpdatesAndClearsOnlyItsOptionalNote()
+    {
+        var plan = new FamilyPlan(
+            Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Visit the park",
+            new DateOnly(2026, 10, 3), new TimeOnly(10, 0), null, null, null, null,
+            PlanAudienceType.FamilyGroup, null);
+
+        plan.UpdateNotes("Meet outside.\nBring water.");
+        Assert.Equal("Meet outside.\nBring water.", plan.Notes);
+        plan.UpdateNotes("   ");
+        Assert.Null(plan.Notes);
+        plan.UpdateNotes("New note");
+        plan.UpdateNotes(null);
+        Assert.Null(plan.Notes);
+        Assert.Throws<ArgumentOutOfRangeException>(() => plan.UpdateNotes(new string('n', 1001)));
+        Assert.Null(plan.Notes);
+        Assert.Equal("Visit the park", plan.ActivityOrDestination);
+    }
+
+    [Fact]
+    public async Task UpdateNotesPassesCurrentAccountPlanAndNoteToRepository()
+    {
+        var accountId = Guid.NewGuid();
+        var planId = Guid.NewGuid();
+        var repository = new StubRepository { Updated = View(Guid.NewGuid()) with { Notes = "Updated" } };
+        var service = CreateService(accountId, repository);
+
+        var result = await service.UpdateNotesAsync(planId, new("Updated"), CancellationToken.None);
+
+        Assert.Same(repository.Updated, result);
+        Assert.Equal(accountId, repository.AccountId);
+        Assert.Equal(planId, repository.PlanId);
+        Assert.Equal("Updated", repository.UpdatedNotes);
+    }
+
+    [Fact]
+    public async Task UpdateNotesRejectsTooLongAndTreatsMissingOrUnauthorizedAsUnavailable()
+    {
+        var repository = new StubRepository();
+        var service = CreateService(Guid.NewGuid(), repository);
+        var planId = Guid.NewGuid();
+
+        var invalid = await Assert.ThrowsAsync<FamilyPlanValidationException>(() =>
+            service.UpdateNotesAsync(planId, new(new string('n', 1001)), CancellationToken.None));
+        Assert.Contains(nameof(UpdateFamilyPlanNotesRequest.Notes), invalid.Errors.Keys);
+        Assert.Equal(0, repository.UpdateCalls);
+        await Assert.ThrowsAsync<FamilyPlanUnavailableException>(() =>
+            service.UpdateNotesAsync(planId, new("Changed"), CancellationToken.None));
+        Assert.Equal(1, repository.UpdateCalls);
+        await Assert.ThrowsAsync<FamilyPlanUnavailableException>(() =>
+            service.UpdateNotesAsync(Guid.Empty, new(null), CancellationToken.None));
+        Assert.Equal(1, repository.UpdateCalls);
+    }
+
+    [Fact]
+    public async Task UpdateNotesRequiresCurrentAccount()
+    {
+        var repository = new StubRepository();
+        var service = new FamilyPlanService(new StubCurrentAccountAccessor(null), repository);
+
+        await Assert.ThrowsAsync<CurrentAccountUnavailableException>(() =>
+            service.UpdateNotesAsync(Guid.NewGuid(), new(null), CancellationToken.None));
+        Assert.Equal(0, repository.UpdateCalls);
+    }
+
+    [Fact]
     public async Task CreatePassesTheCurrentAccountAndAudienceToRepository()
     {
         var accountId = Guid.NewGuid();
@@ -208,6 +274,9 @@ public sealed class FamilyPlanServiceTests
         public Guid PlanId { get; private set; }
         public FamilyPlanView? Item { get; init; }
         public int GetCalls { get; private set; }
+        public FamilyPlanView? Updated { get; init; }
+        public string? UpdatedNotes { get; private set; }
+        public int UpdateCalls { get; private set; }
 
         public Task<FamilyPlanView?> GetAsync(
             Guid accountId,
@@ -231,6 +300,16 @@ public sealed class FamilyPlanServiceTests
             Request = request;
             CreateCalls++;
             return Task.FromResult(Created);
+        }
+
+        public Task<FamilyPlanView?> UpdateNotesAsync(
+            Guid accountId, Guid planId, string? notes, CancellationToken cancellationToken)
+        {
+            AccountId = accountId;
+            PlanId = planId;
+            UpdatedNotes = notes;
+            UpdateCalls++;
+            return Task.FromResult(Updated);
         }
     }
 }

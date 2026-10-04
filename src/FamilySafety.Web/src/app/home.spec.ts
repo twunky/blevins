@@ -227,7 +227,8 @@ describe('Home and feature empty states', () => {
     familyReads(family, [{ profileId: ownProfile.profileId, displayName: 'Alex' }]);
     await harness.fixture.whenStable();
     harness.detectChanges();
-    expect(harness.routeNativeElement?.textContent).toContain('choose at least one other active adult');
+    expect(harness.routeNativeElement?.querySelector('.events-audience-state')?.textContent?.trim())
+      .toBe('This Family has no other active adult members yet. An event needs at least one other active adult to be created.');
     expect(harness.routeNativeElement?.textContent).not.toContain('Create or join a family group');
     const create = Array.from(harness.routeNativeElement!.querySelectorAll('button'))
       .find(button => button.textContent?.toLowerCase().includes('create event')) as HTMLButtonElement;

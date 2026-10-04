@@ -292,6 +292,91 @@ describe('Trips', () => {
     expect(element.textContent).not.toContain('Reply');
   });
 
+  it('shows Notes loading before a successful empty read, then shows the empty state', () => {
+    const fixture = TestBed.createComponent(Trips);
+    fixture.componentRef.setInput('tripId', trip(true).tripId);
+    fixture.detectChanges();
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(trip(true));
+    const notesRead = http.expectOne(`/api/trips/${trip(true).tripId}/notes`);
+    expect(notesRead.request.method).toBe('GET');
+    fixture.detectChanges();
+
+    const notesSection = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLElement>('section[aria-labelledby="trip-notes-heading"]')!;
+    expect(notesSection.querySelector('[role="status"]')?.textContent).toContain('Loading Notes');
+    expect(notesSection.textContent).not.toContain('No Notes yet.');
+
+    notesRead.flush([]);
+    fixture.detectChanges();
+    expect(notesSection.querySelector('[role="status"]')).toBeNull();
+    expect(notesSection.textContent).toContain('No Notes yet.');
+    expect(notesSection.querySelector('button')?.textContent).toContain('Add Note');
+  });
+
+  it('shows a Notes read failure and retries the Notes request to display returned Notes', () => {
+    const fixture = TestBed.createComponent(Trips);
+    fixture.componentRef.setInput('tripId', trip(true).tripId);
+    fixture.detectChanges();
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(trip(true));
+    const notesUrl = `/api/trips/${trip(true).tripId}/notes`;
+    http.expectOne(notesUrl).flush(null, { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    const notesSection = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLElement>('section[aria-labelledby="trip-notes-heading"]')!;
+    expect(notesSection.querySelector('[role="alert"]')?.textContent).toContain('We couldn’t load Notes.');
+    expect(notesSection.textContent).not.toContain('No Notes yet.');
+    const retry = Array.from(notesSection.querySelectorAll('button'))
+      .find(button => button.textContent?.trim() === 'Retry loading Notes');
+    expect(retry).toBeTruthy();
+
+    retry!.click();
+    const retryRead = http.expectOne(notesUrl);
+    expect(retryRead.request.method).toBe('GET');
+    fixture.detectChanges();
+    expect(notesSection.querySelector('[role="status"]')?.textContent).toContain('Loading Notes');
+    expect(notesSection.querySelector('[role="alert"]')).toBeNull();
+    expect(notesSection.textContent).not.toContain('No Notes yet.');
+    retryRead.flush([{ noteId: 'a', authorProfileId: creator.profileId, authorDisplayName: 'Alex',
+      content: 'Flight booked', createdAt: '2026-09-27T10:00:00Z', updatedAt: null,
+      canEdit: true, canDelete: true, canHide: false }]);
+    fixture.detectChanges();
+    expect(notesSection.querySelector('[role="status"]')).toBeNull();
+    expect(notesSection.textContent).toContain('Flight booked');
+    expect(notesSection.textContent).not.toContain('No Notes yet.');
+  });
+
+  it('shows a valid empty state after retry and retains loaded Notes if a later read fails', () => {
+    const fixture = TestBed.createComponent(Trips);
+    fixture.componentRef.setInput('tripId', trip(true).tripId);
+    fixture.detectChanges();
+    http.expectOne(`/api/trips/${trip(true).tripId}`).flush(trip(true));
+    const notesUrl = `/api/trips/${trip(true).tripId}/notes`;
+    http.expectOne(notesUrl).flush(null, { status: 503, statusText: 'Unavailable' });
+    fixture.detectChanges();
+    const notesSection = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLElement>('section[aria-labelledby="trip-notes-heading"]')!;
+    Array.from(notesSection.querySelectorAll('button'))
+      .find(button => button.textContent?.trim() === 'Retry loading Notes')!.click();
+    http.expectOne(notesUrl).flush([]);
+    fixture.detectChanges();
+    expect(notesSection.textContent).toContain('No Notes yet.');
+    expect(notesSection.querySelector('[role="alert"]')).toBeNull();
+
+    const component = fixture.componentInstance as unknown as { loadNotes: (id: string) => void };
+    component.loadNotes(trip(true).tripId);
+    http.expectOne(notesUrl).flush([{ noteId: 'a', authorProfileId: creator.profileId, authorDisplayName: 'Alex',
+      content: 'Flight booked', createdAt: '2026-09-27T10:00:00Z', updatedAt: null,
+      canEdit: true, canDelete: true, canHide: false }]);
+    fixture.detectChanges();
+    component.loadNotes(trip(true).tripId);
+    http.expectOne(notesUrl).flush(null, { status: 503, statusText: 'Unavailable' });
+    fixture.detectChanges();
+    expect(notesSection.querySelector('[role="alert"]')?.textContent).toContain('We couldn’t load Notes.');
+    expect(notesSection.textContent).toContain('Flight booked');
+    expect(notesSection.textContent).not.toContain('No Notes yet.');
+  });
+
   it('sends add, own edit, own delete, and creator hide through bounded routes', () => {
     const fixture = TestBed.createComponent(Trips);
     fixture.detectChanges();

@@ -9,6 +9,51 @@ namespace FamilySafety.Foundation.Tests;
 public sealed class FamilyPlanPersistenceTests
 {
     [Fact]
+    public async Task OnlyActiveCreatorCanUpdateAddOrClearNoteAndReadersSeeTheSamePlan()
+    {
+        if (Environment.GetEnvironmentVariable("RUN_FAMILYSAFETY_SQL_TESTS") != "1") return;
+
+        await WithTestDatabaseAsync(async dbContext =>
+        {
+            var creator = AddAdult(dbContext, "Creator");
+            var selected = AddAdult(dbContext, "Selected");
+            var outsider = AddAdult(dbContext, "Outsider");
+            var group = new FamilyGroup(Guid.NewGuid(), "Plan family", 100);
+            var creatorMembership = Membership(creator, group);
+            dbContext.AddRange(group, creatorMembership, Membership(selected, group), Membership(outsider, group));
+            await dbContext.SaveChangesAsync();
+
+            var repository = new EfFamilyPlanRepository(dbContext);
+            var created = (await repository.CreateAsync(creator.AccountId, group.Id,
+                Request(PlanAudienceType.SelectedPeople, [selected.ProfileId]), CancellationToken.None))!;
+            var planId = created.PlanId;
+            Assert.Null(created.Notes);
+
+            Assert.Null(await repository.UpdateNotesAsync(selected.AccountId, planId, "Unauthorized", CancellationToken.None));
+            Assert.Null(await repository.UpdateNotesAsync(outsider.AccountId, planId, "Unauthorized", CancellationToken.None));
+            Assert.Null(await repository.UpdateNotesAsync(creator.AccountId, Guid.NewGuid(), "Missing", CancellationToken.None));
+
+            var added = await repository.UpdateNotesAsync(creator.AccountId, planId, "Meet outside.", CancellationToken.None);
+            Assert.Equal("Meet outside.", added?.Notes);
+            Assert.Equal(added, await repository.GetAsync(selected.AccountId, planId, CancellationToken.None));
+            Assert.Null(await repository.GetAsync(outsider.AccountId, planId, CancellationToken.None));
+
+            var changed = await repository.UpdateNotesAsync(creator.AccountId, planId, "Bring water.", CancellationToken.None);
+            Assert.Equal("Bring water.", changed?.Notes);
+            var cleared = await repository.UpdateNotesAsync(creator.AccountId, planId, null, CancellationToken.None);
+            Assert.Null(cleared?.Notes);
+            Assert.Null((await repository.GetAsync(selected.AccountId, planId, CancellationToken.None))?.Notes);
+            Assert.Equal(1, await dbContext.FamilyPlans.CountAsync());
+
+            creatorMembership.End();
+            await dbContext.SaveChangesAsync();
+            Assert.Null(await repository.UpdateNotesAsync(creator.AccountId, planId, "After leaving", CancellationToken.None));
+            Assert.Null(await repository.GetAsync(creator.AccountId, planId, CancellationToken.None));
+            Assert.NotNull(await repository.GetAsync(selected.AccountId, planId, CancellationToken.None));
+        });
+    }
+
+    [Fact]
     public async Task WholeGroupPlanIsVisibleToActiveGroupAndRetainedWhenCreatorLeaves()
     {
         if (Environment.GetEnvironmentVariable("RUN_FAMILYSAFETY_SQL_TESTS") != "1") return;

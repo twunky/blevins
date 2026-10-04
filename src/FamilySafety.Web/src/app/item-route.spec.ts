@@ -278,10 +278,88 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
     harness.detectChanges();
     expect(status(harness).textContent).toBe('Switched to Family Two.');
     expect(itemHeading(harness)).toBe('Hike to the falls');
-    // Read-only: the Plan detail has no actions beyond the way back.
+    // An audience member can read the note but cannot change it.
     const article = root(harness).querySelector('article.item-detail')!;
+    expect(article.textContent).toContain('Trail map in the car');
     expect(article.querySelectorAll('button, a')).toHaveLength(0);
     expect(root(harness).querySelector('a.item-back')?.getAttribute('href')).toBe('/plans');
+  });
+
+  it('lets the creator edit, cancel, save, and clear the Plan note', async () => {
+    const harness = await visit(`/plans/${itemId}`);
+    shellReads().flush([one]);
+    familyReads(one);
+    const original = { ...planView(one.familyGroupId), creatorProfileId: ownProfile.profileId };
+    http.expectOne(`/api/plans/${itemId}`).flush(original);
+    await settle(harness);
+    const article = root(harness).querySelector('article[aria-label="Plan details"]')!;
+    const button = (name: string) => Array.from(article.querySelectorAll<HTMLButtonElement>('button'))
+      .find(candidate => candidate.textContent?.trim() === name)!;
+
+    button('Edit note').click();
+    harness.detectChanges();
+    const note = article.querySelector<HTMLTextAreaElement>('textarea#item-plan-note')!;
+    expect(article.querySelector('label[for="item-plan-note"]')?.textContent).toContain('Plan note');
+    expect(note.value).toBe('Trail map in the car');
+    note.value = 'Unsaved draft';
+    note.dispatchEvent(new Event('input'));
+    button('Cancel').click();
+    harness.detectChanges();
+    http.expectNone(`/api/plans/${itemId}/notes`);
+    expect(article.textContent).toContain('Trail map in the car');
+    expect(article.textContent).not.toContain('Unsaved draft');
+
+    button('Edit note').click();
+    harness.detectChanges();
+    const edit = article.querySelector<HTMLTextAreaElement>('textarea#item-plan-note')!;
+    edit.value = 'Updated route note';
+    edit.dispatchEvent(new Event('input'));
+    button('Save note').click();
+    const save = http.expectOne(`/api/plans/${itemId}/notes`);
+    expect(save.request.method).toBe('PUT');
+    expect(save.request.body).toEqual({ notes: 'Updated route note' });
+    save.flush({ ...original, notes: 'Updated route note' });
+    await settle(harness);
+    expect(article.textContent).toContain('Updated route note');
+    expect(article.textContent).toContain('Plan note saved.');
+
+    button('Clear note').click();
+    const clear = http.expectOne(`/api/plans/${itemId}/notes`);
+    expect(clear.request.body).toEqual({ notes: null });
+    clear.flush({ ...original, notes: null });
+    await settle(harness);
+    expect(article.textContent).toContain('Plan note cleared.');
+    expect(article.textContent).not.toContain('Updated route note');
+    expect(button('Add note')).toBeTruthy();
+  });
+
+  it('shows an understandable note length error and can add a note to a Plan without one', async () => {
+    const harness = await visit(`/plans/${itemId}`);
+    shellReads().flush([one]);
+    familyReads(one);
+    const original = { ...planView(one.familyGroupId), creatorProfileId: ownProfile.profileId, notes: null };
+    http.expectOne(`/api/plans/${itemId}`).flush(original);
+    await settle(harness);
+    const article = root(harness).querySelector('article[aria-label="Plan details"]')!;
+    const button = (name: string) => Array.from(article.querySelectorAll<HTMLButtonElement>('button'))
+      .find(candidate => candidate.textContent?.trim() === name)!;
+    button('Add note').click();
+    harness.detectChanges();
+    const note = article.querySelector<HTMLTextAreaElement>('textarea#item-plan-note')!;
+    note.value = 'x'.repeat(1001);
+    note.dispatchEvent(new Event('input'));
+    button('Save note').click();
+    harness.detectChanges();
+    expect(article.querySelector('[role="alert"]')?.textContent).toContain('1,000 characters');
+    http.expectNone(`/api/plans/${itemId}/notes`);
+    note.value = 'Pack lunch';
+    note.dispatchEvent(new Event('input'));
+    button('Save note').click();
+    const add = http.expectOne(`/api/plans/${itemId}/notes`);
+    expect(add.request.body).toEqual({ notes: 'Pack lunch' });
+    add.flush({ ...original, notes: 'Pack lunch' });
+    await settle(harness);
+    expect(article.textContent).toContain('Pack lunch');
   });
 
   it('offers Edit event details only when canEdit and shows the updated Event after the existing PUT (AC-01)', async () => {

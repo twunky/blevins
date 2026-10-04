@@ -17,4 +17,10 @@ public interface IFamilyPlanRepository
         Guid familyGroupId,
         CreateFamilyPlanRequest request,
         CancellationToken cancellationToken);
+
+    Task<FamilyPlanView?> UpdateNotesAsync(
+        Guid accountId,
+        Guid planId,
+        string? notes,
+        CancellationToken cancellationToken);
 }

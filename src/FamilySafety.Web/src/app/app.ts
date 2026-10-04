@@ -455,6 +455,9 @@ export class App implements OnInit {
     expectedCheckInTime: [''],
     notes: ['', Validators.maxLength(1000)],
   });
+  protected readonly planNoteForm = this.formBuilder.group({
+    notes: ['', Validators.maxLength(1000)],
+  });
 
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
@@ -503,6 +506,10 @@ export class App implements OnInit {
   protected readonly planError = signal('');
   protected readonly plansLoadError = signal('');
   protected readonly planMessage = signal('');
+  protected readonly editingPlanNoteId = signal<string | null>(null);
+  protected readonly planNoteSaving = signal(false);
+  protected readonly planNoteError = signal('');
+  protected readonly planNoteMessage = signal('');
   protected readonly homeTripResults = signal<readonly HomeTripPreview[]>([]);
   protected readonly homeTripsLoading = signal(false);
   protected readonly homeTripsError = signal('');
@@ -617,6 +624,8 @@ export class App implements OnInit {
     if (view !== 'eventItem' && view !== 'planItem') return;
     const kind: ItemKind = view === 'eventItem' ? 'event' : 'plan';
     const id = this.routeItemId();
+    this.cancelPlanNoteEdit();
+    this.planNoteMessage.set('');
     if (!isItemId(id)) {
       this.itemStatus.set('unavailable');
       return;
@@ -782,6 +791,8 @@ export class App implements OnInit {
     this.planError.set('');
     this.plansLoadError.set('');
     this.planMessage.set('');
+    this.cancelPlanNoteEdit();
+    this.planNoteMessage.set('');
     this.homeTripResults.set([]);
     this.homeTripsLoading.set(false);
     this.homeTripsError.set('');
@@ -1001,13 +1012,14 @@ export class App implements OnInit {
     this.loadPlanAudienceMembers();
   }
 
-  protected visiblePlanAudienceMembers(): readonly FamilyDirectoryEntry[] {
+  protected availablePlanAudienceMembers(): readonly FamilyDirectoryEntry[] {
     const ownProfileId = this.ownerProfile()?.profileId;
+    return this.planAudienceMembers().filter(member => member.profileId !== ownProfileId);
+  }
+
+  protected visiblePlanAudienceMembers(): readonly FamilyDirectoryEntry[] {
     const search = this.planAudienceSearch().trim().toLocaleLowerCase();
-    return this.planAudienceMembers().filter((member) =>
-      member.profileId !== ownProfileId
-      && member.displayName.toLocaleLowerCase().includes(search),
-    );
+    return this.availablePlanAudienceMembers().filter(member => member.displayName.toLocaleLowerCase().includes(search));
   }
 
   protected isPlanAudienceSelected(profileId: string): boolean {
@@ -1091,6 +1103,56 @@ export class App implements OnInit {
           this.loadPlans();
         },
         error: () => this.planError.set('The plan could not be created. Please try again.'),
+      });
+  }
+
+  protected beginPlanNoteEdit(plan: FamilyPlanView): void {
+    if (plan.creatorProfileId !== this.ownerProfile()?.profileId) return;
+    this.planNoteError.set('');
+    this.planNoteMessage.set('');
+    this.planNoteForm.reset({ notes: plan.notes ?? '' });
+    this.editingPlanNoteId.set(plan.planId);
+  }
+
+  protected cancelPlanNoteEdit(): void {
+    this.editingPlanNoteId.set(null);
+    this.planNoteError.set('');
+    this.planNoteForm.reset({ notes: '' });
+  }
+
+  protected savePlanNote(plan: FamilyPlanView, clear = false): void {
+    if (plan.creatorProfileId !== this.ownerProfile()?.profileId || this.planNoteSaving()) return;
+    if (!clear) this.planNoteForm.markAllAsTouched();
+    this.planNoteError.set('');
+    if (!clear && this.planNoteForm.invalid) {
+      this.planNoteError.set('Notes cannot exceed 1,000 characters.');
+      return;
+    }
+
+    const value = clear ? null : this.planNoteForm.controls.notes.value;
+    this.planNoteSaving.set(true);
+    this.http.put<FamilyPlanView>(`/api/plans/${encodeURIComponent(plan.planId)}/notes`, {
+      notes: value?.trim() ? value : null,
+    })
+      .pipe(takeUntil(this.familyScopeChanged), finalize(() => this.planNoteSaving.set(false)))
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: updated => {
+          if (this.routeItemId() !== updated.planId) return;
+          this.itemPlan.set(updated);
+          this.familyPlans.update(plans => plans.map(current => current.planId === updated.planId ? updated : current));
+          this.cancelPlanNoteEdit();
+          this.planNoteMessage.set(updated.notes ? 'Plan note saved.' : 'Plan note cleared.');
+        },
+        error: (error: HttpErrorResponse) => {
+          if (error.status === 404) {
+            this.itemPlan.set(null);
+            this.itemStatus.set('unavailable');
+            return;
+          }
+          this.planNoteError.set(error.status === 401
+            ? 'Your session may have ended. Please sign in again.'
+            : 'The Plan note could not be saved. Please try again.');
+        },
       });
   }
 

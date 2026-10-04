@@ -47,6 +47,7 @@ public sealed class FamilyPlanApiTests : IClassFixture<FamilyPlanApiTests.PlanAp
             });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal($"/api/plans/{planId:D}", response.Headers.Location?.OriginalString);
         Assert.Equal(StubFamilyPlanService.GroupId, service.LastGroupId);
         Assert.Equal(PlanAudienceType.SelectedPeople, service.LastRequest?.AudienceType);
         Assert.Equal(Guid.Parse("77777777-7777-7777-7777-777777777777"),
@@ -124,6 +125,48 @@ public sealed class FamilyPlanApiTests : IClassFixture<FamilyPlanApiTests.PlanAp
     }
 
     [Fact]
+    public async Task NotesEndpointUpdatesAndClearsTheExistingPlanNote()
+    {
+        var planId = Guid.NewGuid();
+        service.Item = View(planId, PlanAudienceType.SelectedPeople) with { Notes = "Old note" };
+
+        var updated = await client.PutAsJsonAsync($"/api/plans/{planId:D}/notes", new { notes = "New note" });
+
+        Assert.Equal(HttpStatusCode.OK, updated.StatusCode);
+        Assert.Equal(planId, service.LastPlanId);
+        Assert.Equal("New note", service.LastNotes);
+        using var updatedJson = JsonDocument.Parse(await updated.Content.ReadAsStringAsync());
+        Assert.Equal("New note", updatedJson.RootElement.GetProperty("notes").GetString());
+        var read = await client.GetAsync($"/api/plans/{planId:D}");
+        using var readJson = JsonDocument.Parse(await read.Content.ReadAsStringAsync());
+        Assert.Equal("New note", readJson.RootElement.GetProperty("notes").GetString());
+
+        var cleared = await client.PutAsJsonAsync($"/api/plans/{planId:D}/notes", new { notes = (string?)null });
+        Assert.Equal(HttpStatusCode.OK, cleared.StatusCode);
+        Assert.Null(service.LastNotes);
+        using var clearedJson = JsonDocument.Parse(await cleared.Content.ReadAsStringAsync());
+        Assert.Equal(JsonValueKind.Null, clearedJson.RootElement.GetProperty("notes").ValueKind);
+    }
+
+    [Fact]
+    public async Task NotesEndpointPreservesUnavailableValidationAndAuthenticationResponses()
+    {
+        var planId = Guid.NewGuid();
+        var missing = await client.PutAsJsonAsync($"/api/plans/{planId:D}/notes", new { notes = "Changed" });
+        Assert.Equal(HttpStatusCode.NotFound, missing.StatusCode);
+        Assert.Empty(await missing.Content.ReadAsByteArrayAsync());
+
+        service.Item = View(planId, PlanAudienceType.FamilyGroup);
+        var invalid = await client.PutAsJsonAsync($"/api/plans/{planId:D}/notes", new { notes = new string('n', 1001) });
+        Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
+        Assert.Contains("notes", await invalid.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
+
+        service.NoCurrentAccount = true;
+        var unauthenticated = await client.PutAsJsonAsync($"/api/plans/{planId:D}/notes", new { notes = "Changed" });
+        Assert.Equal(HttpStatusCode.Unauthorized, unauthenticated.StatusCode);
+    }
+
+    [Fact]
     public async Task FamilyScopedListRouteStillAnswers()
     {
         var response = await client.GetAsync(
@@ -175,6 +218,7 @@ public sealed class FamilyPlanApiTests : IClassFixture<FamilyPlanApiTests.PlanAp
         public bool ValidationFailure { get; set; }
         public Guid LastPlanId { get; private set; }
         public FamilyPlanView? Item { get; set; }
+        public string? LastNotes { get; private set; }
         public bool NoCurrentAccount { get; set; }
 
         public void Reset()
@@ -185,6 +229,7 @@ public sealed class FamilyPlanApiTests : IClassFixture<FamilyPlanApiTests.PlanAp
             ValidationFailure = false;
             LastPlanId = Guid.Empty;
             Item = null;
+            LastNotes = null;
             NoCurrentAccount = false;
         }
 
@@ -218,6 +263,24 @@ public sealed class FamilyPlanApiTests : IClassFixture<FamilyPlanApiTests.PlanAp
             }
 
             return Task.FromResult(Created!);
+        }
+
+        public Task<FamilyPlanView> UpdateNotesAsync(
+            Guid planId, UpdateFamilyPlanNotesRequest request, CancellationToken cancellationToken)
+        {
+            LastPlanId = planId;
+            LastNotes = request.Notes;
+            if (NoCurrentAccount) throw new CurrentAccountUnavailableException();
+            if (request.Notes?.Length > 1000)
+            {
+                throw new FamilyPlanValidationException(new Dictionary<string, string[]>
+                {
+                    [nameof(request.Notes)] = ["Notes cannot exceed 1,000 characters."],
+                });
+            }
+            if (Item is null || Item.PlanId != planId) throw new FamilyPlanUnavailableException();
+            Item = Item with { Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes };
+            return Task.FromResult(Item);
         }
     }
 }
