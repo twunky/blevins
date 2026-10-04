@@ -6,7 +6,7 @@
 - **Do not push.**
 - **Do not create, update, or complete a pull request.**
 - Leave all changes uncommitted for the owner to review and commit manually. Provide a proposed PR title and description in the closeout as text only.
-- The workspace currently has no `.git`. Do not run `git init` or create a repository.
+- The workspace has a Git repository. Report its actual status; the owner performs commits.
 
 ## Standing rule: scope comes from the current approved work item
 
@@ -16,7 +16,7 @@ Confirm the authorizing work item and its scope before editing `src/` or `tests/
 
 ### Current authorized work item: none
 
-No implementation work item is currently authorized (2026-10-03). Do not change application code, tests, or scripts until the owner selects and authorizes the next Phase 9 item.
+Phase 9 is `COMPLETE / CLOSED` under `DEC-081`; Phase 9.5 is `READY TO BEGIN` but no product implementation work item is authorized. The current approved activity is repository cleanup Wave 1, limited to current context and documentation reconciliation. Do not change application code, tests, or scripts under this authorization. The owner performs commits; do not commit or push.
 
 ### Historical: WI-009-010 — First-Use and Invitation Arrival Workflow — `DONE / PASS`, owner approved 2026-10-03
 
@@ -196,12 +196,14 @@ The rules below applied to the completed presentation-only UI work. Reuse them o
 
 For **presentation-only UI work**, do not change .NET code, API routes, contracts, permissions, schema, or migrations unless that UI work item explicitly authorizes it.
 
-## You may
+## For a separately authorized product work item
+
+The permissions below describe the usual product work-item workflow. They do not expand the current documentation-only Wave 1 authorization.
 
 - Edit the files the current authorized work item allows (see above).
 - Run `dotnet build`, `dotnet test`, Angular/Vitest tests, Playwright, and the production build.
 - Start the API and Angular dev server locally (see `docs/local-development.md`).
-- Inspect diffs and status (when git is available) and file listings.
+- Inspect diffs, Git status, and file listings.
 - Update the current work item's story (task checkboxes, implementation record) and create its VER record.
 
 ## You must not (any work item)

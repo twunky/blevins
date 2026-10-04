@@ -1,6 +1,6 @@
 # Validation
 
-Run the sections that match the current work item before handing back. Record exact commands, counts, and warnings. Commands and paths come from the root `README.md`, `VER-WI-008-001.md`, `VER-WI-008-002.md`, and `e2e/playwright.config.ts`.
+This is validation guidance for a separately authorized product work item. Repository cleanup Wave 1 is documentation only; no application tests or builds are authorized for it. For future product work, follow the approved work item's acceptance checks and record exact commands, counts, and warnings. WI-008 examples and numeric baselines below are historical, not current results.
 
 - **Server work (for example WI-008-003, now `DONE / PASS`):** § 4 is required, with the SQL gate on. Sections 1–3 and 5–6 are not required, because WI-008-003 makes no Web changes. State that explicitly rather than implying they ran.
 - **UI work:** §§ 1–3 and 5–6; § 4 only if server code was touched.
@@ -20,7 +20,7 @@ Set-Location C:\Dev\blevins\src\FamilySafety.Web
 npm test -- --watch=false
 ```
 
-Baseline before alignment: **6 files, 66 tests passed.** Report the new count. If you updated `concerns.spec.ts` for markup changes, say which assertions changed and confirm that behavior coverage was kept: audience, two-step create, correction/challenge linkage, Outdated mapping, creator-only controls, Frozen/Resolved read-only, and unavailable handling.
+Historical WI-008-002 baseline before alignment: **6 files, 66 tests passed.** For future work, report its own baseline and final count. If `concerns.spec.ts` changes for markup, state which assertions changed and whether behavior coverage was kept.
 
 ## 2. Playwright journeys (isolated per-spec scenarios, `WI-009-001`)
 
@@ -57,7 +57,7 @@ npm run build
 
 **Build output location (`WI-009-002`).** Use `npm run build`, which writes `dist/`. If a story needs a separate build copy, use `npm run build -- --output-path dist/verification/<WI-id>`. Never write build output to the repository root or under `ai-context/`.
 
-Must succeed. Report all budget warnings with sizes. Baseline: `concerns.scss` 6.93 kB / 4.00 kB warning; initial bundle 522.11 kB / 500 kB; existing `app.scss` and `trips.scss` warnings. Do not change thresholds. Note whether `concerns.scss` grew or shrank.
+For an authorized UI build, report all budget warnings with sizes and do not change thresholds without approval. Historical WI-008-002 baseline: `concerns.scss` 6.93 kB / 4.00 kB warning; initial bundle 522.11 kB / 500 kB, with `app.scss` and `trips.scss` warnings. Use the work item's actual baseline for comparison.
 
 ## 4. .NET build and tests (required for server work such as WI-008-003)
 
@@ -75,7 +75,7 @@ dotnet test FamilySafety.slnx --no-build
 
 For UI-only work that did not touch server code, state "No server changes; .NET suite not rerun" rather than implying it ran.
 
-## 5. Rendered review — desktop and narrow
+## 5. Rendered review — historical WI-008-002 example
 
 Capture **every** Concern state at **1440 px** and **390 px** width:
 
@@ -106,7 +106,7 @@ Rules:
 - Contrast holds for any new token combinations; enabled buttons are about 44 px or taller.
 - Narrow reading order matches visual order, and timeline/history stays single-column and readable.
 
-No automated accessibility scanner is configured. State that the review is manual or code-based.
+Phase 9 added development-only axe checks (`WI-009-011`; `VER-PH-009`). Report automated results separately from any actual keyboard or manual review required by the authorized work item.
 
 ## 7. Mockup comparison (required — not just "it renders")
 

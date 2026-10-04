@@ -1,5 +1,7 @@
 # PRP-030 — Phase 9 Scope, Themes and Exit Criteria
 
+**Closure disposition (2026-10-03):** Phase 9 is `COMPLETE / CLOSED` under [DEC-081](../../decision-log.md). [VER-PH-009](../verification/VER-PH-009.md) maps the final exit criteria, including approved substitutions and later story decisions that revised specific implementation or presentation details. This proposal remains historical governance, not current implementation authorization; its approved criteria below are preserved as written.
+
 ## Metadata
 
 - **Proposal ID:** `PRP-030`

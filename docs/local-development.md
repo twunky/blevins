@@ -62,15 +62,17 @@ If `npm start` reports that packages are missing, `npm ci` restores packages fro
 
 The current UI includes:
 
+- Home dashboard, six-area navigation, and refresh-safe item links.
 - Adult profile display and editing, including profile-field visibility.
-- Family directory, adult family relationships, and adult invitations.
-- Event creation, list/detail viewing, and authorized detail editing.
+- Family dashboard, Family Settings, adult relationships, and invitations.
+- Events dashboard, creation, list/detail viewing, and authorized detail editing.
 - Plan creation and viewing with audience selection and optional notes.
 - Trip creation and viewing, creator editing of core Trip details, and collaborative Trip Notes.
+- Read-only Safety dashboard and separate private Concern and Safety Incident workflows.
 
 New local databases start with the development Family Group and two adult members but no sample Events, Plans, or Trips. Create records in the UI to explore those features.
 
-Phase 7 is complete; Phase 7.5 is current. Creator-controlled Trip audience editing is available. Trip Check-In execution and Sharing Session execution are not available in this local build.
+Phase 9 is `COMPLETE / CLOSED` under `DEC-081`; Phase 9.5 is `READY TO BEGIN` with no implementation item authorized. Creator-controlled Trip audience editing is available. Trip Check-In and Sharing Session execution are not available in this local build.
 
 ## Invited-adult scenario (WI-075-001)
 
@@ -90,8 +92,8 @@ Start Angular with `npm start` as above and open **http://localhost:4200** in on
 4. Select **Adult B — invited adult**. The previous workspace and its pending reads are discarded. Confirm Home says there is no active Family.
 5. Choose **Show Development invitation links** again, then **Open invitation** for the message. Switching clears the prior outbox display as well as user data.
 6. Confirm the Family and inviter names, then choose **Accept invitation**. Membership and dependent Family data reload automatically. If loading fails after acceptance, use **Retry loading family**; do not accept the consumed token again.
-7. Review the existing profile and privacy choices. Save changes if desired, or choose **Continue to Family without changes**. Review is optional and does not gate membership.
-8. Confirm the Family directory includes A and B and the existing relationship controls are available. Choose **Home** to reach the minimal welcome and links to implemented areas.
+7. Review the existing profile and privacy choices. Save changes if desired, or choose **Continue to Home without changes**. Review is optional and does not gate membership.
+8. Confirm arrival on **Home** with the one-time joined-Family announcement. Open **Family** to confirm the directory includes A and B and the existing relationship controls are available.
 
 For a fresh test, stop the scenario API and run the script again without a scenario name. Each run gets a fresh database; the script never drops a database. To resume an existing scenario, use `-ScenarioName <the name printed by the script>`. B remains a member after acceptance in that database. The outbox is in memory and is cleared by API restart; resend as A if a pending link is needed. A new scenario can also exercise Decline and used/unavailable links.
 
@@ -99,7 +101,7 @@ The script accepts `-Server <SQL instance>` and sets process-local Development f
 
 The switcher uses a request-scoped `X-Development-Account` header, limited to the two fixture Account IDs. It is opt-in through `DevelopmentIdentity:AllowSwitching`, with a Development-only identities endpoint. The browser shows it only in a Development build when that endpoint is available. Invalid identity selections do not fall back to a privileged identity. Production ignores this header and cannot enable the adapter/switcher/fixtures/outbox. This mechanism makes no production identity or recipient-email ownership claim.
 
-The current Home checks only Family context and loaded relationship suggestions. It is not the full dashboard. The existing sections are selected locally within the workspace; final routing/mobile navigation remains future work.
+Home is the current dashboard. The six-area navigation and item routes approved in Phase 9 are available at desktop and narrow widths. See `ai-context/project-status.md` for the current scope and remaining follow-ups.
 
 ## Isolated Playwright scenarios (WI-009-001)
 

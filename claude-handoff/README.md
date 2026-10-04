@@ -10,9 +10,9 @@
 > |---|---|
 > | `reference/detail-shell-topbar.png` | Shared app shell (top bar + sidebar) |
 > | `reference/panel1-main-home.png` | Home |
-> | `reference/panel2-family-activity.png` | Home variant; card and avatar-row patterns (not the Family screen) |
+> | `reference/panel2-family-activity.png` | Family dashboard direction under `DEC-077` (original image highlights Home) |
 > | `reference/panel3-travel-events.png` | Events; its Trip rows inform the Trips list |
-> | `reference/panel4-safety-aware.png` | Concerns list / Safety entry |
+> | `reference/panel4-safety-aware.png` | Safety dashboard direction under `DEC-079`; mockup-only actions are excluded |
 > | `reference/full-mockup.png` | Overview of panels 1–4 |
 >
 > **Hierarchy:**
@@ -28,7 +28,7 @@ Session and task guidance for Claude coding sessions working in this repository.
 - **Project root:** `C:\Dev\blevins`
 - **Product:** Family Safety, Coordination & Planning Application (local-first MVP; .NET 10 API + Angular 22 web client)
 - **Canonical context:** `C:\Dev\blevins\ai-context`
-- **Prepared:** 2026-10-01. Last updated 2026-10-03 (`WI-009-005` to `WI-009-010` `DONE / PASS` — `OWNER APPROVED`; `DEC-076` to `DEC-080`; no work item authorized) against active baseline `CTX-1.28`.
+- **Prepared:** 2026-10-01. Current guidance reconciled after Phase 9 closure (`DEC-081`; `VER-PH-009`) against active baseline `CTX-1.28`. Repository cleanup Wave 1 is documentation maintenance only; no product implementation item is authorized.
 
 ## Source of truth
 
@@ -58,7 +58,7 @@ Read in this order. Stop reading once you have what you need.
 2. [CURRENT-TASK.md](CURRENT-TASK.md) — what the owner wants from this session.
 3. [PROJECT-STATE.md](PROJECT-STATE.md) — short orientation on phase, completed work, open decisions.
 4. [WORKING-RULES.md](WORKING-RULES.md) — what you may and may not change; stop conditions.
-5. [MOCKUP-ALIGNMENT.md](MOCKUP-ALIGNMENT.md) — the KEEP / ALIGN / ADAPT / DROP method and reference index. **UI work only**; not needed for WI-008-003.
+5. [MOCKUP-ALIGNMENT.md](MOCKUP-ALIGNMENT.md) — the KEEP / ALIGN / ADAPT / DROP method and reference index. **Authorized UI work only.**
 6. [CONTEXT-ROUTING.md](CONTEXT-ROUTING.md) — which authoritative file answers which question. Use it instead of reading the whole `ai-context` tree.
 7. [VALIDATION.md](VALIDATION.md) — commands and rendered-review expectations after changes.
 8. [SESSION-CLOSEOUT.md](SESSION-CLOSEOUT.md) — the format for handing work back.
@@ -85,7 +85,7 @@ Phase 9 — Integration & UX Refinement is `COMPLETE / CLOSED` (`DEC-081`, 2026-
 4. Write `VER-WI-008-003`.
 5. Hand back using the server format in `SESSION-CLOSEOUT.md`, with the work item left in `VERIFYING / OWNER REVIEW`.
 
-**UI work (most recent: WI-008-004, now `DONE / PASS`):**
+**UI work (historical example: WI-008-004, now `DONE / PASS`):**
 
 1. Orient.
 2. Compare the mockup against the running implementation and write the comparison down **before** editing code.
@@ -96,7 +96,7 @@ Phase 9 — Integration & UX Refinement is `COMPLETE / CLOSED` (`DEC-081`, 2026-
 
 ## No-commit rule
 
-**Do not commit. Do not push. Do not create or complete a pull request.** The owner commits manually. Leave every change uncommitted in the working tree. (Note: `C:\Dev\blevins` currently has no `.git` directory, so `git status` reports "not a git repository" — say so rather than claiming a clean status.)
+**Do not commit. Do not push. Do not create or complete a pull request.** The owner commits manually. Leave every change uncommitted in the working tree and report the actual Git status.
 
 ## Relationship to `codex-handoff/`
 

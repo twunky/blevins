@@ -1,12 +1,14 @@
 # Family Safety, Coordination & Planning
 
-Local-first MVP for private family coordination and safety.
+Local-first MVP for private family coordination and safety, with a .NET API and Angular web client.
 
 ## Current application
 
-The repository contains working .NET API and Angular UI slices for adult profiles, family directory and relationships, invitations, Events, Plans, and Trips. Phase 7 work completed so far includes Plan audience selection and notes, Trip creation/audience/detail viewing, and collaborative Trip Notes. Check-Ins, Sharing Session execution, and post-creation Trip audience editing are not currently implemented.
+The application includes Home, Family and Family Settings, Events, Plans & Trips, Safety, and Me / Settings. It supports adult profiles, family relationships and invitations, Event and Plan coordination, Trips and Trip Notes, and private Concern and Safety Incident workflows. Approved capabilities that are not yet implemented remain outside the current application.
 
-For the exact local setup, development database behavior, seeded accounts, and current screens, see [Local development](docs/local-development.md).
+**Project state:** Phase 9 is `COMPLETE / CLOSED` under [DEC-081](ai-context/decision-log.md) and [VER-PH-009](ai-context/planning/verification/VER-PH-009.md). `CTX-1.28` is active; development user testing is ready. Phase 9.5 is `READY TO BEGIN`, but no product implementation item is authorized. See [project status](ai-context/project-status.md) for the current checkpoint and [AI context](ai-context/README.md) for authority and working rules.
+
+For local setup, development database behavior, seeded accounts, and current screens, see [Local development](docs/local-development.md).
 
 ## Technology baseline
 
@@ -33,6 +35,8 @@ tests/
 ai-context/                     Approved project context and work records
 docs/                            Developer guides
 ```
+
+The API host is in `src/FamilySafety.Api/`; the Angular client is in `src/FamilySafety.Web/`. Product and privacy authority lives in `ai-context/`, not in this overview.
 
 ## Restore, build, and test
 

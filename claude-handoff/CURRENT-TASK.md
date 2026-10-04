@@ -1,12 +1,16 @@
-# Current Task — Phase 9 Closed / Awaiting Phase 9.5 Scope
+# Current Task — Repository Cleanup Wave 1
 
-**Phase 9 closure (2026-10-03):** WI-009-011 is `DONE / PASS — OWNER APPROVED`; VER-WI-009-011 is `DONE / PASS`; [VER-PH-009](../ai-context/planning/verification/VER-PH-009.md) is `PASS / PHASE CLOSURE VERIFIED`, all 15 exits PASS. DEC-081 records explicit conditional owner closure after Plan filtering, focused verification, one final build, sole final full Playwright 34/34 and artifact health passed. Phase 9 `COMPLETE / CLOSED`; CTX-1.28 ACTIVE; Development user testing READY; Phase 9.5 READY TO BEGIN. No implementation work item remains authorized; no new CTX, out-of-scope feature, commit or push.
+## Current state and authorization
 
-**Next action:** owner scopes and authorizes the next Phase 9.5 item. No implementation work item remains authorized. Plan Location is IMPORTANT FOLLOW-UP — NOT A PHASE 9 BLOCKER; one-person Event is intentional. Production authentication/hosting/backup and protected cleanup remain separate. Do not commit or push.
+Phase 9 is `COMPLETE / CLOSED` under [DEC-081](../ai-context/decision-log.md), with all exits mapped in [VER-PH-009](../ai-context/planning/verification/VER-PH-009.md). `CTX-1.28` is active. Development user testing is `READY`; Phase 9.5 is `READY TO BEGIN`. **No product implementation work item is authorized.** Phase 9.5 requires separate scope and approval.
 
-## Historical checkpoints — superseded by DEC-081
+## Current maintenance activity
 
-All entries below are pre-WI-009-011 history, not current phase status or authorization.
+The owner approved repository cleanup Wave 1: reconcile current context and entry documentation only. Do not move or delete files, change code or tests, run tests or builds, commit, or push. Later cleanup waves are outside this authorization. Plan Location and the one-person Event remain separate product follow-ups; production authentication, hosting, and backup evidence remain separate predeployment work.
+
+## Historical checkpoints — reference only
+
+Everything below records earlier checkpoints and task briefs. In-progress labels, authorization statements, commands, and “next action” instructions below describe their dated historical state; **none authorizes work now**. Current authority is the two sections above and `ai-context/project-status.md`.
 
 **Phase 9 is `CURRENT / IN PROGRESS`. `CTX-1.28` is active.** No implementation work item is currently authorized. Do not change `src/`, `tests/`, or `scripts/` until the owner selects and authorizes the next Phase 9 item (from `PRP-030`).
 

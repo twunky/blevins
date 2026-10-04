@@ -1,6 +1,6 @@
 # Mockup Alignment
 
-> **Status (2026-10-01):** The site-wide alignment described here is implemented and owner-approved (`DEC-070`). Palette, shell, and navigation decisions are resolved: blue palette, sidebar and slim top bar, current destinations. The accepted differences are listed in `DEC-070` and `ai-context/planning/verification/evidence/site-mockup-alignment/README.md`. Use this file as the reference method for future screens.
+> **Current use:** The site-wide visual system was approved under `DEC-070`. Later owner decisions map panel ① to Home (`DEC-076`), ② to Family (`DEC-077`), ③ to Events (`DEC-078`), and ④ to the data-bearing Safety dashboard (`DEC-079`). Phase 9 is closed under `DEC-081`; no product implementation item is authorized. The original DEC-070 comparison examples below record the earlier mapping and are not current implementation instructions.
 
 ## The visual target
 
@@ -14,7 +14,7 @@ generated screenshots      = WHAT WAS BUILT BEFORE (evidence, not design)
 ```
 
 - Do not treat rendered verification evidence (`ai-context\planning\verification\evidence\**`, `src\FamilySafety.Web\*-review-*.png`) as equivalent to the mockups. Those images show what was built, not what is wanted.
-- The current screens, including owner-approved ones, are not automatically the target. Where they differ visually from a reference, move them toward the reference unless an owner decision or canonical rule says otherwise.
+- Compare a screen with its approved reference only within a separately authorized UI work item. Later owner decisions and canonical rules control any difference.
 - The mockups do **not** authorize functionality. Canonical behavior remains in `ai-context`.
 - `codex-handoff\reference\` holds byte-for-byte copies of the same six files. Use the `claude-handoff\reference` copies.
 
@@ -31,7 +31,20 @@ All six files are **desktop** (about 1,400 px wide) and show one product, "Famil
 | `panel3-travel-events.png` | "Travel & Events" — **Events** (the sidebar highlights Events), combining Events and Trips summaries | Title + subtitle + primary "+ Create" at the top right. Row 1: "Upcoming Events" (thumbnail, date · time, place, RSVP pill) and "Active Trips" (thumbnail, dates, place, status pill). Row 2: "RSVPs Needed" (compact rows + Respond) and "Quick Links" (2 × 3 icon tiles). | Thumbnail list rows with status pills; icon tiles; primary header action |
 | `panel4-safety-aware.png` | "Family Safety & Well-Being" — a **Safety** dashboard (the sidebar wrongly highlights Events) | Title + subtitle + outline "Safety Settings" at the top right. Row 1: "Active Concern" (pink tint, avatar, headline, expected time, Contact / Mark as Resolved, Monitoring pill) and "Recent Contact Attempts" list. Row 2: "Today's Check-ins" (avatar rows + Checked In pills) and "Safety Timeline" (time column, colored dots, Today dropdown). | Alert-tint card; timeline with time column and dots; icon list rows |
 
-## Screen mapping
+## Current approved screen mapping
+
+| Panel | Current screen | Decision |
+|---|---|---|
+| ① `panel1-main-home.png` | Home dashboard | `DEC-076` |
+| ② `panel2-family-activity.png` | Family dashboard and Family Settings split; the image itself highlights Home | `DEC-077` |
+| ③ `panel3-travel-events.png` | Events dashboard, with a read-only Trips summary | `DEC-078` |
+| ④ `panel4-safety-aware.png` | Read-only, data-bearing Safety dashboard with Open Concern and Open Safety Incident summaries and a Check-Ins placeholder | `DEC-079` |
+
+The approved destinations and behavior are in `ai-context`, the completed work items, and their decisions. Mockup-only controls do not become features.
+
+## Original screen mapping before Phase 9 dashboard decisions — historical
+
+The table and DEC-070 alignment examples below describe the pre-Phase 9 interpretation. In particular, the original panel ② Home-pattern and panel ④ Concerns-list mappings were later revised by `DEC-077` and `DEC-079`.
 
 | Reference | Running screen | Fit |
 |---|---|---|
@@ -48,7 +61,9 @@ Plans (list/create), Trip create/detail/notes/audience editor, Family directory/
 
 For these, apply the **shared visual language** of the primary references: shell, card, card-header, list-row, pill, button, spacing, and type scale. The older mockups in `ai-context\references\ux\` (`events/`, `plans-trips/`, `family/`, `safety/`, `admin-settings/`, `home-dashboard/`) may be consulted as **secondary** layout hints for these screens only. Where they conflict with the primary references' visual language, the primary references win. If a screen has no reference at all, say so in the comparison. Do not invent a target.
 
-## KEEP / ALIGN / ADAPT / DROP
+## KEEP / ALIGN / ADAPT / DROP — original DEC-070 examples
+
+This method remains useful for approved UI work, but the screen-specific examples below are historical. `DEC-076`–`DEC-079` allow honest data-free placeholders and revised dashboard compositions without implementing the underlying Phase 9.5 capabilities.
 
 | Category | Meaning |
 |---|---|
@@ -57,7 +72,7 @@ For these, apply the **shared visual language** of the primary references: shell
 | **ADAPT** | Visual structure from the mockup reused with currently approved functionality or data substituted. |
 | **DROP** | Mockup-only functionality that is not approved. Do not build it or imply it. |
 
-**Approved but not implemented** capabilities (Event invitations/RSVP, Needs, Updates, Shared Family Dates/birthdays, Trusted Contacts) are approved in `ai-context` but have no authorized implementation story. Treat them as **DROP for visual work**: do not build them to fill a mockup slot.
+**Approved but not implemented** capabilities (Event invitations/RSVP, Needs, Updates, Shared Family Dates/birthdays, Trusted Contacts) remain outside this cleanup. The historical DROP examples below do not override later owner-approved, data-free placeholders; they never authorize the underlying capability.
 
 ### Shell — `detail-shell-topbar.png`
 
@@ -99,7 +114,9 @@ For these, apply the **shared visual language** of the primary references: shell
   - The timeline shows Concern entries, with markers by entry kind, never by danger.
 - **DROP:** Contact, Recent Contact Attempts, Today's Check-ins, Check-in reminders, Safety Settings, "Monitoring" status, expected check-in times, last known location, Incident, and alarm-red styling.
 
-## Mockup-only functionality (never authorized by appearing in a reference)
+## Original mockup exclusions — historical DEC-070 list
+
+Later decisions approved selected presentation elements, placeholders, and the Safety Incident implementation. Use current context and `DEC-076`–`DEC-081` for today's scope; the list below records what the original mockup did not authorize by itself.
 
 Search; notifications and badge; the Messages destination; the avatar menu; RSVP/Respond/Maybe/Going statuses; RSVPs Needed; Pending Invitations as RSVP; Send Note and birthdays; activity/updates feeds and photo uploads; My Tasks and task checklists; Active Sharing and Manage Sharing; live or last-known location; Check-ins, check-in reminders, and Recent Check-ins; contact attempts and Contact/Call/Text actions; Safety Settings; "Monitoring" and other safety statuses; Quick Links (calendar, shared lists, travel documents); Trip statuses (Planning/Considering); Safety Incident and escalation; Suggested Steps; maps; emergency actions; danger or risk scoring; new permissions or roles.
 
@@ -112,7 +129,7 @@ Search; notifications and badge; the Messages destination; the avatar menu; RSVP
 - Calm tone. No alarm-red surfaces, urgency, or danger inference for Concerns.
 - Accessibility: status is never conveyed by color alone; real buttons and labels; visible focus; usable at 390 px.
 
-## Per-screen comparison (fill in before coding)
+## Original per-screen comparison template — historical example
 
 | Screen | Reference + region | Current implementation | KEEP / ALIGN / ADAPT / DROP | Planned change |
 |---|---|---|---|---|
@@ -134,5 +151,5 @@ Cover composition, cards, sections, whitespace, typography, hierarchy, forms, bu
 - `panel4-safety-aware.png` highlights **Events** in the sidebar; it is a Safety view.
 - `panel2-family-activity.png` is titled "Family Activity" but highlights **Home**.
 - Panel 1 flags Jordan as overdue, while panel 4 shows Emma. This is sample data; it has no meaning.
-- The sidebar lists both Trips and Plans, plus Safety and Messages. The destination set is governed by the app and `OD-001`, not the image.
+- The sidebar lists both Trips and Plans, plus Safety and Messages. The destination set is governed by `REQ-UX-013` (`DEC-074`), which resolved `OD-001`, not by the image.
 - "Current Trips" lists future trips. The label is illustrative only.

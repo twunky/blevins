@@ -2,6 +2,8 @@
 
 Hand work back with a single message. Be factual. If something was not run, say so. If something failed, include the output.
 
+The WI-008 examples below are historical templates, not current work or authorization. For repository cleanup Wave 1, report documentation changes and link checks; no application tests or builds are authorized. The repository has Git, and the owner performs commits.
+
 **Server work (last used for WI-008-003, now `DONE / PASS`).** Use this structure:
 
 1. Summary.
@@ -13,12 +15,12 @@ Hand work back with a single message. Be factual. If something was not run, say 
 7. Implementation choices made (the story's non-policy list).
 8. Canonical or handoff conflicts found.
 9. Predeployment dependency (backup aging / restore evidence).
-10. Source control (nothing committed; no `.git`).
+10. Source control (actual `git status`; no commit or push).
 11. Status: `VERIFYING / OWNER REVIEW`.
 12. Proposed PR title and description, as text.
 13. Recommended follow-ups (not done).
 
-**UI work.** Use the template below. It was written for WI-008-002; substitute the current UI work item.
+**UI work — historical WI-008-002 example.** Use its structure only when a separately authorized UI work item calls for it; substitute that item's scope, evidence, and status.
 
 ```markdown
 ## Closeout — WI-008-002 Concern mockup alignment — <date>
@@ -76,7 +78,7 @@ no server/API/schema changes>
 <dated text added to the WI-008-002 story and the VER-WI-008-002 follow-up section>
 
 ### 15. Source control
-`git status` → <output, or "unavailable: C:\Dev\blevins has no .git">
+`git status` → <actual output>
 **No commits, pushes, or PRs were made.** All changes are uncommitted.
 
 ### 16. Status
@@ -92,5 +94,5 @@ WI-008-002 remains `VERIFYING / OWNER REVIEW`; owner visual approval pending.
 ## Rules
 
 - Do not claim a test, build, or capture ran unless it ran in this session.
-- Do not mark WI-008-002 `DONE / PASS`, and do not write "approved" anywhere on the owner's behalf.
+- Do not mark a work item `DONE / PASS` or write "approved" on the owner's behalf without its required approval.
 - Keep the PR description suitable for the owner to paste. Keep the check-in summary to a few lines.
