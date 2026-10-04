@@ -1,0 +1,46 @@
+Fresh focused verification; native output excerpt.
+Command: dotnet test tests/FamilySafety.Foundation.Tests --no-build --filter "FullyQualifiedName~EventInvitationDomainTests|FullyQualifiedName~EventInvitationServiceTests|FullyQualifiedName~EventInvitationApiTests" --logger "console;verbosity=normal"
+HEAD: b8af6798cada23ea4d7a48e02e7c1ebb5e9368de
+RUN_FAMILYSAFETY_SQL_TESTS=1
+SQL environment: localhost; Windows integrated authentication; normal per-test migration/cleanup.
+Started UTC: 2026-10-04T23:14:03.4960627Z
+Raw UTF-8 source: C:\Users\seanb\AppData\Local\Temp\wi095001-backend-focused.txt-20261004T231403.raw.txt
+Test run for C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\bin\Debug\net10.0\FamilySafety.Foundation.Tests.dll (.NETCoreApp,Version=v10.0)
+  Passed FamilySafety.Foundation.Tests.EventInvitationDomainTests.RevocationPreservesFinalResponseAndCannotBeReactivated [26 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.EveryOperationRequiresTheCurrentAuthenticatedActor(operation: "own") [27 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.EveryOperationRequiresTheCurrentAuthenticatedActor(operation: "respond") [2 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.EveryOperationRequiresTheCurrentAuthenticatedActor(operation: "issue") [1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationDomainTests.EveryResponseCanTransitionToEveryApprovedState(from: Pending) [3 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.EveryOperationRequiresTheCurrentAuthenticatedActor(operation: "pending") [1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationDomainTests.EveryResponseCanTransitionToEveryApprovedState(from: Going) [< 1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationDomainTests.EveryResponseCanTransitionToEveryApprovedState(from: NotGoing) [< 1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationDomainTests.EveryResponseCanTransitionToEveryApprovedState(from: Maybe) [< 1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationDomainTests.CreationIsPendingWithoutADeliberateResponse [< 1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.EveryOperationRequiresTheCurrentAuthenticatedActor(operation: "organizer") [1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationDomainTests.InvalidResponseAndEmptyIdentitiesAreRejected [1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.EveryOperationRequiresTheCurrentAuthenticatedActor(operation: "revoke") [1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.UnavailableAndMissingShareOneResultAndActorComesOnlyFromSession(operation: "respond") [7 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.UnavailableAndMissingShareOneResultAndActorComesOnlyFromSession(operation: "issue") [1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.UnavailableAndMissingShareOneResultAndActorComesOnlyFromSession(operation: "pending") [1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.UnavailableAndMissingShareOneResultAndActorComesOnlyFromSession(operation: "revoke") [< 1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.UnavailableAndMissingShareOneResultAndActorComesOnlyFromSession(operation: "own") [< 1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationServiceTests.UnavailableAndMissingShareOneResultAndActorComesOnlyFromSession(operation: "organizer") [1 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.EveryEndpointRequiresAccountAndUsesEmptyNondisclosingUnavailable(action: "pending") [1 s]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.EveryEndpointRequiresAccountAndUsesEmptyNondisclosingUnavailable(action: "own") [13 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.EveryEndpointRequiresAccountAndUsesEmptyNondisclosingUnavailable(action: "respond") [54 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.EveryEndpointRequiresAccountAndUsesEmptyNondisclosingUnavailable(action: "organizer") [7 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.EveryEndpointRequiresAccountAndUsesEmptyNondisclosingUnavailable(action: "issue") [7 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.EveryEndpointRequiresAccountAndUsesEmptyNondisclosingUnavailable(action: "revoke") [6 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.InvalidStatusStringIsRejected [23 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.ConflictsHaveNoInvitationDisclosure(action: "revoke") [4 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.ConflictsHaveNoInvitationDisclosure(action: "respond") [3 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.ConflictsHaveNoInvitationDisclosure(action: "issue") [2 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.MutationContractsIgnoreForgedActorAndCarryIdentityAndVersion [42 ms]
+  Passed FamilySafety.Foundation.Tests.EventInvitationApiTests.ReadContractsExposeOnlyActorSpecificFieldsAndInitialPending [69 ms]
+Test Run Successful.
+Total tests: 31
+     Passed: 31
+ Total time: 3.2870 Seconds
+Native exit code: 0
+Finished UTC: 2026-10-04T23:14:09.4358108Z
+Raw source SHA-256: F8AE878EFE0C093FFCD90ACE06C86D7C180E67CF8CA795D39CD3DEF897BE3AFD

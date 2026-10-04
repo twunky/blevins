@@ -1,0 +1,352 @@
+Fresh real-SQL lock-order investigation; product code unchanged.
+Command: dotnet test tests/FamilySafety.Foundation.Tests --filter FullyQualifiedName~EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap --logger "console;verbosity=detailed"
+RUN_FAMILYSAFETY_SQL_TESTS=1; Server=localhost; Windows integrated authentication; normal fixture cleanup.
+HEAD: b8af6798cada23ea4d7a48e02e7c1ebb5e9368de; only verification test added after prior full run.
+Started UTC: 2026-10-04T23:22:09.1404415Z
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  FamilySafety.Domain -> C:\Dev\blevins\src\FamilySafety.Domain\bin\Debug\net10.0\FamilySafety.Domain.dll
+  FamilySafety.Application -> C:\Dev\blevins\src\FamilySafety.Application\bin\Debug\net10.0\FamilySafety.Application.dll
+  FamilySafety.Infrastructure -> C:\Dev\blevins\src\FamilySafety.Infrastructure\bin\Debug\net10.0\FamilySafety.Infrastructure.dll
+  FamilySafety.Api -> C:\Dev\blevins\src\FamilySafety.Api\bin\Debug\net10.0\FamilySafety.Api.dll
+  FamilySafety.Foundation.Tests -> C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\bin\Debug\net10.0\FamilySafety.Foundation.Tests.dll
+Test run for C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\bin\Debug\net10.0\FamilySafety.Foundation.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\bin\Debug\net10.0\FamilySafety.Foundation.Tests.dll
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.12)
+[xUnit.net 00:00:00.13]   Discovering: FamilySafety.Foundation.Tests
+[xUnit.net 00:00:00.23]   Discovered:  FamilySafety.Foundation.Tests
+[xUnit.net 00:00:00.26]   Starting:    FamilySafety.Foundation.Tests
+[xUnit.net 00:00:06.74]     FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap [FAIL]
+[xUnit.net 00:00:06.74]       Assert.All() Failure: 1 out of 2 items in the collection did not pass.
+[xUnit.net 00:00:06.74]       [1]: Item:  System.InvalidOperationException: An exception has been raised that is likely due to a transient failure. Consider enabling transient error resiliency by adding 'EnableRetryOnFailure' to the 'UseSqlServer' call.
+[xUnit.net 00:00:06.74]                    ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Transaction (Process ID 60) was deadlocked on lock resources with another process and has been chosen as the deadlock victim. Rerun the transaction.
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.CompleteAsyncExecuteReader(Boolean isInternal, Boolean forDescribeParameterEncryption)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__193_1(IAsyncResult asyncResult)
+[xUnit.net 00:00:06.74]                      at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+[xUnit.net 00:00:06.74]                   --- End of stack trace from previous location ---
+[xUnit.net 00:00:06.74]                      at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.74]                      at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.74]                      at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.74]                      at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.74]                   ClientConnectionId:7f669ea3-09b1-4bf9-9f21-38c133728287
+[xUnit.net 00:00:06.74]                   Error Number:1205,State:51,Class:13
+[xUnit.net 00:00:06.74]                      --- End of inner exception stack trace ---
+[xUnit.net 00:00:06.74]                      at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.74]                      at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.LockAndAuthorizeAsync(Guid accountId, Guid eventId, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 127
+[xUnit.net 00:00:06.74]                      at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 90
+[xUnit.net 00:00:06.74]                      at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 101
+[xUnit.net 00:00:06.74]                      at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<>c__DisplayClass11_3.<<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__5>d.MoveNext() in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 300
+[xUnit.net 00:00:06.74]                   --- End of stack trace from previous location ---
+[xUnit.net 00:00:06.74]                      at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>g__Capture|11_3(Func`1 operation) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 290
+[xUnit.net 00:00:06.74]            Error: Assert.Null() Failure: Value is not null
+[xUnit.net 00:00:06.74]                   Expected: null
+[xUnit.net 00:00:06.74]                   Actual:   System.InvalidOperationException: An exception has been raised that is likely due to a transient failure. Consider enabling transient error resiliency by adding 'EnableRetryOnFailure' to the 'UseSqlServer' call.
+[xUnit.net 00:00:06.74]                    ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Transaction (Process ID 60) was deadlocked on lock resources with another process and has been chosen as the deadlock victim. Rerun the transaction.
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.CompleteAsyncExecuteReader(Boolean isInternal, Boolean forDescribeParameterEncryption)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+[xUnit.net 00:00:06.74]                      at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__193_1(IAsyncResult asyncResult)
+[xUnit.net 00:00:06.74]                      at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+[xUnit.net 00:00:06.74]                   --- End of stack trace from previous location ---
+[xUnit.net 00:00:06.74]                      at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.74]                      at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.74]                      at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.74]                      at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.74]                   ClientConnectionId:7f669ea3-09b1-4bf9-9f21-38c133728287
+[xUnit.net 00:00:06.74]                   Error Number:1205,State:51,Class:13
+[xUnit.net 00:00:06.74]                      --- End of inner exception stack trace ---
+[xUnit.net 00:00:06.74]                      at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.74]                      at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.LockAndAuthorizeAsync(Guid accountId, Guid eventId, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 127
+[xUnit.net 00:00:06.74]                      at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 90
+[xUnit.net 00:00:06.74]                      at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 101
+[xUnit.net 00:00:06.74]                      at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<>c__DisplayClass11_3.<<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__5>d.MoveNext() in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 300
+[xUnit.net 00:00:06.74]                   --- End of stack trace from previous location ---
+[xUnit.net 00:00:06.74]                      at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>g__Capture|11_3(Func`1 operation) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 290
+[xUnit.net 00:00:06.74]       Stack Trace:
+[xUnit.net 00:00:06.75]         C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs(315,0): at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__11_0(World w)
+[xUnit.net 00:00:06.75]         C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs(325,0): at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__11_0(World w)
+[xUnit.net 00:00:06.75]         C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs(325,0): at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__11_0(World w)
+[xUnit.net 00:00:06.75]         C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs(325,0): at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__11_0(World w)
+[xUnit.net 00:00:06.75]         C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs(425,0): at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.WithDatabase(Func`2 test, Boolean previousMigration)
+[xUnit.net 00:00:06.75]         C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs(427,0): at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.WithDatabase(Func`2 test, Boolean previousMigration)
+[xUnit.net 00:00:06.75]         C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs(427,0): at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.WithDatabase(Func`2 test, Boolean previousMigration)
+[xUnit.net 00:00:06.75]         C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs(271,0): at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap()
+[xUnit.net 00:00:06.75]         --- End of stack trace from previous location ---
+[xUnit.net 00:00:06.75]       Output:
+[xUnit.net 00:00:06.75]         Task database: FamilySafety_WI095001_e4c083bfa29e4f569bb644492df8571d; normal fixture EnsureDeletedAsync cleanup.
+[xUnit.net 00:00:06.75]         Planned iterations: 3; stop on first failure. Per-iteration deadline: 30 seconds; SQL command timeout: 20 seconds.
+[xUnit.net 00:00:06.75]         Iteration 1 started.
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:26.9726010+00:00 Event edit nonquery executing; isolation=Serializable; SQL: UPDATE [f]
+[xUnit.net 00:00:06.75]         SET [f].[CapacityLimit] = [f].[CapacityLimit]
+[xUnit.net 00:00:06.75]         FROM [FamilyGroups] AS [f]
+[xUnit.net 00:00:06.75]         WHERE [f].[Id] = @familyGroupId
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:26.9754006+00:00 Event edit nonquery completed; isolation=Serializable; SQL: UPDATE [f]
+[xUnit.net 00:00:06.75]         SET [f].[CapacityLimit] = [f].[CapacityLimit]
+[xUnit.net 00:00:06.75]         FROM [FamilyGroups] AS [f]
+[xUnit.net 00:00:06.75]         WHERE [f].[Id] = @familyGroupId
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:27.0550823+00:00 RSVP reader executing; isolation=Serializable; SQL: SELECT TOP(2) [f].[FamilyGroupId]
+[xUnit.net 00:00:06.75]         FROM [FamilyEvents] AS [f]
+[xUnit.net 00:00:06.75]         WHERE [f].[Id] = @eventId
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:27.0557193+00:00 RSVP reader opened; isolation=Serializable; SQL: SELECT TOP(2) [f].[FamilyGroupId]
+[xUnit.net 00:00:06.75]         FROM [FamilyEvents] AS [f]
+[xUnit.net 00:00:06.75]         WHERE [f].[Id] = @eventId
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:27.0566634+00:00 RSVP nonquery executing; isolation=Serializable; SQL: UPDATE [f]
+[xUnit.net 00:00:06.75]         SET [f].[CapacityLimit] = [f].[CapacityLimit]
+[xUnit.net 00:00:06.75]         FROM [FamilyGroups] AS [f]
+[xUnit.net 00:00:06.75]         WHERE [f].[Id] = @groupId
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:27.0572143+00:00 Event edit reader executing; isolation=Serializable; SQL: SELECT TOP(2) [f].[AdultProfileId]
+[xUnit.net 00:00:06.75]         FROM [FamilyGroupMemberships] AS [f]
+[xUnit.net 00:00:06.75]         WHERE [f].[AccountId] = @accountId AND [f].[FamilyGroupId] = @familyGroupId AND [f].[IsActive] = CAST(1 AS bit)
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:27.0576034+00:00 Event edit reader opened; isolation=Serializable; SQL: SELECT TOP(2) [f].[AdultProfileId]
+[xUnit.net 00:00:06.75]         FROM [FamilyGroupMemberships] AS [f]
+[xUnit.net 00:00:06.75]         WHERE [f].[AccountId] = @accountId AND [f].[FamilyGroupId] = @familyGroupId AND [f].[IsActive] = CAST(1 AS bit)
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:27.0670168+00:00 Event edit reader executing; isolation=Serializable; SQL: SELECT TOP(2) [f].[Id], [f].[CreatorProfileId], [f].[Date], [f].[Description], [f].[FamilyGroupId], [f].[Location], [f].[Name], [f].[Time]
+[xUnit.net 00:00:06.75]         FROM [FamilyEvents] AS [f]
+[xUnit.net 00:00:06.75]         WHERE [f].[Id] = @_8__locals1_eventId AND [f].[FamilyGroupId] = @_8__locals1_familyGroupId AND ([f].[CreatorProfileId] = @currentProfileId_Value OR EXISTS (
+[xUnit.net 00:00:06.75]             SELECT 1
+[xUnit.net 00:00:06.75]             FROM [FamilyEventAudienceMembers] AS [f0]
+[xUnit.net 00:00:06.75]             WHERE [f0].[EventId] = [f].[Id] AND [f0].[ProfileId] = @currentProfileId_Value AND [f0].[CanEdit] = CAST(1 AS bit)))
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:27.0736816+00:00 Event edit reader opened; isolation=Serializable; SQL: SELECT TOP(2) [f].[Id], [f].[CreatorProfileId], [f].[Date], [f].[Description], [f].[FamilyGroupId], [f].[Location], [f].[Name], [f].[Time]
+[xUnit.net 00:00:06.75]         FROM [FamilyEvents] AS [f]
+[xUnit.net 00:00:06.75]         WHERE [f].[Id] = @_8__locals1_eventId AND [f].[FamilyGroupId] = @_8__locals1_familyGroupId AND ([f].[CreatorProfileId] = @currentProfileId_Value OR EXISTS (
+[xUnit.net 00:00:06.75]             SELECT 1
+[xUnit.net 00:00:06.75]             FROM [FamilyEventAudienceMembers] AS [f0]
+[xUnit.net 00:00:06.75]             WHERE [f0].[EventId] = [f].[Id] AND [f0].[ProfileId] = @currentProfileId_Value AND [f0].[CanEdit] = CAST(1 AS bit)))
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:27.0823741+00:00 Event edit reader executing; isolation=Serializable; SQL: SET IMPLICIT_TRANSACTIONS OFF;
+[xUnit.net 00:00:06.75]         SET NOCOUNT ON;
+[xUnit.net 00:00:06.75]         UPDATE [FamilyEvents] SET [Name] = @p0
+[xUnit.net 00:00:06.75]         OUTPUT 1
+[xUnit.net 00:00:06.75]         WHERE [Id] = @p1;
+[xUnit.net 00:00:06.75]         
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:29.6307240+00:00 Event edit reader opened; isolation=Serializable; SQL: SET IMPLICIT_TRANSACTIONS OFF;
+[xUnit.net 00:00:06.75]         SET NOCOUNT ON;
+[xUnit.net 00:00:06.75]         UPDATE [FamilyEvents] SET [Name] = @p0
+[xUnit.net 00:00:06.75]         OUTPUT 1
+[xUnit.net 00:00:06.75]         WHERE [Id] = @p1;
+[xUnit.net 00:00:06.75]         
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:29.6343154+00:00 Event edit reader executing; isolation=; SQL: SELECT TOP(2) [f].[Id], [f].[FamilyGroupId], [f].[Name], [f].[Description], [f].[Date], [f].[Time], [f].[Location], [a].[Id], [a].[DisplayName]
+[xUnit.net 00:00:06.75]         FROM [FamilyEvents] AS [f]
+[xUnit.net 00:00:06.75]         INNER JOIN [AdultProfiles] AS [a] ON [f].[CreatorProfileId] = [a].[Id]
+[xUnit.net 00:00:06.75]         WHERE [f].[Id] = @eventId
+[xUnit.net 00:00:06.75]         2026-10-04T23:22:29.6349284+00:00 Event edit reader opened; isolation=; SQL: SELECT TOP(2) [f].[Id], [f].[FamilyGroupId], [f].[Name], [f].[Description], [f].[Date], [f].[Time], [f].[Location], [a].[Id], [a].[DisplayName]
+[xUnit.net 00:00:06.75]         FROM [FamilyEvents] AS [f]
+[xUnit.net 00:00:06.75]         INNER JOIN [AdultProfiles] AS [a] ON [f].[CreatorProfileId] = [a].[Id]
+[xUnit.net 00:00:06.75]         WHERE [f].[Id] = @eventId
+[xUnit.net 00:00:06.75]         Event edit outcome: success
+[xUnit.net 00:00:06.75]         RSVP outcome: failure
+[xUnit.net 00:00:06.75]         System.InvalidOperationException: An exception has been raised that is likely due to a transient failure. Consider enabling transient error resiliency by adding 'EnableRetryOnFailure' to the 'UseSqlServer' call.
+[xUnit.net 00:00:06.75]          ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Transaction (Process ID 60) was deadlocked on lock resources with another process and has been chosen as the deadlock victim. Rerun the transaction.
+[xUnit.net 00:00:06.75]            at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+[xUnit.net 00:00:06.75]            at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+[xUnit.net 00:00:06.75]            at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
+[xUnit.net 00:00:06.75]            at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+[xUnit.net 00:00:06.75]            at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+[xUnit.net 00:00:06.75]            at Microsoft.Data.SqlClient.SqlCommand.CompleteAsyncExecuteReader(Boolean isInternal, Boolean forDescribeParameterEncryption)
+[xUnit.net 00:00:06.75]            at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+[xUnit.net 00:00:06.75]            at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+[xUnit.net 00:00:06.75]            at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+[xUnit.net 00:00:06.75]            at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__193_1(IAsyncResult asyncResult)
+[xUnit.net 00:00:06.75]            at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+[xUnit.net 00:00:06.75]         --- End of stack trace from previous location ---
+[xUnit.net 00:00:06.75]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.75]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.75]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.75]            at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.75]         ClientConnectionId:7f669ea3-09b1-4bf9-9f21-38c133728287
+[xUnit.net 00:00:06.75]         Error Number:1205,State:51,Class:13
+[xUnit.net 00:00:06.75]            --- End of inner exception stack trace ---
+[xUnit.net 00:00:06.75]            at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+[xUnit.net 00:00:06.75]            at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.LockAndAuthorizeAsync(Guid accountId, Guid eventId, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 127
+[xUnit.net 00:00:06.75]            at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 90
+[xUnit.net 00:00:06.75]            at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 101
+[xUnit.net 00:00:06.75]            at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<>c__DisplayClass11_3.<<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__5>d.MoveNext() in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 300
+[xUnit.net 00:00:06.75]         --- End of stack trace from previous location ---
+[xUnit.net 00:00:06.75]            at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>g__Capture|11_3(Func`1 operation) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 290
+[xUnit.net 00:00:06.75]         SQL error number: 1205
+[xUnit.net 00:00:06.77]   Finished:    FamilySafety.Foundation.Tests
+  Failed FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap [6 s]
+  Error Message:
+   Assert.All() Failure: 1 out of 2 items in the collection did not pass.
+[1]: Item:  System.InvalidOperationException: An exception has been raised that is likely due to a transient failure. Consider enabling transient error resiliency by adding 'EnableRetryOnFailure' to the 'UseSqlServer' call.
+             ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Transaction (Process ID 60) was deadlocked on lock resources with another process and has been chosen as the deadlock victim. Rerun the transaction.
+               at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+               at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+               at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
+               at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+               at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+               at Microsoft.Data.SqlClient.SqlCommand.CompleteAsyncExecuteReader(Boolean isInternal, Boolean forDescribeParameterEncryption)
+               at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+               at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+               at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+               at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__193_1(IAsyncResult asyncResult)
+               at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+            --- End of stack trace from previous location ---
+               at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+               at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+               at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+               at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+            ClientConnectionId:7f669ea3-09b1-4bf9-9f21-38c133728287
+            Error Number:1205,State:51,Class:13
+               --- End of inner exception stack trace ---
+               at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+               at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.LockAndAuthorizeAsync(Guid accountId, Guid eventId, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 127
+               at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 90
+               at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 101
+               at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<>c__DisplayClass11_3.<<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__5>d.MoveNext() in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 300
+            --- End of stack trace from previous location ---
+               at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>g__Capture|11_3(Func`1 operation) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 290
+     Error: Assert.Null() Failure: Value is not null
+            Expected: null
+            Actual:   System.InvalidOperationException: An exception has been raised that is likely due to a transient failure. Consider enabling transient error resiliency by adding 'EnableRetryOnFailure' to the 'UseSqlServer' call.
+             ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Transaction (Process ID 60) was deadlocked on lock resources with another process and has been chosen as the deadlock victim. Rerun the transaction.
+               at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+               at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+               at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
+               at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+               at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+               at Microsoft.Data.SqlClient.SqlCommand.CompleteAsyncExecuteReader(Boolean isInternal, Boolean forDescribeParameterEncryption)
+               at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+               at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+               at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+               at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__193_1(IAsyncResult asyncResult)
+               at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+            --- End of stack trace from previous location ---
+               at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+               at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+               at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+               at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+            ClientConnectionId:7f669ea3-09b1-4bf9-9f21-38c133728287
+            Error Number:1205,State:51,Class:13
+               --- End of inner exception stack trace ---
+               at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+               at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.LockAndAuthorizeAsync(Guid accountId, Guid eventId, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 127
+               at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 90
+               at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 101
+               at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<>c__DisplayClass11_3.<<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__5>d.MoveNext() in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 300
+            --- End of stack trace from previous location ---
+               at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>g__Capture|11_3(Func`1 operation) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 290
+  Stack Trace:
+     at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__11_0(World w) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 315
+   at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__11_0(World w) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 325
+   at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__11_0(World w) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 325
+   at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__11_0(World w) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 325
+   at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.WithDatabase(Func`2 test, Boolean previousMigration) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 425
+   at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.WithDatabase(Func`2 test, Boolean previousMigration) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 427
+   at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.WithDatabase(Func`2 test, Boolean previousMigration) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 427
+   at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap() in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 271
+--- End of stack trace from previous location ---
+  Standard Output Messages:
+ Task database: FamilySafety_WI095001_e4c083bfa29e4f569bb644492df8571d; normal fixture EnsureDeletedAsync cleanup.
+ Planned iterations: 3; stop on first failure. Per-iteration deadline: 30 seconds; SQL command timeout: 20 seconds.
+ Iteration 1 started.
+ 2026-10-04T23:22:26.9726010+00:00 Event edit nonquery executing; isolation=Serializable; SQL: UPDATE [f]
+ SET [f].[CapacityLimit] = [f].[CapacityLimit]
+ FROM [FamilyGroups] AS [f]
+ WHERE [f].[Id] = @familyGroupId
+ 2026-10-04T23:22:26.9754006+00:00 Event edit nonquery completed; isolation=Serializable; SQL: UPDATE [f]
+ SET [f].[CapacityLimit] = [f].[CapacityLimit]
+ FROM [FamilyGroups] AS [f]
+ WHERE [f].[Id] = @familyGroupId
+ 2026-10-04T23:22:27.0550823+00:00 RSVP reader executing; isolation=Serializable; SQL: SELECT TOP(2) [f].[FamilyGroupId]
+ FROM [FamilyEvents] AS [f]
+ WHERE [f].[Id] = @eventId
+ 2026-10-04T23:22:27.0557193+00:00 RSVP reader opened; isolation=Serializable; SQL: SELECT TOP(2) [f].[FamilyGroupId]
+ FROM [FamilyEvents] AS [f]
+ WHERE [f].[Id] = @eventId
+ 2026-10-04T23:22:27.0566634+00:00 RSVP nonquery executing; isolation=Serializable; SQL: UPDATE [f]
+ SET [f].[CapacityLimit] = [f].[CapacityLimit]
+ FROM [FamilyGroups] AS [f]
+ WHERE [f].[Id] = @groupId
+ 2026-10-04T23:22:27.0572143+00:00 Event edit reader executing; isolation=Serializable; SQL: SELECT TOP(2) [f].[AdultProfileId]
+ FROM [FamilyGroupMemberships] AS [f]
+ WHERE [f].[AccountId] = @accountId AND [f].[FamilyGroupId] = @familyGroupId AND [f].[IsActive] = CAST(1 AS bit)
+ 2026-10-04T23:22:27.0576034+00:00 Event edit reader opened; isolation=Serializable; SQL: SELECT TOP(2) [f].[AdultProfileId]
+ FROM [FamilyGroupMemberships] AS [f]
+ WHERE [f].[AccountId] = @accountId AND [f].[FamilyGroupId] = @familyGroupId AND [f].[IsActive] = CAST(1 AS bit)
+ 2026-10-04T23:22:27.0670168+00:00 Event edit reader executing; isolation=Serializable; SQL: SELECT TOP(2) [f].[Id], [f].[CreatorProfileId], [f].[Date], [f].[Description], [f].[FamilyGroupId], [f].[Location], [f].[Name], [f].[Time]
+ FROM [FamilyEvents] AS [f]
+ WHERE [f].[Id] = @_8__locals1_eventId AND [f].[FamilyGroupId] = @_8__locals1_familyGroupId AND ([f].[CreatorProfileId] = @currentProfileId_Value OR EXISTS (
+     SELECT 1
+     FROM [FamilyEventAudienceMembers] AS [f0]
+     WHERE [f0].[EventId] = [f].[Id] AND [f0].[ProfileId] = @currentProfileId_Value AND [f0].[CanEdit] = CAST(1 AS bit)))
+ 2026-10-04T23:22:27.0736816+00:00 Event edit reader opened; isolation=Serializable; SQL: SELECT TOP(2) [f].[Id], [f].[CreatorProfileId], [f].[Date], [f].[Description], [f].[FamilyGroupId], [f].[Location], [f].[Name], [f].[Time]
+ FROM [FamilyEvents] AS [f]
+ WHERE [f].[Id] = @_8__locals1_eventId AND [f].[FamilyGroupId] = @_8__locals1_familyGroupId AND ([f].[CreatorProfileId] = @currentProfileId_Value OR EXISTS (
+     SELECT 1
+     FROM [FamilyEventAudienceMembers] AS [f0]
+     WHERE [f0].[EventId] = [f].[Id] AND [f0].[ProfileId] = @currentProfileId_Value AND [f0].[CanEdit] = CAST(1 AS bit)))
+ 2026-10-04T23:22:27.0823741+00:00 Event edit reader executing; isolation=Serializable; SQL: SET IMPLICIT_TRANSACTIONS OFF;
+ SET NOCOUNT ON;
+ UPDATE [FamilyEvents] SET [Name] = @p0
+ OUTPUT 1
+ WHERE [Id] = @p1;
+ 
+ 2026-10-04T23:22:29.6307240+00:00 Event edit reader opened; isolation=Serializable; SQL: SET IMPLICIT_TRANSACTIONS OFF;
+ SET NOCOUNT ON;
+ UPDATE [FamilyEvents] SET [Name] = @p0
+ OUTPUT 1
+ WHERE [Id] = @p1;
+ 
+ 2026-10-04T23:22:29.6343154+00:00 Event edit reader executing; isolation=; SQL: SELECT TOP(2) [f].[Id], [f].[FamilyGroupId], [f].[Name], [f].[Description], [f].[Date], [f].[Time], [f].[Location], [a].[Id], [a].[DisplayName]
+ FROM [FamilyEvents] AS [f]
+ INNER JOIN [AdultProfiles] AS [a] ON [f].[CreatorProfileId] = [a].[Id]
+ WHERE [f].[Id] = @eventId
+ 2026-10-04T23:22:29.6349284+00:00 Event edit reader opened; isolation=; SQL: SELECT TOP(2) [f].[Id], [f].[FamilyGroupId], [f].[Name], [f].[Description], [f].[Date], [f].[Time], [f].[Location], [a].[Id], [a].[DisplayName]
+ FROM [FamilyEvents] AS [f]
+ INNER JOIN [AdultProfiles] AS [a] ON [f].[CreatorProfileId] = [a].[Id]
+ WHERE [f].[Id] = @eventId
+ Event edit outcome: success
+ RSVP outcome: failure
+ System.InvalidOperationException: An exception has been raised that is likely due to a transient failure. Consider enabling transient error resiliency by adding 'EnableRetryOnFailure' to the 'UseSqlServer' call.
+  ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Transaction (Process ID 60) was deadlocked on lock resources with another process and has been chosen as the deadlock victim. Rerun the transaction.
+    at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+    at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+    at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
+    at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+    at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+    at Microsoft.Data.SqlClient.SqlCommand.CompleteAsyncExecuteReader(Boolean isInternal, Boolean forDescribeParameterEncryption)
+    at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+    at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+    at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+    at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__193_1(IAsyncResult asyncResult)
+    at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+ --- End of stack trace from previous location ---
+    at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+    at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+    at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+    at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+ ClientConnectionId:7f669ea3-09b1-4bf9-9f21-38c133728287
+ Error Number:1205,State:51,Class:13
+    --- End of inner exception stack trace ---
+    at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+    at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.LockAndAuthorizeAsync(Guid accountId, Guid eventId, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 127
+    at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 90
+    at FamilySafety.Infrastructure.Persistence.EfEventInvitationRepository.RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken) in C:\Dev\blevins\src\FamilySafety.Infrastructure\Persistence\EfEventInvitationRepository.cs:line 101
+    at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<>c__DisplayClass11_3.<<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>b__5>d.MoveNext() in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 300
+ --- End of stack trace from previous location ---
+    at FamilySafety.Foundation.Tests.EventInvitationPersistenceTests.<EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap>g__Capture|11_3(Func`1 operation) in C:\Dev\blevins\tests\FamilySafety.Foundation.Tests\EventInvitationPersistenceTests.cs:line 290
+ SQL error number: 1205
+
+
+
+Total tests: 1
+     Failed: 1
+Test Run Failed.
+ Total time: 7.4058 Seconds
+Native exit code: 1
+Finished UTC: 2026-10-04T23:22:29.8932093Z

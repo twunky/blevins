@@ -1,6 +1,4 @@
-Result excerpt from the captured command output. SQL gate: RUN_FAMILYSAFETY_SQL_TESTS=1.
-Command: dotnet test FamilySafety.slnx --no-build --logger console;verbosity=normal
-
-
-
-Summary from the retained named results: 0 passed, 0 failed, 0 skipped.
+SUPERSEDED / INVALID HISTORICAL EXCERPT
+The original retained file contained no usable test outcomes and does not prove historical counts.
+Use dotnet-tests-sql-final.txt for the new authoritative SQL-gated run captured on 2026-10-04.
+No original test results have been reconstructed.

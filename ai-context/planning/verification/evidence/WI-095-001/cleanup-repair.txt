@@ -1,0 +1,32 @@
+Measured cleanup verification UTC: 2026-10-04T23:25:02.9598861Z
+SQL cleanup: existing WithDatabase fixture EnsureDeletedAsync in finally; no manual DROP or unrelated cleanup.
+Starting FamilySafety database count: 20
+Ending FamilySafety database count: 20
+New databases remaining: 0
+Pre-existing databases removed: 0
+Task reproduction database absent: True
+4200/5080 listener count: 0
+API/test/browser process candidates from task: 0
+All task execution sessions completed; no task browser launched.
+
+Pre-existing database names retained:
+FamilySafety
+FamilySafety_Invitation_79558d15516649aeb6758a9e2496b6b7
+FamilySafety_Invitation_ConcernReview20261001
+FamilySafety_Invitation_ddf3f406d9024bc1ac330e46513b5209
+FamilySafety_Invitation_E2E_1ba4b847bbf841fc86e0d64f3befaf09
+FamilySafety_Invitation_E2E_9e57fe73a7ab4d3890adbfcd3185be10
+FamilySafety_Invitation_Review_WI008004
+FamilySafety_Invitation_ShellReview034731
+FamilySafety_Invitation_SiteReview044319
+FamilySafety_Invitation_SiteReview044420
+FamilySafety_Invitation_Stage1Retry_20260928_235812_c7f2
+FamilySafety_Invitation_WI075_Browser_20260928
+FamilySafety_Invitation_WI075004Visual
+FamilySafety_Invitation_WI075005_CodexAttempt_20260929
+FamilySafety_Invitation_WI075006VerifyHost
+FamilySafety_VisualReview
+FamilySafety_WI005001_Verification
+FamilySafety_WI005002_ConcurrencyTests
+FamilySafety_WI005002_Verification
+FamilySafety_WI005003_DirectoryTests

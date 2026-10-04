@@ -1,0 +1,15 @@
+Evidence/reference checks measured UTC: 2026-10-04T23:28:11.0826417Z
+Checked text artifacts: 19; invalid UTF-8/NUL/replacement characters: 0
+VER/investigation local references checked: 26; missing targets: 0
+dotnet-tests-sql-final.txt named outcomes: 260 passed, 0 failed, 0 skipped; raw SHA256 verified: True
+sql-focused.txt named outcomes: 10 passed, 0 failed, 0 skipped; raw SHA256 verified: True
+backend-focused.txt named outcomes: 31 passed, 0 failed, 0 skipped; raw SHA256 verified: True
+Playwright source JSON hash verified: True
+Recovered Playwright native lines absent from exact source: 0
+Playwright native exit=0 completion records: 1
+Changed PNG screenshots: 0
+git diff --check native exit: 0
+VER/story/context/roadmap modifications: 0
+Product source modifications: 0
+Index staged changes: 0
+Native lock-order transcript SHA256: 6163425D387D795F649CEB1DB82C697824945157A106B9CE8415AA432659BF45

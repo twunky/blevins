@@ -7,10 +7,13 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System.Data.Common;
+using System.Collections.Concurrent;
+using Microsoft.Data.SqlClient;
+using Xunit.Abstractions;
 
 namespace FamilySafety.Foundation.Tests;
 
-public sealed class EventInvitationPersistenceTests
+public sealed class EventInvitationPersistenceTests(ITestOutputHelper output)
 {
     private static readonly CancellationToken Ct = CancellationToken.None;
 
@@ -260,6 +263,114 @@ public sealed class EventInvitationPersistenceTests
             Assert.Null(preserved.RsvpUpdatedAtUtc);
             Assert.Equal(row.Version, preserved.Version);
         });
+    }
+
+    [Fact]
+    public async Task EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap()
+    {
+        await WithDatabase(async w =>
+        {
+            output.WriteLine($"Task database: {new SqlConnectionStringBuilder(w.Connection).InitialCatalog}; normal fixture EnsureDeletedAsync cleanup.");
+            output.WriteLine("Planned iterations: 3; stop on first failure. Per-iteration deadline: 30 seconds; SQL command timeout: 20 seconds.");
+            var invitation = (await w.Repo.IssueAsync(w.A.Account, w.EventId, new(w.B.Profile), Ct))!;
+            for (var iteration = 1; iteration <= 3; iteration++)
+            {
+                output.WriteLine($"Iteration {iteration} started.");
+                using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                var editorHeldFamily = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                var rsvpAttemptingFamily = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                var trace = new ConcurrentQueue<string>();
+                FamilySafetyDbContext ObservedContext(string role) => new(new DbContextOptionsBuilder<FamilySafetyDbContext>()
+                    .UseSqlServer(w.Connection, sql => sql.CommandTimeout(20))
+                    .AddInterceptors(new EditRsvpOverlapObserver(role, editorHeldFamily, rsvpAttemptingFamily, trace)).Options);
+                await using var editing = ObservedContext("Event edit");
+                await using var responding = ObservedContext("RSVP");
+                async Task<Exception?> Capture(Func<Task> operation)
+                {
+                    try { await operation(); return null; }
+                    catch (Exception error) { return error; }
+                }
+                var edit = Capture(async () => Assert.NotNull(await new EfFamilyEventRepository(editing).UpdateAsync(
+                    w.A.Account, w.GroupId, w.EventId,
+                    new($"Edited gathering {iteration}", "Details", new DateOnly(2020, 1, 1), new TimeOnly(18, 0), "Hall"), deadline.Token)));
+                Task<Exception?>? response = null;
+                try
+                {
+                    await editorHeldFamily.Task.WaitAsync(deadline.Token);
+                    response = Capture(async () => Assert.NotNull(await new EfEventInvitationRepository(responding, TimeProvider.System)
+                        .RespondAsync(w.B.Account, w.EventId,
+                            new(invitation.InvitationId, invitation.Version, EventRsvpStatus.Going), deadline.Token)));
+                    var errors = await Task.WhenAll(edit, response);
+                    foreach (var entry in trace) output.WriteLine(entry);
+                    for (var path = 0; path < errors.Length; path++)
+                    {
+                        output.WriteLine($"{(path == 0 ? "Event edit" : "RSVP")} outcome: {(errors[path] is null ? "success" : "failure")}");
+                        if (errors[path] is { } error)
+                        {
+                            output.WriteLine(error.ToString());
+                            for (Exception? cause = error; cause is not null; cause = cause.InnerException)
+                                if (cause is SqlException sqlError) output.WriteLine($"SQL error number: {sqlError.Number}");
+                        }
+                    }
+                    Assert.All(errors, error => Assert.Null(error));
+                    invitation = (await w.Repo.GetOwnAsync(w.B.Account, w.EventId, Ct))!.Invitation!;
+                    output.WriteLine($"Iteration {iteration} passed.");
+                }
+                finally
+                {
+                    await deadline.CancelAsync();
+                    rsvpAttemptingFamily.TrySetResult();
+                    await edit;
+                    if (response is not null) await response;
+                }
+            }
+        });
+    }
+
+    // Pause only at an actual completed Family UPDATE. The RSVP's Family UPDATE
+    // is announced before execution, after its actual Event SELECT has completed.
+    // Repository SQL, isolation, lock hints and mutation behavior are unchanged.
+    private sealed class EditRsvpOverlapObserver(string role, TaskCompletionSource editorHeldFamily,
+        TaskCompletionSource rsvpAttemptingFamily, ConcurrentQueue<string> trace) : DbCommandInterceptor
+    {
+        private static bool FamilyUpdate(DbCommand command) => command.CommandText.Contains("UPDATE", StringComparison.Ordinal)
+            && command.CommandText.Contains("FamilyGroups", StringComparison.Ordinal);
+        private void Record(string phase, DbCommand command) => trace.Enqueue(
+            $"{DateTimeOffset.UtcNow:O} {role} {phase}; isolation={command.Transaction?.IsolationLevel}; SQL: {command.CommandText}");
+
+        public override ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command,
+            CommandEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        {
+            Record("nonquery executing", command);
+            if (role == "RSVP" && FamilyUpdate(command)) rsvpAttemptingFamily.TrySetResult();
+            return ValueTask.FromResult(result);
+        }
+
+        public override async ValueTask<int> NonQueryExecutedAsync(DbCommand command,
+            CommandExecutedEventData eventData, int result, CancellationToken cancellationToken = default)
+        {
+            Record("nonquery completed", command);
+            if (role == "Event edit" && FamilyUpdate(command))
+            {
+                editorHeldFamily.TrySetResult();
+                await rsvpAttemptingFamily.Task.WaitAsync(cancellationToken);
+            }
+            return result;
+        }
+
+        public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command,
+            CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
+        {
+            Record("reader executing", command);
+            return ValueTask.FromResult(result);
+        }
+
+        public override ValueTask<DbDataReader> ReaderExecutedAsync(DbCommand command,
+            CommandExecutedEventData eventData, DbDataReader result, CancellationToken cancellationToken = default)
+        {
+            Record("reader opened", command);
+            return ValueTask.FromResult(result);
+        }
     }
 
     private sealed class FamilyLockObserver : DbCommandInterceptor
