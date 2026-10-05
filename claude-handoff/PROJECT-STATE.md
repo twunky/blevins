@@ -1,6 +1,6 @@
 # Project State — Orientation Summary
 
-Snapshot reconciled after explicitly authorized WI-095-001 implementation (2026-10-04). Orientation only; authoritative state is `ai-context/project-status.md` and `ai-context/planning/roadmap.md`. Re-check each session.
+Snapshot reconciled after owner-approved WI-095-001 closure (2026-10-04). Orientation only; authoritative state is `ai-context/project-status.md` and `ai-context/planning/roadmap.md`. Re-check each session.
 
 ## Baseline and phase
 
@@ -8,12 +8,12 @@ Snapshot reconciled after explicitly authorized WI-095-001 implementation (2026-
 |---|---|
 | Active context baseline | CTX-1.30 APPROVED / ACTIVE (DEC-083; VER-CTX-1.30 PASS). CTX-1.29 historical Plan-note amendment; CTX-1.28 historical Phase 9 closure baseline. |
 | Previous phase | Phase 9 — Integration & UX Refinement — COMPLETE / CLOSED (DEC-081; VER-PH-009, 15/15 exits PASS). Phase 8 closed under DEC-072. |
-| Current phase | Phase 9.5 — MVP Feature Completion — CURRENT / IN PROGRESS, only WI-095-001 execution YES, implemented; VERIFYING / OWNER REVIEW (DEC-083; separate owner instruction) |
+| Current phase | Phase 9.5 — MVP Feature Completion — CURRENT / IN PROGRESS; WI-095-001 COMPLETE / PASS — OWNER APPROVED. Next item NOT YET AUTHORIZED. |
 | Phase 9 planning basis | `PRP-030 — Phase 9 Scope, Themes and Exit Criteria` — `APPROVED` (`DEC-074`; 15 exit criteria) |
 | Next phase | Phases 10/11 retain numbers; all later Phase 9.5 capabilities separately gated, OD-002 OPEN |
 | Phase 8 planning basis | `PRP-028` — `APPROVED` (`DEC-067`, `DEC-068`) |
 | Incident planning basis | `PRP-029` — `APPROVED` (`DEC-071`); canonical as `REQ-SAFE-016` and `REQ-PRIV-026`. `OD-004` resolved. |
-| **Current implementation objective** | WI-095-001 — Event Invitations and RSVP: implemented under explicit owner authorization; VERIFYING / OWNER REVIEW. VER-WI-095-001 records actual evidence and pending owner review/closure; see [CURRENT-TASK.md](CURRENT-TASK.md). No broad cleanup authorized. |
+| **Current implementation objective** | Latest completed item: WI-095-001 — Event Invitations and RSVP; [VER-WI-095-001](../ai-context/planning/verification/VER-WI-095-001.md) records COMPLETE / PASS — OWNER APPROVED. No next Phase 9.5 item authorized; see [CURRENT-TASK.md](CURRENT-TASK.md). |
 | Home dashboard | **Complete.** `WI-009-006 — Home Dashboard Prototype Alignment` is `DONE / PASS` — `OWNER APPROVED` (2026-10-03; `VER-WI-009-006`; `DEC-076`). <ul><li>Presentation-only Home after `references/ux/home-dashboard` panel ①:<ul><li>a time-of-day greeting, with the Family in the subtitle;</li><li>real Events, Trips, and Plans cards with compact empty states;</li><li>a compact Safety coordination card and a View Family action;</li><li>text-only placeholders for Recent Family Updates, My Tasks, and Active Sharing.</li></ul></li><li>Styles are in `src/FamilySafety.Web/src/app/home.scss`.</li><li>No Phase 9.5 capability.</li></ul> |
 | Family dashboard | **Complete.** `WI-009-007 — Family Dashboard Prototype Alignment` is `DONE / PASS` — `OWNER APPROVED` (2026-10-03; `VER-WI-009-007`; `DEC-077`). <ul><li>`/family` is the coordination dashboard after panel ②:<ul><li>members and member detail;</li><li>Waiting for you;</li><li>text-only placeholders for birthdays, updates, and check-ins.</li></ul></li><li>`/family/settings` holds Family details, relationships, and the administrator-only Invite card. The gear is visible to all members and is navigation only.</li><li>Styles are in `family.scss` and `family-settings.scss`.</li><li>No Phase 9.5 capability.</li></ul> |
 | Safety dashboard | **Complete.** `WI-009-009 — Safety Dashboard Prototype Alignment` is `DONE / PASS` — `OWNER APPROVED` (2026-10-03; `VER-WI-009-009`; `DEC-079`). <ul><li>`/safety` is a read-only dashboard after panel ④: separate Open Concerns and Open Safety Incidents summaries (existing list reads, Open only, no reason or workspace detail), a Recent Check-Ins placeholder, and an About Concerns and Incidents card.</li><li>No create, resolve, contact, settings, or emergency control; no selected Family needed; Family labels for multi-Family callers.</li><li>Back to Safety on `/concerns` and `/incidents`. It revisits `WI-009-003` D1 / `AC-15` for `/safety` only.</li><li>Standalone deferred component; current location: `src/FamilySafety.Web/src/app/safety/safety-dashboard.ts`. No Phase 9.5 capability.</li></ul> |

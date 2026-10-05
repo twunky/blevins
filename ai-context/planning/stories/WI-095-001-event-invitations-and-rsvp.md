@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Work Item ID:** `WI-095-001`
-- **Status:** `VERIFYING / OWNER REVIEW` — implementation execution explicitly authorized by owner on 2026-10-04; owner visual approval and explicit closure pending
+- **Status:** `DONE / PASS — OWNER APPROVED` (COMPLETE; owner acceptance and closure 2026-10-04)
 - **Phase:** Phase 9.5 — MVP Feature Completion; first approved item only
 - **Context baseline:** `CTX-1.30` (execution depends on verified activation)
 - **Requirement references:** `REQ-EVT-001`, `REQ-EVT-005`, `REQ-EVT-008`, `REQ-EVT-009`, `REQ-EVT-010`, `REQ-EVT-014`; `REQ-PRIV-011`, `REQ-PRIV-020`, `REQ-PRIV-021`, `REQ-PRIV-023`, `REQ-PRIV-027`, `REQ-PRIV-028`; `REQ-UX-011`, `REQ-UX-014`; `REQ-VERIFY-001`, `REQ-VERIFY-002`, `REQ-VERIFY-003`.
@@ -58,7 +58,7 @@ Later Needs may consume invitation ID/profile, unrevoked status/current RSVP, cr
 
 ## Acceptance checks
 
-The checks below govern implementation. [VER-WI-095-001](../verification/VER-WI-095-001.md) maps actual evidence; context verification alone does not satisfy them. Owner visual approval and explicit closure remain pending.
+The checks below govern implementation. [VER-WI-095-001](../verification/VER-WI-095-001.md) maps actual evidence; context verification alone does not satisfy them. Owner visual approval and explicit closure were completed 2026-10-04.
 
 1. `AC-01` — Creating an Event and selecting its audience create zero invitations and no organizer RSVP; existing five-field detail editing and fixed audience/editor permissions remain. (`REQ-EVT-005/008/014`, `REQ-PRIV-020/021`)
 2. `AC-02` — Only the currently authorized sole organizer with active Family membership can issue invitations, from Event detail, to existing active adult profiles with current canonical Event visibility; self-invite and ineligible/non-system targets are rejected server-side without expanding audience. (`REQ-EVT-009/010/014`, `REQ-PRIV-011/028`)
@@ -91,7 +91,7 @@ The checks below govern implementation. [VER-WI-095-001](../verification/VER-WI-
 - [x] `TASK-001` — Obtain explicit owner execution authorization after verified CTX activation; re-read checkpoint and inspect current relevant code/conventions.
 - [x] `TASK-002` — Implement the bounded invitation domain, actor-specific contracts, server access, persistence/additive migration and concurrency constraints; focused .NET/SQL verification.
 - [x] `TASK-003` — Add new participation presentation/state and minimal Events dashboard discovery integration, preserving App ownership; focused Angular verification.
-- [ ] `TASK-004` — Verify focused end-to-end privacy/lifecycle/recovery, desktop/narrow render and accessibility; obtain owner visual review.
+- [x] `TASK-004` — Verify focused end-to-end privacy/lifecycle/recovery, desktop/narrow render and accessibility; obtain owner visual review.
 - [x] `TASK-005` — Run required final regressions, verify artifact health, prepare AC/requirement evidence and propose closure for owner review. Leave Git changes uncommitted.
 
 ## Stop conditions / dependencies
@@ -116,11 +116,11 @@ The checks below govern implementation. [VER-WI-095-001](../verification/VER-WI-
 |---|---|---|
 | Context readiness | [VER-CTX-1.30](../verification/VER-CTX-1.30.md) | Separate context verification; not implementation evidence |
 | AC-01 through AC-23 | [VER-WI-095-001](../verification/VER-WI-095-001.md): bounded implementation, focused backend/API/SQL/Angular/E2E, rendered/axe review | See individual evidence/results |
-| AC-24 / AC-25 | Same record: actual final gates, independence and review-order disclosure | Owner visual review/explicit closure PENDING |
+| AC-24 / AC-25 | Same record: actual final gates, independence, owner visual acceptance and closure | PASS — OWNER APPROVED |
 
 - **Verification report:** [VER-WI-095-001](../verification/VER-WI-095-001.md).
-- **Independence:** `SELF-VERIFIED` — the implementing agent also tested/reviewed this implementation. No independent or owner visual approval is inferred.
-- **Outcome:** Implemented; `VERIFYING / OWNER REVIEW`. TASK-004 retains its owner visual-review requirement; final automated gates, evidence and closure proposal are recorded under TASK-005. Actual results and the latest-instruction validation order are disclosed in VER-WI-095-001; no owner approval or closure is inferred. No next item is authorized.
+- **Independence:** `SELF-VERIFIED` — the implementing agent also tested/reviewed this implementation. Owner visual acceptance and explicit closure recorded 2026-10-04; no independent verification is inferred.
+- **Outcome:** `DONE / PASS — OWNER APPROVED` (COMPLETE). All acceptance criteria passed; final automated results and the accepted regression sequence are recorded in VER-WI-095-001. No next item is authorized.
 
 ## Implementation record (2026-10-04)
 
@@ -128,5 +128,5 @@ The checks below govern implementation. [VER-WI-095-001](../verification/VER-WI-
 - Additive migration `20261004220426_EventInvitationsAndRsvp`: filtered active uniqueness, parent-history and own-Pending query indexes, restricted FKs and four-state SQL check. Existing Event/audience schema untouched.
 - Actor-specific application/repository/API operations use canonical Event visibility, exact active membership/profile identity, serializable transactions and the existing Family-lock convention. GUID concurrency token changes on every response/revocation; stale writes return nondisclosing conflict after current access checks.
 - New `src/app/events/event-participation` owns protected participation reads/actions/state/UI. App retains existing create/detail/edit/list/routing/Family-adoption ownership and adds only dashboard own-Pending discovery/reset.
-- Focused evidence: 7 domain, 12 application, 12 API, 10 SQL invitation tests; 30 participation/dashboard Angular tests and 35 existing item-route tests. Two new integrated invitation journeys plus the two existing dashboard journeys verified. Exact final results and initial failures are in VER-WI-095-001.
+- Focused evidence: 7 domain, 12 application, 12 API, 13 SQL invitation tests, including 9/9 coordinated lock-order overlaps; 30 participation/dashboard Angular tests and 35 existing item-route tests. Final SQL-gated .NET regression: 263/263 PASS. Exact results and initial failures are in VER-WI-095-001.
 - Only regression-test adaptation outside Event code: the Incident additive-migration test now explicitly targets its named Incident migration instead of assuming it is forever the latest migration. No Incident behavior or migration changed.

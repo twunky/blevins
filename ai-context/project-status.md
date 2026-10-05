@@ -1,6 +1,6 @@
 # Project Status
 
-**Current checkpoint (2026-10-04):** `CTX-1.30` remains ACTIVE. Phase 9.5 is `CURRENT / IN PROGRESS` only for [WI-095-001](planning/stories/WI-095-001-event-invitations-and-rsvp.md), implemented under the owner's explicit 2026-10-04 execution instruction; `VERIFYING / OWNER REVIEW`. [VER-WI-095-001](planning/verification/VER-WI-095-001.md) records actual evidence and pending owner visual review/closure. Later items remain separately gated; Phase 9 stays closed.
+**Current checkpoint (2026-10-04):** `CTX-1.30` remains ACTIVE. Phase 9.5 is `CURRENT / IN PROGRESS`; [WI-095-001](planning/stories/WI-095-001-event-invitations-and-rsvp.md) — Event Invitations and RSVP — is `COMPLETE / PASS — OWNER APPROVED`. [VER-WI-095-001](planning/verification/VER-WI-095-001.md) records the accepted implementation, 263/263 SQL-gated .NET result, corrected lock order and passing concurrency regression. No next Phase 9.5 item is authorized; Phase 9 stays closed.
 
 *The following post-Phase-9 and closure checkpoint banners are historical, preserved as written; current status is the checkpoint above and continuation table below.*
 
@@ -12,28 +12,28 @@
 
 **As of:** 2026-10-04<br>
 **Project:** Family Safety, Coordination & Planning Application  
-**Current mode:** WI-095-001 implemented; VERIFYING / OWNER REVIEW. CTX-1.30 ACTIVE; Phase 9.5 CURRENT / IN PROGRESS for this item only. Execution authorized YES; owner visual review and explicit closure pending. Development verification does not certify deployment.
+**Current mode:** WI-095-001 COMPLETE / PASS — OWNER APPROVED (2026-10-04). CTX-1.30 ACTIVE; Phase 9.5 CURRENT / IN PROGRESS. No next implementation item is authorized. Development verification does not certify deployment.
 
 ## Continuation checkpoint
 
 | Field | Current value |
 |---|---|
 | Previous phase | Phase 9 — Integration & UX Refinement — `COMPLETE / CLOSED` under `DEC-081`; [VER-PH-009](planning/verification/VER-PH-009.md), 15/15 formal exits PASS. |
-| Current phase | Phase 9.5 — MVP Feature Completion — `CURRENT / IN PROGRESS`, only WI-095-001 execution-authorized and implemented; VERIFYING / OWNER REVIEW. |
+| Current phase | Phase 9.5 — MVP Feature Completion — `CURRENT / IN PROGRESS`; WI-095-001 COMPLETE. No next item authorized. |
 | Next phase | Phases 10/11 retain numbering; later Phase 9.5 capabilities require separate approval/execution gates. OD-002 remains OPEN; predeployment gates separate. |
-| Current objective | [WI-095-001](planning/stories/WI-095-001-event-invitations-and-rsvp.md) — Event Invitations and RSVP implemented; owner review/closure pending. No sibling execution authorized. |
+| Current objective | Latest completed item: [WI-095-001](planning/stories/WI-095-001-event-invitations-and-rsvp.md) — Event Invitations and RSVP. Next Phase 9.5 item NOT YET AUTHORIZED. |
 | Active baseline | `CTX-1.30` — `APPROVED / ACTIVE` (`DEC-083`: REQ-EVT-014 and REQ-PRIV-028), verified before activation. |
 | Candidate baseline | None pending; [CTX-1.30](planning/candidates/CTX-1.30-event-invitations-and-rsvp.md) is ACTIVATED. |
 | Previous baseline | `CTX-1.29` — historical Plan-note amendment; `CTX-1.28` remains historical Phase 9 closure baseline. |
 | Canonical extraction | `COMPLETE` from the curated bootstrap source |
-| Verification | [VER-WI-095-001](planning/verification/VER-WI-095-001.md) — SELF-VERIFIED implementation evidence; owner review/closure pending. VER-CTX-1.30 remains active-baseline verification. |
+| Verification | [VER-WI-095-001](planning/verification/VER-WI-095-001.md) — COMPLETE / PASS — OWNER APPROVED. VER-CTX-1.30 remains active-baseline verification. |
 | Standing authorization | `DEC-032` — routine, reversible `ROUTINE`/`STANDARD` work may use bounded auto-approval; high-impact work still requires explicit approval |
-| Primary blocker | Owner visual review/explicit WI closure pending. Backup-aging/restore evidence remains a production deployment dependency. |
-| Next action | Owner reviews the uncommitted WI-095-001 implementation, evidence and visuals, then explicitly closes the item if accepted. Later capabilities/OD-002 remain separately gated. No Git staging/commit/push/PR by agent. |
+| Primary blocker | None for WI-095-001 closure. Backup-aging/restore evidence remains a production deployment dependency. |
+| Next action | No next implementation item is authorized; obtain separate owner approval before starting another Phase 9.5 capability. Owner performs all Git commits. |
 
 ## Current phase
 
-**Phase 9.5 — MVP Feature Completion** is `CURRENT / IN PROGRESS` only for WI-095-001, explicitly execution-authorized and implemented; VERIFYING / OWNER REVIEW, not DONE. Existing Event rules remain. Needs/Updates and every other DEC-073 capability require separate gates. OD-002 remains OPEN.
+**Phase 9.5 — MVP Feature Completion** remains `CURRENT / IN PROGRESS`. WI-095-001 is COMPLETE / PASS — OWNER APPROVED. No next Phase 9.5 item is authorized; Needs, Updates and every other DEC-073 capability require separate gates. OD-002 remains OPEN.
 
 ## Historical Phase 9 closure checkpoint
 

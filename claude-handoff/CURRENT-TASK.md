@@ -1,12 +1,12 @@
-# Current Task - WI-095-001 Implemented; Verifying / Owner Review
+# Current State - WI-095-001 Complete
 
 ## Current state and authorization
 
-CTX-1.30 remains ACTIVE under DEC-083. Phase 9.5 is CURRENT / IN PROGRESS only for [WI-095-001](../ai-context/planning/stories/WI-095-001-event-invitations-and-rsvp.md). The owner explicitly authorized implementation on 2026-10-04. Implementation is now VERIFYING / OWNER REVIEW; see [VER-WI-095-001](../ai-context/planning/verification/VER-WI-095-001.md) for exact results and pending owner visual review/closure. Phase 9 remains closed; OD-002 OPEN. No sibling execution authorized. No staging, commit, push or PR.
+CTX-1.30 remains ACTIVE under DEC-083. Phase 9.5 remains CURRENT / IN PROGRESS. [WI-095-001](../ai-context/planning/stories/WI-095-001-event-invitations-and-rsvp.md) — Event Invitations and RSVP — is COMPLETE / PASS — OWNER APPROVED (2026-10-04); see [VER-WI-095-001](../ai-context/planning/verification/VER-WI-095-001.md). The corrected Family → Event → invitation/state lock order and concurrency regression are included in the accepted implementation. The bounded participation component lives under `src/app/events/`. No next Phase 9.5 item is authorized; obtain separate owner approval before starting another capability. Phase 9 remains closed; OD-002 OPEN. The owner performs all commits.
 
 ## Implemented first scope
 
-One invitation record/table, organizer-only issue/list/revoke, eligible invitee self-RSVP, version/transaction protection, selected-Family own active Pending discovery and the new src/app/events/event-participation boundary. App retains Event create/detail/edit/list and authorize-first routing/Family adoption. Needs, Updates, Home attention, notifications and every other sibling remain untouched. Owner review is next; do not start the next item or repeat broad gates without a concrete reason.
+One invitation record/table, organizer-only issue/list/revoke, eligible invitee self-RSVP, version/transaction protection, selected-Family own active Pending discovery and the new src/app/events/event-participation boundary. App retains Event create/detail/edit/list and authorize-first routing/Family adoption. Needs, Updates, Home attention, notifications and every other sibling remain untouched. No next item is authorized.
 
 ## Completed post-Phase-9 follow-ups
 

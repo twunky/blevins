@@ -1,6 +1,6 @@
 # Claude Handoff — Blevins / Family Safety
 
-**Current state (2026-10-04):** `CTX-1.30` ACTIVE (`DEC-083`; [VER-CTX-1.30](../ai-context/planning/verification/VER-CTX-1.30.md) PASS). Phase 9 remains `COMPLETE / CLOSED` (`DEC-081`; [VER-PH-009](../ai-context/planning/verification/VER-PH-009.md)). Phase 9.5 is `CURRENT / IN PROGRESS` for only [WI-095-001](../ai-context/planning/stories/WI-095-001-event-invitations-and-rsvp.md) — Event Invitations and RSVP: APPROVED scope, **execution authorized NO**. Separate owner execution authorization is required; later capabilities remain separately gated. Prior confirmation work committed `02ebce3`; see [CURRENT-TASK.md](CURRENT-TASK.md). Historical Phase 9 closure banner remains in [HISTORY.md § Part D](HISTORY.md#part-d).
+**Current state (2026-10-04):** `CTX-1.30` ACTIVE (`DEC-083`; [VER-CTX-1.30](../ai-context/planning/verification/VER-CTX-1.30.md) PASS). Phase 9 remains `COMPLETE / CLOSED` (`DEC-081`; [VER-PH-009](../ai-context/planning/verification/VER-PH-009.md)). Phase 9.5 is `CURRENT / IN PROGRESS`; [WI-095-001](../ai-context/planning/stories/WI-095-001-event-invitations-and-rsvp.md) — Event Invitations and RSVP — is COMPLETE / PASS — OWNER APPROVED. No next implementation item is authorized; later capabilities require separate owner approval. See [CURRENT-TASK.md](CURRENT-TASK.md) and [PROJECT-STATE.md](PROJECT-STATE.md). Historical Phase 9 closure banner remains in [HISTORY.md § Part D](HISTORY.md#part-d).
 
 > ## PRIMARY VISUAL REFERENCES: `C:\Dev\blevins\claude-handoff\reference`
 >
@@ -28,7 +28,7 @@ Session and task guidance for Claude coding sessions working in this repository.
 - **Project root:** `C:\Dev\blevins`
 - **Product:** Family Safety, Coordination & Planning Application (local-first MVP; .NET 10 API + Angular 22 web client)
 - **Canonical context:** `C:\Dev\blevins\ai-context`
-- **Prepared:** 2026-10-01. Current guidance reconciled 2026-10-04 with CTX-1.30 verified activation (`DEC-083`). Phase 9 closure remains intact. Only WI-095-001 scope is approved, execution NO. Cleanup Waves 1–5 complete; no broad cleanup/reorganization authorized.
+- **Prepared:** 2026-10-01. Current guidance reconciled 2026-10-04 with CTX-1.30 verified activation (`DEC-083`) and WI-095-001 owner-approved closure. Phase 9 closure remains intact. Phase 9.5 remains current; no next item is authorized. Cleanup Waves 1–5 complete; no broad cleanup/reorganization authorized.
 
 ## Source of truth
 
@@ -69,7 +69,7 @@ Do not load [HISTORY.md](HISTORY.md) for normal work. It keeps earlier checkpoin
 
 ## Current phase (one line)
 
-Phase 9.5 — MVP Feature Completion is `CURRENT / IN PROGRESS` under DEC-083; CTX-1.30 ACTIVE. Only WI-095-001 — Event Invitations and RSVP is APPROVED; execution NO. Phase 9 remains COMPLETE / CLOSED under DEC-081. See [CURRENT-TASK.md](CURRENT-TASK.md) for gates and [PROJECT-STATE.md](PROJECT-STATE.md) for orientation; earlier checkpoints remain in [HISTORY.md § Part D](HISTORY.md#part-d). Future authorized UI work follows the existing visual system.
+Phase 9.5 — MVP Feature Completion is `CURRENT / IN PROGRESS` under DEC-083; CTX-1.30 ACTIVE. WI-095-001 — Event Invitations and RSVP is COMPLETE / PASS — OWNER APPROVED; no next work item is authorized. Phase 9 remains COMPLETE / CLOSED under DEC-081. See [CURRENT-TASK.md](CURRENT-TASK.md) for current state and [PROJECT-STATE.md](PROJECT-STATE.md) for orientation; earlier checkpoints remain in [HISTORY.md § Part D](HISTORY.md#part-d). Future authorized UI work follows the existing visual system.
 
 ## Workflow
 
