@@ -9,9 +9,9 @@
 | Active baseline | CTX-1.31 APPROVED / ACTIVE under DEC-084; [baseline verification](planning/verification/VER-CTX-1.31.md) PASS / SELF-VERIFIED. |
 | Current phase | Phase 9.5 — MVP Feature Completion — CURRENT / IN PROGRESS. |
 | Previous phase | Phase 9 — Integration & UX Refinement — COMPLETE / CLOSED under DEC-081. |
-| Completed items | [WI-095-001 — Event Invitations and RSVP](planning/stories/WI-095-001-event-invitations-and-rsvp.md) and [WI-095-002 — Event Needs](planning/stories/WI-095-002-event-needs.md) COMPLETE / PASS — OWNER APPROVED (2026-10-04). [Event Needs verification](planning/verification/VER-WI-095-002.md) COMPLETE / PASS. |
-| Current authorized implementation item | [WI-095-003 — Event Updates](planning/stories/WI-095-003-event-updates.md) VERIFYING / OWNER REVIEW; implementation and validation finished, PASS / SELF-VERIFIED. |
-| Next owner action | Review WI-095-003 and its uncommitted changes. Owner commits; no next item authorized. |
+| Completed items | WI-095-001, WI-095-002, and [WI-095-003 — Event Updates](planning/stories/WI-095-003-event-updates.md) COMPLETE / PASS — OWNER APPROVED (2026-10-04). [Event Updates verification](planning/verification/VER-WI-095-003.md) COMPLETE / PASS. |
+| Current authorized implementation item | NONE AUTHORIZED. |
+| Next owner action | Select and authorize a bounded next work item. Owner performs all Git commits. |
 
 ## Open decisions
 
@@ -26,6 +26,6 @@ Production authentication, hosting, and backup-aging/restore evidence remain sep
 
 ## Required context for the next action
 
-Read [AI operating rules](README.md) and this checkpoint first. Load WI-095-003 required context for execution. For an owner-selected task, use [context routing](../claude-handoff/CONTEXT-ROUTING.md) to select relevant canonical sources; an authorized work item's required-context manifest then controls loading.
+Read [AI operating rules](README.md) and this checkpoint first. There is no active implementation manifest to load. For an owner-selected task, use [context routing](../claude-handoff/CONTEXT-ROUTING.md) to select relevant canonical sources; an authorized work item's required-context manifest then controls loading.
 
 Completed implementation and testing details remain in their work items and verification records, including [VER-WI-095-001](planning/verification/VER-WI-095-001.md). Read historical records only for a specific provenance or regression question, not as default session context.

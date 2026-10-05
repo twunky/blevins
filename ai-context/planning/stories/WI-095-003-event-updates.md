@@ -1,6 +1,6 @@
 # WI-095-003 — Event Updates
 
-- **Status:** VERIFYING / OWNER REVIEW; Phase 9.5 CURRENT / IN PROGRESS.
+- **Status:** COMPLETE / PASS — OWNER APPROVED (2026-10-04); Phase 9.5 CURRENT / IN PROGRESS.
 - **Baseline/tier:** CTX-1.31 / DEEP.
 - **Requirements:** REQ-EVT-002/006/009/012; REQ-PRIV-021/023/027.
 - **Authorization:** Work item and execution explicitly authorized by the owner's Event Updates request, 2026-10-04. Owner performs all Git commits; no staging, commits, push or PR.
@@ -32,8 +32,8 @@ No comments, reactions, chat, attachments, rich text, generic feed/audit framewo
 
 ## Stop conditions
 
-Stop for a material unresolved product/privacy decision, canonical conflict, unexplained validation failure, stale baseline or required work outside this scope. Leave VERIFYING / OWNER REVIEW after self-verification; owner alone completes this item.
+Stop for a material unresolved product/privacy decision, canonical conflict, unexplained validation failure, stale baseline or required work outside this scope. Owner acceptance and closure recorded 2026-10-04.
 
 ## Verification
 
-2026-10-04 — implementation and proportional validation finished; PASS / SELF-VERIFIED in [VER-WI-095-003](../verification/VER-WI-095-003.md). Owner acceptance and completion remain pending. No next item authorized; changes remain uncommitted.
+2026-10-04 — implementation and proportional validation finished; PASS / SELF-VERIFIED in [VER-WI-095-003](../verification/VER-WI-095-003.md). Owner accepted implementation and validation and approved closure on 2026-10-04. Verification is COMPLETE / PASS. No next item authorized; owner performs all Git commits.
