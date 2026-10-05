@@ -274,13 +274,6 @@
               <p class="home-future-note">Shared family tasks will appear here as task features become available.</p>
             </section>
 
-            <section class="card home-future home-future--sharing" aria-labelledby="home-sharing-heading">
-              <div class="card-header">
-                <span class="card-icon"><app-icon name="share" /></span>
-                <h2 id="home-sharing-heading">Active Sharing</h2>
-              </div>
-              <p class="home-future-note">Active sharing will appear here when temporary family sharing is available.</p>
-            </section>
           </div>
         } @else if (!familyGroupsLoaded()) {
           <p role="status">Loading your family…</p>
@@ -301,6 +294,9 @@
       </section>
     }
 
+    @if (view() === 'home') {
+      <app-sharing-sessions [ownProfileId]="ownerProfile()?.profileId ?? null" [summaryOnly]="true" />
+    }
     @if (view() === 'plansTrips') {
       <app-group-landing group="plansTrips" />
     }
@@ -309,6 +305,7 @@
       @defer (on immediate) {
         <app-safety-dashboard [ownProfileId]="ownerProfile()?.profileId ?? null" [showFamilyName]="activeFamilyGroups().length > 1" />
         <app-check-ins [familyId]="currentFamilyId() || null" [ownProfileId]="ownerProfile()?.profileId ?? null" />
+        <app-sharing-sessions [familyId]="currentFamilyId() || null" [ownProfileId]="ownerProfile()?.profileId ?? null" />
       } @loading {
         <p role="status">Loading Safety…</p>
       }

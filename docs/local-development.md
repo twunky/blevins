@@ -2,6 +2,15 @@
 
 These instructions describe the current local Development configuration. They do not configure production services.
 
+## Temporary Sharing Sessions (WI-095-006)
+
+Migration `20261005032233_TemporarySharingSessions` adds sessions, exact recipient/membership grants and one replaceable current-location row per session. Its membership-loss trigger permanently invalidates grants; author loss stops the session and removes its raw point. `/api/sharing-sessions` exposes create, active mine/received lists, authorized detail, author stop and author location replacement. Responses are `no-store`; denied/missing IDs return the same empty 404. There is no history/audience-edit/extension endpoint.
+
+Default expiration is one hour; chosen expiration must be in the next 24 hours. Location validation requires finite coordinates, non-negative accuracy and a capture during the session, no more than five minutes old or one minute ahead of server time. Older/non-increasing captures, stale versions and updates within one minute of the previous accepted update are rejected. Capture time remains distinct from server receipt time.
+
+`SharingSessionMaintenanceService` runs feature-specific raw-point cleanup at startup and every minute outside Testing. Authorization checks expiration and current eligible membership on every read/write, so cleanup timing never grants access. Only non-location session/grant metadata survives. Browser tests mock geolocation; they use the existing isolated SQL harness, never physical device location. Recipient display refreshes every 15 seconds and clears on access/read failure; server revocation is immediate. Browser watch collection pauses on hiding/leaving the sharing UI and requires an explicit re-enable on return.
+
+
 ## Prerequisites
 
 - Windows with the .NET 10 SDK. The repository pins SDK `10.0.401` in `global.json`.

@@ -1,0 +1,9 @@
+:host { display: block; margin-top: 1rem; min-width: 0; }
+.session-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-top: 1.25rem; }
+form { display: grid; gap: .65rem; margin-top: 1rem; }
+fieldset { min-width: 0; border: 1px solid var(--color-border); border-radius: .75rem; padding: 1rem; }
+.recipient-choice { display: flex; align-items: center; gap: .5rem; margin-block: .5rem; }
+.recipient-choice input { width: auto; }
+.actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.row-list li { padding-block: .8rem; overflow-wrap: anywhere; }
+@media (max-width: 640px) { .session-grid { grid-template-columns: 1fr; } .card-header { flex-wrap: wrap; } }

@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 using FamilySafety.Api.CheckIns;
+using FamilySafety.Api.Sharing;
+using FamilySafety.Application.Sharing;
 using FamilySafety.Application.CheckIns;
 using FamilySafety.Api.Development;
 using FamilySafety.Api.Directory;
@@ -36,6 +38,7 @@ var connectionString = builder.Configuration.GetConnectionString("FamilySafety")
 
 builder.Services.AddFamilySafetyInfrastructure(connectionString);
 builder.Services.AddScoped<ICheckInService, CheckInService>();
+builder.Services.AddScoped<SharingSessionService>();
 builder.Services.AddScoped<IAdultProfileService, AdultProfileService>();
 builder.Services.AddScoped<IMembershipInvitationService, MembershipInvitationService>();
 builder.Services.AddScoped<IFamilyDirectoryService, FamilyDirectoryService>();
@@ -56,6 +59,7 @@ if (!builder.Environment.IsEnvironment("Testing"))
     builder.Services.AddHostedService<ConcernMaintenanceService>();
     builder.Services.AddHostedService<IncidentMaintenanceService>();
     builder.Services.AddHostedService<SharedFamilyDateMaintenanceService>();
+    builder.Services.AddHostedService<SharingSessionMaintenanceService>();
 }
 builder.Services.AddCurrentAccount(builder.Environment, builder.Configuration);
 builder.Services.AddDevelopmentFixtures(builder.Environment, builder.Configuration);
@@ -66,6 +70,7 @@ var app = builder.Build();
 app.UseExceptionHandler();
 app.MapHealthChecks("/health");
 app.MapCheckInEndpoints();
+app.MapSharingSessionEndpoints();
 app.MapAdultProfileEndpoints();
 app.MapMembershipInvitationEndpoints();
 app.MapFamilyDirectoryEndpoints();

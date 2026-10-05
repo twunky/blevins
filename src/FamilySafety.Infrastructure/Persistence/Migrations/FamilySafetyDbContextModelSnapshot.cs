@@ -1328,6 +1328,8 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                             t.HasTrigger("TR_EventNeeds_MembershipLoss");
 
                             t.HasTrigger("TR_SharedFamilyDates_MembershipLoss");
+
+                            t.HasTrigger("TR_SharingSessions_MembershipLoss");
                         });
 
                     b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
@@ -1442,6 +1444,105 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("FamilyRelationships", (string)null);
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Sharing.SharingCurrentLocation", b =>
+                {
+                    b.Property<Guid>("SharingSessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Accuracy")
+                        .HasColumnType("float");
+
+                    b.Property<DateTimeOffset>("CapturedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<DateTimeOffset>("ReceivedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("SharingSessionId");
+
+                    b.ToTable("SharingCurrentLocations", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_SharingCurrentLocations_Coordinates", "[Latitude] >= -90 AND [Latitude] <= 90 AND [Longitude] >= -180 AND [Longitude] <= 180 AND [Accuracy] >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Sharing.SharingSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AuthorMembershipId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AuthorMembershipVersion")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("AuthorProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("EndsAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("FamilyGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("StartedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("StoppedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorMembershipId");
+
+                    b.HasIndex("FamilyGroupId");
+
+                    b.HasIndex("AuthorProfileId", "EndsAtUtc");
+
+                    b.ToTable("SharingSessions", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_SharingSessions_Duration", "[EndsAtUtc] > [StartedAtUtc] AND [EndsAtUtc] <= DATEADD(hour, 24, [StartedAtUtc])");
+                        });
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Sharing.SharingSessionRecipient", b =>
+                {
+                    b.Property<Guid>("SharingSessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsInvalidated")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MembershipId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MembershipVersion")
+                        .HasColumnType("int");
+
+                    b.HasKey("SharingSessionId", "ProfileId");
+
+                    b.HasIndex("MembershipId");
+
+                    b.HasIndex("ProfileId", "IsInvalidated");
+
+                    b.ToTable("SharingSessionRecipients", (string)null);
                 });
 
             modelBuilder.Entity("FamilySafety.Domain.Trips.FamilyTrip", b =>
@@ -2068,6 +2169,57 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("RecipientProfileId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Sharing.SharingCurrentLocation", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Sharing.SharingSession", null)
+                        .WithOne()
+                        .HasForeignKey("FamilySafety.Domain.Sharing.SharingCurrentLocation", "SharingSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Sharing.SharingSession", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroupMembership", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorMembershipId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroup", null)
+                        .WithMany()
+                        .HasForeignKey("FamilyGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Sharing.SharingSessionRecipient", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroupMembership", null)
+                        .WithMany()
+                        .HasForeignKey("MembershipId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Sharing.SharingSession", null)
+                        .WithMany()
+                        .HasForeignKey("SharingSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

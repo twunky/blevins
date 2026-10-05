@@ -223,7 +223,7 @@ describe('SafetyDashboard (WI-009-009)', () => {
     }
   });
 
-  it('renders at /safety without a selected Family, reading only the two list endpoints beyond the shell (O5)', async () => {
+  it('renders at /safety without a selected Family, reading authorized Safety, Check-In and Sharing lists', async () => {
     const harness = await RouterTestingHarness.create();
     await harness.navigateByUrl('/safety', App);
     http.expectOne('/api/profile').flush({ profileId: me, displayName: 'Alex' });
@@ -235,8 +235,8 @@ describe('SafetyDashboard (WI-009-009)', () => {
     await harness.fixture.whenStable();
     harness.detectChanges();
     const requested = http.match(() => true);
-    expect(requested.map(request => request.request.url).sort()).toEqual(['/api/check-ins/mine', '/api/check-ins/received', '/api/concerns', '/api/incidents']);
-    requested.filter(request => request.request.url.startsWith('/api/check-ins')).forEach(request => request.flush([]));
+    expect(requested.map(request => request.request.url).sort()).toEqual(['/api/check-ins/mine', '/api/check-ins/received', '/api/concerns', '/api/incidents', '/api/sharing-sessions/mine', '/api/sharing-sessions/received']);
+    requested.filter(request => request.request.url.startsWith('/api/check-ins') || request.request.url.startsWith('/api/sharing-sessions')).forEach(request => request.flush([]));
     requested.find(request => request.request.url === '/api/concerns')!.flush([
       concern('c1', 'Avery', 'Open'), concern('c2', 'Blake', 'Open', { familyGroupId: 'family-b', familyGroupName: 'Family B' }),
     ]);

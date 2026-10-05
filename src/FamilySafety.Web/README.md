@@ -8,6 +8,8 @@ In `src/app`, `app.ts` and `app.html` still implement Home, Family, Events, Plan
 
 `check-ins/check-ins` owns WI-095-005 standalone creation and sent/shared history in Safety. App supplies creation Family context and current profile; every history projection uses server-authorized author/recipient access, independently of selected Family. Status/note/recipients are fixed at creation.
 
+`sharing-sessions/sharing-sessions` owns WI-095-006 temporary own-location sharing in Safety and the Home active-sharing indicator. Family/profile inputs reset drafts, protected reads and browser watches. Explicit fixed recipients, a chosen expiration within 24 hours and stop use server authorization. Browser geolocation is permission-based and collected only while the sharing UI is active; author may re-enable updates after returning. Updates are limited to one minute, recipient reads refresh every 15 seconds, and local expiration removes displayed points without waiting for a read. No coordinates are persisted in browser storage or kept as history.
+
 ## Structure and extraction
 
 `family-dates/shared-family-dates` owns WI-095-004 date list/forms, protected requests, server-derived actions and context reset. App supplies the selected Family/profile and retains the rest of the Family experience. Profile birthdays are not copied into date entries.

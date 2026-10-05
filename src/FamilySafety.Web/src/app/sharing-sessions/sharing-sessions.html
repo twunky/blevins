@@ -1,0 +1,80 @@
+@if (!summaryOnly || mine().length > 0 || state() === 'error') {
+<section class="card" [attr.aria-labelledby]="summaryOnly ? 'active-sharing-heading' : 'sharing-heading'">
+  <div class="card-header">
+    <h2 [id]="summaryOnly ? 'active-sharing-heading' : 'sharing-heading'">{{ summaryOnly ? 'Active sharing' : 'Temporary location sharing' }}</h2>
+    @if (!summaryOnly || mine().length > 0) {
+      <button type="button" class="button--secondary" (click)="load()" [disabled]="busy()">Refresh sharing</button>
+    }
+  </div>
+  @if (message()) { <p role="status">{{ message() }}</p> }
+  @if (error()) { <p role="alert">{{ error() }}</p> }
+  @if (state() === 'loading') { <p role="status">Loading sharing…</p> }
+  @else if (state() === 'unavailable') { <p>Sharing is unavailable. Sign in with your own adult profile.</p> }
+  @else if (state() === 'error') { <p role="alert">Sharing could not be loaded. Refresh to check current access.</p> }
+  @else if (summaryOnly) {
+    @for (row of mine(); track row.sharingSessionId) {
+      <p>Sharing your current / last-reported location until {{ row.endsAtUtc | date:dateFormat }} with {{ row.recipients?.length }} explicitly selected recipients.</p>
+    } @empty { <p>You have no active location sharing.</p> }
+    <a routerLink="/safety" fragment="sharing-sessions">Manage sharing in Safety</a>
+  } @else {
+    <p class="section-help">Share only your own current / last-reported location with adults you choose in one Family. Browser location permission is required for updates. Updates work while this page is active and the browser permits them; background updates are not guaranteed.</p>
+    @if (peopleError()) { <p role="alert">{{ peopleError() }}</p> }
+    @if (familyId) { <button type="button" class="button--secondary" (click)="loadPeople()" [disabled]="busy() || formOpen()">Refresh recipients</button> }
+    @if (eligible() && !formOpen()) { <button type="button" (click)="open()">Start location sharing</button> }
+    @if (!familyId) { <p>Choose an active Family to start sharing.</p> }
+    @if (formOpen()) {
+      <form (ngSubmit)="start()">
+        <fieldset [disabled]="busy()">
+          <legend>Choose sharing recipients</legend>
+          <p class="section-help">No one is selected by default. Audience stays fixed; stop and start a new session to change it. Leaving the Family permanently ends that person's grant.</p>
+          @for (person of people(); track person.profileId) {
+            <label class="recipient-choice"><input type="checkbox" [checked]="recipientIds.includes(person.profileId)" (change)="choose(person.profileId, $any($event.target).checked)" />{{ person.displayName }}</label>
+          } @empty { <p>No other eligible adults are available.</p> }
+        </fieldset>
+        <label for="sharing-end">Sharing end time</label>
+        <input id="sharing-end" name="end" type="datetime-local" [(ngModel)]="endTime" required [disabled]="busy()" />
+        <p class="section-help">Default one hour. Choose a time within 24 hours; sharing never extends itself. You may stop early.</p>
+        <div class="actions">
+          <button type="submit" [disabled]="busy() || !valid()">Start sharing and request location</button>
+          <button type="button" class="button--secondary" (click)="formOpen.set(false)" [disabled]="busy()">Cancel sharing draft</button>
+        </div>
+      </form>
+    }
+    @if (locationMessage()) { <p role="status">{{ locationMessage() }}</p> }
+    <div class="session-grid" id="sharing-sessions">
+      <section aria-labelledby="sharing-mine-heading">
+        <h3 id="sharing-mine-heading">Sharing by me</h3>
+        <ul class="row-list">
+          @for (row of mine(); track row.sharingSessionId) {
+            <li><strong>Sharing until {{ row.endsAtUtc | date:dateFormat }}</strong>
+              <p>Current / last-reported location. Audience:</p>
+              <ul>@for (person of row.recipients; track person.profileId) { <li>{{ person.displayName }}{{ person.hasAccess ? '' : ' (access ended)' }}</li> }</ul>
+              @if (row.location) {
+                <p>Latitude {{ row.location.latitude | number:'1.4-6' }}, longitude {{ row.location.longitude | number:'1.4-6' }}. Accuracy {{ row.location.accuracy | number:'1.0-0' }} meters.</p>
+                <p>Last updated {{ row.location.capturedAtUtc | date:dateFormat }}. {{ stale(row) ? 'Location has not updated recently.' : 'Last reported point; location may have changed.' }}</p>
+              } @else { <p>Location not yet available.</p> }
+              <div class="actions">
+                <button type="button" class="button--secondary" (click)="collect(row)" [disabled]="busy()">{{ watching() === row.sharingSessionId ? 'Retry browser location' : 'Enable location updates' }}</button>
+                <button type="button" (click)="stop(row)" [disabled]="busy()">Stop sharing</button>
+              </div>
+            </li>
+          } @empty { <li>You have no active location sharing.</li> }
+        </ul>
+      </section>
+      <section aria-labelledby="sharing-received-heading">
+        <h3 id="sharing-received-heading">Location shared with me</h3>
+        <ul class="row-list">
+          @for (row of received(); track row.sharingSessionId) {
+            <li><strong>{{ row.authorDisplayName }}</strong><p>Sharing until {{ row.endsAtUtc | date:dateFormat }}</p>
+              @if (row.location) {
+                <p>Latitude {{ row.location.latitude | number:'1.4-6' }}, longitude {{ row.location.longitude | number:'1.4-6' }}. Accuracy {{ row.location.accuracy | number:'1.0-0' }} meters.</p>
+                <p>Last updated {{ row.location.capturedAtUtc | date:dateFormat }}. {{ stale(row) ? 'Location has not updated recently.' : 'Last reported point; location may have changed.' }}</p>
+              } @else { <p>Location not yet available.</p> }
+            </li>
+          } @empty { <li>No active locations are shared with you.</li> }
+        </ul>
+      </section>
+    </div>
+  }
+</section>
+}

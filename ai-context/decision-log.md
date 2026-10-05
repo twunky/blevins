@@ -710,7 +710,7 @@ These questions are intentionally unresolved and are not requirements.
 
 | ID | Status | Decision required | Constraint |
 |---|---|---|---|
-| `OD-002` | `OPEN` | Decide whether persistent or indefinite location sharing belongs in MVP. | Temporary/contextual sharing remains the approved default. Assigned to Phase 9.5 — MVP Feature Completion by `DEC-073`; outside Phase 9. |
+| `OD-002` | `RESOLVED - bounded MVP` | Temporary only; no indefinite sharing in this first slice. | DEC-087 / REQ-PRIV-031: default one hour, maximum 24 hours, explicit audience/start/expiration and early stop. Future scope requires separate approval. |
 | `OD-003` | `OPEN — FUTURE WORK` | Define minor and guardian functionality for a future phase. | Excluded from MVP by `DEC-053`; no behavior is defined or authorized. |
 
 ## Resolved product decisions
@@ -1217,3 +1217,11 @@ These questions are intentionally unresolved and are not requirements.
 - **Privacy:** Explicit active adult recipients in one Family where the author is active. Grants bind exact profiles and original memberships; either party's loss permanently invalidates sharing, with no rejoin/inheritance. Own history survives departure. REQ-PRIV-030 is normative.
 - **Canonical effect:** Add REQ-PRIV-030 and REQ-SHARE-010; CTX-1.32 succeeds CTX-1.31 after VER-CTX-1.32 PASS / SELF-VERIFIED.
 - **Authorization:** Create and execute WI-095-005 only. Phase 9.5 remains current; leave VERIFYING / OWNER REVIEW, no next item. Owner alone stages/commits/pushes; no PR.
+
+## DEC-087 — Temporary Sharing Sessions, bounded MVP privacy and execution
+
+- **Date/authority:** 2026-10-04, explicit project-owner Temporary Sharing Sessions prompt.
+- **Decision:** Temporary self-initiated location sharing only, default one hour/maximum 24 hours, chosen end and early stop, fixed explicit same-Family active adult recipients, exact membership grants with permanent invalidation, author loss ends session. OD-002 resolved for this bounded MVP; indefinite sharing excluded.
+- **Location:** Latest accepted point only, browser permission/active-UI limits, bounded minute cadence and honest freshness/failure states. Expiration denies access synchronously; feature cleanup removes raw coordinates. No history, restore, map provider rollout or sibling integrations.
+- **Canonical effect:** REQ-PRIV-031 and REQ-SHARE-011; CTX-1.33 succeeds CTX-1.32 after separate context self-verification. Existing broader concepts remain gated and Check-In rules unchanged.
+- **Authorization:** Create and execute WI-095-006 in this task, including minimum context amendments/baseline. Phase 9.5 stays current; final VERIFYING / OWNER REVIEW, no next item or owner completion. Owner alone performs all Git commits; no staging/push/PR.

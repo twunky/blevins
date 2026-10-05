@@ -1,6 +1,6 @@
 # Requirements Index
 
-**Status:** APPROVED — `CTX-1.32`
+**Status:** APPROVED - `CTX-1.33`
 **Purpose:** Traceability index only; normative wording lives at each canonical source.
 
 ## ID and lifecycle rules
@@ -248,3 +248,10 @@ Do not use `REQ-SAFETY-*`.
 |---|---|---|---|---|---|
 | REQ-PRIV-030 | Explicit Check-In grants and membership loss | privacy-safety-contract.md#req-priv-030 | APPROVED | CTX-1.32 | — |
 | REQ-SHARE-010 | Immutable standalone Check-In creation/history | ../workflows/sharing-checkins.md#req-share-010 | APPROVED | CTX-1.32 | — |
+
+## Temporary Sharing Session first slice (CTX-1.33)
+
+| Requirement | Summary | Canonical source | Status | Baseline | Supersession |
+|---|---|---|---|---|---|
+| REQ-PRIV-031 | Temporary own-location grants, expiration and latest-point privacy | privacy-safety-contract.md#req-priv-031 | APPROVED | CTX-1.33 | — |
+| REQ-SHARE-011 | Bounded browser sharing workflow and Home clarity | ../workflows/sharing-checkins.md#req-share-011 | APPROVED | CTX-1.33 | — |

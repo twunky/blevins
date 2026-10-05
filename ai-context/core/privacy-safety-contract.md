@@ -1,16 +1,29 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.32
-Version: 1.24
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086
+Context-Baseline: CTX-1.33
+Version: 1.25
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087
 ---
 
 # Privacy and Safety Contract
 
-Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.32`.
+Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.33`.
 
 ## Consent and sharing control
+
+### REQ-PRIV-031
+
+For first-slice Temporary Sharing Sessions (DEC-087):
+
+- An active adult initiates sharing only for themselves, anchored to one Family where they are active. Explicitly select active adult recipients from that same Family; no default Family-wide audience, proxy activation or administrative override. Selected Family is creation/navigation context only. Audience is fixed; change it by stopping and deliberately starting another session.
+- Every session has an explicit start and expiration. Default one hour; author may choose another end within 24 hours and stop early. No indefinite mode, automatic extension or remote restart. This resolves OD-002 only for this bounded MVP.
+- Grants bind exact author/recipient profiles and original membership provenance. Reads recheck active eligible author and recipient memberships, valid original grants, and active/unexpired session. Recipient loss permanently invalidates that grant, with no rejoin or replacement-profile inheritance. Author loss ends the whole Family session permanently.
+- Server queries authorize before projecting coordinates or metadata. Known IDs, Family selection, Family Administrator/Application Operator roles and other audiences grant nothing. Denied and missing details use the same unavailable response; lists omit unavailable sessions. Recipients do not receive audience identities.
+- Store only the latest accepted latitude/longitude, accuracy, captured time and server-received time, replaced in place. No historical coordinates, breadcrumb/route/movement data or historical archive UI. Only author may update an active eligible session; validate coordinates/timestamps and bound updates to approximately one per minute. Optimistic concurrency cannot revive ended sharing.
+- Stop, expiration or author loss immediately ends normal coordinate access, independently of background cleanup. Clear raw current-location data through feature-specific cleanup; minimal non-location provenance/diagnostic metadata may remain. No generic retention or restore capability.
+- Browser permission is explicit and availability uncertain: collect only while the sharing UI is active and browser permits it, throttle updates, expose captured-time freshness/staleness and permission/unavailable/transient failures. No background/continuous guarantees. Authorized recipients may see the last accepted point while the session is active, or a clear not-yet-available state.
+- No Event/Plan/Trip/Trusted Contact/Safety Circle audience, audience editing, alerts, notifications, geofences, SOS, automatic Concern/Incident or safety inference is authorized.
 
 ### REQ-PRIV-030
 
@@ -402,7 +415,7 @@ Supported notification purposes may include event invitation or RSVP, event task
 
 ## Open decision references
 
-- `OD-002`
+- `OD-002` is resolved for the temporary-only bounded MVP by DEC-087 / REQ-PRIV-031; indefinite sharing is excluded.
 - `OD-003`
 
-See `../decision-log.md#open-product-decisions`. These questions are not approved requirements. `OD-004` is resolved by `DEC-071` through `REQ-PRIV-026`.
+See `../decision-log.md#open-product-decisions`. Remaining open questions are not approved requirements. `OD-004` is resolved by `DEC-071` through `REQ-PRIV-026`.

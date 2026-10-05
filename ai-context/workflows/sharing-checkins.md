@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL WORKFLOW — CTX-1.3
-Context-Baseline: CTX-1.32
-Version: 1.2
-Source: ../bootstrap/product-ux-source.md; DEC-057; DEC-086
+Context-Baseline: CTX-1.33
+Version: 1.3
+Source: ../bootstrap/product-ux-source.md; DEC-057; DEC-086; DEC-087
 Constrained-By:
   - ../core/product-contract.md
   - ../core/ux-contract.md
@@ -48,7 +48,11 @@ Events, Plans, Trips, and temporary activities may provide context for a Sharing
 
 Active Sharing Sessions must expose the clarity required by `REQ-UX-009` and must allow the user to stop sharing under `REQ-PRIV-003`.
 
-`OD-002` remains open. See `../decision-log.md#open-product-decisions`.
+### REQ-SHARE-011
+
+The first implemented Sharing Session is temporary, self-initiated current/last-reported location sharing under REQ-PRIV-031. Start with an explicit fixed same-Family adult audience and expiration (one-hour default, up to 24 hours); author may stop early. Safety owns the workflow and Home shows an active-sharing indicator under REQ-UX-009. The browser UI states permission/availability limits and freshness; recipients see only an active authorized current point or location-not-yet-available state. No history or general tracking platform is included. Broader modes/dimensions in REQ-SHARE-002/003/004 remain separately gated.
+
+OD-002 is resolved for this bounded temporary-only MVP by DEC-087; indefinite sharing remains excluded.
 
 ## Check-ins
 

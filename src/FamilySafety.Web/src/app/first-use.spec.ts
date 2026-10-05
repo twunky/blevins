@@ -39,6 +39,7 @@ describe('Invited adult first use', () => {
     TestBed.resetTestingModule();
   });
   function background() {
+    http.match(r => r.url === '/api/sharing-sessions/mine').forEach(r => { if (!r.cancelled) r.flush([]); });
     http.match(r => r.url.endsWith('/dates')).forEach(r => { if (!r.cancelled) r.flush({ canCreate: true, dates: [] }); });
     http.match(r => r.url.endsWith('/events') || r.url.endsWith('/plans') || r.url === '/api/trips')
       .forEach(r => { if (!r.cancelled) r.flush([]); });

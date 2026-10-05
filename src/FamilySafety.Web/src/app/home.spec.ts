@@ -105,7 +105,7 @@ describe('Home and feature empty states', () => {
     expect(root.textContent).not.toContain('needs attention');
   });
 
-  it('reserves Family Updates, Tasks, and Active Sharing as honest placeholder cards with no data, actions, or requests', async () => {
+  it('reserves Family Updates and Tasks as placeholders and loads the authorized active-sharing indicator', async () => {
     const harness = await visit('/home');
     initial([family]);
     familyReads();
@@ -114,12 +114,15 @@ describe('Home and feature empty states', () => {
     const root = harness.routeNativeElement!;
     const placeholders = Array.from(root.querySelectorAll<HTMLElement>('.home-grid .home-future'));
     expect(placeholders.map(section => section.querySelector('h2')?.textContent?.trim()))
-      .toEqual(['Recent Family Updates', 'My Tasks', 'Active Sharing']);
+      .toEqual(['Recent Family Updates', 'My Tasks']);
     for (const section of placeholders) {
       expect(section.querySelector('.home-future-note')?.textContent).toMatch(/will appear here (as|when)/);
       expect(section.querySelectorAll('button, a, input, img, li, .avatar')).toHaveLength(0);
       expect(section.textContent).not.toMatch(/\d|Coming later|Phase|roadmap/i);
     }
+    http.expectOne('/api/sharing-sessions/mine').flush([]);
+    harness.detectChanges();
+    expect(root.querySelector('app-sharing-sessions section')).toBeNull();
     http.expectNone(request => !/^\/api\/(profile|family-groups|trips$)/.test(request.url));
   });
 

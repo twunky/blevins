@@ -35,6 +35,7 @@ describe('App', () => {
   });
 
   afterEach(() => {
+    http.match('/api/sharing-sessions/mine').forEach(request => { if (!request.cancelled) request.flush([]); });
     http.match((request) => request.url.endsWith('/events')).forEach((request) => request.flush([]));
     http.match((request) => request.url.endsWith('/plans')).forEach((request) => request.flush([]));
     http.match('/api/trips').forEach((request) => request.flush([]));

@@ -1,5 +1,6 @@
 using FamilySafety.Domain.Profiles;
 using FamilySafety.Domain.CheckIns;
+using FamilySafety.Domain.Sharing;
 using FamilySafety.Domain.FamilyDates;
 using FamilySafety.Domain.Relationships;
 using FamilySafety.Domain.Events;
@@ -17,6 +18,9 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<CheckIn> CheckIns => Set<CheckIn>();
     public DbSet<CheckInRecipient> CheckInRecipients => Set<CheckInRecipient>();
+    public DbSet<SharingSession> SharingSessions => Set<SharingSession>();
+    public DbSet<SharingSessionRecipient> SharingSessionRecipients => Set<SharingSessionRecipient>();
+    public DbSet<SharingCurrentLocation> SharingCurrentLocations => Set<SharingCurrentLocation>();
 
     public DbSet<AdultProfile> AdultProfiles => Set<AdultProfile>();
 
@@ -64,6 +68,25 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var session = modelBuilder.Entity<SharingSession>();
+        session.ToTable("SharingSessions", t => t.HasCheckConstraint("CK_SharingSessions_Duration", "[EndsAtUtc] > [StartedAtUtc] AND [EndsAtUtc] <= DATEADD(hour, 24, [StartedAtUtc])"));
+        session.HasKey(s => s.Id);
+        session.Property(s => s.Version).IsConcurrencyToken();
+        session.HasIndex(s => new { s.AuthorProfileId, s.EndsAtUtc });
+        session.HasOne<FamilyGroup>().WithMany().HasForeignKey(s => s.FamilyGroupId).OnDelete(DeleteBehavior.Restrict);
+        session.HasOne<AdultProfile>().WithMany().HasForeignKey(s => s.AuthorProfileId).OnDelete(DeleteBehavior.Restrict);
+        session.HasOne<FamilyGroupMembership>().WithMany().HasForeignKey(s => s.AuthorMembershipId).OnDelete(DeleteBehavior.Restrict);
+        var recipient = modelBuilder.Entity<SharingSessionRecipient>();
+        recipient.ToTable("SharingSessionRecipients");
+        recipient.HasKey(r => new { r.SharingSessionId, r.ProfileId });
+        recipient.HasIndex(r => new { r.ProfileId, r.IsInvalidated });
+        recipient.HasOne<SharingSession>().WithMany().HasForeignKey(r => r.SharingSessionId).OnDelete(DeleteBehavior.Cascade);
+        recipient.HasOne<AdultProfile>().WithMany().HasForeignKey(r => r.ProfileId).OnDelete(DeleteBehavior.Restrict);
+        recipient.HasOne<FamilyGroupMembership>().WithMany().HasForeignKey(r => r.MembershipId).OnDelete(DeleteBehavior.Restrict);
+        var location = modelBuilder.Entity<SharingCurrentLocation>();
+        location.ToTable("SharingCurrentLocations", t => t.HasCheckConstraint("CK_SharingCurrentLocations_Coordinates", "[Latitude] >= -90 AND [Latitude] <= 90 AND [Longitude] >= -180 AND [Longitude] <= 180 AND [Accuracy] >= 0"));
+        location.HasKey(l => l.SharingSessionId);
+        location.HasOne<SharingSession>().WithOne().HasForeignKey<SharingCurrentLocation>(l => l.SharingSessionId).OnDelete(DeleteBehavior.Cascade);
         var checkIn = modelBuilder.Entity<CheckIn>();
         checkIn.ToTable("CheckIns", t => t.HasCheckConstraint("CK_CheckIns_Status", "[Status] IN ('ImOkay','Arrived','LeavingNow','Delayed','PlansChanged')"));
         checkIn.HasKey(c => c.Id);
@@ -113,6 +136,7 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
             table.HasTrigger("TR_EventNeeds_MembershipLoss");
             table.HasTrigger("TR_SharedFamilyDates_MembershipLoss");
             table.HasTrigger("TR_CheckIns_MembershipLoss");
+            table.HasTrigger("TR_SharingSessions_MembershipLoss");
         });
         membership.HasKey(entity => entity.Id);
         membership.HasIndex(entity => new { entity.AccountId, entity.FamilyGroupId }).IsUnique();
