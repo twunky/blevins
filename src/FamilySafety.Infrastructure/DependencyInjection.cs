@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IFamilyEventRepository, EfFamilyEventRepository>();
         services.AddScoped<IEventInvitationRepository, EfEventInvitationRepository>();
         services.AddScoped<IEventNeedRepository, EfEventNeedRepository>();
+        services.AddScoped<IEventUpdateRepository, EfEventUpdateRepository>();
         services.AddScoped<IFamilyPlanRepository, EfFamilyPlanRepository>();
         services.AddScoped<IFamilyTripRepository, EfFamilyTripRepository>();
         services.AddScoped<IFamilyTripNoteRepository, EfFamilyTripNoteRepository>();

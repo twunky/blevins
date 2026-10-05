@@ -33,6 +33,8 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
     public DbSet<FamilyEventInvitation> FamilyEventInvitations => Set<FamilyEventInvitation>();
     public DbSet<FamilyEventNeed> FamilyEventNeeds => Set<FamilyEventNeed>();
     public DbSet<EventNeedResponsibilityChange> EventNeedResponsibilityChanges => Set<EventNeedResponsibilityChange>();
+    public DbSet<FamilyEventUpdate> FamilyEventUpdates => Set<FamilyEventUpdate>();
+    public DbSet<EventUpdateRevision> EventUpdateRevisions => Set<EventUpdateRevision>();
 
     public DbSet<FamilyPlan> FamilyPlans => Set<FamilyPlan>();
 
@@ -236,6 +238,23 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
         change.HasIndex(c => new { c.NeedId, c.OccurredAtUtc });
         change.HasOne<FamilyEventNeed>().WithMany().HasForeignKey(c => c.NeedId).OnDelete(DeleteBehavior.Cascade);
         change.HasOne<AdultProfile>().WithMany().HasForeignKey(c => c.ProfileId).OnDelete(DeleteBehavior.Restrict);
+
+        var update = modelBuilder.Entity<FamilyEventUpdate>();
+        update.ToTable("FamilyEventUpdates");
+        update.HasKey(u => u.Id);
+        update.Property(u => u.Text).HasMaxLength(FamilyEventUpdate.TextLimit).IsRequired();
+        update.Property(u => u.Version).IsConcurrencyToken();
+        update.HasIndex(u => new { u.EventId, u.HiddenAtUtc, u.CreatedAtUtc });
+        update.HasOne<FamilyEvent>().WithMany().HasForeignKey(u => u.EventId).OnDelete(DeleteBehavior.Restrict);
+        update.HasOne<AdultProfile>().WithMany().HasForeignKey(u => u.AuthorProfileId).OnDelete(DeleteBehavior.Restrict);
+
+        var revision = modelBuilder.Entity<EventUpdateRevision>();
+        revision.ToTable("EventUpdateRevisions");
+        revision.HasKey(r => r.Id);
+        revision.Property(r => r.Text).HasMaxLength(FamilyEventUpdate.TextLimit).IsRequired();
+        revision.HasIndex(r => new { r.UpdateId, r.RevisedAtUtc });
+        revision.HasOne<FamilyEventUpdate>().WithMany().HasForeignKey(r => r.UpdateId).OnDelete(DeleteBehavior.Cascade);
+        revision.HasOne<AdultProfile>().WithMany().HasForeignKey(r => r.EditorProfileId).OnDelete(DeleteBehavior.Restrict);
 
         var familyPlan = modelBuilder.Entity<FamilyPlan>();
         familyPlan.ToTable("FamilyPlans");

@@ -938,6 +938,7 @@
                 </article>
                 <app-event-participation [event]="event" [ownProfileId]="ownerProfile()?.profileId ?? null" [currentFamilyId]="currentFamilyId()" (participationChanged)="needs.refresh()" />
                 <app-event-needs #needs [event]="event" [ownProfileId]="ownerProfile()?.profileId ?? null" [currentFamilyId]="currentFamilyId()" />
+                <app-event-updates [event]="event" [ownProfileId]="ownerProfile()?.profileId ?? null" [currentFamilyId]="currentFamilyId()" />
               }
             } @else {
               <a class="detail-back-link item-back" routerLink="/plans" [state]="focusHeadingState"><app-icon name="back" />Back to Plans</a>

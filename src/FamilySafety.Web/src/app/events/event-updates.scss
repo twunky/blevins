@@ -1,0 +1,9 @@
+:host { display: block; margin-top: var(--space-4); }
+.updates, form, .update-row, .confirmation { display: grid; gap: var(--space-3); }
+h2, h3, p { margin: 0; }
+.update-row { padding-block: var(--space-3); border-bottom: 1px solid var(--color-border); }
+.update-row p { overflow-wrap: anywhere; }
+.update-text { white-space: pre-wrap; }
+.actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+form { max-width: 36rem; }
+.updates > button { justify-self: start; }

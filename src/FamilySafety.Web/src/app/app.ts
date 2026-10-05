@@ -22,6 +22,7 @@ import { SafetyDashboard } from './safety/safety-dashboard';
 import { ItemUnavailable } from './item-unavailable';
 import { EventParticipation, PendingEventInvitation } from './events/event-participation';
 import { EventNeeds } from './events/event-needs';
+import { EventUpdates } from './events/event-updates';
 import { AdoptItemFamily, ItemKind, isItemId } from './item-route';
 import {
   NavigableView, PrimaryDestination, areaForView, focusHeadingState, matchedAreas, matchedPath, pathForView, primaryDestinations, viewForPath,
@@ -128,7 +129,7 @@ interface HomeTripPreview {
 
 @Component({
   selector: 'app-workspace',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, Trips, Concerns, Incidents, AppIcon, GroupLanding, SafetyDashboard, ItemUnavailable, EventParticipation, EventNeeds],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, Trips, Concerns, Incidents, AppIcon, GroupLanding, SafetyDashboard, ItemUnavailable, EventParticipation, EventNeeds, EventUpdates],
   styleUrls: ['./app.scss', './home.scss', './family.scss', './family-settings.scss', './events.scss', './events-dashboard.scss', './plans.scss'],
   templateUrl: './app.html',
 })

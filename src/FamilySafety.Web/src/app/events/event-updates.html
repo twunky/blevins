@@ -1,0 +1,53 @@
+<section class="card updates" aria-labelledby="event-updates-heading">
+  <div class="card-header"><h2 id="event-updates-heading">Event Updates</h2></div>
+  @if (message()) { <p class="message message--success" role="status">{{ message() }}</p> }
+  @if (error()) { <p class="message message--error" role="alert">{{ error() }}</p> }
+  @if (status() === 'loading') {
+    <p role="status">Loading Updates…</p>
+  } @else if (status() === 'error') {
+    <p role="alert">Updates could not be loaded. Please try again.</p>
+    <button type="button" class="button--secondary" (click)="refresh()">Retry loading Updates</button>
+  } @else if (status() === 'unavailable') {
+    <p>Event Updates are currently unavailable.</p>
+    <button type="button" class="button--secondary" (click)="refresh()">Refresh Updates</button>
+  } @else if (data(); as view) {
+    <p class="help">Coordination messages from the Event organizer. Oldest first.</p>
+    <button type="button" class="button--secondary" [disabled]="busy()" (click)="refresh()">Refresh Updates</button>
+    @if (!view.updates.length) { <p>No Updates have been posted.</p> }
+    @for (update of view.updates; track update.updateId) {
+      <article class="update-row" aria-label="Event Update">
+        <p class="help"><strong>{{ update.authorName }}</strong> · Posted <time [attr.datetime]="update.createdAtUtc">{{ update.createdAtUtc | date:'medium' }}</time>
+          @if (update.updatedAtUtc) { <span> · Edited <time [attr.datetime]="update.updatedAtUtc">{{ update.updatedAtUtc | date:'medium' }}</time></span> }
+        </p>
+        <p class="update-text">{{ update.text }}</p>
+        @if (view.canManage) {
+          <div class="actions">
+            <button type="button" class="button--secondary" [disabled]="busy() || needsRefresh()" (click)="edit(update)">Edit Update</button>
+            <button type="button" class="button--secondary" [disabled]="busy() || needsRefresh()" (click)="hiding.set(update.updateId)">Hide Update</button>
+          </div>
+          @if (hiding() === update.updateId) {
+            <div class="confirmation">
+              <p>Hide this Update from the Event? Its record and prior text remain retained. It cannot be restored here.</p>
+              <div class="actions">
+                <button type="button" [disabled]="busy() || needsRefresh()" (click)="hide(update)">Confirm hide</button>
+                <button type="button" class="button--secondary" [disabled]="busy()" (click)="hiding.set(null)">Cancel</button>
+              </div>
+            </div>
+          }
+        }
+      </article>
+    }
+    @if (view.canManage) {
+      <form (ngSubmit)="save()">
+        <h3>{{ editing() ? 'Edit Update' : 'Post an Update' }}</h3>
+        <label for="update-text">Update text</label>
+        <textarea id="update-text" name="text" [(ngModel)]="text" required maxlength="1000" [disabled]="busy() || needsRefresh()" rows="4"></textarea>
+        <p class="help">Plain text, up to 1,000 characters.</p>
+        <div class="actions">
+          <button type="submit" [disabled]="busy() || needsRefresh() || !text.trim() || text.trim().length > 1000">{{ editing() ? 'Save Update' : 'Post Update' }}</button>
+          @if (editing()) { <button type="button" class="button--secondary" [disabled]="busy()" (click)="cancelEdit()">Cancel edit</button> }
+        </div>
+      </form>
+    }
+  }
+</section>
