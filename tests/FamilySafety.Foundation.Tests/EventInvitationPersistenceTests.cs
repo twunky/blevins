@@ -265,26 +265,37 @@ public sealed class EventInvitationPersistenceTests(ITestOutputHelper output)
         });
     }
 
-    [Fact]
-    public async Task EventEditAndRsvpDoNotDeadlockWhenTransactionsOverlap()
+    [Theory]
+    [InlineData("Issue")]
+    [InlineData("Revoke")]
+    [InlineData("RSVP")]
+    public async Task EventEditAndInvitationMutationDoNotDeadlockWhenTransactionsOverlap(string mutation)
     {
         await WithDatabase(async w =>
         {
             output.WriteLine($"Task database: {new SqlConnectionStringBuilder(w.Connection).InitialCatalog}; normal fixture EnsureDeletedAsync cleanup.");
-            output.WriteLine("Planned iterations: 3; stop on first failure. Per-iteration deadline: 30 seconds; SQL command timeout: 20 seconds.");
-            var invitation = (await w.Repo.IssueAsync(w.A.Account, w.EventId, new(w.B.Profile), Ct))!;
+            output.WriteLine($"Mutation: {mutation}. Planned iterations: 3; per-iteration deadline: 30 seconds; SQL command timeout: 20 seconds.");
+            EventInvitationView? invitation = mutation == "RSVP"
+                ? await w.Repo.IssueAsync(w.A.Account, w.EventId, new(w.B.Profile), Ct)
+                : null;
             for (var iteration = 1; iteration <= 3; iteration++)
             {
                 output.WriteLine($"Iteration {iteration} started.");
+                if (mutation == "Issue")
+                    invitation = null;
+                else if (mutation == "Revoke")
+                    invitation = await w.Repo.IssueAsync(w.A.Account, w.EventId, new(w.B.Profile), Ct);
+                else
+                    Assert.NotNull(invitation);
                 using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(30));
                 var editorHeldFamily = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-                var rsvpAttemptingFamily = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                var mutationAttemptingFamily = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
                 var trace = new ConcurrentQueue<string>();
                 FamilySafetyDbContext ObservedContext(string role) => new(new DbContextOptionsBuilder<FamilySafetyDbContext>()
                     .UseSqlServer(w.Connection, sql => sql.CommandTimeout(20))
-                    .AddInterceptors(new EditRsvpOverlapObserver(role, editorHeldFamily, rsvpAttemptingFamily, trace)).Options);
+                    .AddInterceptors(new EditInvitationOverlapObserver(role, editorHeldFamily, mutationAttemptingFamily, trace)).Options);
                 await using var editing = ObservedContext("Event edit");
-                await using var responding = ObservedContext("RSVP");
+                await using var mutating = ObservedContext($"Invitation {mutation}");
                 async Task<Exception?> Capture(Func<Task> operation)
                 {
                     try { await operation(); return null; }
@@ -293,18 +304,26 @@ public sealed class EventInvitationPersistenceTests(ITestOutputHelper output)
                 var edit = Capture(async () => Assert.NotNull(await new EfFamilyEventRepository(editing).UpdateAsync(
                     w.A.Account, w.GroupId, w.EventId,
                     new($"Edited gathering {iteration}", "Details", new DateOnly(2020, 1, 1), new TimeOnly(18, 0), "Hall"), deadline.Token)));
-                Task<Exception?>? response = null;
+                Task<Exception?>? mutationTask = null;
                 try
                 {
                     await editorHeldFamily.Task.WaitAsync(deadline.Token);
-                    response = Capture(async () => Assert.NotNull(await new EfEventInvitationRepository(responding, TimeProvider.System)
-                        .RespondAsync(w.B.Account, w.EventId,
-                            new(invitation.InvitationId, invitation.Version, EventRsvpStatus.Going), deadline.Token)));
-                    var errors = await Task.WhenAll(edit, response);
+                    var repository = new EfEventInvitationRepository(mutating, TimeProvider.System);
+                    mutationTask = mutation switch
+                    {
+                        "Issue" => Capture(async () => Assert.NotNull(await repository.IssueAsync(w.A.Account, w.EventId,
+                            new(w.B.Profile), deadline.Token))),
+                        "Revoke" => Capture(async () => Assert.NotNull(await repository.RevokeAsync(w.A.Account, w.EventId,
+                            invitation!.InvitationId, new(invitation.Version), deadline.Token))),
+                        "RSVP" => Capture(async () => Assert.NotNull(await repository.RespondAsync(w.B.Account, w.EventId,
+                            new(invitation!.InvitationId, invitation.Version, EventRsvpStatus.Going), deadline.Token))),
+                        _ => throw new ArgumentOutOfRangeException(nameof(mutation)),
+                    };
+                    var errors = await Task.WhenAll(edit, mutationTask);
                     foreach (var entry in trace) output.WriteLine(entry);
                     for (var path = 0; path < errors.Length; path++)
                     {
-                        output.WriteLine($"{(path == 0 ? "Event edit" : "RSVP")} outcome: {(errors[path] is null ? "success" : "failure")}");
+                        output.WriteLine($"{(path == 0 ? "Event edit" : $"Invitation {mutation}")} outcome: {(errors[path] is null ? "success" : "failure")}");
                         if (errors[path] is { } error)
                         {
                             output.WriteLine(error.ToString());
@@ -313,25 +332,32 @@ public sealed class EventInvitationPersistenceTests(ITestOutputHelper output)
                         }
                     }
                     Assert.All(errors, error => Assert.Null(error));
-                    invitation = (await w.Repo.GetOwnAsync(w.B.Account, w.EventId, Ct))!.Invitation!;
+                    if (mutation == "Issue")
+                    {
+                        invitation = (await w.Repo.GetOrganizerAsync(w.A.Account, w.EventId, Ct))!.Invitations
+                            .Single(row => row.Invitation.RevokedAtUtc is null).Invitation;
+                        Assert.NotNull(await w.Repo.RevokeAsync(w.A.Account, w.EventId, invitation.InvitationId, new(invitation.Version), Ct));
+                    }
+                    if (mutation == "RSVP")
+                        invitation = (await w.Repo.GetOwnAsync(w.B.Account, w.EventId, Ct))!.Invitation;
                     output.WriteLine($"Iteration {iteration} passed.");
                 }
                 finally
                 {
                     await deadline.CancelAsync();
-                    rsvpAttemptingFamily.TrySetResult();
+                    mutationAttemptingFamily.TrySetResult();
                     await edit;
-                    if (response is not null) await response;
+                    if (mutationTask is not null) await mutationTask;
                 }
             }
         });
     }
 
-    // Pause only at an actual completed Family UPDATE. The RSVP's Family UPDATE
-    // is announced before execution, after its actual Event SELECT has completed.
+    // Pause only at an actual completed Family UPDATE. The invitation mutation's
+    // Family UPDATE is announced before execution after any pre-lock target read.
     // Repository SQL, isolation, lock hints and mutation behavior are unchanged.
-    private sealed class EditRsvpOverlapObserver(string role, TaskCompletionSource editorHeldFamily,
-        TaskCompletionSource rsvpAttemptingFamily, ConcurrentQueue<string> trace) : DbCommandInterceptor
+    private sealed class EditInvitationOverlapObserver(string role, TaskCompletionSource editorHeldFamily,
+        TaskCompletionSource mutationAttemptingFamily, ConcurrentQueue<string> trace) : DbCommandInterceptor
     {
         private static bool FamilyUpdate(DbCommand command) => command.CommandText.Contains("UPDATE", StringComparison.Ordinal)
             && command.CommandText.Contains("FamilyGroups", StringComparison.Ordinal);
@@ -342,7 +368,7 @@ public sealed class EventInvitationPersistenceTests(ITestOutputHelper output)
             CommandEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
         {
             Record("nonquery executing", command);
-            if (role == "RSVP" && FamilyUpdate(command)) rsvpAttemptingFamily.TrySetResult();
+            if (role.StartsWith("Invitation ", StringComparison.Ordinal) && FamilyUpdate(command)) mutationAttemptingFamily.TrySetResult();
             return ValueTask.FromResult(result);
         }
 
@@ -353,7 +379,7 @@ public sealed class EventInvitationPersistenceTests(ITestOutputHelper output)
             if (role == "Event edit" && FamilyUpdate(command))
             {
                 editorHeldFamily.TrySetResult();
-                await rsvpAttemptingFamily.Task.WaitAsync(cancellationToken);
+                await mutationAttemptingFamily.Task.WaitAsync(cancellationToken);
             }
             return result;
         }

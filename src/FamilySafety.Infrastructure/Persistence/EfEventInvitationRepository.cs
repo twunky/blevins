@@ -52,8 +52,10 @@ public sealed class EfEventInvitationRepository(FamilySafetyDbContext db, TimePr
 
     public async Task<EventInvitationView?> IssueAsync(Guid accountId, Guid eventId, IssueEventInvitationRequest request, CancellationToken cancellationToken)
     {
+        var groupId = await ResolveFamilyGroupIdAsync(eventId, cancellationToken);
+        if (groupId is null) return null;
         await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-        var item = await LockAndAuthorizeAsync(accountId, eventId, cancellationToken);
+        var item = await LockAndAuthorizeAsync(accountId, eventId, groupId.Value, cancellationToken);
         if (item is null || !await IsOrganizerAsync(accountId, item, cancellationToken)) return null;
         if (request.InviteeProfileId == item.CreatorProfileId
             || !await db.FamilyGroupMemberships.AsNoTracking().AnyAsync(member => member.FamilyGroupId == item.FamilyGroupId
@@ -72,8 +74,10 @@ public sealed class EfEventInvitationRepository(FamilySafetyDbContext db, TimePr
 
     public async Task<EventInvitationView?> RevokeAsync(Guid accountId, Guid eventId, Guid invitationId, RevokeEventInvitationRequest request, CancellationToken cancellationToken)
     {
+        var groupId = await ResolveFamilyGroupIdAsync(eventId, cancellationToken);
+        if (groupId is null) return null;
         await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-        var item = await LockAndAuthorizeAsync(accountId, eventId, cancellationToken);
+        var item = await LockAndAuthorizeAsync(accountId, eventId, groupId.Value, cancellationToken);
         if (item is null || !await IsOrganizerAsync(accountId, item, cancellationToken)) return null;
         var row = await FreshInvitationAsync(eventId, invitationId, cancellationToken);
         if (row is null || row.RevokedAtUtc is not null) return null;
@@ -86,8 +90,10 @@ public sealed class EfEventInvitationRepository(FamilySafetyDbContext db, TimePr
 
     public async Task<EventInvitationView?> RespondAsync(Guid accountId, Guid eventId, UpdateEventRsvpRequest request, CancellationToken cancellationToken)
     {
+        var groupId = await ResolveFamilyGroupIdAsync(eventId, cancellationToken);
+        if (groupId is null) return null;
         await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-        var item = await LockAndAuthorizeAsync(accountId, eventId, cancellationToken);
+        var item = await LockAndAuthorizeAsync(accountId, eventId, groupId.Value, cancellationToken);
         if (item is null) return null;
         var profileId = await ProfileAsync(accountId, item.FamilyGroupId, cancellationToken);
         var row = await FreshInvitationAsync(eventId, request.InvitationId, cancellationToken);
@@ -116,17 +122,20 @@ public sealed class EfEventInvitationRepository(FamilySafetyDbContext db, TimePr
         return await db.FamilyEventInvitations.SingleOrDefaultAsync(row => row.EventId == eventId && row.Id == invitationId, cancellationToken);
     }
 
-    private async Task<FamilyEvent?> LockAndAuthorizeAsync(Guid accountId, Guid eventId, CancellationToken cancellationToken)
-    {
-        // Resolve the lock target internally; disclose nothing until the protected
-        // visibility query below succeeds. Serializable reads hold current access
-        // and membership stable through commit, including external eligibility loss.
-        var groupId = await db.FamilyEvents.AsNoTracking().Where(item => item.Id == eventId)
+    private Task<Guid?> ResolveFamilyGroupIdAsync(Guid eventId, CancellationToken cancellationToken) =>
+        db.FamilyEvents.AsNoTracking().Where(item => item.Id == eventId)
             .Select(item => (Guid?)item.FamilyGroupId).SingleOrDefaultAsync(cancellationToken);
-        if (groupId is null) return null;
+
+    private async Task<FamilyEvent?> LockAndAuthorizeAsync(Guid accountId, Guid eventId, Guid groupId, CancellationToken cancellationToken)
+    {
+        // Resolve the non-authorizing Family lock target before the transaction so
+        // every mutation acquires Family before its protected Event/access reads.
         await db.FamilyGroups.Where(group => group.Id == groupId).ExecuteUpdateAsync(
             updates => updates.SetProperty(group => group.CapacityLimit, group => group.CapacityLimit), cancellationToken);
-        return await GetAuthorizedEventAsync(accountId, eventId, cancellationToken);
+        var item = await GetAuthorizedEventAsync(accountId, eventId, cancellationToken);
+        // The target lookup is not authorization. Re-read access inside Serializable
+        // and reject any Event whose Family no longer matches the acquired lock.
+        return item?.FamilyGroupId == groupId ? item : null;
     }
 
     private Task<FamilyEvent?> GetAuthorizedEventAsync(Guid accountId, Guid eventId, CancellationToken cancellationToken) =>
