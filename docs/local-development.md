@@ -186,3 +186,9 @@ Every destructive form is a dry run unless `-Execute` is added. Each refuses (ex
 - **API startup fails connecting to SQL Server:** Confirm that SQL Server is running and reachable at `localhost`, and that the current Windows account can create/update the `FamilySafety` database. Set `ConnectionStrings__FamilySafety` to the correct local instance if needed.
 - **The browser loads but API-backed content fails:** Confirm the API is listening at `http://localhost:5080` and `/health` responds. The proxy target is fixed to that address in `proxy.conf.json`.
 - **No Trips, Plans, or Events appear:** The development fixture intentionally creates family/account records only; create a record through the UI.
+
+## Safety Circle presets (WI-095-008)
+
+Migration `20261005215851_SafetyCircleRecipientPresets` adds owner/Family-scoped circles and member rows with exact membership ID/version provenance, owner/Family/name uniqueness and optimistic versions. `TR_SafetyCircles_MembershipLoss` deletes a departing owner's circles (cascade member deletion), or removes only an ineligible ordinary member and advances circle version. Rejoining restores neither. No cleanup job, retained history, transfer or target-grant FK exists.
+
+`/api/family-groups/{familyId}/safety-circles` lists/creates the current eligible owner's circles; `/{circleId}` reads/renames/deletes; `/{circleId}/members` adds and `/members/{profileId}` removes. Writes use Family-before-membership/circle locking and current eligibility; rename/member requests carry version and deletes use a version query. Uniform empty 404 for missing/denied access; no-store responses; 409 CircleChanged or DuplicateCircleName. Safety management uses existing calm cards/forms and confirmed deletion. Optional creation presets populate current eligible recipient checkboxes; normal Check-In/Sharing Session APIs revalidate and save their own fixed grants. No circle membership grants product access.

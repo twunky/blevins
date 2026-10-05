@@ -6,10 +6,10 @@
 
 | Field | Current value |
 |---|---|
-| Active baseline | CTX-1.34 APPROVED / ACTIVE under DEC-088; [baseline verification](planning/verification/VER-CTX-1.34.md) PASS / SELF-VERIFIED. |
+| Active baseline | CTX-1.35 APPROVED / ACTIVE under DEC-089; [baseline verification](planning/verification/VER-CTX-1.35.md) PASS / SELF-VERIFIED. |
 | Current phase | Phase 9.5 — MVP Feature Completion — CURRENT / IN PROGRESS. |
 | Previous phase | Phase 9 — Integration & UX Refinement — COMPLETE / CLOSED under DEC-081. |
-| Completed items | WI-095-001 through WI-095-005 and [WI-095-006 — Temporary Sharing Sessions](planning/stories/WI-095-006-temporary-sharing-sessions.md) COMPLETE / PASS — OWNER APPROVED. WI-095-007 — [Trusted Contacts](planning/stories/WI-095-007-trusted-contacts.md) and its [verification](planning/verification/VER-WI-095-007.md) COMPLETE / PASS — OWNER APPROVED (2026-10-05). |
+| Completed items | WI-095-001 through WI-095-005 and [WI-095-006 - Temporary Sharing Sessions](planning/stories/WI-095-006-temporary-sharing-sessions.md) COMPLETE / PASS — OWNER APPROVED. WI-095-007 - [Trusted Contacts](planning/stories/WI-095-007-trusted-contacts.md) and its [verification](planning/verification/VER-WI-095-007.md) COMPLETE / PASS — OWNER APPROVED (2026-10-05). WI-095-008 - [Safety Circles](planning/stories/WI-095-008-safety-circles.md) and [verification](planning/verification/VER-WI-095-008.md) COMPLETE / PASS — OWNER APPROVED (2026-10-05).
 | Current authorized implementation item | NONE AUTHORIZED. |
 | Next owner action | Select and explicitly authorize a bounded work item when ready. Owner performs all Git commits. |
 

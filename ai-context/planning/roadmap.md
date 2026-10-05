@@ -14,15 +14,15 @@ Approved phase status and remaining gates. The [project checkpoint](../project-s
 | Phase 7.5 | End-to-End UX & User-Test Readiness | `COMPLETE / CLOSED` |
 | Phase 8 | Safety Coordination | `COMPLETE / CLOSED` |
 | Phase 9 | Integration & UX Refinement | `COMPLETE / CLOSED` |
-| Phase 9.5 | MVP Feature Completion | `CURRENT / IN PROGRESS` — WI-095-001 through WI-095-007 COMPLETE / PASS — OWNER APPROVED |
+| Phase 9.5 | MVP Feature Completion | `CURRENT / IN PROGRESS` - WI-095-001 through WI-095-008 COMPLETE / PASS — OWNER APPROVED |
 | Phase 10 | Testing & Verification | `FUTURE` |
 | Phase 11 | Pilot & Release Readiness | `FUTURE` |
 
 ## Phase 9.5 — MVP Feature Completion
 
-WI-095-001 through WI-095-007 are COMPLETE / PASS — OWNER APPROVED. WI-095-007 — Trusted Contacts is COMPLETE under CTX-1.34 / DEC-088; verification COMPLETE / PASS. Phase 9.5 remains CURRENT / IN PROGRESS. No next work item is authorized.
+WI-095-001 through WI-095-008 are COMPLETE / PASS — OWNER APPROVED. Phase 9.5 remains CURRENT / IN PROGRESS. Next work item: NONE AUTHORIZED.
 
-Remaining capabilities include broader Sharing Session scope, Safety Circles, Household grouping, and notifications. Any additional Check-In or Event RSVP scope remains separately gated. OD-002 is resolved for the temporary-only bounded MVP by DEC-087; broader sharing remains separately gated.
+Remaining capabilities include broader Sharing Session scope, Household grouping, and notifications. Any additional Check-In or Event RSVP scope remains separately gated. OD-002 is resolved for the temporary-only bounded MVP by DEC-087; broader sharing remains separately gated.
 
 DEC-073 defines phase placement, not capability behavior, order, or implementation scope. Each later capability requires owner/work-item approval, canonical updates where needed, and separate execution authorization. Home attention and outbound/notification delivery were excluded from WI-095-001. No blanket Phase 9.5 authorization exists.
 

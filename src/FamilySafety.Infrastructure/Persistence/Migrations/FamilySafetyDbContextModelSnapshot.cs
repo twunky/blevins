@@ -1327,6 +1327,8 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
 
                             t.HasTrigger("TR_EventNeeds_MembershipLoss");
 
+                            t.HasTrigger("TR_SafetyCircles_MembershipLoss");
+
                             t.HasTrigger("TR_SharedFamilyDates_MembershipLoss");
 
                             t.HasTrigger("TR_SharingSessions_MembershipLoss");
@@ -1444,6 +1446,80 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("FamilyRelationships", (string)null);
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.SafetyCircles.SafetyCircle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("FamilyGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<Guid>("OwnerMembershipId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("OwnerMembershipVersion")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("OwnerProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FamilyGroupId");
+
+                    b.HasIndex("OwnerMembershipId");
+
+                    b.HasIndex("OwnerProfileId", "FamilyGroupId", "NormalizedName")
+                        .IsUnique();
+
+                    b.ToTable("SafetyCircles", (string)null);
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.SafetyCircles.SafetyCircleMember", b =>
+                {
+                    b.Property<Guid>("SafetyCircleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MemberProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MembershipId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MembershipVersion")
+                        .HasColumnType("int");
+
+                    b.HasKey("SafetyCircleId", "MemberProfileId");
+
+                    b.HasIndex("MemberProfileId");
+
+                    b.HasIndex("MembershipId");
+
+                    b.ToTable("SafetyCircleMembers", (string)null);
                 });
 
             modelBuilder.Entity("FamilySafety.Domain.Sharing.SharingCurrentLocation", b =>
@@ -2225,6 +2301,48 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("RecipientProfileId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.SafetyCircles.SafetyCircle", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroup", null)
+                        .WithMany()
+                        .HasForeignKey("FamilyGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroupMembership", null)
+                        .WithMany()
+                        .HasForeignKey("OwnerMembershipId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("OwnerProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.SafetyCircles.SafetyCircleMember", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("MemberProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroupMembership", null)
+                        .WithMany()
+                        .HasForeignKey("MembershipId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.SafetyCircles.SafetyCircle", null)
+                        .WithMany()
+                        .HasForeignKey("SafetyCircleId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

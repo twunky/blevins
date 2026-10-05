@@ -24,7 +24,8 @@
     @if (!familyId) { <p>Choose an active Family to start sharing.</p> }
     @if (formOpen()) {
       <form (ngSubmit)="start()">
-        <fieldset [disabled]="busy()">
+        <app-circle-recipient-preset [familyId]="familyId" [ownProfileId]="ownProfileId" controlId="sharing-sessions-circle-preset" [disabled]="busy()" (recipients)="recipientIds = $event" (loading)="presetLoading = $event" />
+        <fieldset [disabled]="busy() || presetLoading">
           <legend>Choose sharing recipients</legend>
           <p class="section-help">No one is selected by default. Audience stays fixed; stop and start a new session to change it. Leaving the Family permanently ends that person's grant.</p>
           @for (person of people(); track person.profileId) {
@@ -35,7 +36,7 @@
         <input id="sharing-end" name="end" type="datetime-local" [(ngModel)]="endTime" required [disabled]="busy()" />
         <p class="section-help">Default one hour. Choose a time within 24 hours; sharing never extends itself. You may stop early.</p>
         <div class="actions">
-          <button type="submit" [disabled]="busy() || !valid()">Start sharing and request location</button>
+          <button type="submit" [disabled]="busy() || presetLoading || !valid()">Start sharing and request location</button>
           <button type="button" class="button--secondary" (click)="formOpen.set(false)" [disabled]="busy()">Cancel sharing draft</button>
         </div>
       </form>

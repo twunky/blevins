@@ -1,0 +1,53 @@
+<section class="card circles" aria-labelledby="circles-heading">
+  <div class="card-header"><h2 id="circles-heading">My Safety Circles</h2></div>
+  <p>Private recipient presets for this Family. Membership gives no access. Each Check-In or Sharing Session shares only with the recipients you confirm.</p>
+  @if (message()) { <p role="status">{{ message() }}</p> }
+  @if (error()) { <p role="alert">{{ error() }}</p> }
+  @if (state() === 'loading') { <p role="status">Loading Safety Circles...</p> }
+  @else if (state() === 'error') {
+    <p role="alert">Safety Circles could not be loaded.</p><button type="button" (click)="refresh()">Retry loading Safety Circles</button>
+  } @else if (state() === 'unavailable') {
+    <p>Choose a Family where you have active adult membership to manage your Safety Circles.</p>
+    <button type="button" class="button--secondary" (click)="refresh()">Refresh Safety Circles</button>
+  } @else {
+    <div class="actions">
+      <button type="button" class="button--secondary" [disabled]="busy()" (click)="refresh()">Refresh Safety Circles</button>
+      <button type="button" [disabled]="busy() || formOpen()" (click)="open()">Create a Safety Circle</button>
+    </div>
+    @if (formOpen()) {
+      <form (ngSubmit)="save()">
+        <label for="circle-name">Safety Circle name</label>
+        <input id="circle-name" name="name" [(ngModel)]="name" required maxlength="100" [disabled]="busy()" autocomplete="off" />
+        <div class="actions">
+          <button type="submit" [disabled]="busy() || !valid()">{{ editing() ? 'Save circle name' : 'Create circle' }}</button>
+          <button type="button" class="button--secondary" [disabled]="busy()" (click)="cancel()">Cancel circle edit</button>
+        </div>
+      </form>
+    }
+    @for (row of circles(); track row.safetyCircleId) {
+      <article class="circle-row" [attr.aria-label]="row.name">
+        <h3>{{ row.name }}</h3>
+        <ul>
+          @for (member of row.members; track member.profileId) {
+            <li>{{ member.displayName }} <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="removeMember(row, member.profileId)" [attr.aria-label]="'Remove ' + member.displayName + ' from ' + row.name">Remove member</button></li>
+          } @empty { <li>No members selected yet.</li> }
+        </ul>
+        <label [for]="'circle-member-' + row.safetyCircleId">Add eligible Family member to {{ row.name }}</label>
+        <select #member [id]="'circle-member-' + row.safetyCircleId" [disabled]="busy() || formOpen()" (change)="addMember(row, member.value); member.value = ''">
+          <option value="">Choose an adult</option>
+          @for (person of available(row); track person.profileId) { <option [value]="person.profileId">{{ person.displayName }}</option> }
+        </select>
+        <div class="actions">
+          <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="open(row)">Rename circle</button>
+          <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="removing.set(row.safetyCircleId)">Delete circle</button>
+        </div>
+        @if (removing() === row.safetyCircleId) {
+          <p>Delete {{ row.name }} permanently? Existing Check-Ins and Sharing Sessions keep their own recipients.</p>
+          <div class="actions"><button type="button" [disabled]="busy()" (click)="deleteCircle(row)">Confirm circle deletion</button>
+          <button type="button" class="button--secondary" [disabled]="busy()" (click)="removing.set(null)">Cancel circle deletion</button></div>
+        }
+      </article>
+    } @empty { <p>You have no Safety Circles in this Family yet.</p> }
+    <p>If a member leaves this Family, their circle membership is removed. If you leave, your circles in this Family are permanently deleted. Rejoining does not restore them.</p>
+  }
+</section>

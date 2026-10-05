@@ -1,6 +1,6 @@
 # Requirements Index
 
-**Status:** APPROVED - `CTX-1.34`
+**Status:** APPROVED - `CTX-1.35`
 **Purpose:** Traceability index only; normative wording lives at each canonical source.
 
 ## ID and lifecycle rules
@@ -264,3 +264,10 @@ Do not use `REQ-SAFETY-*`.
 | REQ-PRIV-032 | Owner-only manual-contact privacy and zero downstream grants | privacy-safety-contract.md#req-priv-032 | APPROVED | CTX-1.34 | — |
 
 DEC-088 clarifies REQ-FAM-014/015 and REQ-PRIV-019/024 for this first slice; broader future uses remain gated.
+
+## Safety Circle first slice
+
+| ID | Short label | Canonical location | Status | Introduced | Superseded by |
+|---|---|---|---|---|---|
+| REQ-FAM-017 | Owner Safety Circle CRUD | product-contract.md#req-fam-017 | APPROVED | CTX-1.35 | - |
+| REQ-PRIV-033 | Circle privacy, provenance, deletion and target grants | privacy-safety-contract.md#req-priv-033 | APPROVED | CTX-1.35 | - |

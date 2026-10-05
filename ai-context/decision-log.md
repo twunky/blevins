@@ -1233,3 +1233,10 @@ These questions are intentionally unresolved and are not requirements.
 - **Privacy:** REQ-PRIV-032 defines owner-only server authorization, no administrator/selected-Family/known-ID override, nondisclosure/no-store and zero downstream access, notifications, membership or Safety Circle enrollment. Future integrations/linking remain separately gated.
 - **Canonical effect:** Update REQ-FAM-014/015, REQ-PRIV-019/024 and glossary/index; add REQ-FAM-016 / REQ-PRIV-032. Earlier DEC-049/059 open questions are resolved only for the approved manual first slice. CTX-1.34 succeeds CTX-1.33 after separate VER-CTX-1.34 PASS / SELF-VERIFIED under this owner authorization.
 - **Authorization:** Create and execute WI-095-007 in this task, including this minimum context successor. Phase 9.5 remains current; final VERIFYING / OWNER REVIEW, no next item or completion on owner's behalf. Owner performs Git commits; no staging/push/PR.
+
+## DEC-089 - Safety Circle presets and owner-loss deletion
+
+- **Status:** ACCEPTED - original owner instruction and follow-up owner-loss decision explicitly authorize WI-095-008 and minimum successor CTX-1.35, 2026-10-05.
+- **Decision:** REQ-FAM-017 / REQ-PRIV-033 record private owner-only, one-Family presets with same-Family eligible adult profiles and zero protected authority. Ordinary loss permanently removes only the member row; owner loss permanently deletes circle/member rows, without retention/restore/transfer or automatic rejoin recreation. Optional Check-In/Sharing presets materialize confirmed explicit grants independently of later circle changes/deletion.
+- **Scope:** Bounded CRUD, creation presets, focused verification and one final regression; no other item authorized. Owner performs Git commits. WI-095-008 ends VERIFYING / OWNER REVIEW.
+- **Canonical effect:** CTX-1.35 succeeds CTX-1.34 after separate context verification; other permissions/lifecycles unchanged.

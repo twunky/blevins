@@ -1,3 +1,4 @@
+using FamilySafety.Application.SafetyCircles;
 using FamilySafety.Application.Directory;
 using FamilySafety.Application.TrustedContacts;
 using FamilySafety.Application.CheckIns;
@@ -26,6 +27,7 @@ public static class DependencyInjection
         ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
 
         services.AddDbContext<FamilySafetyDbContext>(options => options.UseSqlServer(connectionString));
+        services.AddScoped<ISafetyCircleRepository, EfSafetyCircleRepository>();
         services.AddScoped<ICheckInRepository, EfCheckInRepository>();
         services.AddScoped<ITrustedContactRepository, EfTrustedContactRepository>();
         services.AddScoped<ISharingSessionRepository, EfSharingSessionRepository>();

@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.34
-Version: 1.18
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-045; DEC-046; DEC-047; DEC-053; DEC-059; DEC-068; DEC-071; DEC-088
+Context-Baseline: CTX-1.35
+Version: 1.19
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-045; DEC-046; DEC-047; DEC-053; DEC-059; DEC-068; DEC-071; DEC-088; DEC-089
 ---
 
 # Product Contract
@@ -180,6 +180,10 @@ Each record has a required trimmed plain-text Display Name, at least one valid P
 The owner may list, add, edit these four fields and remove records in the existing Safety experience, without a feature Family selector. The resulting record must always have at least one valid contact method. A match on either normalized email or normalized phone rejects create/edit as a duplicate within the owner; exclude the edited record itself. Names alone are not identity, and different owners may store the same contact independently. Optimistic concurrency follows current CRUD conventions; no revision history is created.
 
 Removal permanently deletes the record, with no tombstone, retained feature history, recycle bin, restore or retention window. Leaving/joining/changing selected Family does not remove, duplicate or expose records. Contacts follow owner-profile deletion through ownership cascade when a separately implemented account lifecycle actually deletes that profile; this slice implements no account deletion. External-contact eligibility loss does not apply. Operational logs/backups remain governed by existing infrastructure, not a new feature retention framework.
+
+### REQ-FAM-017
+
+Safety Circles v1 are private reusable recipient-selection presets in Safety under REQ-PRIV-033. An eligible adult owner may list, create, rename, add eligible same-Family adult members, remove members and confirm permanent deletion of their own circles for one Family. Require a trimmed short plain-text name (up to 100 characters); normalized names are unique per owner and Family, while different owners may use the same name. Mutations use optimistic concurrency. Optional presets assist standalone Check-In and Temporary Sharing Session creation only; manual recipient selection remains available. No generic group/ACL framework, Trusted Contact integration, notifications or other product integrations are authorized.
 
 ## Explicit non-goals
 

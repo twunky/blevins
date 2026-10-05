@@ -25,3 +25,5 @@ This is the current rule for organizing `src/app`:
 - **Family-scoped state in `App`.** If you add Family-scoped state to `App`, also reset it in `clearFamilyScopedState()` so a Family switch never shows another Family's data.
 
 See the [repository README](../../README.md) for the project overview, [local development](../../docs/local-development.md) for setup and test-artifact guidance, and [AI context](../../ai-context/README.md) for authoritative product and project rules.
+
+`safety-circles/safety-circles` owns WI-095-008 private owner-only Family presets and member management. `circle-recipient-preset` fetches fresh authorized members only when optionally requested in Check-In/Temporary Sharing creation; users review adjustable checkboxes and submit profile IDs to unchanged explicit-grant APIs. Identity/Family changes discard data and cancel reads. Owner membership loss deletes the circle, ordinary member loss removes only that member; rejoin does not restore either.

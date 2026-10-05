@@ -1,0 +1,6 @@
+:host { display: block; margin-top: 1rem; min-width: 0; }
+.circles, form, .circle-row { display: grid; gap: var(--space-3); }
+h2, h3, p, li { margin: 0; overflow-wrap: anywhere; }
+.circle-row { padding-block: var(--space-3); border-bottom: 1px solid var(--color-border); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+input, select { width: 100%; min-width: 0; box-sizing: border-box; }

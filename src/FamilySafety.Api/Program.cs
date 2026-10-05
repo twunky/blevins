@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using FamilySafety.Api.SafetyCircles;
+using FamilySafety.Application.SafetyCircles;
 using FamilySafety.Api.TrustedContacts;
 using FamilySafety.Application.TrustedContacts;
 using FamilySafety.Api.CheckIns;
@@ -39,6 +41,7 @@ var connectionString = builder.Configuration.GetConnectionString("FamilySafety")
     ?? throw new InvalidOperationException("Connection string 'FamilySafety' is required.");
 
 builder.Services.AddFamilySafetyInfrastructure(connectionString);
+builder.Services.AddScoped<SafetyCircleService>();
 builder.Services.AddScoped<ICheckInService, CheckInService>();
 builder.Services.AddScoped<TrustedContactService>();
 builder.Services.AddScoped<SharingSessionService>();
@@ -72,6 +75,7 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 app.MapHealthChecks("/health");
+app.MapSafetyCircleEndpoints();
 app.MapCheckInEndpoints();
 app.MapTrustedContactEndpoints();
 app.MapSharingSessionEndpoints();

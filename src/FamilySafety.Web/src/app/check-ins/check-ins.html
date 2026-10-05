@@ -35,7 +35,8 @@
         </select>
         <label for="check-in-note">Note (optional)</label>
         <textarea id="check-in-note" name="note" [(ngModel)]="note" maxlength="1000" rows="3" [disabled]="busy()"></textarea>
-        <fieldset [disabled]="busy()" aria-describedby="check-in-audience-help">
+        <app-circle-recipient-preset [familyId]="familyId" [ownProfileId]="ownProfileId" controlId="check-ins-circle-preset" [disabled]="busy()" (recipients)="recipientIds = $event" (loading)="presetLoading = $event" />
+        <fieldset [disabled]="busy() || presetLoading" aria-describedby="check-in-audience-help">
           <legend>Choose recipients</legend>
           <p id="check-in-audience-help" class="section-help">No one is selected by default. Choose people from the current Family, or keep this Check-In to yourself. Recipients cannot see who else you selected.</p>
           @for (person of people(); track person.profileId) {
@@ -45,7 +46,7 @@
         </fieldset>
         <p class="section-help">Status, note and recipients are fixed after creation. If you or a recipient leaves this Family, that sharing grant ends permanently. Your own history remains available.</p>
         <div class="actions">
-          <button type="submit" [disabled]="busy() || !valid()">{{ busy() ? 'Creating…' : 'Create Check-In' }}</button>
+          <button type="submit" [disabled]="busy() || presetLoading || !valid()">{{ busy() ? 'Creating…' : 'Create Check-In' }}</button>
           <button type="button" class="button--secondary" (click)="cancel()" [disabled]="busy()">Cancel</button>
         </div>
       </form>

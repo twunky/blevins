@@ -1,8 +1,8 @@
 ---
 Status: APPROVED
 Authority: CANONICAL WORKFLOW — CTX-1.3
-Context-Baseline: CTX-1.33
-Version: 1.3
+Context-Baseline: CTX-1.35
+Version: 1.4
 Source: ../bootstrap/product-ux-source.md; DEC-057; DEC-086; DEC-087
 Constrained-By:
   - ../core/product-contract.md
@@ -50,7 +50,7 @@ Active Sharing Sessions must expose the clarity required by `REQ-UX-009` and mus
 
 ### REQ-SHARE-011
 
-The first implemented Sharing Session is temporary, self-initiated current/last-reported location sharing under REQ-PRIV-031. Start with an explicit fixed same-Family adult audience and expiration (one-hour default, up to 24 hours); author may stop early. Safety owns the workflow and Home shows an active-sharing indicator under REQ-UX-009. The browser UI states permission/availability limits and freshness; recipients see only an active authorized current point or location-not-yet-available state. No history or general tracking platform is included. Broader modes/dimensions in REQ-SHARE-002/003/004 remain separately gated.
+The first implemented Sharing Session is temporary, self-initiated current/last-reported location sharing under REQ-PRIV-031. Start with an explicit fixed same-Family adult audience and expiration (one-hour default, up to 24 hours); author may stop early. Safety owns the workflow and Home shows an active-sharing indicator under REQ-UX-009. The browser UI states permission/availability limits and freshness; recipients see only an active authorized current point or location-not-yet-available state. No history or general tracking platform is included. Optional Safety Circle recipient presets follow REQ-PRIV-033; the confirmed audience remains fixed. Broader modes/dimensions in REQ-SHARE-002/003/004 remain separately gated.
 
 OD-002 is resolved for this bounded temporary-only MVP by DEC-087; indefinite sharing remains excluded.
 
@@ -78,4 +78,4 @@ Trip context does not grant Sharing Session or another person's Check-In access.
 
 ### REQ-SHARE-010
 
-The first standalone Check-In slice is self-authored creation and read-only history. It uses exactly the five statuses in REQ-SHARE-006 and an optional plain-text note under REQ-SHARE-007. Status, note and explicitly chosen recipients are fixed at creation; post-creation editing, re-sharing, deletion and restore are excluded. Historical records remain stored without an invented expiry; their availability follows REQ-PRIV-030. No location, expected-arrival update, Event/Plan/Trip association, Sharing Session dependency, reminder, notification or automatic Concern/Incident/safety inference is included. A status is the author's report, not verified safety.
+The first standalone Check-In slice is self-authored creation and read-only history. It uses exactly the five statuses in REQ-SHARE-006 and an optional plain-text note under REQ-SHARE-007. Status, note and explicitly chosen recipients are fixed at creation; post-creation editing, re-sharing, deletion and restore are excluded. Historical records remain stored without an invented expiry; their availability follows REQ-PRIV-030. No location, expected-arrival update, Event/Plan/Trip association, Sharing Session dependency, reminder, notification or automatic Concern/Incident/safety inference is included. Optional Safety Circle recipient presets follow REQ-PRIV-033; recipients remain explicit and fixed. A status is the author's report, not verified safety.

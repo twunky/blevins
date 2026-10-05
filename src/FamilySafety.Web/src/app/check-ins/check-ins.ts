@@ -1,3 +1,4 @@
+import { CircleRecipientPreset } from '../safety-circles/circle-recipient-preset';
 import { DatePipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, Input, OnChanges, inject, signal } from '@angular/core';
@@ -18,7 +19,7 @@ interface Person { profileId: string; displayName: string }
 
 /** Standalone workflow. Family selection helps creation only; history uses explicit server grants. */
 @Component({
-  selector: 'app-check-ins', imports: [FormsModule, DatePipe],
+  selector: 'app-check-ins', imports: [CircleRecipientPreset, FormsModule, DatePipe],
   templateUrl: './check-ins.html', styleUrl: './check-ins.scss',
 })
 export class CheckIns implements OnChanges {
@@ -40,6 +41,7 @@ export class CheckIns implements OnChanges {
   protected readonly statuses = checkInStatuses;
   protected status = '';
   protected note = '';
+  protected presetLoading = false;
   protected recipientIds: string[] = [];
 
   ngOnChanges(): void { this.refresh(); }
@@ -82,14 +84,14 @@ export class CheckIns implements OnChanges {
       });
   }
   protected create(): void { if (this.peopleState() === 'ready') { this.cancel(); this.formOpen.set(true); this.error.set(''); } }
-  protected cancel(): void { this.formOpen.set(false); this.status = ''; this.note = ''; this.recipientIds = []; }
+  protected cancel(): void { this.presetLoading = false; this.formOpen.set(false); this.status = ''; this.note = ''; this.recipientIds = []; }
   protected choose(profileId: string, selected: boolean): void {
     this.recipientIds = selected ? [...this.recipientIds, profileId] : this.recipientIds.filter(id => id !== profileId);
   }
   protected label(status: string): string { return this.statuses.find(s => s.value === status)?.label ?? ''; }
   protected valid(): boolean { return this.statuses.some(s => s.value === this.status) && this.note.trim().length <= 1000 && this.peopleState() === 'ready'; }
   protected save(): void {
-    if (!this.valid() || !this.familyId || this.busy() || this.state() !== 'ready') return;
+    if (this.presetLoading || !this.valid() || !this.familyId || this.busy() || this.state() !== 'ready') return;
     this.busy.set(true); this.error.set(''); this.message.set('');
     const generation = this.generation;
     this.http.post<CheckInView>('/api/check-ins', {

@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
-Authority: CANONICAL — CTX-1.34
-Context-Baseline: CTX-1.34
-Version: 1.10
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-059; DEC-071; DEC-088
+Authority: CANONICAL — CTX-1.35
+Context-Baseline: CTX-1.35
+Version: 1.11
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-059; DEC-071; DEC-088; DEC-089
 ---
 
 # Domain Glossary
@@ -58,7 +58,7 @@ A basic grouping of family members. Detailed household behavior is not defined b
 
 ### Safety Circle
 
-A user-selected set of trusted people, potentially including a spouse, parent, adult child, sibling, trusted friend, or caregiver. It is distinct from Trusted Contact entries; designating a Trusted Contact does not automatically add that person to the Safety Circle.
+A private owner-managed, Family-scoped reusable recipient-selection preset under REQ-FAM-017 / REQ-PRIV-033. V1 members are eligible same-Family adult application profiles; Trusted Contacts and external contacts remain separate. Circle membership grants no protected access. Check-Ins and Sharing Sessions store their own confirmed explicit grants.
 
 ### Trusted Contact
 

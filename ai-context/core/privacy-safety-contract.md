@@ -1,16 +1,26 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.34
-Version: 1.26
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087; DEC-088
+Context-Baseline: CTX-1.35
+Version: 1.27
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087; DEC-088; DEC-089
 ---
 
 # Privacy and Safety Contract
 
-Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.34`.
+Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.35`.
 
 ## Consent and sharing control
+
+### REQ-PRIV-033
+
+Safety Circles v1 (DEC-089) are private owner-managed recipient-selection presets, never authorization roles. One exact adult owner profile and one Family Group own each circle. Every operation authorizes the current account's exact owner profile, qualifying active membership in that Family and circle identity before name/member projection. Known IDs, selected Family, Family Administrator and Application Operator roles grant nothing. Denied/missing reads are uniformly unavailable; lists omit unauthorized circles; responses are no-store.
+
+Only existing adult application profiles correctly bound to qualifying active memberships in the same Family may be members. The current model has no separate inactive adult-profile state. Child profiles, Trusted Contacts, external/manual contacts and cross-Family members are excluded. Store exact profile and original membership ID/version provenance. Ordinary member eligibility loss permanently removes only that circle membership; rejoin/replacement profiles do not restore it. The owner may explicitly add a currently eligible profile again.
+
+Owner qualifying Family membership loss permanently deletes the circle and all its member rows immediately, with no retention, restore, tombstone, transfer, administrator takeover or automatic recreation on rejoin. An eligible rejoined owner must explicitly create a new circle. Owner-requested confirmed deletion is also permanent. No generic retention framework or cleanup job is authorized.
+
+Membership grants zero access to Check-Ins, Sharing Sessions, location, Events, Plans, Trips, Concerns, Incidents, profiles, Family administration or any other protected data. On standalone Check-In or Temporary Sharing Session creation only, an owner may optionally choose a circle to populate currently eligible recipients. The user sees and can adjust final recipients before deliberately creating the item. The target feature revalidates and stores its own normal explicit grants; no SafetyCircleId or live circle membership becomes an authorization source. Circle additions/removals/deletion never modify existing target grants. REQ-PRIV-030/031 membership-loss, expiration and access rules remain authoritative independently.
 
 ### REQ-PRIV-031
 
@@ -23,13 +33,13 @@ For first-slice Temporary Sharing Sessions (DEC-087):
 - Store only the latest accepted latitude/longitude, accuracy, captured time and server-received time, replaced in place. No historical coordinates, breadcrumb/route/movement data or historical archive UI. Only author may update an active eligible session; validate coordinates/timestamps and bound updates to approximately one per minute. Optimistic concurrency cannot revive ended sharing.
 - Stop, expiration or author loss immediately ends normal coordinate access, independently of background cleanup. Clear raw current-location data through feature-specific cleanup; minimal non-location provenance/diagnostic metadata may remain. No generic retention or restore capability.
 - Browser permission is explicit and availability uncertain: collect only while the sharing UI is active and browser permits it, throttle updates, expose captured-time freshness/staleness and permission/unavailable/transient failures. No background/continuous guarantees. Authorized recipients may see the last accepted point while the session is active, or a clear not-yet-available state.
-- No Event/Plan/Trip/Trusted Contact/Safety Circle audience, audience editing, alerts, notifications, geofences, SOS, automatic Concern/Incident or safety inference is authorized.
+- Optional Safety Circle presets follow REQ-PRIV-033; the confirmed explicit audience remains fixed. No Event/Plan/Trip/Trusted Contact audience, audience editing, alerts, notifications, geofences, SOS, automatic Concern/Incident or safety inference is authorized.
 
 ### REQ-PRIV-030
 
 For first-slice standalone Check-Ins (DEC-086):
 
-- Only the signed-in adult authors their own Check-In. At creation the author and every explicitly selected recipient must be active adults in one chosen Family Group. No cross-Family audience or default Family, Event, Trip, Safety Circle or administrator audience exists. Selected Family is navigation/context only.
+- Only the signed-in adult authors their own Check-In. At creation the author and every explicitly selected recipient must be active adults in one chosen Family Group. No cross-Family audience or default Family, Event, Trip, Safety Circle or administrator audience exists. Optional Safety Circle presets follow REQ-PRIV-033. Selected Family is navigation/context only.
 - Sharing belongs to that Family Group and the exact original author/recipient profiles. Every recipient read rechecks both parties' current eligibility and the original membership grants. Loss by either party permanently invalidates the recipient grant; later rejoining, a replacement profile on the same Account, matching names, Family reselection or a known Check-In ID never restores or inherits it.
 - The author retains access to their own historical Check-In after leaving the Family. Stored history/share provenance grants no recipient access. No post-creation recipient editing/re-sharing is included.
 - Queries authorize before projecting content. Unauthorized callers receive no status, note, recipient list, timestamps or existence disclosure; denied and missing detail reads use the same unavailable response. Lists omit unauthorized records. Family Administrators and Application Operators have no override. Other recipients do not receive the selected recipient identity list.

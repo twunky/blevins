@@ -1,3 +1,4 @@
+import { CircleRecipientPreset } from '../safety-circles/circle-recipient-preset';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, Input, OnChanges, inject, signal } from '@angular/core';
@@ -16,7 +17,7 @@ interface Person { profileId: string; displayName: string }
 
 /** Family is creation context. Every read uses server grants, never a client Family filter. */
 @Component({
-  selector: 'app-sharing-sessions', imports: [FormsModule, DatePipe, DecimalPipe, RouterLink],
+  selector: 'app-sharing-sessions', imports: [CircleRecipientPreset, FormsModule, DatePipe, DecimalPipe, RouterLink],
   templateUrl: './sharing-sessions.html', styleUrl: './sharing-sessions.scss',
 })
 export class SharingSessions implements OnChanges {
@@ -45,6 +46,7 @@ export class SharingSessions implements OnChanges {
   protected readonly message = signal('');
   protected readonly error = signal('');
   protected readonly now = signal(Date.now());
+  protected presetLoading = false;
   protected recipientIds: string[] = [];
   protected endTime = '';
   private defaultEndTime = '';
@@ -122,7 +124,7 @@ export class SharingSessions implements OnChanges {
     return this.eligible() && this.recipientIds.length > 0 && end > this.now() && end <= this.now() + 86400000;
   }
   protected start(): void {
-    if (!this.valid() || !this.familyId || this.busy()) return;
+    if (this.presetLoading || !this.valid() || !this.familyId || this.busy()) return;
     this.cancelReads();
     this.busy.set(true); this.error.set('');
     this.http.post<SharingSessionView>('/api/sharing-sessions', {

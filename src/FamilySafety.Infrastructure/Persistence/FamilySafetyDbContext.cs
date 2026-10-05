@@ -1,3 +1,4 @@
+using FamilySafety.Domain.SafetyCircles;
 using FamilySafety.Domain.Profiles;
 using FamilySafety.Domain.TrustedContacts;
 using FamilySafety.Domain.CheckIns;
@@ -16,6 +17,8 @@ namespace FamilySafety.Infrastructure.Persistence;
 public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext> options)
     : DbContext(options)
 {
+    public DbSet<SafetyCircle> SafetyCircles => Set<SafetyCircle>();
+    public DbSet<SafetyCircleMember> SafetyCircleMembers => Set<SafetyCircleMember>();
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<TrustedContact> TrustedContacts => Set<TrustedContact>();
     public DbSet<CheckIn> CheckIns => Set<CheckIn>();
@@ -70,6 +73,20 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var circle = modelBuilder.Entity<SafetyCircle>();
+        circle.ToTable("SafetyCircles"); circle.HasKey(c => c.Id);
+        circle.Property(c => c.Name).HasMaxLength(100).IsRequired();
+        circle.Property(c => c.NormalizedName).HasMaxLength(200).UseCollation("Latin1_General_100_BIN2").IsRequired();
+        circle.Property(c => c.Version).IsConcurrencyToken();
+        circle.HasIndex(c => new { c.OwnerProfileId, c.FamilyGroupId, c.NormalizedName }).IsUnique();
+        circle.HasOne<AdultProfile>().WithMany().HasForeignKey(c => c.OwnerProfileId).OnDelete(DeleteBehavior.Restrict);
+        circle.HasOne<FamilyGroup>().WithMany().HasForeignKey(c => c.FamilyGroupId).OnDelete(DeleteBehavior.Restrict);
+        circle.HasOne<FamilyGroupMembership>().WithMany().HasForeignKey(c => c.OwnerMembershipId).OnDelete(DeleteBehavior.Restrict);
+        var circleMember = modelBuilder.Entity<SafetyCircleMember>();
+        circleMember.ToTable("SafetyCircleMembers"); circleMember.HasKey(m => new { m.SafetyCircleId, m.MemberProfileId });
+        circleMember.HasOne<SafetyCircle>().WithMany().HasForeignKey(m => m.SafetyCircleId).OnDelete(DeleteBehavior.Cascade);
+        circleMember.HasOne<AdultProfile>().WithMany().HasForeignKey(m => m.MemberProfileId).OnDelete(DeleteBehavior.Restrict);
+        circleMember.HasOne<FamilyGroupMembership>().WithMany().HasForeignKey(m => m.MembershipId).OnDelete(DeleteBehavior.Restrict);
         var trustedContact = modelBuilder.Entity<TrustedContact>();
         trustedContact.ToTable("TrustedContacts", t => t.HasCheckConstraint("CK_TrustedContacts_ContactMethod",
             "([PhoneNumber] IS NOT NULL AND [NormalizedPhone] IS NOT NULL) OR ([EmailAddress] IS NOT NULL AND [NormalizedEmail] IS NOT NULL)"));
@@ -153,6 +170,7 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
             table.HasTrigger("TR_SharedFamilyDates_MembershipLoss");
             table.HasTrigger("TR_CheckIns_MembershipLoss");
             table.HasTrigger("TR_SharingSessions_MembershipLoss");
+            table.HasTrigger("TR_SafetyCircles_MembershipLoss");
         });
         membership.HasKey(entity => entity.Id);
         membership.HasIndex(entity => new { entity.AccountId, entity.FamilyGroupId }).IsUnique();
