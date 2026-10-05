@@ -548,6 +548,87 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.ToTable("FamilyEventUpdates", (string)null);
                 });
 
+            modelBuilder.Entity("FamilySafety.Domain.FamilyDates.SharedFamilyDate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("CreatorMembershipId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("CreatorMembershipVersion")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CreatorProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("FamilyGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("RetainUntilUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset?>("UnavailableAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatorProfileId");
+
+                    b.HasIndex("RetainUntilUtc");
+
+                    b.HasIndex("FamilyGroupId", "Date");
+
+                    b.ToTable("SharedFamilyDates", (string)null);
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.FamilyDates.SharedFamilyDateAssociation", b =>
+                {
+                    b.Property<Guid>("DateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MembershipId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MembershipVersion")
+                        .HasColumnType("int");
+
+                    b.HasKey("DateId", "ProfileId");
+
+                    b.HasIndex("MembershipId");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("SharedFamilyDateAssociations", (string)null);
+                });
+
             modelBuilder.Entity("FamilySafety.Domain.Incidents.IncidentAuditEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1173,6 +1254,8 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.ToTable("FamilyGroupMemberships", null, t =>
                         {
                             t.HasTrigger("TR_EventNeeds_MembershipLoss");
+
+                            t.HasTrigger("TR_SharedFamilyDates_MembershipLoss");
                         });
 
                     b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
@@ -1633,6 +1716,36 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.HasOne("FamilySafety.Domain.Events.FamilyEvent", null)
                         .WithMany()
                         .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.FamilyDates.SharedFamilyDate", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("CreatorProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroup", null)
+                        .WithMany()
+                        .HasForeignKey("FamilyGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.FamilyDates.SharedFamilyDateAssociation", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.FamilyDates.SharedFamilyDate", null)
+                        .WithMany()
+                        .HasForeignKey("DateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

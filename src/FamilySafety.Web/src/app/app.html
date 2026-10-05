@@ -1134,6 +1134,11 @@
 
         @if (familyGroupsLoaded() && activeFamilyGroups().length > 0) {
           <div class="family-coordination">
+            @if (view() === 'family' && selectedFamily(); as family) {
+              @defer (on immediate) {
+                <app-shared-family-dates [familyId]="family.familyGroupId" [ownProfileId]="ownerProfile()?.profileId ?? null" />
+              } @loading { <p role="status">Loading shared dates…</p> }
+            }
             <!-- D2: real, actionable items only. Today that is relationship suggestions sent to you. -->
             <section class="card family-waiting" aria-labelledby="family-waiting-heading">
               <div class="card-header">

@@ -1,4 +1,5 @@
 using FamilySafety.Application.Directory;
+using FamilySafety.Application.FamilyDates;
 using FamilySafety.Application.Events;
 using FamilySafety.Application.Invitations;
 using FamilySafety.Application.Profiles;
@@ -25,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IAdultProfileRepository, EfAdultProfileRepository>();
         services.AddScoped<IMembershipInvitationRepository, EfMembershipInvitationRepository>();
         services.AddScoped<IFamilyDirectoryRepository, EfFamilyDirectoryRepository>();
+        services.AddScoped<ISharedFamilyDateRepository, EfSharedFamilyDateRepository>();
         services.AddScoped<IFamilyEventRepository, EfFamilyEventRepository>();
         services.AddScoped<IEventInvitationRepository, EfEventInvitationRepository>();
         services.AddScoped<IEventNeedRepository, EfEventNeedRepository>();

@@ -2,8 +2,8 @@
 Status: APPROVED
 Authority: CANONICAL
 Context-Baseline: CTX-1.31
-Version: 1.22
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084
+Version: 1.23
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085
 ---
 
 # Privacy and Safety Contract
@@ -133,7 +133,7 @@ For shared Family Date data:
 
 ### REQ-PRIV-018
 
-For shared Family Date data that becomes unavailable under `REQ-PRIV-017`, the finite retention period is 30 calendar days, beginning when the entry first becomes unavailable in normal Family views. At the end of that period, the retained date data must be deleted. This duration applies only to shared Family Date data and does not define retention for other product data. Audit records, technical backups, and cleanup mechanics remain undecided and must not be inferred from this requirement.
+For shared Family Date data that becomes unavailable under `REQ-PRIV-017`, the finite retention period is 30 calendar days, beginning when the entry first becomes unavailable in normal Family views. At the end of that period, the retained date data must be deleted. This duration applies only to shared Family Date data and does not define retention for other product data. Audit records and technical backup retention remain undecided and must not be inferred from this requirement. `DEC-085` resolves implementation mechanics for WI-095-004: feature-specific cleanup and no user-facing restore, with current authorization required after operational restoration; the existing visibility and duration rules are unchanged.
 
 ### REQ-PRIV-019
 

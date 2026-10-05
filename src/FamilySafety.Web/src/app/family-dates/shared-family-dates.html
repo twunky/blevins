@@ -1,0 +1,75 @@
+<section class="card family-dates" aria-labelledby="family-dates-heading">
+  <div class="card-header"><h2 id="family-dates-heading">Shared Family Dates</h2></div>
+  @if (message()) { <p class="message message--success" role="status">{{ message() }}</p> }
+  @if (error()) { <p class="message message--error" role="alert">{{ error() }}</p> }
+  @if (status() === 'loading') {
+    <p role="status">Loading shared dates…</p>
+  } @else if (status() === 'error') {
+    <p role="alert">Shared dates could not be loaded. Please try again.</p>
+    <button type="button" class="button--secondary" (click)="refresh()">Retry loading dates</button>
+  } @else if (status() === 'unavailable') {
+    <p>Shared dates are currently unavailable.</p>
+    <button type="button" class="button--secondary" (click)="refresh()">Refresh dates</button>
+  } @else if (data(); as view) {
+    <p class="help">Important dates with a year, shared only with their creator and selected family members. These dates do not repeat automatically.</p>
+    <div class="actions">
+      <button type="button" class="button--secondary" [disabled]="busy()" (click)="refresh()">Refresh dates</button>
+      @if (view.canCreate) { <button type="button" [disabled]="busy() || needsRefresh() || formOpen()" (click)="create()">Add a date</button> }
+    </div>
+    @if (!view.dates.length) { <p>No shared dates are available to you.</p> }
+    @for (entry of view.dates; track entry.dateId) {
+      <article class="date-row" aria-label="Shared Family Date">
+        <h3>{{ entry.title }}</h3>
+        <time [attr.datetime]="entry.date">{{ displayDate(entry.date) }}</time>
+        <p class="description">{{ entry.description }}</p>
+        <p class="help">Associated members:
+          @for (person of entry.associatedPeople; track person.profileId; let last = $last) {
+            {{ person.displayName }}{{ last ? '' : ', ' }}
+          } @empty { None selected. }
+        </p>
+        <div class="actions">
+          @if (entry.canEdit) { <button type="button" class="button--secondary" [disabled]="busy() || needsRefresh()" (click)="edit(entry)">Edit date</button> }
+          @if (entry.canDelete) { <button type="button" class="button--secondary" [disabled]="busy() || needsRefresh()" (click)="deleting.set(entry.dateId)">Delete date</button> }
+        </div>
+        @if (deleting() === entry.dateId) {
+          <div class="confirmation">
+            <p>Delete this date? It will disappear immediately for everyone it is shared with. You cannot restore it here.</p>
+            <div class="actions">
+              <button type="button" [disabled]="busy() || needsRefresh()" (click)="remove(entry)">Confirm delete</button>
+              <button type="button" class="button--secondary" [disabled]="busy()" (click)="deleting.set(null)">Cancel deletion</button>
+            </div>
+          </div>
+        }
+      </article>
+    }
+    @if (formOpen()) {
+      <form (ngSubmit)="save()">
+        <h3>{{ editing() ? 'Edit shared date' : 'Create shared date' }}</h3>
+        <label for="family-date-title">Title</label>
+        <input id="family-date-title" name="title" [(ngModel)]="title" required maxlength="100" [disabled]="busy() || needsRefresh()">
+        <label for="family-date-value">Date including year</label>
+        <input id="family-date-value" name="date" type="date" [(ngModel)]="date" required [disabled]="busy() || needsRefresh()">
+        <label for="family-date-description">Description</label>
+        <textarea id="family-date-description" name="description" [(ngModel)]="description" required maxlength="1000" rows="3" [disabled]="busy() || needsRefresh()"></textarea>
+        @if (!editing() || editing()?.canManageAssociations) {
+          <fieldset [disabled]="busy() || needsRefresh()">
+            <legend>Associated members</legend>
+            <p class="help">Only you and the members you select can see this date. If you or any associated member leaves this Family, the whole date becomes unavailable.</p>
+            @if (peopleStatus() === 'loading') { <p role="status">Loading member choices…</p> }
+            @else if (peopleStatus() === 'error') {
+              <p role="alert">Member choices could not be loaded.</p>
+              <button type="button" class="button--secondary" (click)="loadPeople()">Retry loading member choices</button>
+            } @else { @for (person of people(); track person.profileId) {
+              <label class="person-choice"><input type="checkbox" [checked]="associatedIds.includes(person.profileId)"
+                (change)="associate(person.profileId, $any($event.target).checked)">{{ person.displayName }}</label>
+            } @empty { <p>No other active members are available.</p> } }
+          </fieldset>
+        } @else { <p class="help">Only the creator can change associated members or delete this date.</p> }
+        <div class="actions">
+          <button type="submit" [disabled]="busy() || needsRefresh() || !valid()">{{ editing() ? 'Save date' : 'Create date' }}</button>
+          <button type="button" class="button--secondary" [disabled]="busy()" (click)="cancel()">Cancel edit</button>
+        </div>
+      </form>
+    }
+  }
+</section>

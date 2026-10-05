@@ -8,6 +8,8 @@ In `src/app`, `app.ts` and `app.html` still implement Home, Family, Events, Plan
 
 ## Structure and extraction
 
+`family-dates/shared-family-dates` owns WI-095-004 date list/forms, protected requests, server-derived actions and context reset. App supplies the selected Family/profile and retains the rest of the Family experience. Profile birthdays are not copied into date entries.
+
 This is the current rule for organizing `src/app`:
 
 - **A folder is a real boundary.** Create a folder only when it holds a genuine ownership or implementation boundary, such as `concerns/`, `incidents/`, `trips/`, `safety/`, or `plans-trips/`. Do not create feature folders for symmetry.

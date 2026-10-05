@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using FamilySafety.Api.Development;
 using FamilySafety.Api.Directory;
+using FamilySafety.Api.FamilyDates;
+using FamilySafety.Application.FamilyDates;
 using FamilySafety.Api.Events;
 using FamilySafety.Api.Invitations;
 using FamilySafety.Api.Profiles;
@@ -34,6 +36,7 @@ builder.Services.AddFamilySafetyInfrastructure(connectionString);
 builder.Services.AddScoped<IAdultProfileService, AdultProfileService>();
 builder.Services.AddScoped<IMembershipInvitationService, MembershipInvitationService>();
 builder.Services.AddScoped<IFamilyDirectoryService, FamilyDirectoryService>();
+builder.Services.AddScoped<ISharedFamilyDateService, SharedFamilyDateService>();
 builder.Services.AddScoped<IFamilyEventService, FamilyEventService>();
 builder.Services.AddScoped<IEventInvitationService, EventInvitationService>();
 builder.Services.AddScoped<IEventNeedService, EventNeedService>();
@@ -49,6 +52,7 @@ if (!builder.Environment.IsEnvironment("Testing"))
 {
     builder.Services.AddHostedService<ConcernMaintenanceService>();
     builder.Services.AddHostedService<IncidentMaintenanceService>();
+    builder.Services.AddHostedService<SharedFamilyDateMaintenanceService>();
 }
 builder.Services.AddCurrentAccount(builder.Environment, builder.Configuration);
 builder.Services.AddDevelopmentFixtures(builder.Environment, builder.Configuration);
@@ -61,6 +65,7 @@ app.MapHealthChecks("/health");
 app.MapAdultProfileEndpoints();
 app.MapMembershipInvitationEndpoints();
 app.MapFamilyDirectoryEndpoints();
+app.MapSharedFamilyDateEndpoints();
 app.MapFamilyEventEndpoints();
 app.MapEventInvitationEndpoints();
 app.MapEventNeedEndpoints();

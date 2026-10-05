@@ -1202,3 +1202,10 @@ These questions are intentionally unresolved and are not requirements.
 - **Canonical effect:** REQ-PRIV-029 records actor-aware responsibility identity disclosure; REQ-EVT-011 references it. CTX-1.31 succeeds CTX-1.30 after concise self-verification.
 - **Authorization:** Create and execute WI-095-002 — Event Needs under existing canonical transitions/eligibility and the approved privacy rule. No Event Updates or sibling capability. Owner performs all Git commits.
 - **Activation:** CTX-1.31 ACTIVE after VER-CTX-1.31 PASS / SELF-VERIFIED. WI-095-002 IN_PROGRESS, execution YES. Leave VERIFYING / OWNER REVIEW after implementation; no owner completion inferred.
+
+## DEC-085 — Shared Family Dates execution and retention mechanics
+
+- **Status/date:** ACCEPTED — explicit owner instruction, 2026-10-04.
+- **Authorization:** Create and execute WI-095-004 under CTX-1.31 and REQ-FAM-010/011/012/013, REQ-PRIV-016/017/018. Immediate unavailability and 30-calendar-day duration are unchanged. No new baseline is needed for implementation mechanics.
+- **Mechanics:** No user-facing restore or retained-data API. Reuse feature-specific hosted maintenance for permanent cleanup at expiry; retained storage never grants current access. Operational/backup restoration must recheck current Family and original membership/association authorization. Audit/backup retention policies remain separate predeployment work.
+- **Scope/status:** Shared Family Dates only; owner commits; hand back VERIFYING / OWNER REVIEW. No sibling capability authorization.

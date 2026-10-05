@@ -61,7 +61,7 @@ test('direct entry, gear, Back to Family, administrator Settings, member detail,
   await expect(heading(page)).toHaveText('Family');
   await expect(page.locator('.page-title')).toContainText(family.name);
   await expectFamilyCurrent(page, 'page');
-  await expect(page.locator('.family-coordination h2')).toHaveText(['Waiting for you', 'Upcoming birthdays', 'Recent Family Updates', 'Recent Check-Ins']);
+  await expect(page.locator('.family-coordination h2')).toHaveText(['Shared Family Dates', 'Waiting for you', 'Upcoming birthdays', 'Recent Family Updates', 'Recent Check-Ins']);
   await expect(page.getByText('Nothing is waiting for you right now.')).toBeVisible();
   const placeholders = page.locator('.family-coordination .home-future');
   await expect(placeholders).toHaveCount(3);

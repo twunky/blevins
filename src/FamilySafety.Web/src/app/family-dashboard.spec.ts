@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import { DeferBlockState, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
@@ -67,6 +67,10 @@ describe('Family dashboard and Family settings (WI-009-007)', () => {
 
   it('renders /family as the dashboard: title, gear for every member, members, and the coordination grid', async () => {
     const harness = await open('/family');
+    const blocks = await harness.fixture.getDeferBlocks();
+    await blocks[0].render(DeferBlockState.Complete);
+    http.expectOne('/api/family-groups/family-a/dates').flush({ canCreate: true, dates: [] });
+    harness.detectChanges();
     const root = harness.routeNativeElement!;
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('Family');
     expect(root.querySelector('.page-title p')?.textContent).toContain('Family A');
@@ -77,7 +81,8 @@ describe('Family dashboard and Family settings (WI-009-007)', () => {
     expect(dashboard.hidden).toBe(false);
     expect(visible(root, 'section.family-settings').hidden).toBe(true);
     expect(Array.from(dashboard.querySelectorAll('.family-coordination h2')).map(h => h.textContent?.trim()))
-      .toEqual(['Waiting for you', 'Upcoming birthdays', 'Recent Family Updates', 'Recent Check-Ins']);
+      .toEqual(['Shared Family Dates', 'Waiting for you', 'Upcoming birthdays', 'Recent Family Updates', 'Recent Check-Ins']);
+    expect(dashboard.textContent).toContain('No shared dates are available to you.');
     // Management controls are not on the dashboard.
     expect(dashboard.querySelector('#relationship-member, #invitation-email')).toBeNull();
     expect(root.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe('Family');

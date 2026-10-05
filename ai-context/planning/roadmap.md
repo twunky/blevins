@@ -14,15 +14,15 @@ Approved phase status and remaining gates. The [project checkpoint](../project-s
 | Phase 7.5 | End-to-End UX & User-Test Readiness | `COMPLETE / CLOSED` |
 | Phase 8 | Safety Coordination | `COMPLETE / CLOSED` |
 | Phase 9 | Integration & UX Refinement | `COMPLETE / CLOSED` |
-| Phase 9.5 | MVP Feature Completion | `CURRENT / IN PROGRESS` — WI-095-001, WI-095-002, and WI-095-003 COMPLETE / PASS — OWNER APPROVED |
+| Phase 9.5 | MVP Feature Completion | `CURRENT / IN PROGRESS` — WI-095-001/002/003 COMPLETE / PASS — OWNER APPROVED; WI-095-004 VERIFYING / OWNER REVIEW |
 | Phase 10 | Testing & Verification | `FUTURE` |
 | Phase 11 | Pilot & Release Readiness | `FUTURE` |
 
 ## Phase 9.5 — MVP Feature Completion
 
-WI-095-001 — Event Invitations and RSVP — is COMPLETE / PASS — OWNER APPROVED under CTX-1.30 / DEC-083. It delivers the first bounded in-app invitation/self-RSVP scope. WI-095-002 — Event Needs is COMPLETE / PASS — OWNER APPROVED under CTX-1.31 / DEC-084. WI-095-003 — Event Updates is COMPLETE / PASS — OWNER APPROVED under CTX-1.31. No next item or sibling capability is authorized.
+WI-095-001 — Event Invitations and RSVP — is COMPLETE / PASS — OWNER APPROVED under CTX-1.30 / DEC-083. It delivers the first bounded in-app invitation/self-RSVP scope. WI-095-002 — Event Needs is COMPLETE / PASS — OWNER APPROVED under CTX-1.31 / DEC-084. WI-095-003 — Event Updates is COMPLETE / PASS — OWNER APPROVED under CTX-1.31. WI-095-004 — Shared Family Dates is VERIFYING / OWNER REVIEW under explicit owner authorization / DEC-085; no completion or sibling capability is authorized.
 
-Remaining capabilities include Check-In, Sharing Sessions, Trusted Contacts, Shared Family Dates, Safety Circles, Household grouping, and notifications. Any additional Event RSVP scope also remains separately gated. OD-002 (persistent or indefinite location sharing) remains OPEN and is assigned to this phase alongside Sharing Sessions and Check-In.
+Remaining capabilities include Check-In, Sharing Sessions, Trusted Contacts, Safety Circles, Household grouping, and notifications; Shared Family Dates awaits owner review. Any additional Event RSVP scope also remains separately gated. OD-002 (persistent or indefinite location sharing) remains OPEN and is assigned to this phase alongside Sharing Sessions and Check-In.
 
 DEC-073 defines phase placement, not capability behavior, order, or implementation scope. Each later capability requires owner/work-item approval, canonical updates where needed, and separate execution authorization. Home attention and outbound/notification delivery were excluded from WI-095-001. No blanket Phase 9.5 authorization exists.
 

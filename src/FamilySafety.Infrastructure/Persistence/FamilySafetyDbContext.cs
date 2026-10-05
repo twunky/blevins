@@ -1,4 +1,5 @@
 using FamilySafety.Domain.Profiles;
+using FamilySafety.Domain.FamilyDates;
 using FamilySafety.Domain.Relationships;
 using FamilySafety.Domain.Events;
 using FamilySafety.Domain.Plans;
@@ -26,6 +27,8 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
     public DbSet<MembershipInvitation> MembershipInvitations => Set<MembershipInvitation>();
 
     public DbSet<FamilyRelationship> FamilyRelationships => Set<FamilyRelationship>();
+    public DbSet<SharedFamilyDate> SharedFamilyDates => Set<SharedFamilyDate>();
+    public DbSet<SharedFamilyDateAssociation> SharedFamilyDateAssociations => Set<SharedFamilyDateAssociation>();
 
     public DbSet<FamilyEvent> FamilyEvents => Set<FamilyEvent>();
 
@@ -86,7 +89,10 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
         familyGroup.Property(entity => entity.CapacityLimit).IsRequired();
 
         var membership = modelBuilder.Entity<FamilyGroupMembership>();
-        membership.ToTable("FamilyGroupMemberships", table => table.HasTrigger("TR_EventNeeds_MembershipLoss"));
+        membership.ToTable("FamilyGroupMemberships", table => {
+            table.HasTrigger("TR_EventNeeds_MembershipLoss");
+            table.HasTrigger("TR_SharedFamilyDates_MembershipLoss");
+        });
         membership.HasKey(entity => entity.Id);
         membership.HasIndex(entity => new { entity.AccountId, entity.FamilyGroupId }).IsUnique();
         membership.HasIndex(entity => new { entity.FamilyGroupId, entity.IsActive });
@@ -423,6 +429,29 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
         // Deliberately no Concern FK: audit retention is independent of product-history deletion.
 
         ConfigureIncidents(modelBuilder);
+        ConfigureSharedFamilyDates(modelBuilder);
+    }
+
+    private static void ConfigureSharedFamilyDates(ModelBuilder modelBuilder)
+    {
+        var date = modelBuilder.Entity<SharedFamilyDate>();
+        date.ToTable("SharedFamilyDates");
+        date.HasKey(d => d.Id);
+        date.Property(d => d.Title).HasMaxLength(SharedFamilyDate.TitleLimit).IsRequired();
+        date.Property(d => d.Description).HasMaxLength(SharedFamilyDate.DescriptionLimit).IsRequired();
+        date.Property(d => d.Date).HasColumnType("date");
+        date.Property(d => d.Version).IsConcurrencyToken();
+        date.HasIndex(d => new { d.FamilyGroupId, d.Date });
+        date.HasIndex(d => d.RetainUntilUtc);
+        date.HasOne<FamilyGroup>().WithMany().HasForeignKey(d => d.FamilyGroupId).OnDelete(DeleteBehavior.Restrict);
+        date.HasOne<AdultProfile>().WithMany().HasForeignKey(d => d.CreatorProfileId).OnDelete(DeleteBehavior.Restrict);
+        // Membership identity is an authorization snapshot, not a storage dependency.
+        var association = modelBuilder.Entity<SharedFamilyDateAssociation>();
+        association.ToTable("SharedFamilyDateAssociations");
+        association.HasKey(a => new { a.DateId, a.ProfileId });
+        association.HasOne<SharedFamilyDate>().WithMany().HasForeignKey(a => a.DateId).OnDelete(DeleteBehavior.Restrict);
+        association.HasOne<AdultProfile>().WithMany().HasForeignKey(a => a.ProfileId).OnDelete(DeleteBehavior.Restrict);
+        association.HasIndex(a => a.MembershipId);
     }
 
     // All Incident relationships are Restrict so whole-aggregate deletion stays explicit and ordered.
