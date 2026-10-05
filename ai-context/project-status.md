@@ -9,9 +9,9 @@
 | Active baseline | CTX-1.34 APPROVED / ACTIVE under DEC-088; [baseline verification](planning/verification/VER-CTX-1.34.md) PASS / SELF-VERIFIED. |
 | Current phase | Phase 9.5 — MVP Feature Completion — CURRENT / IN PROGRESS. |
 | Previous phase | Phase 9 — Integration & UX Refinement — COMPLETE / CLOSED under DEC-081. |
-| Completed items | WI-095-001 through WI-095-005 and [WI-095-006 — Temporary Sharing Sessions](planning/stories/WI-095-006-temporary-sharing-sessions.md) COMPLETE / PASS — OWNER APPROVED (2026-10-04). [Temporary Sharing Sessions verification](planning/verification/VER-WI-095-006.md) COMPLETE / PASS. |
-| Current authorized implementation item | [WI-095-007 — Trusted Contacts](planning/stories/WI-095-007-trusted-contacts.md) VERIFYING / OWNER REVIEW under DEC-088; [verification](planning/verification/VER-WI-095-007.md) technical PASS / SELF-VERIFIED. No other item authorized. |
-| Next owner action | Review WI-095-007 implementation and verification; perform any Git commit. Owner performs all Git commits. |
+| Completed items | WI-095-001 through WI-095-005 and [WI-095-006 — Temporary Sharing Sessions](planning/stories/WI-095-006-temporary-sharing-sessions.md) COMPLETE / PASS — OWNER APPROVED. WI-095-007 — [Trusted Contacts](planning/stories/WI-095-007-trusted-contacts.md) and its [verification](planning/verification/VER-WI-095-007.md) COMPLETE / PASS — OWNER APPROVED (2026-10-05). |
+| Current authorized implementation item | NONE AUTHORIZED. |
+| Next owner action | Select and explicitly authorize a bounded work item when ready. Owner performs all Git commits. |
 
 ## Open decisions
 
@@ -26,6 +26,6 @@ Production authentication, hosting, and backup-aging/restore evidence remain sep
 
 ## Required context for the next action
 
-Read [AI operating rules](README.md) and this checkpoint first. The WI-095-007 required-context manifest controls this authorized manual Trusted Contact slice. Use [context routing](../claude-handoff/CONTEXT-ROUTING.md) only for specific needed sources.
+Read [AI operating rules](README.md) and this checkpoint first. No implementation item is authorized. For a newly selected task, use [context routing](../claude-handoff/CONTEXT-ROUTING.md) to choose the relevant canonical sources.
 
 Completed implementation and testing details remain in their work items and verification records, including [VER-WI-095-001](planning/verification/VER-WI-095-001.md). Read historical records only for a specific provenance or regression question, not as default session context.

@@ -1,6 +1,6 @@
 # WI-095-007 — Trusted Contacts
 
-- **Status:** VERIFYING / OWNER REVIEW; **Phase:** 9.5 CURRENT / IN PROGRESS.
+- **Status:** COMPLETE / PASS — OWNER APPROVED (2026-10-05); **Phase:** 9.5 CURRENT / IN PROGRESS.
 - **Baseline:** CTX-1.34 / DEC-088; **Tier:** DEEP.
 - **Requirements:** REQ-FAM-014/015/016; REQ-PRIV-019/024/032.
 - **Authorization:** Explicit owner decision, 2026-10-05, resolves the blocker, approves the narrow canonical update/successor baseline and authorizes implementation in this task. No standing auto-approval, Git action, PR, sibling work or phase transition.
@@ -27,7 +27,7 @@ Private manual owner-profile contacts: list/read/add/edit/permanent removal. Dis
 3. **AC-03:** Email case and phone formatting duplicates rejected on create/edit within owner, either method sufficient; names alone do not deduplicate; two owners may store the same contact. Database prevents concurrent duplicates; stale edit/delete rejected.
 4. **AC-04:** Contacts survive Family selection/membership changes. Removal physically deletes, cannot be read/restored and retains no feature history; ownership FK follows profile deletion without implementing account deletion.
 5. **AC-05:** Safety UI supports loading/empty/error/Retry, add/edit, field validation, success/error feedback and explicit removal confirmation; identity changes cancel reads/mutations and clear private state. Desktop/narrow presentation uses existing visual language without feature Family selectors/navigation redesign.
-6. **AC-06:** Focused backend/API/SQL and Angular checks, then one full SQL-gated .NET regression, full Angular, production build, one relevant Playwright journey and diff check. Record actual results/limitations as SELF-VERIFIED; hand back VERIFYING / OWNER REVIEW.
+6. **AC-06:** Focused backend/API/SQL and Angular checks, then one full SQL-gated .NET regression, full Angular, production build, one relevant Playwright journey and diff check. Record actual results/limitations as SELF-VERIFIED; require owner acceptance before closure.
 
 ## Stop conditions
 
@@ -35,4 +35,4 @@ Only a new material unresolved canonical/product/privacy conflict or unexplained
 
 ## Evidence
 
-Backend/schema/API and Safety manual-contact workflow implemented. [VER-WI-095-007](../verification/VER-WI-095-007.md) records AC-01–06 PASS / SELF-VERIFIED: focused backend 14, focused Angular/Safety 23, full SQL-gated .NET 355, full Angular 382, production build and one browser journey. The initial full Angular run's existing invitation timeout passed isolated and on the justified full retry; no timeout changed. Existing build warning categories persist. Migration `20261005040757_ManualTrustedContacts`; no user database migration during validation. Owner review remains required; not COMPLETE, no next work item authorized. Owner performs all commits.
+AC-01–06 accepted. [VER-WI-095-007](../verification/VER-WI-095-007.md) is COMPLETE / PASS — OWNER APPROVED. No next work item authorized; owner performs all commits.
