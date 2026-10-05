@@ -1,6 +1,6 @@
 # WI-095-004 — Shared Family Dates
 
-- **Status:** VERIFYING / OWNER REVIEW
+- **Status:** COMPLETE / PASS — OWNER APPROVED (2026-10-04)
 - **Phase / baseline:** Phase 9.5; CTX-1.31 ACTIVE (unchanged).
 - **Requirements:** REQ-FAM-010/011/012/013; REQ-PRIV-016/017/018.
 - **Model tier:** DEEP (association privacy and retention).
@@ -34,4 +34,4 @@ Non-goals: recurring dates, reminders, notifications, calendar sync/framework, c
 
 ## Evidence / handback
 
-Implementation and proportional SELF-VERIFIED validation are complete; [VER-WI-095-004](../verification/VER-WI-095-004.md) records the acceptance mapping and actual results. Leave VERIFYING / OWNER REVIEW; completion is NOT authorized and no next capability is authorized.
+Implementation and proportional SELF-VERIFIED validation are complete; [VER-WI-095-004](../verification/VER-WI-095-004.md) is COMPLETE / PASS. The owner explicitly reviewed and accepted WI-095-004 on 2026-10-04, including the listed behavior and validation, and authorized closure. Default cleanup cadence was narrowly changed from two minutes to hourly under that instruction; 30-day retention and immediate unavailability are unchanged. No next work item is authorized. Owner performs Git commits.

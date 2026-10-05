@@ -16,7 +16,7 @@ public sealed partial class SharedFamilyDateMaintenanceService(IServiceScopeFact
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
             catch (Exception exception) { LogCleanupFailure(logger, exception); }
-            await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
+            await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
         }
     }
     [LoggerMessage(Level = LogLevel.Error, Message = "Shared Family Date maintenance failed.")]

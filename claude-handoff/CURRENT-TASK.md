@@ -7,6 +7,7 @@ Checkpoint: 2026-10-04.
 - WI-095-001 COMPLETE / OWNER APPROVED.
 - WI-095-002 — Event Needs — COMPLETE / PASS — OWNER APPROVED; verification COMPLETE / PASS.
 - WI-095-003 — Event Updates — COMPLETE / PASS — OWNER APPROVED; verification COMPLETE / PASS (2026-10-04).
-- WI-095-004 — Shared Family Dates VERIFYING / OWNER REVIEW; implementation and self-verification finished under DEC-085. Owner performs Git commits/acceptance. No completion or sibling capability authorized.
+- WI-095-004 — Shared Family Dates COMPLETE / PASS — OWNER APPROVED; verification COMPLETE / PASS (2026-10-04). Default cleanup cadence hourly; 30-day retention unchanged.
+- Next work item: NONE AUTHORIZED. Owner performs Git commits.
 
 [Project status](../ai-context/project-status.md) owns the checkpoint. Completed work-item evidence is historical context; load it only for a specific review or regression question.
