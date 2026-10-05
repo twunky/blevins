@@ -1,6 +1,6 @@
 # WI-095-006 — Temporary Sharing Sessions
 
-- **Status:** VERIFYING / OWNER REVIEW; **Phase:** 9.5 CURRENT / IN PROGRESS.
+- **Status:** COMPLETE / PASS — OWNER APPROVED (2026-10-04); **Phase:** 9.5 CURRENT / IN PROGRESS.
 - **Baseline:** CTX-1.33 / DEC-087; **Tier:** DEEP.
 - **Requirements:** REQ-SHARE-001–005/011; REQ-PRIV-001–006/009–012/031; REQ-UX-009/010/011/013. REQ-PRIV-030 supplies the consistent stale-grant precedent only.
 - **Authorization:** Explicit project-owner prompt, 2026-10-04, approves this work item, narrow canonical amendments/successor baseline and implementation in this task. No standing auto-approval, Git action, PR, sibling item or phase transition.
@@ -43,4 +43,4 @@ Stop only for a new material unresolved canonical/product/privacy conflict, mand
 
 ## Evidence
 
-Implemented backend/schema/API, Safety workflow and Home active-sharing indicator. [VER-WI-095-006](../verification/VER-WI-095-006.md) records AC-01–07 PASS / SELF-VERIFIED, focused checks, final SQL-gated .NET 341/341, Angular 373/373, production build, one integrated Playwright journey and diff/context checks. Build warning categories persist; initial bundle grew to 687.53 kB, thresholds unchanged. Owner visual/product acceptance remains pending. Owner alone commits and accepts completion; no next item authorized.
+Implemented backend/schema/API, Safety workflow and Home active-sharing indicator. [VER-WI-095-006](../verification/VER-WI-095-006.md) records AC-01–07 PASS / SELF-VERIFIED, focused checks, final SQL-gated .NET 341/341, Angular 373/373, production build, one integrated Playwright journey and diff/context checks. Build warning categories persist; initial bundle grew to 687.53 kB, thresholds unchanged. Owner accepted the implementation and recorded validation on 2026-10-04. Targeted bundle check found no accidental dependency/import; closure changed documentation only. Owner performs all Git commits; no next item authorized.

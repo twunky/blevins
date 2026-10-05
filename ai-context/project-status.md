@@ -9,9 +9,9 @@
 | Active baseline | CTX-1.33 APPROVED / ACTIVE under DEC-087; [baseline verification](planning/verification/VER-CTX-1.33.md) PASS / SELF-VERIFIED. |
 | Current phase | Phase 9.5 — MVP Feature Completion — CURRENT / IN PROGRESS. |
 | Previous phase | Phase 9 — Integration & UX Refinement — COMPLETE / CLOSED under DEC-081. |
-| Completed items | WI-095-001 through WI-095-004 and [WI-095-005 — Standalone Check-Ins](planning/stories/WI-095-005-standalone-check-ins.md) COMPLETE / PASS — OWNER APPROVED (2026-10-04). [Standalone Check-Ins verification](planning/verification/VER-WI-095-005.md) COMPLETE / PASS. |
-| Current authorized implementation item | [WI-095-006 — Temporary Sharing Sessions](planning/stories/WI-095-006-temporary-sharing-sessions.md) VERIFYING / OWNER REVIEW; [verification](planning/verification/VER-WI-095-006.md) technical PASS / SELF-VERIFIED. |
-| Next owner action | Review WI-095-006 implementation/validation and perform any Git commit. Owner acceptance remains pending; no later item authorized. |
+| Completed items | WI-095-001 through WI-095-005 and [WI-095-006 — Temporary Sharing Sessions](planning/stories/WI-095-006-temporary-sharing-sessions.md) COMPLETE / PASS — OWNER APPROVED (2026-10-04). [Temporary Sharing Sessions verification](planning/verification/VER-WI-095-006.md) COMPLETE / PASS. |
+| Current authorized implementation item | NONE AUTHORIZED. |
+| Next owner action | Perform any Git commit; select and authorize a bounded next work item when ready. Owner performs all Git commits. |
 
 ## Open decisions
 
@@ -26,6 +26,6 @@ Production authentication, hosting, and backup-aging/restore evidence remain sep
 
 ## Required context for the next action
 
-Read [AI operating rules](README.md) and this checkpoint first. WI-095-006 is the active implementation manifest. Use [context routing](../claude-handoff/CONTEXT-ROUTING.md) to select relevant canonical sources; its authorized work-item manifest then controls loading.
+Read [AI operating rules](README.md) and this checkpoint first. There is no active implementation manifest. For an owner-selected task, use [context routing](../claude-handoff/CONTEXT-ROUTING.md) to select relevant canonical sources; its authorized work-item manifest then controls loading.
 
 Completed implementation and testing details remain in their work items and verification records, including [VER-WI-095-001](planning/verification/VER-WI-095-001.md). Read historical records only for a specific provenance or regression question, not as default session context.

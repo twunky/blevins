@@ -14,13 +14,13 @@ Approved phase status and remaining gates. The [project checkpoint](../project-s
 | Phase 7.5 | End-to-End UX & User-Test Readiness | `COMPLETE / CLOSED` |
 | Phase 8 | Safety Coordination | `COMPLETE / CLOSED` |
 | Phase 9 | Integration & UX Refinement | `COMPLETE / CLOSED` |
-| Phase 9.5 | MVP Feature Completion | `CURRENT / IN PROGRESS` — WI-095-001/002/003/004/005 COMPLETE / PASS — OWNER APPROVED; WI-095-006 VERIFYING / OWNER REVIEW |
+| Phase 9.5 | MVP Feature Completion | `CURRENT / IN PROGRESS` — WI-095-001 through WI-095-006 COMPLETE / PASS — OWNER APPROVED |
 | Phase 10 | Testing & Verification | `FUTURE` |
 | Phase 11 | Pilot & Release Readiness | `FUTURE` |
 
 ## Phase 9.5 — MVP Feature Completion
 
-WI-095-001 — Event Invitations and RSVP — is COMPLETE / PASS — OWNER APPROVED under CTX-1.30 / DEC-083. It delivers the first bounded in-app invitation/self-RSVP scope. WI-095-002 — Event Needs is COMPLETE / PASS — OWNER APPROVED under CTX-1.31 / DEC-084. WI-095-003 — Event Updates is COMPLETE / PASS — OWNER APPROVED under CTX-1.31. WI-095-004 — Shared Family Dates is COMPLETE / PASS — OWNER APPROVED under CTX-1.31 / DEC-085; verification COMPLETE / PASS (2026-10-04). WI-095-005 — Standalone Check-Ins is COMPLETE / PASS — OWNER APPROVED under CTX-1.32 / DEC-086; verification COMPLETE / PASS (2026-10-04). WI-095-006 — Temporary Sharing Sessions is VERIFYING / OWNER REVIEW under CTX-1.33 / DEC-087. No later item is authorized.
+WI-095-001 — Event Invitations and RSVP — is COMPLETE / PASS — OWNER APPROVED under CTX-1.30 / DEC-083. It delivers the first bounded in-app invitation/self-RSVP scope. WI-095-002 — Event Needs is COMPLETE / PASS — OWNER APPROVED under CTX-1.31 / DEC-084. WI-095-003 — Event Updates is COMPLETE / PASS — OWNER APPROVED under CTX-1.31. WI-095-004 — Shared Family Dates is COMPLETE / PASS — OWNER APPROVED under CTX-1.31 / DEC-085; verification COMPLETE / PASS (2026-10-04). WI-095-005 — Standalone Check-Ins is COMPLETE / PASS — OWNER APPROVED under CTX-1.32 / DEC-086; verification COMPLETE / PASS (2026-10-04). WI-095-006 — Temporary Sharing Sessions is COMPLETE / PASS — OWNER APPROVED under CTX-1.33 / DEC-087; verification COMPLETE / PASS (2026-10-04). No next item is authorized.
 
 Remaining capabilities include broader Sharing Session scope, Trusted Contacts, Safety Circles, Household grouping, and notifications. Any additional Check-In or Event RSVP scope remains separately gated. OD-002 is resolved for the temporary-only bounded MVP by DEC-087; broader sharing remains separately gated.
 
