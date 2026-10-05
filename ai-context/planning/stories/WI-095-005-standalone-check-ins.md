@@ -1,6 +1,6 @@
 # WI-095-005 — Standalone Check-Ins
 
-- **Status:** VERIFYING / OWNER REVIEW
+- **Status:** COMPLETE / PASS — OWNER APPROVED
 - **Phase:** 9.5 — MVP Feature Completion
 - **Context baseline:** CTX-1.32
 - **Requirements:** REQ-SHARE-006/007/008/009/010; REQ-PRIV-002/005/006/011/013/030; REQ-FAM-005/007/008; REQ-SAFE-001; REQ-UX-010/013/014.
@@ -39,7 +39,7 @@ No location, Event/Plan/Trip association, Sharing Sessions, OD-002 resolution, d
 - Record narrowly scoped DEC-086 and CTX-1.32 privacy baseline.
 - Implement domain, service, repository/query projections, EF/migration and API.
 - Implement standalone Check-In component in Safety, retaining existing visual patterns.
-- Validate and leave VERIFYING / OWNER REVIEW with concise evidence.
+- Validate and record concise evidence; owner acceptance is recorded below.
 
 ## Execution authorization
 
@@ -54,4 +54,4 @@ Only a new material canonical status, privacy, retention or mutation conflict, o
 
 ## Verification
 
-[VER-WI-095-005](../verification/VER-WI-095-005.md) records AC-01–05 and requirement mappings: PASS / SELF-VERIFIED. Focused backend 6, Angular 19 and E2E 1 passed; one final SQL-gated .NET regression 332, Angular 366 and relevant E2E 5 passed; production build and final context/diff checks passed. Existing build warning categories remain; no thresholds raised. No retained test database or API process. Owner review/acceptance remains pending; no completion or next-item authorization inferred.
+[VER-WI-095-005](../verification/VER-WI-095-005.md) records AC-01–05 and requirement mappings: COMPLETE / PASS. Technical evidence remains SELF-VERIFIED. The owner explicitly accepted the implementation and recorded validation on 2026-10-04; no application tests or builds were rerun for closure. No next item is authorized.
