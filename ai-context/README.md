@@ -1,6 +1,6 @@
 # Family Safety, Coordination & Planning Application
 
-**Current context (2026-10-04):** `CTX-1.30` remains ACTIVE under `DEC-083` and [VER-CTX-1.30](planning/verification/VER-CTX-1.30.md). Phase 9 remains `COMPLETE / CLOSED`. Phase 9.5 is `CURRENT / IN PROGRESS` for only [WI-095-001](planning/stories/WI-095-001-event-invitations-and-rsvp.md), explicitly execution-authorized by the owner and now `VERIFYING / OWNER REVIEW`. In-app invitations and self-RSVP are implemented; [VER-WI-095-001](planning/verification/VER-WI-095-001.md) records actual verification and pending owner visual review/closure. Later capabilities require separate gates. Owner performs all commits; no staging, push or PR by the agent.
+**Current state:** Read [project-status.md](project-status.md) for the active baseline, phase, completed item, authorization, and next owner action. Owner performs Git commits; agents do not stage, commit, push, or create PRs.
 
 AI Context Foundation v1.0 operating guide.
 
@@ -54,7 +54,7 @@ After the mandatory entry files, select context by task:
 | Maintain context | Accepted decision, affected canonical files, requirement index, and `maintain-context` skill |
 | Audit history | Only the specifically referenced bootstrap or archived material |
 
-**Historical checkpoint routing:** Earlier Phase 9 entry and work-item states are historical, not current authorization. The closure decision is [DEC-081](decision-log.md), and [VER-PH-009](planning/verification/VER-PH-009.md) records the final exit mapping. Use `project-status.md` and the roadmap for current status. Pin individual document versions only when a specific dependency requires it.
+Use [context routing](../claude-handoff/CONTEXT-ROUTING.md) to select topic-specific canonical sources. Completed work-item manifests, historical checkpoints, candidates, and verification evidence are not default session context; read them only for a specific historical or regression question.
 
 Each story or work item's `required_context` must be intentionally small and explain why each file or anchor is needed. Do not include a contract, workflow, proposal, bootstrap file, archive file, or prior verification report merely because it exists. If broader context becomes necessary during work, add the specific file and reason to the story or work item, or report the need before continuing.
 
@@ -113,6 +113,7 @@ Additional states are `BLOCKED`, `NEEDS_REVIEW`, and `SUPERSEDED`.
 - The verifier must not change requirements to make work pass.
 - The later project verification phase supplements rather than replaces story/work-item-level verification.
 - If independent verification is unavailable, label the report `SELF-VERIFIED` and disclose the limitation.
+- Match validation and documentation to scope and risk: focused checks during implementation, one meaningful broad regression near completion when justified, and repeat full-suite/evidence cycles only for failures, material changes or risks, or explicit acceptance/gate requirements. Documentation-only work receives documentation checks. See [validation guidance](../claude-handoff/VALIDATION.md); do not create extra records solely for ceremony.
 
 ## Supersession and archive
 

@@ -1,86 +1,31 @@
 # Context Routing
 
-Use this to load only what a question needs. All paths are relative to `C:\Dev\blevins`. For requirement IDs, load the named section instead of the whole file when you can.
+Read [AI operating rules](../ai-context/README.md) and [project status](../ai-context/project-status.md) first. Then select only sources relevant to the requested task. An active authorized work item's required-context manifest controls execution loading; completed manifests are historical.
 
-## Visual target (read first for any UI work)
+## Canonical sources by task
 
-Current approved panel mapping: ① Home (`DEC-076`), ② Family (`DEC-077`), ③ Events (`DEC-078`), ④ Safety (`DEC-079`). The images guide presentation only; later owner decisions and canonical context control current behavior. No UI implementation is authorized by this routing guide.
-
-| Question | Read |
+| If working on | Read |
 |---|---|
-| **What should the app look like?** | **`claude-handoff/reference/*.png` — the primary visual target.** Open the images directly. |
-| Which reference maps to which screen, and what to KEEP / ALIGN / ADAPT / DROP | `claude-handoff/MOCKUP-ALIGNMENT.md` |
-| Screens with no primary reference | Secondary layout hints in `ai-context/references/ux/` (`events/`, `plans-trips/`, `family/`, `safety/`, `admin-settings/`, `home-dashboard/`). Use them only where the primary set has no coverage. |
-| Canonical verification evidence (what a completed work item verified) | `ai-context/planning/verification/evidence/<WI-ID>/` |
-| Historical owner/design review images (comparison only, **not** a target or canonical evidence) | `artifacts/reviews/<WI-ID>/` |
+| Events | [Events workflow](../ai-context/workflows/events.md); [privacy contract](../ai-context/core/privacy-safety-contract.md), especially REQ-PRIV-020/021/023/027/028. First invitation/self-RSVP scope: REQ-EVT-014. |
+| Plans | [Plans & Trips workflow](../ai-context/workflows/plans-trips.md), REQ-PLAN-* including REQ-PLAN-007; relevant privacy anchors. |
+| Trips | [Plans & Trips workflow](../ai-context/workflows/plans-trips.md), REQ-TRIP-*; relevant Trip privacy anchors. |
+| Family, profiles, membership, administration | [Product contract](../ai-context/core/product-contract.md), REQ-FAM-*; [privacy contract](../ai-context/core/privacy-safety-contract.md), especially REQ-PRIV-011/012. |
+| Safety, Concerns, Incidents | [Safety workflow](../ai-context/workflows/safety.md), especially REQ-SAFE-015/016; [privacy contract](../ai-context/core/privacy-safety-contract.md), especially REQ-PRIV-025/026; relevant product rules. |
+| Sharing / Check-Ins | [Sharing & Check-Ins workflow](../ai-context/workflows/sharing-checkins.md) and relevant privacy anchors; OD-002 in the [full decision log](../ai-context/decision-log.md#open-product-decisions) when location scope is involved. |
+| Navigation, deep links, UX, accessibility | [UX contract](../ai-context/core/ux-contract.md), especially REQ-UX-011/013/014; REQ-PRIV-027 in the privacy contract. |
+| Requirement lookup / terminology | [Requirements index](../ai-context/core/requirements-index.md) / [domain glossary](../ai-context/core/domain-glossary.md). |
+| Phase scope / approval rationale | [Roadmap](../ai-context/planning/roadmap.md); only relevant entries in the [full decision log](../ai-context/decision-log.md). planning/decision-log.md is a partial excerpt. |
 
-## Authoritative project context
+## Implementation and operations
 
-| Question / topic | Read |
+| If working on | Read / inspect |
 |---|---|
-| AI operating rules, authority, work modes, auto-approval limits | `ai-context/README.md` |
-| Current state, next action, open decisions | `ai-context/project-status.md` |
-| Active context baseline | CTX-1.30 (DEC-083; REQ-EVT-014 / REQ-PRIV-028; VER-CTX-1.30 PASS); confirm in `ai-context/project-status.md` |
-| Phase 9 closure and first Phase 9.5 item | `ai-context/planning/roadmap.md`, `ai-context/decision-log.md` → DEC-081 / DEC-083; VER-PH-009 historical, VER-CTX-1.30 current |
-| Historical Phase 9 scope and exit criteria; current navigation and deep-link rules | `ai-context/planning/proposals/PRP-030-phase-9-scope-themes-and-exit-criteria.md` (closed Phase 9 planning basis), `ai-context/decision-log.md` → `DEC-074`, `DEC-075`, `DEC-081`; canonical `REQ-UX-011`, `REQ-UX-013`, `REQ-UX-014` (`ai-context/core/ux-contract.md`) and `REQ-PRIV-027` |
-| Current implementation authorization | WI-095-001 scope APPROVED, execution NO. Read `ai-context/planning/stories/WI-095-001-event-invitations-and-rsvp.md` and its manifest; separate explicit owner execution authorization required. Later Phase 9.5 capabilities and broad cleanup remain unauthorized. |
-| Product behavior, boundaries, permissions | `ai-context/core/product-contract.md` (`REQ-PROD-004`, `REQ-PROD-007`–`012` for Concern) |
-| Privacy and safety rules, protected data, Concern and Incident access and retention | `ai-context/core/privacy-safety-contract.md` (`REQ-PRIV-005`–`008`, `011`, `025`, `026`) |
-| UX rules: calm presentation, accessibility, uncertainty, provenance | `ai-context/core/ux-contract.md` (`REQ-UX-001`, `003`–`008`, `010`–`012`) |
-| Concern and Incident workflow, categories, correction, resolution | `ai-context/workflows/safety.md` (`REQ-SAFE-001`–`016`; Concern `015`, Incident `016`) |
-| Plan and Trip behavior, including the current Plan note edit/clear rule | `ai-context/workflows/plans-trips.md` (`REQ-PLAN-001`–`007`, with `REQ-PLAN-007` added in `CTX-1.29`; `REQ-TRIP-*`) |
-| Event behavior, audience, editing and first invitation/self-RSVP scope | `ai-context/workflows/events.md` (REQ-EVT-014 supplements settled rules), `ai-context/core/privacy-safety-contract.md` (REQ-PRIV-028); DEC-083 and WI-095-001 |
-| Requirement ID lookup and traceability | `ai-context/core/requirements-index.md` |
-| Terms (Concern, Participant, Frozen, …) | `ai-context/core/domain-glossary.md` |
-| Check-In / Sharing separation (only if a mockup idea touches it) | `ai-context/workflows/sharing-checkins.md` |
+| Angular structure | [Client README](../src/FamilySafety.Web/README.md#structure-and-extraction). |
+| Authorized UI presentation | [MOCKUP-ALIGNMENT](MOCKUP-ALIGNMENT.md) and its mapped primary images in reference/; secondary ai-context/references/ux images only for uncovered screens. |
+| Feature code | Relevant paths under src/FamilySafety.Api/, Application/, Domain/, Infrastructure/, and Web/src/app/; find files for the selected domain. |
+| Local setup / test artifacts | [Local development](../docs/local-development.md); scripts/test-artifacts.ps1 for guarded artifact operations. |
+| Validation / closeout | [VALIDATION](VALIDATION.md) / [SESSION-CLOSEOUT](SESSION-CLOSEOUT.md), as needed. |
 
-## Concern decisions and records
+## Historical routing — only on demand
 
-| Topic | Read |
-|---|---|
-| Approved Concern access and lifecycle policy | `ai-context/planning/proposals/PRP-028-phase-8-concern-access-and-lifecycle.md` |
-| Approval decisions | `ai-context/decision-log.md` → `DEC-066`, `DEC-067`, `DEC-068`, `DEC-069` (this is the full log; `planning/decision-log.md` is a partial excerpt) |
-| Baseline change record | `ai-context/planning/candidates/CTX-1.25-phase-8-concern-access-and-retention.md` |
-| Approved Incident policy and its baseline record | `ai-context/planning/proposals/PRP-029-phase-8-safety-incident-workflow-and-access.md`, `DEC-071`, `ai-context/planning/candidates/CTX-1.26-phase-8-safety-incident-workflow-and-retention.md`, `VER-CTX-1.26` |
-| Server implementation and its evidence | `ai-context/planning/stories/WI-008-001-concern-domain-and-access-foundation.md`, `ai-context/planning/verification/VER-WI-008-001.md` |
-| Incident server foundation and its evidence (`DONE / PASS`, owner approved; historical implementation record) | `ai-context/planning/stories/WI-008-003-safety-incident-domain-and-access-foundation.md`, `ai-context/planning/verification/VER-WI-008-003.md` |
-| Concern UI implementation (`DONE / PASS`) | `ai-context/planning/stories/WI-008-002-concern-mvp-user-interface.md`, `ai-context/planning/verification/VER-WI-008-002.md` |
-
-## Visual-alignment precedent
-
-| Topic | Read |
-|---|---|
-| Mockup gap assessment, token policy, KEEP/ADAPT/DROP origin | `ai-context/planning/proposals/PRP-027-mockup-alignment-ui-gap-assessment.md` |
-| Worked examples of the KEEP/ALIGN/ADAPT/DROP method | `ai-context/planning/stories/WI-075-011-home-visual-alignment.md` through `WI-075-015-trips-visual-alignment.md` (read one or two, not all) |
-| How earlier alignment work was verified and owner-approved | `ai-context/planning/verification/VER-WI-075-013.md` or `VER-WI-075-015.md` |
-| Older mockups and their notes (secondary visual hints) | `ai-context/references/ux/`. For current screen mapping, apply `DEC-076`–`DEC-079` before consulting `claude-handoff/reference/`. |
-
-## Code
-
-| Area | Location |
-|---|---|
-| Angular structure and extraction rule (read before adding or moving folders) | `src/FamilySafety.Web/README.md` § Structure and extraction |
-| Home, Family, Family Settings, Events, Plans, Me / Settings, first use, and invitation arrival | `src/FamilySafety.Web/src/app/app.ts` and `app.html`, with `home.scss`, `family.scss`, `family-settings.scss`, `events.scss`, `events-dashboard.scss`, `plans.scss` |
-| Main navigation, item routes, and shared date display | `src/FamilySafety.Web/src/app/navigation.ts`, `item-route.ts`, `item-unavailable.ts`, `date-format.ts` |
-| Trips and Trip Notes | `src/FamilySafety.Web/src/app/trips/` |
-| Safety Incidents | `src/FamilySafety.Web/src/app/incidents/` |
-| Concern feature (component, template, styles, spec, API client) | `src/FamilySafety.Web/src/app/concerns/` — `concerns.ts`, `concerns.html`, `concerns.scss`, `concerns.spec.ts`, `concern-api.ts` |
-| Shell, routes, Home entry card | `src/FamilySafety.Web/src/app/app.html`, `app.ts`, `app.routes.ts`, `app.scss` |
-| API endpoints by domain | `src/FamilySafety.Api/<Domain>/` (for example `Events/`, `Plans/`, `Trips/`, `Concerns/`, `Incidents/`) |
-| Plans & Trips navigation landing | `src/FamilySafety.Web/src/app/plans-trips/` — `group-landing.ts`, `group-landing.spec.ts` |
-| Safety dashboard | `src/FamilySafety.Web/src/app/safety/` — `safety-dashboard.ts`, `.html`, `.scss`, `.spec.ts` |
-| Design tokens (colors, radii, shadow) and global styles | `src/FamilySafety.Web/src/styles.scss` |
-| Other screen styles for consistency reference | `src/FamilySafety.Web/src/app/family.scss`, `events.scss`, `plans.scss`, `trips/` |
-| Concern E2E journey | `src/FamilySafety.Web/e2e/concern-workflow.spec.ts`; config `e2e/playwright.config.ts`; fixtures `e2e/fixtures/` |
-| Concern API contract | `src/FamilySafety.Api/Concerns/ConcernEndpoints.cs`, `src/FamilySafety.Application/Concerns/ConcernContracts.cs`, `ConcernService.cs` |
-| Running locally (API + Angular, dev identities, scenario script) | `docs/local-development.md`, `scripts/start-invitation-scenario.ps1`, root `README.md` |
-
-## Do not load unless specifically needed
-
-- `ai-context/bootstrap/` — extraction evidence only, not canonical
-- Old `VER-CTX-1.x` reports and Phase 2–7 verification reports
-- `events.md` and `plans-trips.md` workflows, unless the work touches Events, Plans, or Trips; `plans-trips.md` holds the current `REQ-PLAN-007`
-- Unrelated proposals (PRP-003 to PRP-023)
-- `claude-handoff/HISTORY.md`, the word-for-word archive of earlier handoff checkpoints, closed work-item scopes, and old closeout templates
-- `ai-context/skills/` and `templates/`, unless you are creating a new work item or verification report
-- `src/FamilySafety.Web/node_modules` and `dist` (generated output)
+Do not normally load HISTORY.md, bootstrap/archive, old candidates/proposals, completed work-item manifests, verification reports/evidence, screenshots, raw transcripts, or generated output. For a specific provenance, acceptance, or regression question, read only the relevant decision, completed work item, or verification record. [HISTORY](HISTORY.md) retains earlier handoff checkpoints; do not copy canonical history into it.
