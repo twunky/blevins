@@ -20,7 +20,7 @@ Approved phase status and remaining gates. The [project checkpoint](../project-s
 
 ## Phase 9.5 — MVP Feature Completion
 
-WI-095-001 — Event Invitations and RSVP — is COMPLETE / PASS — OWNER APPROVED under CTX-1.30 / DEC-083. It delivers the first bounded in-app invitation/self-RSVP scope. WI-095-002 — Event Needs is COMPLETE / PASS — OWNER APPROVED under CTX-1.31 / DEC-084. WI-095-003 — Event Updates is COMPLETE / PASS — OWNER APPROVED under CTX-1.31. WI-095-004 — Shared Family Dates is COMPLETE / PASS — OWNER APPROVED under CTX-1.31 / DEC-085; verification COMPLETE / PASS (2026-10-04). No next work item is authorized.
+WI-095-001 — Event Invitations and RSVP — is COMPLETE / PASS — OWNER APPROVED under CTX-1.30 / DEC-083. It delivers the first bounded in-app invitation/self-RSVP scope. WI-095-002 — Event Needs is COMPLETE / PASS — OWNER APPROVED under CTX-1.31 / DEC-084. WI-095-003 — Event Updates is COMPLETE / PASS — OWNER APPROVED under CTX-1.31. WI-095-004 — Shared Family Dates is COMPLETE / PASS — OWNER APPROVED under CTX-1.31 / DEC-085; verification COMPLETE / PASS (2026-10-04). WI-095-005 — Standalone Check-Ins is VERIFYING / OWNER REVIEW under CTX-1.32 / DEC-086; verification PASS / SELF-VERIFIED. No next item is authorized.
 
 Remaining capabilities include Check-In, Sharing Sessions, Trusted Contacts, Safety Circles, Household grouping, and notifications. Any additional Event RSVP scope also remains separately gated. OD-002 (persistent or indefinite location sharing) remains OPEN and is assigned to this phase alongside Sharing Sessions and Check-In.
 

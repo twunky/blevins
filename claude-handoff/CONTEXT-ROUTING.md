@@ -11,7 +11,7 @@ Read [AI operating rules](../ai-context/README.md) and [project status](../ai-co
 | Trips | [Plans & Trips workflow](../ai-context/workflows/plans-trips.md), REQ-TRIP-*; relevant Trip privacy anchors. |
 | Family, profiles, membership, administration | [Product contract](../ai-context/core/product-contract.md), REQ-FAM-*; [privacy contract](../ai-context/core/privacy-safety-contract.md), especially REQ-PRIV-011/012. |
 | Safety, Concerns, Incidents | [Safety workflow](../ai-context/workflows/safety.md), especially REQ-SAFE-015/016; [privacy contract](../ai-context/core/privacy-safety-contract.md), especially REQ-PRIV-025/026; relevant product rules. |
-| Sharing / Check-Ins | [Sharing & Check-Ins workflow](../ai-context/workflows/sharing-checkins.md) and relevant privacy anchors; OD-002 in the [full decision log](../ai-context/decision-log.md#open-product-decisions) when location scope is involved. |
+| Sharing / Check-Ins | [Sharing & Check-Ins workflow](../ai-context/workflows/sharing-checkins.md) and REQ-PRIV-030 for standalone explicit recipients/membership loss; OD-002 in the [full decision log](../ai-context/decision-log.md#open-product-decisions) when location scope is involved. |
 | Navigation, deep links, UX, accessibility | [UX contract](../ai-context/core/ux-contract.md), especially REQ-UX-011/013/014; REQ-PRIV-027 in the privacy contract. |
 | Requirement lookup / terminology | [Requirements index](../ai-context/core/requirements-index.md) / [domain glossary](../ai-context/core/domain-glossary.md). |
 | Phase scope / approval rationale | [Roadmap](../ai-context/planning/roadmap.md); only relevant entries in the [full decision log](../ai-context/decision-log.md). planning/decision-log.md is a partial excerpt. |

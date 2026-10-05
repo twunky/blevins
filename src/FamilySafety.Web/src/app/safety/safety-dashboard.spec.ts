@@ -176,16 +176,16 @@ describe('SafetyDashboard (WI-009-009)', () => {
     const { root } = render([concern('c1', 'Avery', 'Open')], [incident('i1', 'Drew', 'Open')]);
     expect(root.querySelectorAll('button, form, input, select, textarea')).toHaveLength(0);
     const linkTargets = Array.from(root.querySelectorAll('a')).map(a => a.getAttribute('href'));
-    expect(linkTargets.sort()).toEqual(['/concerns', '/concerns/c1', '/incidents', '/incidents/i1']);
+    expect(linkTargets.sort()).toEqual(['#check-ins', '/concerns', '/concerns/c1', '/incidents', '/incidents/i1']);
     expect(root.textContent).not.toMatch(/create a|start an incident|resolve|\bcall\b|send message|settings|emergency/i);
   });
 
-  it('shows the exact Check-Ins placeholder with no data, control, or request (O7)', () => {
+  it('links to standalone Check-Ins without combining protected records', () => {
     const { card } = render([], []);
     const placeholder = card('Recent Check-Ins');
-    expect(placeholder.querySelector('.safety-future-note')?.textContent?.trim()).toBe('Check-ins shared with you will appear here when available.');
-    expect(placeholder.querySelectorAll('a, button, input, ul, li, img, time')).toHaveLength(0);
-    expect(placeholder.textContent).not.toMatch(/\d/);
+    expect(placeholder.querySelector('.safety-future-note')?.textContent?.trim()).toBe('View personal status reports sent by you or explicitly shared with you.');
+    expect(placeholder.querySelectorAll('button, input, ul, li, img, time')).toHaveLength(0);
+    expect(placeholder.querySelector('a')?.getAttribute('href')).toBe('#check-ins');
     // render() already proved the only requests were the two list reads.
   });
 
@@ -235,7 +235,8 @@ describe('SafetyDashboard (WI-009-009)', () => {
     await harness.fixture.whenStable();
     harness.detectChanges();
     const requested = http.match(() => true);
-    expect(requested.map(request => request.request.url).sort()).toEqual(['/api/concerns', '/api/incidents']);
+    expect(requested.map(request => request.request.url).sort()).toEqual(['/api/check-ins/mine', '/api/check-ins/received', '/api/concerns', '/api/incidents']);
+    requested.filter(request => request.request.url.startsWith('/api/check-ins')).forEach(request => request.flush([]));
     requested.find(request => request.request.url === '/api/concerns')!.flush([
       concern('c1', 'Avery', 'Open'), concern('c2', 'Blake', 'Open', { familyGroupId: 'family-b', familyGroupName: 'Family B' }),
     ]);

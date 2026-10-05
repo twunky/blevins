@@ -68,11 +68,11 @@ The current UI includes:
 - Events dashboard, creation, list/detail viewing, and authorized detail editing.
 - Plan creation and viewing with audience selection and optional notes; the Plan's creator can edit or clear its note from the Plan page.
 - Trip creation and viewing, creator editing of core Trip details, and collaborative Trip Notes.
-- Read-only Safety dashboard and separate private Concern and Safety Incident workflows.
+- Safety dashboard and separate private Concern and Safety Incident workflows; standalone Check-Ins with optional plain-text note and explicit same-Family recipients. Check-Ins have immutable sent/shared history, no location or safety inference.
 
 New local databases start with the development Family Group and two adult members but no sample Events, Plans, or Trips. Create records in the UI to explore those features.
 
-Phase 9 is `COMPLETE / CLOSED` under `DEC-081`; Phase 9.5 is `READY TO BEGIN` with no implementation item authorized. Creator-controlled Trip audience editing is available. Trip Check-In and Sharing Session execution are not available in this local build.
+Phase 9 is `COMPLETE / CLOSED` under `DEC-081`; Phase 9.5 is `CURRENT / IN PROGRESS`; WI-095-005 is the bounded standalone Check-In item under CTX-1.32. Creator-controlled Trip audience editing is available. Trip Check-In and Sharing Session execution are not available in this local build.
 
 ## Invited-adult scenario (WI-075-001)
 

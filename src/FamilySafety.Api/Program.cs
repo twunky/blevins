@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using FamilySafety.Api.CheckIns;
+using FamilySafety.Application.CheckIns;
 using FamilySafety.Api.Development;
 using FamilySafety.Api.Directory;
 using FamilySafety.Api.FamilyDates;
@@ -33,6 +35,7 @@ var connectionString = builder.Configuration.GetConnectionString("FamilySafety")
     ?? throw new InvalidOperationException("Connection string 'FamilySafety' is required.");
 
 builder.Services.AddFamilySafetyInfrastructure(connectionString);
+builder.Services.AddScoped<ICheckInService, CheckInService>();
 builder.Services.AddScoped<IAdultProfileService, AdultProfileService>();
 builder.Services.AddScoped<IMembershipInvitationService, MembershipInvitationService>();
 builder.Services.AddScoped<IFamilyDirectoryService, FamilyDirectoryService>();
@@ -62,6 +65,7 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 app.MapHealthChecks("/health");
+app.MapCheckInEndpoints();
 app.MapAdultProfileEndpoints();
 app.MapMembershipInvitationEndpoints();
 app.MapFamilyDirectoryEndpoints();

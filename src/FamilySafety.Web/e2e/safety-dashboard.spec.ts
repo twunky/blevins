@@ -162,8 +162,8 @@ test('Adult A sees only authorized Open items, with Family context, and nothing 
   await expect(page.getByRole('navigation', { name: 'Main navigation' }).locator('a[aria-current="page"]')).toHaveText('Safety');
 
   // Only the two authorized Safety lists are read; no Check-In, Trip, or item-detail request.
-  const safetyReads = [...new Set(requested.filter(path => /\/api\/(concerns|incidents|checkins?|trips)/i.test(path)))].sort();
-  expect(safetyReads).toEqual(['/api/concerns', '/api/incidents']);
+  const safetyReads = [...new Set(requested.filter(path => /\/api\/(concerns|incidents|check-ins|trips)/i.test(path)))].sort();
+  expect(safetyReads).toEqual(['/api/check-ins/mine', '/api/check-ins/received', '/api/concerns', '/api/incidents']);
 
   // Concerns: A's own Family 1 Concern and the Family 2 Concern; never the Concern about A (subject + administrator),
   // never the resolved one.
@@ -184,12 +184,12 @@ test('Adult A sees only authorized Open items, with Family context, and nothing 
   expect(await dashboard(page).innerText()).not.toMatch(forbiddenWording);
   await expect(dashboard(page).locator('.safety-more')).toHaveCount(0);
   await expect(dashboard(page).getByRole('button')).toHaveCount(0);
-  await expect(dashboard(page).getByRole('link')).toHaveCount(6);
+  await expect(dashboard(page).getByRole('link')).toHaveCount(7);
 
   // Check-Ins placeholder: its sentence only.
   const checkIns = card(page, 'Recent Check-Ins');
-  await expect(checkIns.locator('.safety-future-note')).toHaveText('Check-ins shared with you will appear here when available.');
-  await expect(checkIns.locator('a, button, input, li, time, img')).toHaveCount(0);
+  await expect(checkIns.locator('.safety-future-note')).toHaveText('View personal status reports sent by you or explicitly shared with you.');
+  await expect(checkIns.locator('button, input, li, time, img')).toHaveCount(0);
   await expect(card(page, 'About Concerns and Incidents')).toContainText('Neither one proves danger or safety.');
 
   // 44 px targets on row and View all links.

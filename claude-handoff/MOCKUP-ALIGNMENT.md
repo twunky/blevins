@@ -1,6 +1,6 @@
 # Mockup Alignment
 
-> **Current use:** The site-wide visual system was approved under `DEC-070`. Later owner decisions map panel ① to Home (`DEC-076`), ② to Family (`DEC-077`), ③ to Events (`DEC-078`), and ④ to the data-bearing Safety dashboard (`DEC-079`). Phase 9 is closed under `DEC-081`; no product implementation item is authorized. The original DEC-070 comparison examples below record the earlier mapping and are not current implementation instructions.
+> **Current use:** The site-wide visual system was approved under `DEC-070`. Later owner decisions map panel ① to Home (`DEC-076`), ② to Family (`DEC-077`), ③ to Events (`DEC-078`), and ④ to the data-bearing Safety dashboard (`DEC-079`). Phase 9 is closed under `DEC-081`; [project status](../ai-context/project-status.md) owns current Phase 9.5 authorization. The original DEC-070 comparison examples below record the earlier mapping and are not current implementation instructions.
 
 ## The visual target
 

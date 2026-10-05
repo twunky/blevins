@@ -1209,3 +1209,11 @@ These questions are intentionally unresolved and are not requirements.
 - **Authorization:** Create and execute WI-095-004 under CTX-1.31 and REQ-FAM-010/011/012/013, REQ-PRIV-016/017/018. Immediate unavailability and 30-calendar-day duration are unchanged. No new baseline is needed for implementation mechanics.
 - **Mechanics:** No user-facing restore or retained-data API. Reuse feature-specific hosted maintenance for permanent cleanup at expiry; retained storage never grants current access. Operational/backup restoration must recheck current Family and original membership/association authorization. Audit/backup retention policies remain separate predeployment work.
 - **Scope/status:** Shared Family Dates only; owner commits; hand back VERIFYING / OWNER REVIEW. No sibling capability authorization.
+
+## DEC-086 — Standalone Check-Ins and explicit Family-anchored grants
+
+- **Date:** 2026-10-04; **Authority:** Project owner, original standalone scope and follow-up eligibility decision.
+- **Decision:** Approve creation/read-only standalone Check-Ins, five existing statuses and optional plain-text note; no location or integrations, recipient editing, automatic expiry, delete/restore or safety inference.
+- **Privacy:** Explicit active adult recipients in one Family where the author is active. Grants bind exact profiles and original memberships; either party's loss permanently invalidates sharing, with no rejoin/inheritance. Own history survives departure. REQ-PRIV-030 is normative.
+- **Canonical effect:** Add REQ-PRIV-030 and REQ-SHARE-010; CTX-1.32 succeeds CTX-1.31 after VER-CTX-1.32 PASS / SELF-VERIFIED.
+- **Authorization:** Create and execute WI-095-005 only. Phase 9.5 remains current; leave VERIFYING / OWNER REVIEW, no next item. Owner alone stages/commits/pushes; no PR.

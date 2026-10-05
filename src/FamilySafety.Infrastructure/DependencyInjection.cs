@@ -1,4 +1,5 @@
 using FamilySafety.Application.Directory;
+using FamilySafety.Application.CheckIns;
 using FamilySafety.Application.FamilyDates;
 using FamilySafety.Application.Events;
 using FamilySafety.Application.Invitations;
@@ -23,6 +24,7 @@ public static class DependencyInjection
         ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
 
         services.AddDbContext<FamilySafetyDbContext>(options => options.UseSqlServer(connectionString));
+        services.AddScoped<ICheckInRepository, EfCheckInRepository>();
         services.AddScoped<IAdultProfileRepository, EfAdultProfileRepository>();
         services.AddScoped<IMembershipInvitationRepository, EfMembershipInvitationRepository>();
         services.AddScoped<IFamilyDirectoryRepository, EfFamilyDirectoryRepository>();

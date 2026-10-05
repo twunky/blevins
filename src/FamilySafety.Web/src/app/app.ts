@@ -24,6 +24,7 @@ import { EventParticipation, PendingEventInvitation } from './events/event-parti
 import { EventNeeds } from './events/event-needs';
 import { EventUpdates } from './events/event-updates';
 import { SharedFamilyDates } from './family-dates/shared-family-dates';
+import { CheckIns } from './check-ins/check-ins';
 import { AdoptItemFamily, ItemKind, isItemId } from './item-route';
 import {
   NavigableView, PrimaryDestination, areaForView, focusHeadingState, matchedAreas, matchedPath, pathForView, primaryDestinations, viewForPath,
@@ -130,7 +131,7 @@ interface HomeTripPreview {
 
 @Component({
   selector: 'app-workspace',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, Trips, Concerns, Incidents, AppIcon, GroupLanding, SafetyDashboard, ItemUnavailable, EventParticipation, EventNeeds, EventUpdates, SharedFamilyDates],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, Trips, Concerns, Incidents, AppIcon, GroupLanding, SafetyDashboard, ItemUnavailable, EventParticipation, EventNeeds, EventUpdates, SharedFamilyDates, CheckIns],
   styleUrls: ['./app.scss', './home.scss', './family.scss', './family-settings.scss', './events.scss', './events-dashboard.scss', './plans.scss'],
   templateUrl: './app.html',
 })

@@ -22,6 +22,76 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("FamilySafety.Domain.CheckIns.CheckIn", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AuthorMembershipId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AuthorMembershipVersion")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("AuthorProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset(7)");
+
+                    b.Property<Guid>("FamilyGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorMembershipId");
+
+                    b.HasIndex("FamilyGroupId");
+
+                    b.HasIndex("AuthorProfileId", "CreatedAtUtc");
+
+                    b.ToTable("CheckIns", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CheckIns_Status", "[Status] IN ('ImOkay','Arrived','LeavingNow','Delayed','PlansChanged')");
+                        });
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.CheckIns.CheckInRecipient", b =>
+                {
+                    b.Property<Guid>("CheckInId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsInvalidated")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MembershipId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MembershipVersion")
+                        .HasColumnType("int");
+
+                    b.HasKey("CheckInId", "ProfileId");
+
+                    b.HasIndex("MembershipId");
+
+                    b.HasIndex("ProfileId", "IsInvalidated");
+
+                    b.ToTable("CheckInRecipients", (string)null);
+                });
+
             modelBuilder.Entity("FamilySafety.Domain.Concerns.Concern", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1253,6 +1323,8 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
 
                     b.ToTable("FamilyGroupMemberships", null, t =>
                         {
+                            t.HasTrigger("TR_CheckIns_MembershipLoss");
+
                             t.HasTrigger("TR_EventNeeds_MembershipLoss");
 
                             t.HasTrigger("TR_SharedFamilyDates_MembershipLoss");
@@ -1546,6 +1618,48 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.HasIndex("ProfileId");
 
                     b.ToTable("FamilyTripTravelers", (string)null);
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.CheckIns.CheckIn", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroupMembership", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorMembershipId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroup", null)
+                        .WithMany()
+                        .HasForeignKey("FamilyGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.CheckIns.CheckInRecipient", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.CheckIns.CheckIn", null)
+                        .WithMany()
+                        .HasForeignKey("CheckInId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroupMembership", null)
+                        .WithMany()
+                        .HasForeignKey("MembershipId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("FamilySafety.Domain.Concerns.Concern", b =>

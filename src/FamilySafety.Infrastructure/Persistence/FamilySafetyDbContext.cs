@@ -1,4 +1,5 @@
 using FamilySafety.Domain.Profiles;
+using FamilySafety.Domain.CheckIns;
 using FamilySafety.Domain.FamilyDates;
 using FamilySafety.Domain.Relationships;
 using FamilySafety.Domain.Events;
@@ -14,6 +15,8 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
     : DbContext(options)
 {
     public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<CheckIn> CheckIns => Set<CheckIn>();
+    public DbSet<CheckInRecipient> CheckInRecipients => Set<CheckInRecipient>();
 
     public DbSet<AdultProfile> AdultProfiles => Set<AdultProfile>();
 
@@ -61,6 +64,23 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var checkIn = modelBuilder.Entity<CheckIn>();
+        checkIn.ToTable("CheckIns", t => t.HasCheckConstraint("CK_CheckIns_Status", "[Status] IN ('ImOkay','Arrived','LeavingNow','Delayed','PlansChanged')"));
+        checkIn.HasKey(c => c.Id);
+        checkIn.Property(c => c.Status).HasConversion<string>().HasMaxLength(32).IsRequired();
+        checkIn.Property(c => c.Note).HasMaxLength(CheckIn.NoteLimit);
+        checkIn.Property(c => c.CreatedAtUtc).HasColumnType("datetimeoffset(7)");
+        checkIn.HasIndex(c => new { c.AuthorProfileId, c.CreatedAtUtc });
+        checkIn.HasOne<AdultProfile>().WithMany().HasForeignKey(c => c.AuthorProfileId).OnDelete(DeleteBehavior.Restrict);
+        checkIn.HasOne<FamilyGroup>().WithMany().HasForeignKey(c => c.FamilyGroupId).OnDelete(DeleteBehavior.Restrict);
+        checkIn.HasOne<FamilyGroupMembership>().WithMany().HasForeignKey(c => c.AuthorMembershipId).OnDelete(DeleteBehavior.Restrict);
+        var checkInRecipient = modelBuilder.Entity<CheckInRecipient>();
+        checkInRecipient.ToTable("CheckInRecipients");
+        checkInRecipient.HasKey(r => new { r.CheckInId, r.ProfileId });
+        checkInRecipient.HasIndex(r => new { r.ProfileId, r.IsInvalidated });
+        checkInRecipient.HasOne<CheckIn>().WithMany().HasForeignKey(r => r.CheckInId).OnDelete(DeleteBehavior.Cascade);
+        checkInRecipient.HasOne<AdultProfile>().WithMany().HasForeignKey(r => r.ProfileId).OnDelete(DeleteBehavior.Restrict);
+        checkInRecipient.HasOne<FamilyGroupMembership>().WithMany().HasForeignKey(r => r.MembershipId).OnDelete(DeleteBehavior.Restrict);
         var account = modelBuilder.Entity<Account>();
         account.ToTable("Accounts");
         account.HasKey(entity => entity.Id);
@@ -92,6 +112,7 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
         membership.ToTable("FamilyGroupMemberships", table => {
             table.HasTrigger("TR_EventNeeds_MembershipLoss");
             table.HasTrigger("TR_SharedFamilyDates_MembershipLoss");
+            table.HasTrigger("TR_CheckIns_MembershipLoss");
         });
         membership.HasKey(entity => entity.Id);
         membership.HasIndex(entity => new { entity.AccountId, entity.FamilyGroupId }).IsUnique();

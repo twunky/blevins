@@ -24,8 +24,8 @@ function byLastActivity<T extends { lastAuthorizedMutationAt: string }>(a: T, b:
  * Read only. It shows the Open Concerns and Open Safety Incidents that the existing authorized list reads return,
  * in two separate cards (REQ-UX-013: no combined list, count, timeline, or create menu). The server decides every
  * row; nothing here grants access or implies that an item exists for anyone else (REQ-PRIV-027). Concern reasons,
- * contact attempts, tasks, and timelines stay on the authorized detail pages. Recent Check-Ins is a static
- * placeholder only. Nothing here states or infers anyone's real-world safety.
+ * contact attempts, tasks, and timelines stay on the authorized detail pages. Recent Check-Ins links to the standalone
+ * workflow below the dashboard (WI-095-005). Nothing here states or infers anyone's real-world safety.
  */
 @Component({
   selector: 'app-safety-dashboard',

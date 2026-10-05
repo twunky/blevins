@@ -1,0 +1,79 @@
+<section class="card" id="check-ins" aria-labelledby="check-ins-heading">
+  <div class="card-header">
+    <h2 id="check-ins-heading">Check-Ins</h2>
+    <button type="button" class="button--secondary" (click)="refresh()" [disabled]="busy()">Refresh Check-Ins</button>
+  </div>
+  <p class="section-help">Personal status reports, shared only with the people you choose. They do not confirm anyone's safety.</p>
+  @if (message()) { <p role="status" class="message message--success">{{ message() }}</p> }
+  @if (error()) { <p role="alert" class="message message--error">{{ error() }}</p> }
+  @if (state() === 'loading') {
+    <p role="status">Loading Check-Ins…</p>
+  } @else if (state() === 'unavailable') {
+    <p role="status">Check-Ins are unavailable. Please sign in with your own adult profile.</p>
+  } @else if (state() === 'error') {
+    <p role="alert">Check-Ins could not be loaded.</p>
+    <button type="button" (click)="refresh()">Retry loading Check-Ins</button>
+  } @else {
+    @if (peopleState() === 'loading') { <p role="status">Loading recipient choices…</p> }
+    @if (peopleState() === 'error') {
+      <p role="alert">Recipient choices could not be loaded.</p>
+      <button type="button" class="button--secondary" (click)="loadPeople()">Retry loading recipients</button>
+    }
+    @if (familyId && peopleState() === 'ready' && !formOpen()) {
+      <button type="button" (click)="create()">Create a Check-In</button>
+    } @else if (!familyId) {
+      <p class="section-help">Choose an active Family to create a Check-In. Your own history remains available here.</p>
+    } @else if (peopleState() === 'unavailable') {
+      <p class="section-help">You cannot create a Check-In in this Family right now. Your own history remains available.</p>
+    }
+    @if (formOpen()) {
+      <form (ngSubmit)="save()">
+        <label for="check-in-status">Status</label>
+        <select id="check-in-status" name="status" [(ngModel)]="status" required [disabled]="busy()">
+          <option value="" disabled>Choose a status</option>
+          @for (choice of statuses; track choice.value) { <option [value]="choice.value">{{ choice.label }}</option> }
+        </select>
+        <label for="check-in-note">Note (optional)</label>
+        <textarea id="check-in-note" name="note" [(ngModel)]="note" maxlength="1000" rows="3" [disabled]="busy()"></textarea>
+        <fieldset [disabled]="busy()" aria-describedby="check-in-audience-help">
+          <legend>Choose recipients</legend>
+          <p id="check-in-audience-help" class="section-help">No one is selected by default. Choose people from the current Family, or keep this Check-In to yourself. Recipients cannot see who else you selected.</p>
+          @for (person of people(); track person.profileId) {
+            <label class="recipient-choice"><input type="checkbox" [checked]="recipientIds.includes(person.profileId)"
+              (change)="choose(person.profileId, $any($event.target).checked)" />{{ person.displayName }}</label>
+          } @empty { <p>No other eligible adults are available in this Family.</p> }
+        </fieldset>
+        <p class="section-help">Status, note and recipients are fixed after creation. If you or a recipient leaves this Family, that sharing grant ends permanently. Your own history remains available.</p>
+        <div class="actions">
+          <button type="submit" [disabled]="busy() || !valid()">{{ busy() ? 'Creating…' : 'Create Check-In' }}</button>
+          <button type="button" class="button--secondary" (click)="cancel()" [disabled]="busy()">Cancel</button>
+        </div>
+      </form>
+    }
+    <div class="history">
+      <section aria-labelledby="check-ins-mine-heading">
+        <h3 id="check-ins-mine-heading">Sent by me</h3>
+        <ul class="row-list">
+          @for (entry of mine(); track entry.checkInId) {
+            <li><span class="status-pill">{{ label(entry.status) }}</span>
+              <time [attr.datetime]="entry.createdAtUtc">{{ entry.createdAtUtc | date:'MMM d, y, h:mm a' }}</time>
+              @if (entry.note) { <p class="note">{{ entry.note }}</p> }
+              <p class="section-help">{{ entry.recipientProfileIds?.length ?? 0 }} explicitly selected recipients at creation.</p>
+            </li>
+          } @empty { <li>You have no Check-Ins yet.</li> }
+        </ul>
+      </section>
+      <section aria-labelledby="check-ins-received-heading">
+        <h3 id="check-ins-received-heading">Shared with me</h3>
+        <ul class="row-list">
+          @for (entry of received(); track entry.checkInId) {
+            <li><strong>{{ entry.authorDisplayName }}</strong> <span class="status-pill">{{ label(entry.status) }}</span>
+              <time [attr.datetime]="entry.createdAtUtc">{{ entry.createdAtUtc | date:'MMM d, y, h:mm a' }}</time>
+              @if (entry.note) { <p class="note">{{ entry.note }}</p> }
+            </li>
+          } @empty { <li>No Check-Ins are shared with you.</li> }
+        </ul>
+      </section>
+    </div>
+  }
+</section>

@@ -1,16 +1,26 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.31
-Version: 1.23
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085
+Context-Baseline: CTX-1.32
+Version: 1.24
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086
 ---
 
 # Privacy and Safety Contract
 
-Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.30`.
+Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.32`.
 
 ## Consent and sharing control
+
+### REQ-PRIV-030
+
+For first-slice standalone Check-Ins (DEC-086):
+
+- Only the signed-in adult authors their own Check-In. At creation the author and every explicitly selected recipient must be active adults in one chosen Family Group. No cross-Family audience or default Family, Event, Trip, Safety Circle or administrator audience exists. Selected Family is navigation/context only.
+- Sharing belongs to that Family Group and the exact original author/recipient profiles. Every recipient read rechecks both parties' current eligibility and the original membership grants. Loss by either party permanently invalidates the recipient grant; later rejoining, a replacement profile on the same Account, matching names, Family reselection or a known Check-In ID never restores or inherits it.
+- The author retains access to their own historical Check-In after leaving the Family. Stored history/share provenance grants no recipient access. No post-creation recipient editing/re-sharing is included.
+- Queries authorize before projecting content. Unauthorized callers receive no status, note, recipient list, timestamps or existence disclosure; denied and missing detail reads use the same unavailable response. Lists omit unauthorized records. Family Administrators and Application Operators have no override. Other recipients do not receive the selected recipient identity list.
+- Records remain historical without an invented automatic expiry or delete/restore workflow in this slice. These rules authorize no location, Sharing Session, protected-record integration, notification or safety inference.
 
 ### REQ-PRIV-001
 
@@ -48,7 +58,7 @@ Creating a Concern or Safety Incident does not bypass privacy settings or unlock
 
 Signing in or receiving an invitation does not itself grant Family Group data access. A pending, expired, revoked, or already-used membership invitation grants no Family Group access. Ending active membership ends access to that Family Group's data. Family membership and Family Administrator responsibility remain separate from access to private information.
 
-The Trip creator's continued access to their own Trip after membership ends is the narrow feature-specific exception defined by `REQ-PRIV-022`. It does not restore Family Group membership or access to other Family Group data.
+The Trip creator's continued own-Trip access under `REQ-PRIV-022` and the standalone Check-In author's own historical access under `REQ-PRIV-030` are narrow feature-specific exceptions after membership ends. Neither restores Family Group membership or access to other Family Group data.
 
 ### REQ-PRIV-012
 

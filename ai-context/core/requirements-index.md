@@ -1,6 +1,6 @@
 # Requirements Index
 
-**Status:** APPROVED — `CTX-1.30`
+**Status:** APPROVED — `CTX-1.32`
 **Purpose:** Traceability index only; normative wording lives at each canonical source.
 
 ## ID and lifecycle rules
@@ -241,3 +241,10 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-VERIFY-004` | Project verification does not replace story verification | `../README.md#verification` | `APPROVED` | Phase 2B pre-baseline | — |
 
 
+
+## Standalone Check-In first slice (CTX-1.32)
+
+| ID | Short label | Canonical location | Status | Introduced | Superseded by |
+|---|---|---|---|---|---|
+| REQ-PRIV-030 | Explicit Check-In grants and membership loss | privacy-safety-contract.md#req-priv-030 | APPROVED | CTX-1.32 | — |
+| REQ-SHARE-010 | Immutable standalone Check-In creation/history | ../workflows/sharing-checkins.md#req-share-010 | APPROVED | CTX-1.32 | — |

@@ -6,12 +6,12 @@
 
 | Field | Current value |
 |---|---|
-| Active baseline | CTX-1.31 APPROVED / ACTIVE under DEC-084; [baseline verification](planning/verification/VER-CTX-1.31.md) PASS / SELF-VERIFIED. |
+| Active baseline | CTX-1.32 APPROVED / ACTIVE under DEC-086; [baseline verification](planning/verification/VER-CTX-1.32.md) PASS / SELF-VERIFIED. |
 | Current phase | Phase 9.5 — MVP Feature Completion — CURRENT / IN PROGRESS. |
 | Previous phase | Phase 9 — Integration & UX Refinement — COMPLETE / CLOSED under DEC-081. |
 | Completed items | WI-095-001/002/003 and [WI-095-004 — Shared Family Dates](planning/stories/WI-095-004-shared-family-dates.md) COMPLETE / PASS — OWNER APPROVED (2026-10-04). [Shared Family Dates verification](planning/verification/VER-WI-095-004.md) COMPLETE / PASS. |
-| Current authorized implementation item | NONE AUTHORIZED. |
-| Next owner action | Perform any Git commit; select and authorize a bounded next work item when ready. Owner performs all Git commits. |
+| Current authorized implementation item | [WI-095-005 — Standalone Check-Ins](planning/stories/WI-095-005-standalone-check-ins.md) VERIFYING / OWNER REVIEW; [verification](planning/verification/VER-WI-095-005.md) PASS / SELF-VERIFIED. |
+| Next owner action | Review WI-095-005 and perform any Git commit; no next item authorized. Owner performs all Git commits. |
 
 ## Open decisions
 
@@ -26,6 +26,6 @@ Production authentication, hosting, and backup-aging/restore evidence remain sep
 
 ## Required context for the next action
 
-Read [AI operating rules](README.md) and this checkpoint first. There is no active implementation manifest. For an owner-selected task, use [context routing](../claude-handoff/CONTEXT-ROUTING.md) to select relevant canonical sources; its authorized work-item manifest then controls loading.
+Read [AI operating rules](README.md) and this checkpoint first. WI-095-005 is the active implementation manifest. For an owner-selected task, use [context routing](../claude-handoff/CONTEXT-ROUTING.md) to select relevant canonical sources; its authorized work-item manifest then controls loading.
 
 Completed implementation and testing details remain in their work items and verification records, including [VER-WI-095-001](planning/verification/VER-WI-095-001.md). Read historical records only for a specific provenance or regression question, not as default session context.

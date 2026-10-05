@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL WORKFLOW — CTX-1.3
-Context-Baseline: CTX-1.18
-Version: 1.1
-Source: ../bootstrap/product-ux-source.md; DEC-057
+Context-Baseline: CTX-1.32
+Version: 1.2
+Source: ../bootstrap/product-ux-source.md; DEC-057; DEC-086
 Constrained-By:
   - ../core/product-contract.md
   - ../core/ux-contract.md
@@ -71,3 +71,7 @@ This flow must preserve the uncertainty rule in `REQ-SAFE-001`; it does not auto
 ### REQ-SHARE-009
 
 Trip context does not grant Sharing Session or another person's Check-In access. A Trip audience member receives only the Trip information allowed by the Trip audience rules; access to another person's location, Check-In information, or Sharing Session data requires separate authorization under the applicable privacy and sharing rules. Each person controls Sharing Sessions involving their own information. A Trip creator cannot start or manage a Sharing Session for another person's information merely by creating, organizing, or completing the Trip.
+
+### REQ-SHARE-010
+
+The first standalone Check-In slice is self-authored creation and read-only history. It uses exactly the five statuses in REQ-SHARE-006 and an optional plain-text note under REQ-SHARE-007. Status, note and explicitly chosen recipients are fixed at creation; post-creation editing, re-sharing, deletion and restore are excluded. Historical records remain stored without an invented expiry; their availability follows REQ-PRIV-030. No location, expected-arrival update, Event/Plan/Trip association, Sharing Session dependency, reminder, notification or automatic Concern/Incident/safety inference is included. A status is the author's report, not verified safety.
