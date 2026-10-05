@@ -306,6 +306,7 @@
         <app-safety-dashboard [ownProfileId]="ownerProfile()?.profileId ?? null" [showFamilyName]="activeFamilyGroups().length > 1" />
         <app-check-ins [familyId]="currentFamilyId() || null" [ownProfileId]="ownerProfile()?.profileId ?? null" />
         <app-sharing-sessions [familyId]="currentFamilyId() || null" [ownProfileId]="ownerProfile()?.profileId ?? null" />
+        <app-trusted-contacts [ownProfileId]="ownerProfile()?.profileId ?? null" />
       } @loading {
         <p role="status">Loading Safety…</p>
       }

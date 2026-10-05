@@ -1,14 +1,14 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.33
-Version: 1.25
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087
+Context-Baseline: CTX-1.34
+Version: 1.26
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087; DEC-088
 ---
 
 # Privacy and Safety Contract
 
-Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.33`.
+Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.34`.
 
 ## Consent and sharing control
 
@@ -160,7 +160,7 @@ For shared Family Date data that becomes unavailable under `REQ-PRIV-017`, the f
 
 ### REQ-PRIV-019
 
-Trusted Contact entries are private to the adult who maintains them by default. Sharing an entry or designating it for a defined use requires a separate explicit choice by that adult. Listing someone as a Trusted Contact does not itself grant that person access to Family Group data or authorize notifications. The specific fields, permitted audiences, and permitted uses remain undecided.
+Trusted Contact entries are private to the adult who maintains them by default. Sharing an entry or designating it for a defined use requires a separate explicit choice by that adult and an approved rule. Listing someone as a Trusted Contact does not itself grant that person access to Family Group data or authorize notifications. The manual first slice's fields and owner-only operations follow `REQ-FAM-016` / `REQ-PRIV-032`; future audiences and uses remain separately gated.
 
 ### REQ-PRIV-020
 
@@ -194,7 +194,13 @@ For Events, audience visibility, invitation, participant or RSVP status, and Nee
 
 ### REQ-PRIV-024
 
-Trusted Contact entries remain owner-managed and private by default under `REQ-PRIV-019`. Designating a person as a Trusted Contact does not itself grant that person Family Group, Event, Trip, Sharing Session, or safety-incident access, and does not automatically add that person to the owner's Safety Circle. Any future use or sharing of the Trusted Contact entry requires its own approved rule and the adult owner's separate explicit choice. Trusted Contact and Safety Circle remain distinct concepts.
+Trusted Contact entries remain owner-managed and private by default under `REQ-PRIV-019`. Designating a person as a Trusted Contact does not itself grant that person Family Group, Event, Trip, Sharing Session, or safety-incident access, and does not automatically add that person to the owner's Safety Circle. Any future use or sharing of the Trusted Contact entry requires its own approved rule and the adult owner's separate explicit choice. Trusted Contact and Safety Circle remain distinct concepts. The first-slice boundary is explicit in `REQ-PRIV-032`.
+
+### REQ-PRIV-032
+
+Manual Trusted Contacts (DEC-088 / REQ-FAM-016) are visible and manageable only by the owning adult. Server authorization derives the owner from the current authenticated account and its existing adult profile on every list/read/create/edit/delete. No caller-supplied owner, selected Family, Family membership, administrator status or known contact ID establishes authority. Specific-ID missing and denied operations use the same nondisclosing unavailable response; protected responses must not be cached.
+
+Designation and the descriptive relationship label grant zero access or authority over Family data, Events, Plans, Trips, Check-Ins, Sharing Sessions, location, Concerns, Incidents, Safety data, profiles or administration. They do not send notifications, enroll a Safety Circle, share Check-Ins/location or create Family membership. No contact record is linked to an application Account/Profile or membership. Future sharing/linking/use requires its own approved rule/work item and owner choice. Removal and Family-independent lifecycle are defined solely in REQ-FAM-016.
 
 ### REQ-PRIV-025
 

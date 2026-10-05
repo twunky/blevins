@@ -1,6 +1,6 @@
 # Requirements Index
 
-**Status:** APPROVED - `CTX-1.33`
+**Status:** APPROVED - `CTX-1.34`
 **Purpose:** Traceability index only; normative wording lives at each canonical source.
 
 ## ID and lifecycle rules
@@ -255,3 +255,12 @@ Do not use `REQ-SAFETY-*`.
 |---|---|---|---|---|---|
 | REQ-PRIV-031 | Temporary own-location grants, expiration and latest-point privacy | privacy-safety-contract.md#req-priv-031 | APPROVED | CTX-1.33 | — |
 | REQ-SHARE-011 | Bounded browser sharing workflow and Home clarity | ../workflows/sharing-checkins.md#req-share-011 | APPROVED | CTX-1.33 | — |
+
+## Manual Trusted Contacts first slice (CTX-1.34)
+
+| ID | Requirement | Canonical source | Status | Baseline | Supersedes |
+|---|---|---|---|---|---|
+| REQ-FAM-016 | Private manual contacts, fields, duplicates and personal lifecycle | product-contract.md#req-fam-016 | APPROVED | CTX-1.34 | — |
+| REQ-PRIV-032 | Owner-only manual-contact privacy and zero downstream grants | privacy-safety-contract.md#req-priv-032 | APPROVED | CTX-1.34 | — |
+
+DEC-088 clarifies REQ-FAM-014/015 and REQ-PRIV-019/024 for this first slice; broader future uses remain gated.

@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
-Authority: CANONICAL — CTX-1.26
-Context-Baseline: CTX-1.26
-Version: 1.9
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-059; DEC-071
+Authority: CANONICAL — CTX-1.34
+Context-Baseline: CTX-1.34
+Version: 1.10
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-059; DEC-071; DEC-088
 ---
 
 # Domain Glossary
@@ -62,7 +62,7 @@ A user-selected set of trusted people, potentially including a spouse, parent, a
 
 ### Trusted Contact
 
-An adult owner-managed trusted person/contact entry or designation. The person may be outside the Family Group. The entry is private to its owner by default and is distinct from the owner's profile contact fields and Safety Circle. Designation alone grants no Family Group, Event, Trip, Sharing Session, or safety-incident access. Fields, Account expectations, uses, and implementation mechanics remain undecided.
+An adult owner-managed trusted person/contact entry or designation. The person may be outside the Family Group. The first slice is a private manual contact record with no application identity or Family link, under REQ-FAM-016 / REQ-PRIV-032. It is distinct from the owner's profile contact fields and Safety Circle. Designation alone grants no protected product access or authority; future uses remain separately gated.
 
 ## Coordination
 

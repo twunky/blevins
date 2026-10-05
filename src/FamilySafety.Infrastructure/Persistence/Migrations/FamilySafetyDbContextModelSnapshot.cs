@@ -1721,6 +1721,62 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.ToTable("FamilyTripTravelers", (string)null);
                 });
 
+            modelBuilder.Entity("FamilySafety.Domain.TrustedContacts.TrustedContact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EmailAddress")
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<string>("NormalizedPhone")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<Guid>("OwnerProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("RelationshipLabel")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerProfileId", "NormalizedEmail")
+                        .IsUnique()
+                        .HasFilter("[NormalizedEmail] IS NOT NULL");
+
+                    b.HasIndex("OwnerProfileId", "NormalizedPhone")
+                        .IsUnique()
+                        .HasFilter("[NormalizedPhone] IS NOT NULL");
+
+                    b.ToTable("TrustedContacts", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_TrustedContacts_ContactMethod", "([PhoneNumber] IS NOT NULL AND [NormalizedPhone] IS NOT NULL) OR ([EmailAddress] IS NOT NULL AND [NormalizedEmail] IS NOT NULL)");
+                        });
+                });
+
             modelBuilder.Entity("FamilySafety.Domain.CheckIns.CheckIn", b =>
                 {
                     b.HasOne("FamilySafety.Domain.Profiles.FamilyGroupMembership", null)
@@ -2289,6 +2345,15 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("TripId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.TrustedContacts.TrustedContact", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("OwnerProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

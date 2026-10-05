@@ -1,14 +1,14 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.26
-Version: 1.17
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-045; DEC-046; DEC-047; DEC-053; DEC-059; DEC-068; DEC-071
+Context-Baseline: CTX-1.34
+Version: 1.18
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-045; DEC-046; DEC-047; DEC-053; DEC-059; DEC-068; DEC-071; DEC-088
 ---
 
 # Product Contract
 
-This contract carries approved product truth through `CTX-1.20`. Shared Family Dates v1 use a required title, description, and one specific calendar date; they do not recur automatically. Trusted Contacts remain owner-managed and private by default. Minor and guardian functionality is outside the MVP and reserved for future work under `DEC-053`; this does not define that future behavior.
+This contract includes the narrow manual Trusted Contact clarification under `CTX-1.34` / `DEC-088`. Shared Family Dates v1 use a required title, description, and one specific calendar date; they do not recur automatically. Trusted Contacts remain owner-managed and private by default. Minor and guardian functionality is outside the MVP and reserved for future work under `DEC-053`; this does not define that future behavior.
 
 ## Identity and purpose
 
@@ -165,11 +165,21 @@ The description field for each v1 Shared Family Date is required.
 
 ### REQ-FAM-014
 
-Each adult manages their own Trusted Contact entries. Entries are private to that adult by default. Trusted Contacts remain distinct from the adult's own profile contact fields, Family membership, Family Relationships, and Safety Circle. A separate explicit choice is required to share or designate an entry for a defined use. The allowed fields, audiences, uses, and v1 implementation shape remain undecided. Eligibility of people outside the Family Group follows `REQ-FAM-015`.
+Each adult manages their own Trusted Contact entries. Entries are private to that adult by default. Trusted Contacts remain distinct from the adult's own profile contact fields, Family membership, Family Relationships, and Safety Circle. A separate explicit choice and approved rule are required to share or designate an entry for a defined use. The manual first slice is defined by `REQ-FAM-016` and `REQ-PRIV-032`. Eligibility of people outside the Family Group follows `REQ-FAM-015`.
 
 ### REQ-FAM-015
 
-A Trusted Contact may be a person who is not a Family Group member, such as a trusted friend, caregiver, neighbor, or other trusted person. Family Group membership is not a prerequisite for designation. This requirement does not decide whether a future implementation requires an Account, nor does it define required fields, invitation or acceptance mechanics, notification consent, retention, user interface, or v1 implementation shape. A Trusted Contact remains distinct from the adult's own profile contact fields and from Safety Circle membership.
+A Trusted Contact may be a person who is not a Family Group member, such as a trusted friend, caregiver, neighbor, or other trusted person. Family Group membership is not a prerequisite for designation. The first slice requires no contact Account or Profile and uses only owner-entered information under `REQ-FAM-016`. A Trusted Contact remains distinct from the adult's own profile contact fields and from Safety Circle membership.
+
+### REQ-FAM-016
+
+Trusted Contacts first slice (DEC-088): an existing adult profile may own private manual contact records, independently of any Family membership. The current Account/Profile model has no separate inactive-profile state; an existing adult profile belonging to the current account is the owner eligibility check. The contact has no application identity or Family link, even if the actual person uses the application. No user/profile discovery, lookup, linking, invitation, acceptance or verification is provided.
+
+Each record has a required trimmed plain-text Display Name, at least one valid Phone Number or Email Address, and an optional trimmed plain-text Relationship / Label. No other descriptive contact fields or authority flags are allowed. Email follows existing application validation and compares case-insensitively. Phone preserves its useful display value, supports international numbers and normalizes formatting for duplicate comparison without assuming a country for local numbers. Reasonable field lengths/validation use existing repository conventions.
+
+The owner may list, add, edit these four fields and remove records in the existing Safety experience, without a feature Family selector. The resulting record must always have at least one valid contact method. A match on either normalized email or normalized phone rejects create/edit as a duplicate within the owner; exclude the edited record itself. Names alone are not identity, and different owners may store the same contact independently. Optimistic concurrency follows current CRUD conventions; no revision history is created.
+
+Removal permanently deletes the record, with no tombstone, retained feature history, recycle bin, restore or retention window. Leaving/joining/changing selected Family does not remove, duplicate or expose records. Contacts follow owner-profile deletion through ownership cascade when a separately implemented account lifecycle actually deletes that profile; this slice implements no account deletion. External-contact eligibility loss does not apply. Operational logs/backups remain governed by existing infrastructure, not a new feature retention framework.
 
 ## Explicit non-goals
 

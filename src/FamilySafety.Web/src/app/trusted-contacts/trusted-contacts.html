@@ -1,0 +1,61 @@
+<section class="card trusted-contacts" aria-labelledby="trusted-contacts-heading">
+  <div class="card-header"><h2 id="trusted-contacts-heading">My Trusted Contacts</h2></div>
+  <p class="help">Private contact information you enter yourself. Listing someone here does not give them access to your data or send notifications. These contacts belong to you across Families.</p>
+  @if (message()) { <p class="message message--success" role="status">{{ message() }}</p> }
+  @if (error()) { <p class="message message--error" role="alert">{{ error() }}</p> }
+  @if (state() === 'loading') {
+    <p role="status">Loading Trusted Contacts…</p>
+  } @else if (state() === 'error') {
+    <p role="alert">Trusted Contacts could not be loaded. Please try again.</p>
+    <button type="button" class="button--secondary" (click)="refresh()">Retry loading Trusted Contacts</button>
+  } @else if (state() === 'unavailable') {
+    <p>Trusted Contacts are currently unavailable. Your session or profile may be unavailable.</p>
+    <button type="button" class="button--secondary" (click)="refresh()">Refresh Trusted Contacts</button>
+  } @else {
+    <div class="actions">
+      <button type="button" class="button--secondary" [disabled]="busy()" (click)="refresh()">Refresh Trusted Contacts</button>
+      <button type="button" [disabled]="busy() || formOpen()" (click)="add()">Add a Trusted Contact</button>
+    </div>
+    @if (formOpen()) {
+      <form (ngSubmit)="save()">
+        <h3>{{ editing() ? 'Edit Trusted Contact' : 'Add Trusted Contact' }}</h3>
+        <label for="trusted-contact-name">Display Name</label>
+        <input id="trusted-contact-name" name="displayName" [(ngModel)]="displayName" required maxlength="100" [disabled]="busy()" autocomplete="off">
+        <p id="trusted-contact-method-help" class="help">Enter at least one phone number or email address. Phone numbers may use an international + or 00 prefix and spaces, parentheses, periods or hyphens; enter 7–15 digits.</p>
+        <label for="trusted-contact-phone">Phone Number</label>
+        <input id="trusted-contact-phone" name="phoneNumber" type="tel" [(ngModel)]="phoneNumber" maxlength="32" [disabled]="busy()" aria-describedby="trusted-contact-method-help" autocomplete="off">
+        <label for="trusted-contact-email">Email Address</label>
+        <input id="trusted-contact-email" name="emailAddress" type="email" [(ngModel)]="emailAddress" maxlength="254" [disabled]="busy()" aria-describedby="trusted-contact-method-help" autocomplete="off">
+        <label for="trusted-contact-label">Relationship / Label (optional)</label>
+        <input id="trusted-contact-label" name="relationshipLabel" [(ngModel)]="relationshipLabel" maxlength="100" [disabled]="busy()" aria-describedby="trusted-contact-label-help" autocomplete="off">
+        <p id="trusted-contact-label-help" class="help">For example, Parent, Neighbor or Friend. This label grants no authority.</p>
+        <div class="actions">
+          <button type="submit" [disabled]="busy() || !valid()">{{ editing() ? 'Save Trusted Contact' : 'Create Trusted Contact' }}</button>
+          <button type="button" class="button--secondary" [disabled]="busy()" (click)="cancel()">Cancel edit</button>
+        </div>
+      </form>
+    }
+    @if (!contacts().length) { <p>You have no Trusted Contacts yet.</p> }
+    @for (entry of contacts(); track entry.trustedContactId) {
+      <article class="contact-row" aria-label="Trusted Contact">
+        <h3>{{ entry.displayName }}</h3>
+        @if (entry.phoneNumber) { <p>Phone: {{ entry.phoneNumber }}</p> }
+        @if (entry.emailAddress) { <p>Email: {{ entry.emailAddress }}</p> }
+        @if (entry.relationshipLabel) { <p>Relationship / Label: {{ entry.relationshipLabel }}</p> }
+        <div class="actions">
+          <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="edit(entry)">Edit contact</button>
+          <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="removing.set(entry.trustedContactId)">Remove contact</button>
+        </div>
+        @if (removing() === entry.trustedContactId) {
+          <div class="confirmation">
+            <p>Remove {{ entry.displayName }}? Their contact information will be permanently deleted. You cannot restore it.</p>
+            <div class="actions">
+              <button type="button" [disabled]="busy()" (click)="confirmRemoval(entry)">Confirm removal</button>
+              <button type="button" class="button--secondary" [disabled]="busy()" (click)="removing.set(null)">Cancel removal</button>
+            </div>
+          </div>
+        }
+      </article>
+    }
+  }
+</section>

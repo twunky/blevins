@@ -1225,3 +1225,11 @@ These questions are intentionally unresolved and are not requirements.
 - **Location:** Latest accepted point only, browser permission/active-UI limits, bounded minute cadence and honest freshness/failure states. Expiration denies access synchronously; feature cleanup removes raw coordinates. No history, restore, map provider rollout or sibling integrations.
 - **Canonical effect:** REQ-PRIV-031 and REQ-SHARE-011; CTX-1.33 succeeds CTX-1.32 after separate context self-verification. Existing broader concepts remain gated and Check-In rules unchanged.
 - **Authorization:** Create and execute WI-095-006 in this task, including minimum context amendments/baseline. Phase 9.5 stays current; final VERIFYING / OWNER REVIEW, no next item or owner completion. Owner alone performs all Git commits; no staging/push/PR.
+
+## DEC-088 — Private manual Trusted Contacts first slice
+
+- **Date/authority:** 2026-10-05, explicit owner decision resolving the Trusted Contact blocker and continuing implementation.
+- **Decision:** Approve personal manual contact records with no contact Account/Profile/Family links or discovery. REQ-FAM-016 defines name, phone/email, optional descriptive label, owner-scoped duplicate create/edit rules, optimistic concurrency, Family independence and permanent deletion with no feature history/restore.
+- **Privacy:** REQ-PRIV-032 defines owner-only server authorization, no administrator/selected-Family/known-ID override, nondisclosure/no-store and zero downstream access, notifications, membership or Safety Circle enrollment. Future integrations/linking remain separately gated.
+- **Canonical effect:** Update REQ-FAM-014/015, REQ-PRIV-019/024 and glossary/index; add REQ-FAM-016 / REQ-PRIV-032. Earlier DEC-049/059 open questions are resolved only for the approved manual first slice. CTX-1.34 succeeds CTX-1.33 after separate VER-CTX-1.34 PASS / SELF-VERIFIED under this owner authorization.
+- **Authorization:** Create and execute WI-095-007 in this task, including this minimum context successor. Phase 9.5 remains current; final VERIFYING / OWNER REVIEW, no next item or completion on owner's behalf. Owner performs Git commits; no staging/push/PR.

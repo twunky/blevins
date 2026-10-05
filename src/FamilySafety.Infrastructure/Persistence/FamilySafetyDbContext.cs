@@ -1,4 +1,5 @@
 using FamilySafety.Domain.Profiles;
+using FamilySafety.Domain.TrustedContacts;
 using FamilySafety.Domain.CheckIns;
 using FamilySafety.Domain.Sharing;
 using FamilySafety.Domain.FamilyDates;
@@ -16,6 +17,7 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
     : DbContext(options)
 {
     public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<TrustedContact> TrustedContacts => Set<TrustedContact>();
     public DbSet<CheckIn> CheckIns => Set<CheckIn>();
     public DbSet<CheckInRecipient> CheckInRecipients => Set<CheckInRecipient>();
     public DbSet<SharingSession> SharingSessions => Set<SharingSession>();
@@ -68,6 +70,20 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var trustedContact = modelBuilder.Entity<TrustedContact>();
+        trustedContact.ToTable("TrustedContacts", t => t.HasCheckConstraint("CK_TrustedContacts_ContactMethod",
+            "([PhoneNumber] IS NOT NULL AND [NormalizedPhone] IS NOT NULL) OR ([EmailAddress] IS NOT NULL AND [NormalizedEmail] IS NOT NULL)"));
+        trustedContact.HasKey(c => c.Id);
+        trustedContact.Property(c => c.DisplayName).HasMaxLength(TrustedContact.NameLimit).IsRequired();
+        trustedContact.Property(c => c.PhoneNumber).HasMaxLength(TrustedContact.PhoneLimit);
+        trustedContact.Property(c => c.NormalizedPhone).HasMaxLength(16).UseCollation("Latin1_General_100_BIN2");
+        trustedContact.Property(c => c.EmailAddress).HasMaxLength(TrustedContact.EmailLimit);
+        trustedContact.Property(c => c.NormalizedEmail).HasMaxLength(TrustedContact.EmailLimit).UseCollation("Latin1_General_100_BIN2");
+        trustedContact.Property(c => c.RelationshipLabel).HasMaxLength(TrustedContact.LabelLimit);
+        trustedContact.Property(c => c.Version).IsConcurrencyToken();
+        trustedContact.HasIndex(c => new { c.OwnerProfileId, c.NormalizedPhone }).IsUnique().HasFilter("[NormalizedPhone] IS NOT NULL");
+        trustedContact.HasIndex(c => new { c.OwnerProfileId, c.NormalizedEmail }).IsUnique().HasFilter("[NormalizedEmail] IS NOT NULL");
+        trustedContact.HasOne<AdultProfile>().WithMany().HasForeignKey(c => c.OwnerProfileId).OnDelete(DeleteBehavior.Cascade);
         var session = modelBuilder.Entity<SharingSession>();
         session.ToTable("SharingSessions", t => t.HasCheckConstraint("CK_SharingSessions_Duration", "[EndsAtUtc] > [StartedAtUtc] AND [EndsAtUtc] <= DATEADD(hour, 24, [StartedAtUtc])"));
         session.HasKey(s => s.Id);

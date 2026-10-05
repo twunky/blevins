@@ -12,6 +12,8 @@ In `src/app`, `app.ts` and `app.html` still implement Home, Family, Events, Plan
 
 ## Structure and extraction
 
+`trusted-contacts/trusted-contacts` owns WI-095-007 private manual contact list/forms and owner-only requests in Safety. App supplies only the current owner profile; there is no feature Family input/selector, contact profile lookup/link or downstream permission grant. Identity changes cancel pending requests and discard contacts/drafts. Add/edit use owner-scoped duplicate validation and optimistic concurrency; confirmed removal permanently deletes the record.
+
 `family-dates/shared-family-dates` owns WI-095-004 date list/forms, protected requests, server-derived actions and context reset. App supplies the selected Family/profile and retains the rest of the Family experience. Profile birthdays are not copied into date entries.
 
 This is the current rule for organizing `src/app`:

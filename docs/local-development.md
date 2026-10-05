@@ -11,6 +11,12 @@ Default expiration is one hour; chosen expiration must be in the next 24 hours. 
 `SharingSessionMaintenanceService` runs feature-specific raw-point cleanup at startup and every minute outside Testing. Authorization checks expiration and current eligible membership on every read/write, so cleanup timing never grants access. Only non-location session/grant metadata survives. Browser tests mock geolocation; they use the existing isolated SQL harness, never physical device location. Recipient display refreshes every 15 seconds and clears on access/read failure; server revocation is immediate. Browser watch collection pauses on hiding/leaving the sharing UI and requires an explicit re-enable on return.
 
 
+## Manual Trusted Contacts (WI-095-007)
+
+Migration `20261005040757_ManualTrustedContacts` adds one personal owner-profile table with name, phone/email, optional descriptive label, normalized duplicate keys and a concurrency version. Owner-scoped filtered unique indexes prevent duplicates; deleting an owner profile cascades its contacts. There is no contact identity or Family FK, history or retention job. The migration is applied by existing local startup/test workflows; no user database was modified during feature validation.
+
+`/api/trusted-contacts` lists/adds current-adult contacts; `/{contactId}` reads/edits/removes only that adult's records. Missing/denied IDs return the same empty 404 and responses are `no-store`. Updates take `version` in the body, deletes in the query; stale versions return 409 (`ContactChanged`), normalized phone/email collisions return 409 (`DuplicateContact`). Phone accepts 7–15 digits with an optional +/00 international prefix and ordinary separators, up to 32 display characters; no country is guessed for local numbers. Email uses the existing profile validator. Safety contains the manual forms and explicit removal confirmation, with no contact lookup or automatic product sharing.
+
 ## Prerequisites
 
 - Windows with the .NET 10 SDK. The repository pins SDK `10.0.401` in `global.json`.

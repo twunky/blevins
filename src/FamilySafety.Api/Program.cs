@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using FamilySafety.Api.TrustedContacts;
+using FamilySafety.Application.TrustedContacts;
 using FamilySafety.Api.CheckIns;
 using FamilySafety.Api.Sharing;
 using FamilySafety.Application.Sharing;
@@ -38,6 +40,7 @@ var connectionString = builder.Configuration.GetConnectionString("FamilySafety")
 
 builder.Services.AddFamilySafetyInfrastructure(connectionString);
 builder.Services.AddScoped<ICheckInService, CheckInService>();
+builder.Services.AddScoped<TrustedContactService>();
 builder.Services.AddScoped<SharingSessionService>();
 builder.Services.AddScoped<IAdultProfileService, AdultProfileService>();
 builder.Services.AddScoped<IMembershipInvitationService, MembershipInvitationService>();
@@ -70,6 +73,7 @@ var app = builder.Build();
 app.UseExceptionHandler();
 app.MapHealthChecks("/health");
 app.MapCheckInEndpoints();
+app.MapTrustedContactEndpoints();
 app.MapSharingSessionEndpoints();
 app.MapAdultProfileEndpoints();
 app.MapMembershipInvitationEndpoints();

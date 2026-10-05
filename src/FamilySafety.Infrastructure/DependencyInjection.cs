@@ -1,4 +1,5 @@
 using FamilySafety.Application.Directory;
+using FamilySafety.Application.TrustedContacts;
 using FamilySafety.Application.CheckIns;
 using FamilySafety.Application.Sharing;
 using FamilySafety.Application.FamilyDates;
@@ -26,6 +27,7 @@ public static class DependencyInjection
 
         services.AddDbContext<FamilySafetyDbContext>(options => options.UseSqlServer(connectionString));
         services.AddScoped<ICheckInRepository, EfCheckInRepository>();
+        services.AddScoped<ITrustedContactRepository, EfTrustedContactRepository>();
         services.AddScoped<ISharingSessionRepository, EfSharingSessionRepository>();
         services.AddScoped<IAdultProfileRepository, EfAdultProfileRepository>();
         services.AddScoped<IMembershipInvitationRepository, EfMembershipInvitationRepository>();
