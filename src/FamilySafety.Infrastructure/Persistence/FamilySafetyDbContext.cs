@@ -31,6 +31,8 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
 
     public DbSet<FamilyEventAudienceMember> FamilyEventAudienceMembers => Set<FamilyEventAudienceMember>();
     public DbSet<FamilyEventInvitation> FamilyEventInvitations => Set<FamilyEventInvitation>();
+    public DbSet<FamilyEventNeed> FamilyEventNeeds => Set<FamilyEventNeed>();
+    public DbSet<EventNeedResponsibilityChange> EventNeedResponsibilityChanges => Set<EventNeedResponsibilityChange>();
 
     public DbSet<FamilyPlan> FamilyPlans => Set<FamilyPlan>();
 
@@ -82,7 +84,7 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
         familyGroup.Property(entity => entity.CapacityLimit).IsRequired();
 
         var membership = modelBuilder.Entity<FamilyGroupMembership>();
-        membership.ToTable("FamilyGroupMemberships");
+        membership.ToTable("FamilyGroupMemberships", table => table.HasTrigger("TR_EventNeeds_MembershipLoss"));
         membership.HasKey(entity => entity.Id);
         membership.HasIndex(entity => new { entity.AccountId, entity.FamilyGroupId }).IsUnique();
         membership.HasIndex(entity => new { entity.FamilyGroupId, entity.IsActive });
@@ -179,7 +181,7 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         var eventAudienceMember = modelBuilder.Entity<FamilyEventAudienceMember>();
-        eventAudienceMember.ToTable("FamilyEventAudienceMembers");
+        eventAudienceMember.ToTable("FamilyEventAudienceMembers", table => table.HasTrigger("TR_EventNeeds_VisibilityLoss"));
         eventAudienceMember.HasKey(entity => new { entity.EventId, entity.ProfileId });
         eventAudienceMember.Property(entity => entity.CanEdit).HasDefaultValue(false);
         eventAudienceMember.HasOne<FamilyEvent>()
@@ -194,6 +196,7 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
         var eventInvitation = modelBuilder.Entity<FamilyEventInvitation>();
         eventInvitation.ToTable("FamilyEventInvitations", table => table.HasCheckConstraint(
             "CK_FamilyEventInvitations_RsvpStatus", "[RsvpStatus] IN ('Pending', 'Going', 'Maybe', 'NotGoing')"));
+        eventInvitation.ToTable(table => table.HasTrigger("TR_EventNeeds_InvitationEligibility"));
         eventInvitation.HasKey(entity => entity.Id);
         eventInvitation.Property(entity => entity.RsvpStatus).HasConversion<string>().HasMaxLength(16).IsRequired();
         eventInvitation.Property(entity => entity.Version).IsConcurrencyToken();
@@ -206,6 +209,33 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
             .OnDelete(DeleteBehavior.Restrict);
         eventInvitation.HasOne<AdultProfile>().WithMany().HasForeignKey(entity => entity.InviteeProfileId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        var need = modelBuilder.Entity<FamilyEventNeed>();
+        need.ToTable("FamilyEventNeeds", table =>
+        {
+            table.HasCheckConstraint("CK_EventNeeds_Status", "[Status] IN ('Open', 'Claimed', 'Assigned', 'Completed')");
+            table.HasCheckConstraint("CK_EventNeeds_Responsibility", "([Status] = 'Open' AND [ResponsibleProfileId] IS NULL) OR ([Status] <> 'Open' AND [ResponsibleProfileId] IS NOT NULL)");
+            table.HasCheckConstraint("CK_EventNeeds_Category", "[Category] IS NULL OR [Category] IN ('Food', 'Supplies', 'Help', 'Transport', 'Other')");
+        });
+        need.HasKey(n => n.Id);
+        need.Property(n => n.Title).HasMaxLength(200).IsRequired();
+        need.Property(n => n.Detail).HasMaxLength(1000);
+        need.Property(n => n.Status).HasConversion<string>().HasMaxLength(16);
+        need.Property(n => n.Category).HasConversion<string>().HasMaxLength(16);
+        need.Property(n => n.Version).IsConcurrencyToken();
+        need.HasIndex(n => new { n.EventId, n.ResponsibleProfileId, n.Status });
+        need.HasOne<FamilyEvent>().WithMany().HasForeignKey(n => n.EventId).OnDelete(DeleteBehavior.Restrict);
+        need.HasOne<AdultProfile>().WithMany().HasForeignKey(n => n.ResponsibleProfileId).OnDelete(DeleteBehavior.Restrict);
+
+        var change = modelBuilder.Entity<EventNeedResponsibilityChange>();
+        change.ToTable("EventNeedResponsibilityChanges");
+        change.HasKey(c => c.Id);
+        change.Property(c => c.PriorStatus).HasConversion<string>().HasMaxLength(16);
+        change.Property(c => c.Status).HasConversion<string>().HasMaxLength(16);
+        change.Property(c => c.Reason).HasMaxLength(40).IsRequired();
+        change.HasIndex(c => new { c.NeedId, c.OccurredAtUtc });
+        change.HasOne<FamilyEventNeed>().WithMany().HasForeignKey(c => c.NeedId).OnDelete(DeleteBehavior.Cascade);
+        change.HasOne<AdultProfile>().WithMany().HasForeignKey(c => c.ProfileId).OnDelete(DeleteBehavior.Restrict);
 
         var familyPlan = modelBuilder.Entity<FamilyPlan>();
         familyPlan.ToTable("FamilyPlans");

@@ -1,0 +1,98 @@
+<section class="card needs" aria-labelledby="event-needs-heading">
+  <div class="card-header"><h2 id="event-needs-heading">Event Needs</h2></div>
+  @if (message()) { <p class="message message--success" role="status">{{ message() }}</p> }
+  @if (error()) { <p class="message message--error" role="alert">{{ error() }}</p> }
+  @if (status() === 'loading') {
+    <p role="status">Loading Needs…</p>
+  } @else if (status() === 'error') {
+    <p role="alert">Needs could not be loaded. Please try again.</p>
+    <button type="button" class="button--secondary" (click)="refresh()">Retry loading Needs</button>
+  } @else if (status() === 'unavailable') {
+    <p>Event Needs are currently unavailable.</p>
+    <button type="button" class="button--secondary" (click)="refresh()">Refresh Needs</button>
+  } @else if (data(); as view) {
+    <p class="help">Simple responsibilities for this Event. Assignments are requests pending acceptance.</p>
+    <button type="button" class="button--secondary" [disabled]="busy()" (click)="refresh()">Refresh Needs</button>
+    @if (!view.needs.length) { <p>No Needs have been added.</p> }
+    @for (need of view.needs; track need.needId) {
+      <article class="need-row" [attr.aria-label]="need.title">
+        <div class="item-row"><strong>{{ need.title }}</strong><span class="status-pill">{{ need.status }}</span></div>
+        @if (need.category) { <p class="help">{{ need.category }}</p> }
+        @if (need.detail) { <p>{{ need.detail }}</p> }
+        @if (need.isResponsible) {
+          <p>{{ need.status === 'Assigned' ? 'You have a pending assignment. Accept or decline below.' : need.status === 'Completed' ? 'You were responsible for this completed Need.' : 'You claimed this Need.' }}</p>
+        } @else if (need.responsibleName) {
+          <p>{{ need.responsibleName }}{{ need.status === 'Assigned' ? ' — acceptance pending' : ' — ' + need.status }}</p>
+        } @else if (need.status === 'Assigned') { <p>Acceptance pending.</p> }
+        <div class="actions">
+          @if (need.status === 'Open' && view.canParticipate) {
+            <button type="button" [disabled]="busy() || needsRefresh()" (click)="act(need, 'claim')">Claim Need</button>
+          }
+          @if (need.isResponsible && view.canParticipate && need.status === 'Claimed') {
+            <button type="button" class="button--secondary" [disabled]="busy() || needsRefresh()" (click)="act(need, 'release')">Release Need</button>
+          }
+          @if (need.isResponsible && view.canParticipate && need.status === 'Assigned') {
+            <button type="button" [disabled]="busy() || needsRefresh()" (click)="act(need, 'accept')">Accept assignment</button>
+            <button type="button" class="button--secondary" [disabled]="busy() || needsRefresh()" (click)="act(need, 'decline')">Decline assignment</button>
+          }
+          @if ((view.canManage || (need.isResponsible && view.canParticipate)) && (need.status === 'Claimed' || need.status === 'Assigned')) {
+            <button type="button" [disabled]="busy() || needsRefresh()" (click)="completing.set(need.needId)">Complete Need</button>
+          }
+          @if (view.canManage) {
+            <button type="button" class="button--secondary" [disabled]="busy() || needsRefresh()" (click)="edit(need)">Edit Need</button>
+            <button type="button" class="button--secondary" [disabled]="busy() || needsRefresh()" (click)="removing.set(need.needId)">Remove Need</button>
+          }
+        </div>
+        @if (view.canManage && need.status === 'Open' && view.eligibleParticipants.length) {
+          <div class="assignment">
+            <label [for]="'assignee-' + need.needId">Ask a participant to take this Need</label>
+            <select [id]="'assignee-' + need.needId" [(ngModel)]="assignees[need.needId]" [disabled]="busy() || needsRefresh()">
+              <option value="">Choose participant</option>
+              @for (person of view.eligibleParticipants; track person.profileId) { <option [value]="person.profileId">{{ person.displayName }}</option> }
+            </select>
+            <button type="button" [disabled]="busy() || needsRefresh() || !assignees[need.needId]" (click)="act(need, 'assign')">Request assignment</button>
+          </div>
+        }
+        @if (completing() === need.needId) {
+          <div class="confirmation">
+            <p>Mark “{{ need.title }}” completed? Completed responsibility stays recorded.</p>
+            <button type="button" [disabled]="busy() || needsRefresh()" (click)="act(need, 'complete')">Confirm complete</button>
+            <button type="button" class="button--secondary" [disabled]="busy()" (click)="completing.set(null)">Cancel</button>
+          </div>
+        }
+        @if (removing() === need.needId) {
+          <div class="confirmation">
+            <p>Remove “{{ need.title }}” and its responsibility history?</p>
+            <button type="button" [disabled]="busy() || needsRefresh()" (click)="act(need, 'remove')">Confirm remove</button>
+            <button type="button" class="button--secondary" [disabled]="busy()" (click)="removing.set(null)">Cancel</button>
+          </div>
+        }
+        @if (need.history.length) {
+          <details><summary>Responsibility history</summary>
+            <ul>@for (change of need.history; track $index) {
+              <li>{{ change.profileId === ownProfileId ? 'You' : change.displayName }} — {{ reason(change.reason) }} ({{ change.occurredAtUtc | date:'medium' }})</li>
+            }</ul>
+          </details>
+        }
+      </article>
+    }
+    @if (view.canManage) {
+      <form (ngSubmit)="save()">
+        <h3>{{ editing() ? 'Edit Need' : 'Add a Need' }}</h3>
+        <label for="need-title">Need title</label>
+        <input id="need-title" name="title" [(ngModel)]="title" required maxlength="200" [disabled]="busy() || needsRefresh()" />
+        <label for="need-detail">Short detail (optional)</label>
+        <textarea id="need-detail" name="detail" [(ngModel)]="detail" maxlength="1000" [disabled]="busy() || needsRefresh()"></textarea>
+        <label for="need-category">Category (optional)</label>
+        <select id="need-category" name="category" [(ngModel)]="category" [disabled]="busy() || needsRefresh()">
+          <option value="">No category</option>
+          @for (value of categories; track value) { <option [value]="value">{{ value }}</option> }
+        </select>
+        <div class="actions">
+          <button type="submit" [disabled]="busy() || needsRefresh() || !title.trim()">{{ editing() ? 'Save Need' : 'Add Need' }}</button>
+          @if (editing()) { <button type="button" class="button--secondary" [disabled]="busy()" (click)="cancelEdit()">Cancel edit</button> }
+        </div>
+      </form>
+    }
+  }
+</section>

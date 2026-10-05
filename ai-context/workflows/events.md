@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL WORKFLOW
-Context-Baseline: CTX-1.30
-Version: 1.4
-Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-051; DEC-058; DEC-083
+Context-Baseline: CTX-1.31
+Version: 1.5
+Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-051; DEC-058; DEC-083; DEC-084
 Constrained-By:
   - ../core/product-contract.md
   - ../core/ux-contract.md
@@ -69,6 +69,8 @@ An Event Need is one lightweight coordination item with a required title, option
 A Need is Open when no one is responsible. An eligible invited in-system participant may voluntarily claim an Open Need, making it Claimed. The organizer may ask an eligible invited participant to take an Open Need, making it Assigned; Assigned is a request pending that person's explicit acceptance or decline, not forced consent, and the experience must communicate that pending acceptance. A Claimed or Assigned Need may become Completed. Release or decline returns it to Open. The organizer may create, edit, cancel/remove, assign, and mark a Need complete when appropriate. An eligible participant may claim an Open Need, release their own claim, accept/retain or decline/release their own assignment, and mark their own responsibility complete. Event detail editors do not automatically manage Needs; Need-manager delegation is deferred.
 
 Claiming and organizer assignment require an active invitation, authorized Event visibility, eligible active membership, and RSVP Pending, Going, or Maybe. A person with RSVP Not Going may not take a new Need. When a responsible person changes RSVP to Not Going, or loses eligibility through invitation revocation, Event visibility loss, or eligible membership loss, any Need they hold as Claimed or Assigned automatically returns to Open without being completed or deleted. Prior responsibility, prior person, release reason, and release time remain in history/provenance. Later restored access or a new invitation does not restore responsibility automatically; normal claim or assignment is required. Need responsibility grants no broader Event or private-data access.
+
+Need state and named current/historical responsibility disclosure follow `REQ-PRIV-029`.
 
 ### REQ-EVT-012
 

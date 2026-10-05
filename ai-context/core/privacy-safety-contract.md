@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.30
-Version: 1.21
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083
+Context-Baseline: CTX-1.31
+Version: 1.22
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084
 ---
 
 # Privacy and Safety Contract
@@ -335,6 +335,12 @@ Invitation and RSVP reads and writes require current server-authorized Event vis
 While retaining current Event access and active membership, the sole organizer under `REQ-EVT-009` may see invitation identity, invited person, unrevoked (active) or revoked state, and current RSVP, including retained revoked records. The eligible invited adult may read only their own invitation and RSVP; a retained revoked record is historical and never actionable. Other Event viewers and Event detail editors receive no named invitation/RSVP information. Detail edit permission provides neither invitation management nor additional RSVP visibility; an editor sees their own invitation only if independently invited and eligible. Family Administrator status grants no override.
 
 If the organizer loses current Event access or active membership, they cannot read organizer invitation data, issue, or revoke invitations. Being the original creator in client state supplies no authority. Independently eligible invitees with unrevoked invitations may continue reading and updating their own RSVP; organizer access loss does not freeze or revoke all invitations. These rules add no authority over Needs, Updates, location, Sharing Sessions, Plans, or Trips. Historical retention under `REQ-EVT-014` does not weaken current privacy or authorization.
+
+## Event Need responsibility privacy
+
+### REQ-PRIV-029
+
+Need state is visible to the current authorized Event audience. Responsible/proposed-assignee identity is disclosed only to the currently authorized organizer and that person themselves. Other viewers, editors, invited/eligible participants, and Family Administrators see state without another person's profile or name. The same restriction applies to Completed responsibility and normal historical/provenance projections: organizer may see named history; a person may see only their own named history. Stored provenance may retain identities required by REQ-EVT-011; there is no public responsibility-history feed. Server projections enforce disclosure before sending data. This supplements REQ-PRIV-028 without changing invitation/RSVP visibility. Current Event access and active membership remain required; responsibility/history supplies no alternate access path.
 
 ## Safety information invariants
 

@@ -101,6 +101,7 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-PRIV-026` | Safety Incident access, lineage, retention, audit, and backup privacy | `privacy-safety-contract.md#req-priv-026` | `APPROVED` | `CTX-1.26` | — |
 | `REQ-PRIV-027` | Item URLs, navigation, and selected Family are not authorization; nondisclosing unavailable result | `privacy-safety-contract.md#req-priv-027` | `APPROVED` | `CTX-1.27` | — |
 | `REQ-PRIV-028` | Event invitation eligibility, same-profile restoration, and named RSVP privacy | `privacy-safety-contract.md#req-priv-028` | `APPROVED` | `CTX-1.30` | — |
+| `REQ-PRIV-029` | Actor-aware Event Need responsibility identity disclosure | `privacy-safety-contract.md#req-priv-029` | `APPROVED` | `CTX-1.31` | — |
 
 ## Family and profiles
 

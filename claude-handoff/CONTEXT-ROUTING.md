@@ -6,7 +6,7 @@ Read [AI operating rules](../ai-context/README.md) and [project status](../ai-co
 
 | If working on | Read |
 |---|---|
-| Events | [Events workflow](../ai-context/workflows/events.md); [privacy contract](../ai-context/core/privacy-safety-contract.md), especially REQ-PRIV-020/021/023/027/028. First invitation/self-RSVP scope: REQ-EVT-014. |
+| Events | [Events workflow](../ai-context/workflows/events.md); [privacy contract](../ai-context/core/privacy-safety-contract.md), especially REQ-PRIV-020/021/023/027/028/029. Invitation/self-RSVP: REQ-EVT-014; Needs: REQ-EVT-011. |
 | Plans | [Plans & Trips workflow](../ai-context/workflows/plans-trips.md), REQ-PLAN-* including REQ-PLAN-007; relevant privacy anchors. |
 | Trips | [Plans & Trips workflow](../ai-context/workflows/plans-trips.md), REQ-TRIP-*; relevant Trip privacy anchors. |
 | Family, profiles, membership, administration | [Product contract](../ai-context/core/product-contract.md), REQ-FAM-*; [privacy contract](../ai-context/core/privacy-safety-contract.md), especially REQ-PRIV-011/012. |

@@ -1195,3 +1195,10 @@ These questions are intentionally unresolved and are not requirements.
 - **Affected context:** `workflows/events.md`, `core/privacy-safety-contract.md`, `core/requirements-index.md`, `planning/stories/WI-095-001-event-invitations-and-rsvp.md`, `planning/candidates/CTX-1.30-event-invitations-and-rsvp.md`, `planning/verification/VER-CTX-1.30.md`, README, project-status, roadmap, and current handoff summaries.
 - **Supersedes:** Only Phase 9.5 readiness/current-state routing once verified activation occurs. No historical closure or prior requirement is superseded.
 - **Approved by:** Explicit owner APPROVED CONTEXT / GOVERNANCE PREPARATION instruction dated 2026-10-04.
+
+## DEC-084 — Event Needs responsibility privacy and execution
+
+- **Status/date:** ACCEPTED — explicit owner decision, 2026-10-04.
+- **Canonical effect:** REQ-PRIV-029 records actor-aware responsibility identity disclosure; REQ-EVT-011 references it. CTX-1.31 succeeds CTX-1.30 after concise self-verification.
+- **Authorization:** Create and execute WI-095-002 — Event Needs under existing canonical transitions/eligibility and the approved privacy rule. No Event Updates or sibling capability. Owner performs all Git commits.
+- **Activation:** CTX-1.31 ACTIVE after VER-CTX-1.31 PASS / SELF-VERIFIED. WI-095-002 IN_PROGRESS, execution YES. Leave VERIFYING / OWNER REVIEW after implementation; no owner completion inferred.

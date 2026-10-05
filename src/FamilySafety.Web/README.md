@@ -4,7 +4,7 @@ Angular browser client for the Family Safety, Coordination & Planning applicatio
 
 The client provides Home, Family and Family Settings, Events, Plans & Trips, Safety, and Me / Settings. It includes the implemented invitation, Concern, and Safety Incident screens within those areas.
 
-In `src/app`, `app.ts` and `app.html` still implement Home, Family, Events, Plans, Me / Settings, and first use. Standalone feature code lives in `concerns/`, `incidents/`, `trips/`, `safety/`, and `plans-trips/`; navigation and cross-feature item routing remain at the app root. `events/event-participation` owns only WI-095-001 invitation/self-RSVP UI and protected requests. App supplies an already authorized Event and retains Event create/detail/edit, dashboard discovery, and authorize-first routing/Family adoption.
+In `src/app`, `app.ts` and `app.html` still implement Home, Family, Events, Plans, Me / Settings, and first use. Standalone feature code lives in `concerns/`, `incidents/`, `trips/`, `safety/`, and `plans-trips/`; navigation and cross-feature item routing remain at the app root. `events/event-participation` owns WI-095-001 invitation/self-RSVP UI and protected requests; `events/event-needs` owns WI-095-002 Need UI and protected requests, refreshing after participation changes. App supplies an already authorized Event and retains Event create/detail/edit, dashboard discovery, and authorize-first routing/Family adoption.
 
 ## Structure and extraction
 

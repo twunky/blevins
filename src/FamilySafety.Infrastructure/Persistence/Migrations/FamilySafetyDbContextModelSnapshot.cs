@@ -267,6 +267,45 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.ToTable("ConcernParticipantGrants", (string)null);
                 });
 
+            modelBuilder.Entity("FamilySafety.Domain.Events.EventNeedResponsibilityChange", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("NeedId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("OccurredAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("PriorStatus")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfileId");
+
+                    b.HasIndex("NeedId", "OccurredAtUtc");
+
+                    b.ToTable("EventNeedResponsibilityChanges", (string)null);
+                });
+
             modelBuilder.Entity("FamilySafety.Domain.Events.FamilyEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -323,7 +362,12 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProfileId");
 
-                    b.ToTable("FamilyEventAudienceMembers", (string)null);
+                    b.ToTable("FamilyEventAudienceMembers", null, t =>
+                        {
+                            t.HasTrigger("TR_EventNeeds_VisibilityLoss");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("FamilySafety.Domain.Events.FamilyEventInvitation", b =>
@@ -369,7 +413,67 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
 
                     b.ToTable("FamilyEventInvitations", null, t =>
                         {
+                            t.HasTrigger("TR_EventNeeds_InvitationEligibility");
+
                             t.HasCheckConstraint("CK_FamilyEventInvitations_RsvpStatus", "[RsvpStatus] IN ('Pending', 'Going', 'Maybe', 'NotGoing')");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Events.FamilyEventNeed", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Detail")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ResponsibleProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ResponsibleProfileId");
+
+                    b.HasIndex("EventId", "ResponsibleProfileId", "Status");
+
+                    b.ToTable("FamilyEventNeeds", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_EventNeeds_Category", "[Category] IS NULL OR [Category] IN ('Food', 'Supplies', 'Help', 'Transport', 'Other')");
+
+                            t.HasCheckConstraint("CK_EventNeeds_Responsibility", "([Status] = 'Open' AND [ResponsibleProfileId] IS NULL) OR ([Status] <> 'Open' AND [ResponsibleProfileId] IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_EventNeeds_Status", "[Status] IN ('Open', 'Claimed', 'Assigned', 'Completed')");
                         });
                 });
 
@@ -995,7 +1099,12 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("FamilyGroupId", "IsActive");
 
-                    b.ToTable("FamilyGroupMemberships", (string)null);
+                    b.ToTable("FamilyGroupMemberships", null, t =>
+                        {
+                            t.HasTrigger("TR_EventNeeds_MembershipLoss");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("FamilySafety.Domain.Profiles.MembershipInvitation", b =>
@@ -1353,6 +1462,21 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("FamilySafety.Domain.Events.EventNeedResponsibilityChange", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Events.FamilyEventNeed", null)
+                        .WithMany()
+                        .HasForeignKey("NeedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("FamilySafety.Domain.Events.FamilyEvent", b =>
                 {
                     b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
@@ -1396,6 +1520,20 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                         .HasForeignKey("InviteeProfileId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Events.FamilyEventNeed", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Events.FamilyEvent", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("ResponsibleProfileId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("FamilySafety.Domain.Incidents.IncidentCoordinatorChange", b =>

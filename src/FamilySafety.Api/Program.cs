@@ -36,6 +36,7 @@ builder.Services.AddScoped<IMembershipInvitationService, MembershipInvitationSer
 builder.Services.AddScoped<IFamilyDirectoryService, FamilyDirectoryService>();
 builder.Services.AddScoped<IFamilyEventService, FamilyEventService>();
 builder.Services.AddScoped<IEventInvitationService, EventInvitationService>();
+builder.Services.AddScoped<IEventNeedService, EventNeedService>();
 builder.Services.AddScoped<IFamilyPlanService, FamilyPlanService>();
 builder.Services.AddScoped<IFamilyTripService, FamilyTripService>();
 builder.Services.AddScoped<IFamilyTripNoteService, FamilyTripNoteService>();
@@ -61,6 +62,7 @@ app.MapMembershipInvitationEndpoints();
 app.MapFamilyDirectoryEndpoints();
 app.MapFamilyEventEndpoints();
 app.MapEventInvitationEndpoints();
+app.MapEventNeedEndpoints();
 app.MapFamilyPlanEndpoints();
 app.MapFamilyTripEndpoints();
 app.MapFamilyTripNoteEndpoints();
