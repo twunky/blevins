@@ -1,6 +1,6 @@
 # Phase 10 — Testing & Verification / User-Testability Readiness
 
-CURRENT / IN PROGRESS under DEC-093, 2026-10-05. Baseline CTX-1.37 remains APPROVED / ACTIVE. First item: [WI-010-001](stories/WI-010-001-post-9-5-user-testability-baseline.md) COMPLETE / PASS — OWNER APPROVED; [verification](verification/VER-WI-010-001.md) COMPLETE / PASS. [WI-010-002](stories/WI-010-002-connected-everyday-coordination-verification.md) VERIFYING / OWNER REVIEW under explicit owner authorization, 2026-10-05. No WI-010-003 authorized.
+CURRENT / IN PROGRESS under DEC-093, 2026-10-05. Baseline CTX-1.37 remains APPROVED / ACTIVE. First item: [WI-010-001](stories/WI-010-001-post-9-5-user-testability-baseline.md) COMPLETE / PASS — OWNER APPROVED; [verification](verification/VER-WI-010-001.md) COMPLETE / PASS. [WI-010-002](stories/WI-010-002-connected-everyday-coordination-verification.md) COMPLETE / PASS — OWNER APPROVED, accepted 2026-10-05. Next work item: NONE AUTHORIZED. No WI-010-003 authorized.
 
 ## Boundary and exits
 
