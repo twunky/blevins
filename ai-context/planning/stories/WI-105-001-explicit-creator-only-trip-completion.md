@@ -2,7 +2,8 @@
 
 ## Metadata and authority
 
-- **Status:** VERIFYING / OWNER REVIEW; implementation and verification ready, not COMPLETE.
+- **Status:** COMPLETE / PASS — OWNER APPROVED.
+- **Owner acceptance:** Explicit closure approval, 2026-10-06; implementation/test/context changes already manually committed by the owner. No next implementation is authorized.
 - **Phase:** 10.5 — MVP Functional Completion; Phase 10 stays CURRENT / IN PROGRESS.
 - **Context baseline:** CTX-1.38, narrow successor to CTX-1.37 under DEC-094 and explicit owner request, 2026-10-06.
 - **Model tier:** DEEP (privacy/creator authorization).
@@ -54,4 +55,4 @@ No reopen/undo/archive/delete, broad filters/history, lifecycle framework/state 
 
 ## Evidence / verification
 
-[VER-WI-105-001](../verification/VER-WI-105-001.md), SELF-VERIFIED; acceptance checks PASS after the documented targeted test corrections. Exit is VERIFYING / OWNER REVIEW; no owner acceptance inferred.
+[VER-WI-105-001](../verification/VER-WI-105-001.md) COMPLETE / PASS; technical evidence remains SELF-VERIFIED. Owner explicitly accepted the implementation and recorded validation, including the original SQL broad result of 371/372 and the corrected historical fixture's passing targeted rerun as sufficient isolated validation. Closure performs documentation/governance checks only; no application validation rerun.

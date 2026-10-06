@@ -16,7 +16,7 @@ Approved phase status and remaining gates. The [project checkpoint](../project-s
 | Phase 9 | Integration & UX Refinement | `COMPLETE / CLOSED` |
 | Phase 9.5 | MVP Feature Completion | `COMPLETE / CLOSED` under DEC-092 |
 | Phase 10 | Testing & Verification / User-Testability Readiness | `CURRENT / IN PROGRESS` under DEC-093 |
-| Phase 10.5 | MVP Functional Completion | `APPROVED / NEXT IMPLEMENTATION PRIORITY` under DEC-094 |
+| Phase 10.5 | MVP Functional Completion | `ACTIVE / IN PROGRESS` under DEC-094 |
 | Phase 11 | Pilot & Release Readiness | `FUTURE` |
 
 ## Phase 9.5 — MVP Feature Completion
@@ -50,15 +50,15 @@ Exit gates: critical adult journeys understandable and completable without unrea
 
 ## Phase 10.5 — MVP Functional Completion
 
-APPROVED / NEXT IMPLEMENTATION PRIORITY under [DEC-094](../decision-log.md#dec-094--establish-phase-105-mvp-functional-completion), 2026-10-06. Inserted between Phase 10 and Phase 11 using the decimal-phase precedent (DEC-062/073); historical phases retain their numbers and meanings. Phase 10 remains CURRENT / IN PROGRESS for verification/readiness. Phase 10.5 functional work precedes resumption of its deferred human-validation gate; numerical placement does not require Phase 10 closure before functional development.
+ACTIVE / IN PROGRESS under [DEC-094](../decision-log.md#dec-094--establish-phase-105-mvp-functional-completion), 2026-10-06. Inserted between Phase 10 and Phase 11 using the decimal-phase precedent (DEC-062/073); historical phases retain their numbers and meanings. Phase 10 remains CURRENT / IN PROGRESS for verification/readiness. Phase 10.5 functional work precedes resumption of its deferred human-validation gate; numerical placement does not require Phase 10 closure before functional development.
 
-Purpose: close only the minimum remaining owner-selected functional MVP lifecycle gaps. Expected candidates are Explicit Creator-Only Trip Completion, Bounded Plan Activity/Timing Correction, and Final Functional MVP Readiness Review. No work items are created by this governance decision. The authorized functional item is `WI-105-001 — Explicit Creator-Only Trip Completion`, created and VERIFYING / OWNER REVIEW under the explicit owner scope and DEC-094, with canonical reconciliation active before execution. Plan correction and final review require separately approved scope and authorization; no general Plan lifecycle/completion is authorized.
+Purpose: close only the minimum remaining owner-selected functional MVP lifecycle gaps. Expected candidates are Explicit Creator-Only Trip Completion, Bounded Plan Activity/Timing Correction, and Final Functional MVP Readiness Review. No work items are created by this governance decision. First delivered item: [WI-105-001 — Explicit Creator-Only Trip Completion](stories/WI-105-001-explicit-creator-only-trip-completion.md) COMPLETE / PASS — OWNER APPROVED; [verification](verification/VER-WI-105-001.md) COMPLETE / PASS, technical evidence SELF-VERIFIED, accepted 2026-10-06. Next implementation NONE AUTHORIZED. Plan correction and final review require separately approved scope and authorization; no general Plan lifecycle/completion is authorized.
 
 Numbering follows `WI-075` / `WI-095` for decimal phases and DEC-093 for whole phases: Phase 10.5 uses `WI-105-###`. This roadmap owns phase scope and exit gates; no separate phase record or initial WI is required to establish it.
 
 Exit/human-resumption gates: required functional work owner-approved complete, no known blocking functional defect, and an accepted final functional readiness review. Only then may WI-010-004 Stage B facilitated adult validation resume using approved Stage A preparation; no observations are requested now. Phase closure and human-result acceptance remain owner decisions.
 
-DEC-092's broader/contextual Sharing Sessions, broader notifications and additional Check-In integrations/reminders remain deferred. Exclude child/minor support, production authentication, invitation delivery infrastructure, hosting/deployment, backup/restore, production observability, physical-device GPS validation, general Event completion and generic lifecycle/state-machine architecture. Phase 9.5 stays closed; Phase 11 retains its separate pilot/release boundary. CTX-1.38 is active under DEC-094 for the narrow Trip completion reconciliation; CTX-1.37 remains the historical closure baseline. WI-105-001 is VERIFYING / OWNER REVIEW under the explicit owner implementation request.
+DEC-092's broader/contextual Sharing Sessions, broader notifications and additional Check-In integrations/reminders remain deferred. Exclude child/minor support, production authentication, invitation delivery infrastructure, hosting/deployment, backup/restore, production observability, physical-device GPS validation, general Event completion and generic lifecycle/state-machine architecture. Phase 9.5 stays closed; Phase 11 retains its separate pilot/release boundary. CTX-1.38 is active under DEC-094 for the narrow Trip completion reconciliation; CTX-1.37 remains the historical closure baseline. WI-105-001 is owner-approved complete; Phase 10.5 remains ACTIVE / IN PROGRESS, not closed.
 
 ## Later phases
 
