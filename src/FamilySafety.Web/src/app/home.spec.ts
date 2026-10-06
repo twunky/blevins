@@ -93,7 +93,7 @@ describe('Home and feature empty states', () => {
     expect(root.querySelector('h1')?.textContent?.trim()).toMatch(/^Good (morning|afternoon|evening), Alex!$/);
     expect(root.querySelector('.home-title')?.textContent).toContain("Here's what's happening with Family A today.");
     expect(root.querySelector('.home-title')?.textContent).toContain('View Family');
-    expect(card('home-attention-heading').textContent).toContain('Nothing needs your attention right now.');
+    expect(card('home-attention-heading').textContent).toContain('No pending RSVPs or relationship suggestions.');
     for (const [heading, title, area] of [['home-events-heading', 'Upcoming Events', 'Events'],
       ['home-trips-heading', 'Trips', 'Trips'], ['home-plans-heading', 'Plans you can see', 'Plans']]) {
       expect(card(heading).querySelector('h2')?.textContent?.trim()).toBe(title);
@@ -106,7 +106,7 @@ describe('Home and feature empty states', () => {
     expect(root.textContent).not.toContain('needs attention');
   });
 
-  it('reserves Family Updates and Tasks as placeholders and loads the authorized active-sharing indicator', async () => {
+  it('links data-free discovery cards to existing areas and loads the authorized active-sharing indicator', async () => {
     const harness = await visit('/home');
     initial([family]);
     familyReads();
@@ -116,9 +116,11 @@ describe('Home and feature empty states', () => {
     const placeholders = Array.from(root.querySelectorAll<HTMLElement>('.home-grid .home-future'));
     expect(placeholders.map(section => section.querySelector('h2')?.textContent?.trim()))
       .toEqual(['Recent Family Updates', 'My Tasks']);
+    expect(placeholders[0].textContent).toContain('A Family activity feed is not available here.');
+    expect(Array.from(placeholders[0].querySelectorAll('a')).map(link => link.getAttribute('href'))).toEqual(['/events', '/safety']);
+    expect(placeholders[1].querySelector('.home-future-note')?.textContent).toMatch(/will appear here as/);
     for (const section of placeholders) {
-      expect(section.querySelector('.home-future-note')?.textContent).toMatch(/will appear here (as|when)/);
-      expect(section.querySelectorAll('button, a, input, img, li, .avatar')).toHaveLength(0);
+      expect(section.querySelectorAll('button, input, img, li, .avatar')).toHaveLength(0);
       expect(section.textContent).not.toMatch(/\d|Coming later|Phase|roadmap/i);
     }
     http.expectOne('/api/sharing-sessions/mine').flush([]);
@@ -179,7 +181,7 @@ describe('Home and feature empty states', () => {
       .toEqual([['Trip One', '/trips/t-1'], ['Trip Two', '/trips/t-2'], ['Trip Three', '/trips/t-3']]);
     expect(Array.from(root.querySelectorAll('.home-dashboard button')).map(button => button.textContent?.trim()))
       .toEqual(['View Family', 'Review in Family', 'View all', 'View all', 'View all', 'Open Concerns', 'Open Incidents']);
-    expect(root.querySelectorAll('.home-dashboard a')).toHaveLength(9);
+    expect(root.querySelectorAll('.home-preview-list a')).toHaveLength(9);
     expect(root.textContent).toContain('Family relationship suggestion to respond to');
     expect(root.textContent).not.toContain('Creator Trip Outside Family');
     expect(root.textContent).not.toContain('nothing else');
@@ -320,7 +322,7 @@ describe('Home and feature empty states', () => {
     retry('Retry loading relationships')!.click();
     http.expectOne(relationshipsUrl).flush([]);
     harness.detectChanges();
-    expect(root.textContent).toContain('Nothing needs your attention right now.');
+    expect(root.textContent).toContain('No pending RSVPs or relationship suggestions.');
     expect(retry('Retry loading relationships')).toBeUndefined();
   });
 

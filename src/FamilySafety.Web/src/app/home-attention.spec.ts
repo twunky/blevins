@@ -59,7 +59,7 @@ describe('Home pending RSVP attention (WI-095-009)', () => {
     const harness = await open();
     relationships();
     expect(card(harness).textContent).toContain('Checking pending Event invitations');
-    expect(card(harness).textContent).not.toContain('Nothing needs your attention');
+    expect(card(harness).textContent).not.toContain('No pending RSVPs or relationship suggestions');
     http.expectOne(pendingUrl()).flush([invitation]);
     const attention = card(harness);
     expect(attention.textContent).toContain('RSVP needed');
@@ -72,12 +72,12 @@ describe('Home pending RSVP attention (WI-095-009)', () => {
   it('keeps RSVP and relationship attention together without showing premature all-clear', async () => {
     const harness = await open();
     http.expectOne(pendingUrl()).flush([invitation]);
-    expect(card(harness).textContent).not.toContain('Nothing needs your attention');
+    expect(card(harness).textContent).not.toContain('No pending RSVPs or relationship suggestions');
     relationships(familyA, [{ relationshipId: 'r', status: 'Pending', isCurrentUserRecipient: true }]);
     expect(card(harness).textContent).toContain('Relationship suggestion');
     expect(card(harness).textContent).toContain(invitation.name);
     expect(card(harness).textContent).toContain('2 items');
-    expect(card(harness).textContent).not.toContain('Nothing needs your attention');
+    expect(card(harness).textContent).not.toContain('No pending RSVPs or relationship suggestions');
     const retry = harness.routeNativeElement!.querySelector<HTMLButtonElement>('.attention-row button')!;
     expect(retry.textContent).toContain('Review in Family');
   });
@@ -88,7 +88,7 @@ describe('Home pending RSVP attention (WI-095-009)', () => {
     http.match(request => request.url !== pendingUrl()).forEach(request => request.flush([]));
     http.expectOne(pendingUrl()).flush({}, { status: 503, statusText: 'Unavailable' });
     expect(card(harness).querySelector('[role="alert"]')?.textContent).toContain('could not be loaded');
-    expect(card(harness).textContent).not.toContain('Nothing needs your attention');
+    expect(card(harness).textContent).not.toContain('No pending RSVPs or relationship suggestions');
     http.expectOne('/api/sharing-sessions/mine').flush([]);
     card(harness).querySelector<HTMLButtonElement>('button')!.click();
     expect(card(harness).textContent).toContain('Checking pending Event invitations');
@@ -114,7 +114,7 @@ describe('Home pending RSVP attention (WI-095-009)', () => {
     expect(delayed.cancelled).toBe(true);
     relationships();
     http.expectOne(pendingUrl()).flush([]);
-    expect(card(harness).textContent).toContain('Nothing needs your attention');
+    expect(card(harness).textContent).toContain('No pending RSVPs or relationship suggestions');
   });
 
   it('rereads live state on return to Home and removes a resolved invitation', async () => {
@@ -130,6 +130,6 @@ describe('Home pending RSVP attention (WI-095-009)', () => {
     relationships();
     http.expectOne(pendingUrl()).flush([]);
     expect(card(harness).textContent).not.toContain(invitation.name);
-    expect(card(harness).textContent).toContain('Nothing needs your attention');
+    expect(card(harness).textContent).toContain('No pending RSVPs or relationship suggestions');
   });
 });

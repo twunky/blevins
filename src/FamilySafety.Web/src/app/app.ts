@@ -218,7 +218,7 @@ export class App implements OnInit {
     if (this.relationshipLoading() || this.pendingEventInvitationsLoading()) return 'Checking attention…';
     if (this.relationshipError() || this.pendingEventInvitationsError()) return 'Some attention could not be checked';
     const count = this.pendingEventInvitations().length + (this.hasRelationshipSuggestions() ? 1 : 0);
-    return count === 0 ? 'Nothing right now' : `${count} ${count === 1 ? 'item' : 'items'}`;
+    return count === 0 ? 'No items in these checks' : `${count} ${count === 1 ? 'item' : 'items'}`;
   }
 
   /** Family dashboard and Settings groupings of the relationships the server already returns; no new request or rule. */

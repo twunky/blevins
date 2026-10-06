@@ -57,9 +57,55 @@ test('Home Pending attention opens Event RSVP and disappears on return and reloa
   await participation.getByRole('button', { name: 'Save RSVP' }).click();
   await expect(participation).toContainText('Your RSVP was saved');
   await page.getByRole('link', { name: 'Home', exact: true }).click();
-  await expect(attention).toContainText('Nothing needs your attention right now.');
+  await expect(attention).toContainText('No pending RSVPs or relationship suggestions.');
   await expect(link).toHaveCount(0);
   await page.reload();
-  await expect(attention).toContainText('Nothing needs your attention right now.');
+  await expect(attention).toContainText('No pending RSVPs or relationship suggestions.');
   await expect(link).toHaveCount(0);
+  // Phase 10: follow the clarified discovery links using keyboard activation at both widths.
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+    for (const source of ['/home', '/family']) {
+      await page.goto(source);
+      const discovery = page.locator(source === '/home' ? '[aria-labelledby="home-updates-heading"]' : '[aria-labelledby="family-updates-heading"]');
+      await expect(discovery).toContainText('A Family activity feed is not available here.');
+      const updates = discovery.getByRole('link', { name: 'Open Events for Updates' });
+      await updates.focus(); await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(/\/events$/);
+      await expect(page.locator('main h1')).toBeFocused();
+      await page.goto(source);
+      const safety = page.locator(source === '/home' ? '[aria-labelledby="home-updates-heading"]' : '[aria-labelledby="family-checkins-heading"]');
+      await safety.getByRole('link', { name: 'Open Safety for Check-Ins' }).focus(); await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(/\/safety$/);
+      await expect(page.getByRole('heading', { name: 'Check-Ins', exact: true })).toBeVisible();
+      await expect(page.locator('main h1')).toBeFocused();
+    }
+    for (const source of ['/home', '/family', '/plans']) {
+      await page.goto(source);
+      await page.waitForLoadState('networkidle');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+      await page.screenshot({ path: resolve(captures, `readiness-${source.slice(1)}-${width}.png`), fullPage: true });
+    }
+  }
+  const expectation = 'Expected check-in records a planned time only. It does not schedule a Check-In or send reminders.';
+  await expect(page.locator('#plan-checkin-help')).toContainText(expectation);
+  await expect(page.locator('#plan-checkin-date')).toHaveAttribute('aria-describedby', 'plan-checkin-help');
+  await expect(page.locator('#plan-checkin-time')).toHaveAttribute('aria-describedby', 'plan-checkin-help');
+  await page.locator('#plan-activity').fill('Recorded expectation only');
+  await page.locator('#plan-date').fill('2030-01-01');
+  await page.locator('#plan-time').fill('10:00');
+  await page.locator('#plan-checkin-date').fill('2030-01-01');
+  await page.locator('#plan-checkin-time').fill('12:00');
+  await page.locator('#plan-audience-group').check();
+  await page.getByRole('button', { name: 'Create plan', exact: true }).click();
+  await page.getByRole('link', { name: 'Recorded expectation only', exact: true }).click();
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+    await page.reload();
+    await expect(page.locator('.item-page')).toContainText(expectation);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await page.screenshot({ path: resolve(captures, `readiness-plan-detail-${width}.png`), fullPage: true });
+  }
 });

@@ -118,7 +118,7 @@
         </header>
         @if (selectedFamily(); as family) {
           <!-- Home dashboard (panel1-main-home). DOM order is reading priority; the grid places cards on wider screens.
-               Placeholder cards (.home-future) reserve the prototype's places for capabilities that do not exist yet: no data, requests, or actions. -->
+               Placeholder cards (.home-future) carry no feed data or requests; discovery links reach existing authorized areas. -->
           <div class="home-grid">
             <section class="card home-attention" aria-labelledby="home-attention-heading">
               <div class="card-header">
@@ -126,6 +126,7 @@
                 <div>
                   <h2 id="home-attention-heading">Needs Your Attention</h2>
                   <p class="card-sub">{{ homeAttentionSummary() }}</p>
+                  <p class="card-sub">Pending Event RSVPs and relationship suggestions only.</p>
                 </div>
               </div>
               @if (relationshipLoading()) {
@@ -163,7 +164,7 @@
                 && !pendingEventInvitationsLoading() && !pendingEventInvitationsError() && pendingEventInvitations().length === 0) {
                 <div class="attention-list home-attention-clear">
                   <span class="row-icon row-icon--clear"><app-icon name="check" /></span>
-                  <div class="item-main"><strong>Nothing needs your attention right now.</strong><span class="item-meta">Items that need a response from you will appear here.</span></div>
+                  <div class="item-main"><strong>No pending RSVPs or relationship suggestions.</strong><span class="item-meta">Check other areas for activity shared with you.</span></div>
                 </div>
               }
             </section>
@@ -280,7 +281,10 @@
                 <span class="card-icon"><app-icon name="message" /></span>
                 <h2 id="home-updates-heading">Recent Family Updates</h2>
               </div>
-              <p class="home-future-note">Family updates will appear here as activity and check-ins are added.</p>
+              <p class="home-future-note">A Family activity feed is not available here. Read Event Updates on an Event you can access.</p>
+              <a routerLink="/events" [state]="focusHeadingState">Open Events for Updates</a>
+              <p class="home-future-note">Standalone Check-Ins are in Safety.</p>
+              <a routerLink="/safety" [state]="focusHeadingState">Open Safety for Check-Ins</a>
             </section>
 
             <section class="card home-card home-future home-future--tasks" aria-labelledby="home-tasks-heading">
@@ -898,13 +902,14 @@
               <div class="field-grid">
                 <div class="field">
                   <label for="plan-checkin-date">Expected check-in date</label>
-                  <input id="plan-checkin-date" type="date" formControlName="expectedCheckInDate" />
+                  <input id="plan-checkin-date" type="date" formControlName="expectedCheckInDate" aria-describedby="plan-checkin-help" />
                 </div>
                 <div class="field">
                   <label for="plan-checkin-time">Expected check-in time</label>
-                  <input id="plan-checkin-time" type="time" formControlName="expectedCheckInTime" />
+                  <input id="plan-checkin-time" type="time" formControlName="expectedCheckInTime" aria-describedby="plan-checkin-help" />
                 </div>
               </div>
+              <p class="field-hint" id="plan-checkin-help">Expected check-in records a planned time only. It does not schedule a Check-In or send reminders. Standalone Check-Ins are available in Safety.</p>
               <div class="field plans-notes-field">
                 <label for="plan-notes">Notes <span class="help">(optional, up to 1,000 characters)</span></label>
                 <textarea id="plan-notes" formControlName="notes" rows="4" maxlength="1000" aria-describedby="plan-notes-audience"></textarea>
@@ -1202,7 +1207,7 @@
               } @else if (relationshipLoading()) {
                 <p role="status">Checking for items waiting for you…</p>
               } @else {
-                <p class="family-waiting-clear"><span class="row-icon row-icon--clear"><app-icon name="check" /></span>Nothing is waiting for you right now.</p>
+                <p class="family-waiting-clear"><span class="row-icon row-icon--clear"><app-icon name="check" /></span>No relationship suggestions are waiting for you.</p>
               }
             </section>
 
@@ -1211,7 +1216,7 @@
                 <span class="card-icon"><app-icon name="calendar" /></span>
                 <h2 id="family-birthdays-heading">Upcoming birthdays</h2>
               </div>
-              <p class="home-future-note">Birthdays shared with your family will appear here.</p>
+              <p class="home-future-note">This card does not show a birthday summary. Review dates shared with you in Shared Family Dates.</p>
             </section>
 
             <section class="card home-future family-future" aria-labelledby="family-updates-heading">
@@ -1219,7 +1224,8 @@
                 <span class="card-icon"><app-icon name="message" /></span>
                 <h2 id="family-updates-heading">Recent Family Updates</h2>
               </div>
-              <p class="home-future-note">Family updates will appear here as activity is shared.</p>
+              <p class="home-future-note">A Family activity feed is not available here. Read Event Updates on an Event you can access.</p>
+              <a routerLink="/events" [state]="focusHeadingState">Open Events for Updates</a>
             </section>
 
             <section class="card home-future family-future" aria-labelledby="family-checkins-heading">
@@ -1227,7 +1233,8 @@
                 <span class="card-icon"><app-icon name="check" /></span>
                 <h2 id="family-checkins-heading">Recent Check-Ins</h2>
               </div>
-              <p class="home-future-note">Recent family check-ins will appear here when available.</p>
+              <p class="home-future-note">See your sent Check-Ins and those explicitly shared with you in Safety. This card does not show a Family-wide Check-In feed.</p>
+              <a routerLink="/safety" [state]="focusHeadingState">Open Safety for Check-Ins</a>
             </section>
           </div>
         }
@@ -1577,6 +1584,9 @@
         <div class="plans-fact"><dt>Expected check-in</dt><dd>{{ displayDateTime(plan.expectedCheckInDate, plan.expectedCheckInTime) }}</dd></div>
       }
     </dl>
+  }
+  @if (plan.expectedCheckInDate && plan.expectedCheckInTime) {
+    <p class="help">Expected check-in records a planned time only. It does not schedule a Check-In or send reminders. Standalone Check-Ins are available in Safety.</p>
   }
   @if (plan.notes) {
     <div class="plans-note">

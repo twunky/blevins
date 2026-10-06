@@ -15,12 +15,12 @@ Approved phase status and remaining gates. The [project checkpoint](../project-s
 | Phase 8 | Safety Coordination | `COMPLETE / CLOSED` |
 | Phase 9 | Integration & UX Refinement | `COMPLETE / CLOSED` |
 | Phase 9.5 | MVP Feature Completion | `COMPLETE / CLOSED` under DEC-092 |
-| Phase 10 | Testing & Verification | `FUTURE` |
+| Phase 10 | Testing & Verification / User-Testability Readiness | `CURRENT / IN PROGRESS` under DEC-093 |
 | Phase 11 | Pilot & Release Readiness | `FUTURE` |
 
 ## Phase 9.5 — MVP Feature Completion
 
-COMPLETE / CLOSED under DEC-092, 2026-10-05. WI-095-001 through WI-095-010 are COMPLETE / PASS — OWNER APPROVED and constitute the completed implementation set. CTX-1.37 is active. No Phase 9.5 work remains active; no WI-095-011 is required. Next work item: NONE AUTHORIZED; no next phase is started.
+COMPLETE / CLOSED under DEC-092, 2026-10-05. WI-095-001 through WI-095-010 are COMPLETE / PASS — OWNER APPROVED and constitute the completed implementation set. CTX-1.37 is active. No Phase 9.5 work remains active; no WI-095-011 is required. Phase 10 is separately authorized below.
 
 | Work item | Delivered capability |
 |---|---|
@@ -39,9 +39,17 @@ The owner-approved minimum and full deferral boundary are canonical in [REQ-PROD
 
 DEC-092 supersedes the remaining Phase 9.5 gates under DEC-073 and DEC-090's notification-completion boundary only. Broader product intent and existing privacy/implementation permissions are preserved. General Plan editing/lifecycle/completion and Trip completion remain outside Phase 9.5 closure, without new phase placement. Any future capability or additional Event RSVP scope requires separate owner-approved scope, canonical updates where needed and execution authorization.
 
+## Phase 10 — Testing & Verification / User-Testability Readiness
+
+CURRENT / IN PROGRESS under DEC-093. Evaluate whether adults can discover, understand and complete implemented journeys together in facilitated LOCAL DEVELOPMENT testing. Use isolated synthetic adult identities/data and later small adult usability sessions; no child/minor profiles or feature expansion. The single [readiness matrix](phase-10-readiness.md) records critical journeys, reused coverage, honest limitations and session preparation.
+
+First item: [WI-010-001 — Post-9.5 User-Testability Baseline](stories/WI-010-001-post-9-5-user-testability-baseline.md) COMPLETE / PASS — OWNER APPROVED, including bounded corrections to verified misleading presentation. Next work item: NONE AUTHORIZED. No second Phase 10 item authorized. CTX-1.37 remains active because no canonical behavior changes.
+
+Exit gates: critical adult journeys understandable and completable without unreasonable coaching; no blocking defect in tested critical paths or identified unintended privacy/access disclosure; deferred/unsupported behavior clearly communicated; remaining issues classified as blocking, bounded follow-up, deferred or production-readiness. Actual human observations and owner acceptance are still needed; automated evidence alone does not close Phase 10. DEC-092 deferrals remain active.
+
 ## Later phases
 
-Phase 10 — Testing & Verification and Phase 11 — Pilot & Release Readiness retain their numbering and purpose. Production authentication, hosting, and backup-aging/restore evidence (DEC-068, DEC-071) remain separate predeployment requirements. Development verification and phase closure do not establish deployment readiness.
+Phase 11 — Pilot & Release Readiness remains FUTURE. Real signup/sign-in/recovery, production invitation delivery, hosting, provisioning, backup-aging/restore evidence (DEC-068, DEC-071) and physical-device location validation remain separate production/pilot dependencies. They do not block facilitated local Development testing; Development verification and phase closure do not establish deployment readiness.
 
 ## Phase 9 — Integration & UX Refinement
 

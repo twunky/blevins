@@ -87,7 +87,7 @@ The current UI includes:
 
 New local databases start with the development Family Group and two adult members but no sample Events, Plans, or Trips. Create records in the UI to explore those features.
 
-Phase 9 is `COMPLETE / CLOSED` under `DEC-081`; Phase 9.5 is `CURRENT / IN PROGRESS`; WI-095-005 is the bounded standalone Check-In item under CTX-1.32. Creator-controlled Trip audience editing is available. Trip Check-In and Sharing Session execution are not available in this local build.
+Phase 9 and Phase 9.5 are `COMPLETE / CLOSED` under `DEC-081` / `DEC-092`; Phase 10 is current under `DEC-093`, with CTX-1.37 active. The [readiness matrix](../ai-context/planning/phase-10-readiness.md) prepares facilitated adult Development testing. Standalone Check-Ins and temporary Sharing Sessions are available in Safety; Trip-associated Check-In/Sharing execution remains deferred. Creator-controlled Trip audience editing is available.
 
 ## Invited-adult scenario (WI-075-001)
 

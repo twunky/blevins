@@ -5,6 +5,8 @@
 
 DEC-092 / REQ-PROD-014 records Phase 9.5 closure scope. Existing product-intent anchors remain approved; formal deferral does not mean implementation. Prior row baselines retain requirement provenance; CTX-1.37 is the active aggregate baseline.
 
+Phase 10 trace: [WI-010-001](../planning/stories/WI-010-001-post-9-5-user-testability-baseline.md) / [verification](../planning/verification/VER-WI-010-001.md) evaluates REQ-PROD-014, REQ-UX-006/008/011/014, REQ-PLAN-002 and REQ-SHARE-010 without changing them. DEC-093 authorizes testing and bounded presentation fixes; no new requirement or CTX baseline.
+
 ## ID and lifecycle rules
 
 - Format: `REQ-<NAMESPACE>-###`.

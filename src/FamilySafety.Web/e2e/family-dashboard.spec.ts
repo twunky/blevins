@@ -62,10 +62,12 @@ test('direct entry, gear, Back to Family, administrator Settings, member detail,
   await expect(page.locator('.page-title')).toContainText(family.name);
   await expectFamilyCurrent(page, 'page');
   await expect(page.locator('.family-coordination h2')).toHaveText(['Shared Family Dates', 'Waiting for you', 'Upcoming birthdays', 'Recent Family Updates', 'Recent Check-Ins']);
-  await expect(page.getByText('Nothing is waiting for you right now.')).toBeVisible();
+  await expect(page.getByText('No relationship suggestions are waiting for you.')).toBeVisible();
   const placeholders = page.locator('.family-coordination .home-future');
   await expect(placeholders).toHaveCount(3);
-  await expect(placeholders.locator('button, a, input, select, img, li')).toHaveCount(0);
+  await expect(placeholders.locator('button, input, select, img, li')).toHaveCount(0);
+  await expect(placeholders.getByRole('link', { name: 'Open Events for Updates' })).toHaveAttribute('href', '/events');
+  await expect(placeholders.getByRole('link', { name: 'Open Safety for Check-Ins' })).toHaveAttribute('href', '/safety');
   await page.waitForLoadState('networkidle');
   expect(apiPaths.filter(path => !/^\/api\/(profile|development\/|family-groups(\/|$)|family-members\/)/.test(path)),
     'the Family dashboard makes no request beyond existing profile and Family reads').toEqual([]);
@@ -144,7 +146,7 @@ test('a member who is not an administrator uses Settings without Invite; Waiting
   await expect(waiting).toContainText('Development Audience Member suggested a relationship');
   await waiting.getByRole('button', { name: 'Accept relationship' }).click();
   await expect(waiting.getByRole('status')).toContainText('Relationship confirmed.');
-  await expect(waiting).toContainText('Nothing is waiting for you right now.');
+  await expect(waiting).toContainText('No relationship suggestions are waiting for you.');
   // D5: the tile note appears only for the member in an accepted relationship with A.
   const members = page.getByRole('list', { name: 'Active adult family members' });
   await expect(members.getByRole('button', { name: /Development Audience Member/ }).locator('.member-note')).toHaveText('Sibling');

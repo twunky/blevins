@@ -88,16 +88,17 @@ describe('Family dashboard and Family settings (WI-009-007)', () => {
     expect(root.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe('Family');
   });
 
-  it('keeps placeholders data-free, action-free, and request-free (D1, D7)', async () => {
+  it('keeps summaries data-free and request-free while linking to existing protected areas', async () => {
     const harness = await open('/family');
     const placeholders = Array.from(harness.routeNativeElement!.querySelectorAll<HTMLElement>('.family-coordination .home-future'));
     expect(placeholders.map(section => section.querySelector('.home-future-note')?.textContent?.trim())).toEqual([
-      'Birthdays shared with your family will appear here.',
-      'Family updates will appear here as activity is shared.',
-      'Recent family check-ins will appear here when available.',
+      'This card does not show a birthday summary. Review dates shared with you in Shared Family Dates.',
+      'A Family activity feed is not available here. Read Event Updates on an Event you can access.',
+      'See your sent Check-Ins and those explicitly shared with you in Safety. This card does not show a Family-wide Check-In feed.',
     ]);
+    expect(placeholders.flatMap(section => Array.from(section.querySelectorAll('a')).map(link => link.getAttribute('href')))).toEqual(['/events', '/safety']);
     for (const section of placeholders) {
-      expect(section.querySelectorAll('button, a, input, select, img, li, .avatar')).toHaveLength(0);
+      expect(section.querySelectorAll('button, input, select, img, li, .avatar')).toHaveLength(0);
       expect(section.textContent).not.toMatch(/\d|Coming later|Phase|roadmap|work item/i);
     }
     http.expectNone(request => !/^\/api\/(profile|family-groups)/.test(request.url));
@@ -117,7 +118,7 @@ describe('Family dashboard and Family settings (WI-009-007)', () => {
     http.expectOne('/api/family-groups/family-a/relationships').flush([relationship('incoming', 'sam', 'me', 'Accepted', 'Parent', 'AdultChild')]);
     harness.detectChanges();
     expect(waiting.querySelectorAll('.family-request')).toHaveLength(0);
-    expect(waiting.textContent).toContain('Nothing is waiting for you right now.');
+    expect(waiting.textContent).toContain('No relationship suggestions are waiting for you.');
     expect(waiting.textContent).toContain('Relationship confirmed.');
   });
 
@@ -127,7 +128,7 @@ describe('Family dashboard and Family settings (WI-009-007)', () => {
     http.expectOne(r => r.method === 'POST' && r.url === '/api/family-groups/relationships/incoming/decline').flush({});
     http.expectOne('/api/family-groups/family-a/relationships').flush([]);
     harness.detectChanges();
-    expect(harness.routeNativeElement!.querySelector('.family-waiting')?.textContent).toContain('Nothing is waiting for you right now.');
+    expect(harness.routeNativeElement!.querySelector('.family-waiting')?.textContent).toContain('No relationship suggestions are waiting for you.');
   });
 
   it('shows a tile note only for an accepted relationship with the signed-in adult, and no administrator status (D5)', async () => {
