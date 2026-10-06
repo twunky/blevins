@@ -2,7 +2,7 @@
 
 ## Metadata / authorization
 
-- **Status:** VERIFYING / OWNER REVIEW (owner alone closes; not COMPLETE).
+- **Status:** COMPLETE / PASS — OWNER APPROVED, 2026-10-06.
 - **Phase:** 10.5 — MVP Functional Completion.
 - **Context baseline:** CTX-1.39, successor to the verified entry checkpoint CTX-1.38.
 - **Requirements:** REQ-PLAN-002/005/007/008; REQ-PRIV-011/020/027; REQ-PROD-014.
@@ -51,4 +51,4 @@ No audience replacement, completion/reopen/archive/delete, transfer/reassignment
 - [x] Existing detail form and focused Angular/integrated coverage.
 - [x] Final validation and SELF-VERIFIED report; hand back VERIFYING / OWNER REVIEW.
 
-Evidence: [VER-WI-105-002](../verification/VER-WI-105-002.md) — technical checks PASS / SELF-VERIFIED; owner acceptance pending. No owner completion inferred. Expected next step after acceptance: Final Functional MVP Readiness Review, separately authorized.
+Evidence: [VER-WI-105-002](../verification/VER-WI-105-002.md) COMPLETE / PASS; technical evidence SELF-VERIFIED and accepted by the owner, 2026-10-06. WI-105-002 is closed. Next activity: Final Functional MVP Readiness Review, separately authorized; no implementation work item is authorized.
