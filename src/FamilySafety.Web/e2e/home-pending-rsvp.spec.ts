@@ -69,16 +69,54 @@ test('Home Pending attention opens Event RSVP and disappears on return and reloa
       await page.goto(source);
       const discovery = page.locator(source === '/home' ? '[aria-labelledby="home-updates-heading"]' : '[aria-labelledby="family-updates-heading"]');
       await expect(discovery).toContainText('A Family activity feed is not available here.');
-      const updates = discovery.getByRole('link', { name: 'Open Events for Updates' });
-      await updates.focus(); await page.keyboard.press('Enter');
+      const isHome = source === '/home';
+      const updates = discovery.getByRole('link', { name: isHome ? 'Open Events' : 'Open Events for Updates' });
+      await expect(updates).toHaveAttribute('href', '/events');
+      if (isHome) {
+        await expect(updates).toHaveClass(/button-link.*button--secondary|button--secondary.*button-link/);
+        await expect(updates).toHaveCSS('border-radius', '10px');
+        await expect(updates).toHaveCSS('border-color', 'rgb(219, 231, 251)');
+        await expect(updates).toHaveCSS('text-decoration-line', 'none');
+        await expect(updates.locator('svg')).toHaveAttribute('aria-hidden', 'true');
+        await updates.hover();
+        await expect(updates).toHaveCSS('background-color', 'rgb(219, 234, 254)');
+      }
+      await updates.focus();
+      if (isHome) {
+        await page.keyboard.press('Tab');
+        await page.keyboard.press('Shift+Tab');
+        await expect(updates).toBeFocused();
+        await expect(updates).toHaveCSS('outline-style', 'solid');
+        await expect(updates).toHaveCSS('outline-width', '3px');
+      }
+      await page.keyboard.press('Enter');
       await expect(page).toHaveURL(/\/events$/);
       await expect(page.locator('main h1')).toBeFocused();
       await page.goto(source);
       const safety = page.locator(source === '/home' ? '[aria-labelledby="home-updates-heading"]' : '[aria-labelledby="family-checkins-heading"]');
-      await safety.getByRole('link', { name: 'Open Safety for Check-Ins' }).focus(); await page.keyboard.press('Enter');
-      await expect(page).toHaveURL(/\/safety$/);
+      const checkIns = safety.getByRole('link', { name: isHome ? 'Open Check-Ins' : 'Open Safety for Check-Ins' });
+      if (isHome) {
+        await expect(checkIns).toHaveAttribute('href', '/safety#check-ins');
+        await expect(checkIns).toHaveClass(/button-link.*button--secondary|button--secondary.*button-link/);
+        await expect(checkIns).toHaveCSS('border-radius', '10px');
+        await expect(checkIns).toHaveCSS('border-color', 'rgb(219, 231, 251)');
+        await expect(checkIns).toHaveCSS('text-decoration-line', 'none');
+        await expect(checkIns.locator('svg')).toHaveAttribute('aria-hidden', 'true');
+      }
+      await checkIns.focus();
+      if (isHome) {
+        await page.keyboard.press('Tab');
+        await page.keyboard.press('Shift+Tab');
+        await expect(checkIns).toBeFocused();
+        await expect(checkIns).toHaveCSS('outline-style', 'solid');
+        await expect(checkIns).toHaveCSS('outline-width', '3px');
+      }
+      await page.keyboard.press('Enter');
+      if (isHome) await expect(page).toHaveURL(/\/safety#check-ins$/);
+      else await expect(page).toHaveURL(/\/safety$/);
       await expect(page.getByRole('heading', { name: 'Check-Ins', exact: true })).toBeVisible();
-      await expect(page.locator('main h1')).toBeFocused();
+      if (isHome) await expect(page.locator('#check-ins')).toBeInViewport();
+      else await expect(page.locator('main h1')).toBeFocused();
     }
     for (const source of ['/home', '/family', '/plans']) {
       await page.goto(source);

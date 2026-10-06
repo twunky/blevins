@@ -281,10 +281,18 @@
                 <span class="card-icon"><app-icon name="message" /></span>
                 <h2 id="home-updates-heading">Recent Family Updates</h2>
               </div>
-              <p class="home-future-note">A Family activity feed is not available here. Read Event Updates on an Event you can access.</p>
-              <a routerLink="/events" [state]="focusHeadingState">Open Events for Updates</a>
-              <p class="home-future-note">Standalone Check-Ins are in Safety.</p>
-              <a routerLink="/safety" [state]="focusHeadingState">Open Safety for Check-Ins</a>
+              <div class="home-update-section">
+                <p class="home-future-note">A Family activity feed is not available here. Read Event Updates on an Event you can access.</p>
+                <a class="button-link button--secondary home-update-action" routerLink="/events" [state]="focusHeadingState">
+                  <app-icon name="calendar" />Open Events
+                </a>
+              </div>
+              <div class="home-update-section">
+                <p class="home-future-note">Standalone Check-Ins are in Safety.</p>
+                <a class="button-link button--secondary home-update-action" routerLink="/safety" [fragment]="'check-ins'">
+                  <app-icon name="check" />Open Check-Ins
+                </a>
+              </div>
             </section>
 
             <section class="card home-card home-future home-future--tasks" aria-labelledby="home-tasks-heading">

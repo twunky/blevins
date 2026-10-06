@@ -67,6 +67,10 @@
   margin: 0;
   padding: var(--space-3) var(--space-4);
 }
+.home-update-section { align-items: flex-start; display: flex; flex-direction: column; gap: var(--space-3); }
+.home-update-action { gap: var(--space-2); }
+.home-future--updates a.home-update-action { border-color: #dbe7fb; }
+.home-future--updates a.home-update-action:hover { border-color: var(--color-accent); }
 
 @media (min-width: 44rem) {
   .home-grid {

@@ -117,7 +117,8 @@ describe('Home and feature empty states', () => {
     expect(placeholders.map(section => section.querySelector('h2')?.textContent?.trim()))
       .toEqual(['Recent Family Updates', 'My Tasks']);
     expect(placeholders[0].textContent).toContain('A Family activity feed is not available here.');
-    expect(Array.from(placeholders[0].querySelectorAll('a')).map(link => link.getAttribute('href'))).toEqual(['/events', '/safety']);
+    expect(Array.from(placeholders[0].querySelectorAll('a')).map(link => [link.textContent?.trim(), link.getAttribute('href')]))
+      .toEqual([['Open Events', '/events'], ['Open Check-Ins', '/safety#check-ins']]);
     expect(placeholders[1].querySelector('.home-future-note')?.textContent).toMatch(/will appear here as/);
     for (const section of placeholders) {
       expect(section.querySelectorAll('button, input, img, li, .avatar')).toHaveLength(0);
@@ -505,6 +506,38 @@ describe('Home and feature empty states', () => {
     expect(buttons).toEqual(['Open Concerns', 'Open Incidents']);
     expect(card.textContent).not.toMatch(/\d/);
     http.expectNone(request => request.url.startsWith('/api/incidents'));
+  });
+
+  it('shows styled, accessible Home update actions directly beneath their explanations', async () => {
+    const harness = await visit('/home');
+    initial([family]);
+    familyReads();
+    http.expectOne('/api/trips').flush([]);
+    harness.detectChanges();
+
+    const card = harness.routeNativeElement!.querySelector('[aria-labelledby="home-updates-heading"]')!;
+    const sections = Array.from(card.querySelectorAll('.home-update-section'));
+    expect(sections).toHaveLength(2);
+
+    const [eventsSection, checkInsSection] = sections;
+    const eventsLink = eventsSection.querySelector('a')!;
+    expect(eventsSection.querySelector('p')?.textContent).toContain('Read Event Updates on an Event you can access.');
+    expect(eventsLink.textContent?.trim()).toBe('Open Events');
+    expect(eventsLink.getAttribute('href')).toBe('/events');
+    expect(eventsLink.classList).toContain('button-link');
+    expect(eventsLink.classList).toContain('button--secondary');
+    expect(eventsLink.querySelector('app-icon')?.getAttribute('name')).toBe('calendar');
+    expect(eventsLink.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+
+    const checkInsLink = checkInsSection.querySelector('a')!;
+    expect(checkInsSection.querySelector('p')?.textContent).toContain('Standalone Check-Ins are in Safety.');
+    expect(checkInsLink.textContent?.trim()).toBe('Open Check-Ins');
+    expect(checkInsLink.getAttribute('href')).toBe('/safety#check-ins');
+    expect(checkInsLink.classList).toContain('button-link');
+    expect(checkInsLink.classList).toContain('button--secondary');
+    expect(checkInsLink.querySelector('app-icon')?.getAttribute('name')).toBe('check');
+    expect(checkInsLink.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+    expect(card.querySelectorAll('button')).toHaveLength(0);
   });
 
   it('serves the Incident routes in the existing shell under the Safety area without a shell reload', async () => {
