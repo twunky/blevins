@@ -1,9 +1,9 @@
 # WI-010-004 — Facilitated Adult Usability Sessions
 
-- **Status:** APPROVED — Stage A PREPARATION COMPLETE; Stage B DEFERRED — MVP-END HUMAN VALIDATION. Not current active execution.
-- **Phase / baseline:** Phase 10 CURRENT / IN PROGRESS; CTX-1.37 APPROVED / ACTIVE.
+- **Status:** APPROVED — Stage A PREPARATION COMPLETE; Stage B READY TO RESUME after Phase 10.5 closure through a separately authorized preparation/resumption task. Not current active execution.
+- **Phase / baseline:** Phase 10 CURRENT / IN PROGRESS; Stage A was prepared under CTX-1.37. Current baseline CTX-1.39 remains ACTIVE.
 - **Purpose / tier:** DEEP for observing privacy understanding; gather actual adult discovery, understanding and task-completion evidence without unreasonable coaching.
-- **Authority:** Stage A creation/preparation authorized by the explicit owner continuation request, 2026-10-05, following clean manual commit `b14aab6`. Subsequent explicit owner decision defers all Stage B sessions until the MVP functional scope is complete and before pilot/release readiness. Reuse these materials then. No participant sessions or results exist. No WI-010-005 authorized.
+- **Authority:** Stage A creation/preparation authorized by the explicit owner continuation request, 2026-10-05, following clean manual commit `b14aab6`. Stage B was deferred pending functional completion; owner accepted the Final Functional MVP Readiness Review and closed Phase 10.5 under DEC-096. Stage B is now READY TO RESUME via a separate preparation/resumption task. No participant sessions or results exist. No WI-010-005 authorized.
 
 ## Required context
 
@@ -23,7 +23,7 @@ Excluded: bootstrap/archive, unrelated historical verification, production provi
 
 Minimum useful first round: 3 adults; target: 5, identified only as P1–P5. Use isolated Development accounts and synthetic data; no participant identifiers, real relationships, contact details, locations, travel or Safety information in evidence. Sessions last approximately 30–45 minutes. Owner performs every Git commit; no staging, commit, push or PR.
 
-DEC-092 remains intact: no broader/contextual Sharing Sessions, notifications, additional Check-In integrations/reminders or Plan/Trip/Event completion. Production authentication, signup/recovery, invitation delivery, hosting, provisioning, backup/restore, physical GPS and background tracking remain outside this round. No fixes or feature expansion are authorized by an observed expectation alone.
+DEC-092 remains intact: no broader/contextual Sharing Sessions, broader notifications or additional Check-In integrations/reminders. General Event completion and explicit Plan completion remain deferred until after human testing; Trip reopen/undo and child/minor/guardian support remain out of MVP. Production authentication, signup/recovery, invitation delivery, hosting, provisioning, backup/restore, physical GPS and background tracking remain outside this round. No fixes or feature expansion are authorized by an observed expectation alone.
 
 ## Two stages and acceptance checks
 
@@ -35,7 +35,9 @@ DEC-092 remains intact: no broader/contextual Sharing Sessions, notifications, a
 - [x] **AC-A4:** Existing Development scenario inspected and reused; facilitator preflight/reset checklist covers Event invitation, organization, existing Plan/Trip Notes, private preset/contact and synthetic location. No application/test/setup code change required. Runtime setup is a facilitator pre-session action, not claimed executed here.
 - [x] **AC-A5:** Practical readiness signals and deferred/production distinctions defined; current routing synchronized. Stage A documentation checks recorded below; human usability remains uncollected.
 
-### Stage B — EXECUTE / ANALYZE (deferred until MVP completion)
+### Stage B — EXECUTE / ANALYZE (ready to resume after closure; preparation task first)
+
+**Current status:** READY TO RESUME after Phase 10.5 closure under DEC-096, but not active execution. A separate preparation/resumption task must update the facilitator materials for WI-105-001 Trip completion and WI-105-002 Plan correction, prepare participant-owned synthetic Plan/Trip examples, and run runtime/preflight. Stop before P1 unless separately authorized. Human evidence remains uncollected.
 
 - [ ] **AC-B1:** Owner conducts at least 3 adult sessions (target 5), returns actual anonymous task observations, records every recovery hint separately and distinguishes unattempted tasks from failed tasks.
 - [ ] **AC-B2:** Analyze only returned human evidence; trace findings to participant/task and classify blocking, bounded follow-up, deferred or production dependency. Record privacy misunderstandings even where implementation is correct. No statistical thresholds from this small round.
@@ -43,6 +45,6 @@ DEC-092 remains intact: no broader/contextual Sharing Sessions, notifications, a
 
 ## Stage A evidence / handoff
 
-Preparation is SELF-VERIFIED; no human task outcomes, participant observations, completion rates or usability conclusions exist. The recognized work-item lifecycle has no DEFERRED state; retain APPROVED to represent this authorized but inactive future gate, and record Stage B's deferral explicitly. Do not treat this item as current execution, a product-development blocker, or a completed validation. At the MVP-end checkpoint, the owner can resume Stage B using these materials and supply actual anonymous human evidence for analysis. No P1–P5 sessions are scheduled or requested now.
+Preparation is SELF-VERIFIED; no human task outcomes, participant observations, completion rates or usability conclusions exist. The recognized work-item lifecycle has no DEFERRED state; retain APPROVED to represent this authorized but inactive gate, and record Stage B as READY TO RESUME after closure. Do not treat this item as current execution or completed validation. Before P1, the separately authorized preparation/resumption task updates the guide to cover participant discovery and correction of Plan facts with separate Notes and updated detail/list/Home values, descriptive-only expected Check-In timing, and creator-only one-way Trip completion with Home exclusion and continued authorized list/detail editing/Notes. It also prepares participant-owned synthetic Plan/Trip examples because the prior A/B setup does not permit B to exercise creator-only actions. No P1–P5 sessions are active and no observations exist.
 
 Stage A validation (2026-10-05): SELF-VERIFIED documentation checks passed across 7 changed/new Markdown files: 59 local links, including 6 anchors, resolved; no trailing whitespace, replacement characters or unbalanced code fences. The Stage A checkpoint checks confirmed active CTX-1.37, then-awaiting human execution, no stale current authorization, no WI-010-005 file and empty staging. The existing readiness matrix table was identical to HEAD. `git diff --check` passed; new-file whitespace was checked separately. Scenario suitability was confirmed by inspecting the existing script, local instructions and connected specs; no database/browser preflight was executed or claimed. No application tests/builds or browser participant simulation were performed. Stage A materials are preserved for the MVP-end validation gate.
