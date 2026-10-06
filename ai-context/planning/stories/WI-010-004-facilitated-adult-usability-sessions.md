@@ -1,9 +1,9 @@
 # WI-010-004 — Facilitated Adult Usability Sessions
 
-- **Status:** IN_PROGRESS — Stage A PREPARED / AWAITING FACILITATED HUMAN EXECUTION; Stage B NOT STARTED.
+- **Status:** APPROVED — Stage A PREPARATION COMPLETE; Stage B DEFERRED — MVP-END HUMAN VALIDATION. Not current active execution.
 - **Phase / baseline:** Phase 10 CURRENT / IN PROGRESS; CTX-1.37 APPROVED / ACTIVE.
 - **Purpose / tier:** DEEP for observing privacy understanding; gather actual adult discovery, understanding and task-completion evidence without unreasonable coaching.
-- **Authority:** Explicit owner continuation request, 2026-10-05, following clean manual commit `b14aab6`. Creation and Stage A preparation authorized; owner conducts sessions and returns observations. This agent run must stop after Stage A. Stage B analysis awaits actual owner-supplied human evidence. No WI-010-005 authorized.
+- **Authority:** Stage A creation/preparation authorized by the explicit owner continuation request, 2026-10-05, following clean manual commit `b14aab6`. Subsequent explicit owner decision defers all Stage B sessions until the MVP functional scope is complete and before pilot/release readiness. Reuse these materials then. No participant sessions or results exist. No WI-010-005 authorized.
 
 ## Required context
 
@@ -35,7 +35,7 @@ DEC-092 remains intact: no broader/contextual Sharing Sessions, notifications, a
 - [x] **AC-A4:** Existing Development scenario inspected and reused; facilitator preflight/reset checklist covers Event invitation, organization, existing Plan/Trip Notes, private preset/contact and synthetic location. No application/test/setup code change required. Runtime setup is a facilitator pre-session action, not claimed executed here.
 - [x] **AC-A5:** Practical readiness signals and deferred/production distinctions defined; current routing synchronized. Stage A documentation checks recorded below; human usability remains uncollected.
 
-### Stage B — EXECUTE / ANALYZE (owner sessions pending)
+### Stage B — EXECUTE / ANALYZE (deferred until MVP completion)
 
 - [ ] **AC-B1:** Owner conducts at least 3 adult sessions (target 5), returns actual anonymous task observations, records every recovery hint separately and distinguishes unattempted tasks from failed tasks.
 - [ ] **AC-B2:** Analyze only returned human evidence; trace findings to participant/task and classify blocking, bounded follow-up, deferred or production dependency. Record privacy misunderstandings even where implementation is correct. No statistical thresholds from this small round.
@@ -43,6 +43,6 @@ DEC-092 remains intact: no broader/contextual Sharing Sessions, notifications, a
 
 ## Stage A evidence / handoff
 
-Preparation is SELF-VERIFIED; overall WI outcome remains PENDING. No human task outcomes, participant observations, completion rates or usability conclusions exist. Normal status remains IN_PROGRESS; the owner explicitly forbids VERIFYING / OWNER REVIEW until human evidence is collected, overriding the execute-story skill's ordinary end-of-execution transition for this staged item.
+Preparation is SELF-VERIFIED; no human task outcomes, participant observations, completion rates or usability conclusions exist. The recognized work-item lifecycle has no DEFERRED state; retain APPROVED to represent this authorized but inactive future gate, and record Stage B's deferral explicitly. Do not treat this item as current execution, a product-development blocker, or a completed validation. At the MVP-end checkpoint, the owner can resume Stage B using these materials and supply actual anonymous human evidence for analysis. No P1–P5 sessions are scheduled or requested now.
 
-Stage A validation (2026-10-05): SELF-VERIFIED documentation checks passed across 7 changed/new Markdown files: 59 local links, including 6 anchors, resolved; no trailing whitespace, replacement characters or unbalanced code fences. Current-state checks confirmed active CTX-1.37, awaiting human execution, no stale current authorization, no WI-010-005 file and empty staging. The existing readiness matrix table is identical to HEAD. `git diff --check` passed; new-file whitespace was checked separately. Scenario suitability was confirmed by inspecting the existing script, local instructions and connected specs; no database/browser preflight was executed or claimed. No application tests/builds or browser participant simulation were performed. Stage A stops here; await owner-facilitated human execution and returned observations.
+Stage A validation (2026-10-05): SELF-VERIFIED documentation checks passed across 7 changed/new Markdown files: 59 local links, including 6 anchors, resolved; no trailing whitespace, replacement characters or unbalanced code fences. The Stage A checkpoint checks confirmed active CTX-1.37, then-awaiting human execution, no stale current authorization, no WI-010-005 file and empty staging. The existing readiness matrix table was identical to HEAD. `git diff --check` passed; new-file whitespace was checked separately. Scenario suitability was confirmed by inspecting the existing script, local instructions and connected specs; no database/browser preflight was executed or claimed. No application tests/builds or browser participant simulation were performed. Stage A materials are preserved for the MVP-end validation gate.

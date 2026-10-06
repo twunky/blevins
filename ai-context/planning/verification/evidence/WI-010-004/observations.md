@@ -1,6 +1,6 @@
 # WI-010-004 — First-round human observation record
 
-**State:** TEMPLATE ONLY / HUMAN EVIDENCE UNCOLLECTED. No sessions or observations recorded. [Guide](facilitator-guide.md) / [work item](../../../stories/WI-010-004-facilitated-adult-usability-sessions.md). Preparation is not a participant result.
+**State:** TEMPLATE ONLY / HUMAN EVIDENCE UNCOLLECTED. No sessions or observations recorded. Human execution is DEFERRED until MVP functional completion, before pilot/release readiness. [Guide](facilitator-guide.md) / [work item](../../../stories/WI-010-004-facilitated-adult-usability-sessions.md). Preparation is not a participant result.
 
 ## Session register — owner fills after actual sessions
 
@@ -52,4 +52,4 @@ No findings, readiness decision, success estimate or phase exit is recorded. Do 
 |---|---|---|---|---|---|
 | | | | | | |
 
-**Readiness matrix updates / owner acceptance:** PENDING. WI-010-004 remains IN_PROGRESS; Stage B has not started. No WI-010-005 or implementation fix is authorized by this template.
+**Readiness matrix updates / owner acceptance:** PENDING until the MVP-end human validation gate. WI-010-004 Stage B is deferred; no session has occurred. No WI-010-005 or implementation fix is authorized by this template.
