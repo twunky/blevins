@@ -1,6 +1,6 @@
 # WI-095-010 — Household Grouping
 
-- **Status:** VERIFYING / OWNER REVIEW — explicitly owner-authorized by the original Household instruction and adult-only blocker-resolution decision, 2026-10-05. Technical validation PASS / SELF-VERIFIED; owner acceptance pending.
+- **Status:** COMPLETE / PASS — OWNER APPROVED, 2026-10-05. Verification COMPLETE / PASS.
 - **Tier / baseline:** DEEP / CTX-1.36 (narrow successor to CTX-1.35 under DEC-091).
 - **Goal:** Organize existing active adult members within a Family, with read-only member visibility and current Family-administrator management.
 - **Governing sources:** REQ-FAM-001/018, REQ-PROD-013, REQ-PRIV-011/013/034; DEC-073/091.
@@ -26,4 +26,4 @@ Excluded: unrelated workflows, bootstrap/archive, prior verification packages, g
 
 ## Authorization / handback
 
-Only WI-095-010 is authorized. Owner commits; no staging/commit/push/PR. Handback is VERIFYING / OWNER REVIEW, not COMPLETE; WI-095-011 remains unauthorized. Verification evidence: [VER-WI-095-010](../verification/VER-WI-095-010.md). Focused SQL 7 PASS and Angular 24 PASS; ONE final SQL-gated .NET 367 PASS, Angular 403 PASS, production build PASS with existing warning categories, live Playwright 1 PASS and diff/context checks PASS.
+Owner accepted WI-095-010 on 2026-10-05. Verification: [VER-WI-095-010](../verification/VER-WI-095-010.md) COMPLETE / PASS. No next work item is authorized. Owner performs all Git commits; no staging, commit, push, or PR by agents.
