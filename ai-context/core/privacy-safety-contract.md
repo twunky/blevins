@@ -1,14 +1,14 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.36
-Version: 1.28
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087; DEC-088; DEC-089; DEC-091
+Context-Baseline: CTX-1.37
+Version: 1.29
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087; DEC-088; DEC-089; DEC-091; DEC-092
 ---
 
 # Privacy and Safety Contract
 
-Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.36`.
+Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.37`.
 
 ## Consent and sharing control
 
@@ -416,6 +416,8 @@ Stale information must not appear current. Old sensitive information must not re
 The product must not provide a default family-wide live location map, covert tracking, behavioral surveillance, historical movement playback, or movement anomaly detection. Use **location sharing**, not **location tracking**, in product language.
 
 ## Notifications
+
+DEC-092 / REQ-PROD-014 recognizes WI-095-009's live Home own-Pending RSVP attention as the completed Phase 9.5 minimum attention slice. Broader notification functionality is formally deferred future scope, not implemented or required for Phase 9.5 closure. REQ-NOTIFY-001–003 remain design principles for separately approved notification scope; this reconciliation changes no privacy or delivery authorization.
 
 ### REQ-NOTIFY-001
 

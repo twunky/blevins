@@ -14,17 +14,30 @@ Approved phase status and remaining gates. The [project checkpoint](../project-s
 | Phase 7.5 | End-to-End UX & User-Test Readiness | `COMPLETE / CLOSED` |
 | Phase 8 | Safety Coordination | `COMPLETE / CLOSED` |
 | Phase 9 | Integration & UX Refinement | `COMPLETE / CLOSED` |
-| Phase 9.5 | MVP Feature Completion | `CURRENT / IN PROGRESS` - WI-095-001 through WI-095-010 COMPLETE / PASS — OWNER APPROVED |
+| Phase 9.5 | MVP Feature Completion | `COMPLETE / CLOSED` under DEC-092 |
 | Phase 10 | Testing & Verification | `FUTURE` |
 | Phase 11 | Pilot & Release Readiness | `FUTURE` |
 
 ## Phase 9.5 — MVP Feature Completion
 
-WI-095-001 through WI-095-010 are COMPLETE / PASS — OWNER APPROVED. WI-095-010 verification is COMPLETE / PASS; owner acceptance recorded 2026-10-05. Phase 9.5 remains CURRENT / IN PROGRESS. CTX-1.36 remains active. Next work item: NONE AUTHORIZED.
+COMPLETE / CLOSED under DEC-092, 2026-10-05. WI-095-001 through WI-095-010 are COMPLETE / PASS — OWNER APPROVED and constitute the completed implementation set. CTX-1.37 is active. No Phase 9.5 work remains active; no WI-095-011 is required. Next work item: NONE AUTHORIZED; no next phase is started.
 
-Remaining capabilities include broader Sharing Session scope and notifications. Any additional Check-In or Event RSVP scope remains separately gated. OD-002 is resolved for the temporary-only bounded MVP by DEC-087; broader sharing remains separately gated.
+| Work item | Delivered capability |
+|---|---|
+| WI-095-001 | Event Invitations and RSVP |
+| WI-095-002 | Event Needs |
+| WI-095-003 | Event Updates |
+| WI-095-004 | Shared Family Dates |
+| WI-095-005 | Standalone Check-Ins |
+| WI-095-006 | Temporary Sharing Sessions |
+| WI-095-007 | Trusted Contacts |
+| WI-095-008 | Safety Circles |
+| WI-095-009 | Home Pending RSVP Attention |
+| WI-095-010 | Household Grouping |
 
-DEC-073 defines phase placement, not capability behavior, order, or implementation scope. Each later capability requires owner/work-item approval, canonical updates where needed, and separate execution authorization. Home attention and outbound/notification delivery were excluded from WI-095-001. DEC-090 separately authorizes live Home own-Pending RSVP attention only, with no generic notification capability or outbound delivery. No blanket Phase 9.5 authorization exists.
+The owner-approved minimum and full deferral boundary are canonical in [REQ-PROD-014](../core/product-contract.md#req-prod-014). WI-095-005 satisfies standalone Check-Ins, WI-095-006 satisfies bounded temporary location sharing, and WI-095-009 satisfies the first notification/attention slice through live eligible own-Pending RSVP Home attention. Broader/contextual Sharing Sessions, broader notifications and additional Check-In integrations/reminders are FORMALLY DEFERRED, not implemented or closure gates. OD-002 remains resolved only for the bounded temporary MVP under DEC-087; indefinite sharing remains excluded.
+
+DEC-092 supersedes the remaining Phase 9.5 gates under DEC-073 and DEC-090's notification-completion boundary only. Broader product intent and existing privacy/implementation permissions are preserved. General Plan editing/lifecycle/completion and Trip completion remain outside Phase 9.5 closure, without new phase placement. Any future capability or additional Event RSVP scope requires separate owner-approved scope, canonical updates where needed and execution authorization.
 
 ## Later phases
 

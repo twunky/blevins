@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.36
-Version: 1.20
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-045; DEC-046; DEC-047; DEC-053; DEC-059; DEC-068; DEC-071; DEC-088; DEC-089; DEC-091
+Context-Baseline: CTX-1.37
+Version: 1.21
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-045; DEC-046; DEC-047; DEC-053; DEC-059; DEC-068; DEC-071; DEC-088; DEC-089; DEC-091; DEC-092
 ---
 
 # Product Contract
@@ -60,7 +60,17 @@ MVP includes these product capabilities:
 - **Safety:** Safety Circle, Concern, Safety Incident, coordinator, participants, information confidence, unknowns, contact attempts, tasks, timeline, and resolution.
 - **Notifications:** Event, task, check-in, trip, Concern, incident, and resolution notifications.
 
-Detailed behavior is governed by the relevant contracts and workflow files.
+Detailed behavior is governed by the relevant contracts and workflow files. This capability list preserves broader product intent; the implemented and formally deferred Phase 9.5 boundary is governed by REQ-PROD-014.
+
+### REQ-PROD-014
+
+Under DEC-092, WI-095-001 through WI-095-010 are the complete, owner-approved Phase 9.5 implementation set. WI-095-005 satisfies the standalone Check-In minimum; WI-095-006 satisfies the minimum location-sharing capability; WI-095-009 satisfies the minimum notification/attention slice through live Home attention for the user's eligible Pending Event RSVP. No WI-095-011 is required. Phase 9.5 may close without implementing the following formally deferred capabilities:
+
+- **Broader/contextual sharing:** Event-, Plan- and Trip-associated sessions; contextual audience, duration and lifecycle behavior; and modes beyond the bounded temporary-session model. REQ-SHARE-002/003/004/011 preserve applicable future-capability anchors. Context does not currently grant audience, authorization or location access; future contextual sharing requires separately approved scope.
+- **Broader notifications:** Additional workflow attention triggers, persistent inbox, read/unread state, dismiss/snooze, email, SMS, push, notification preferences and generic notification infrastructure. REQ-NOTIFY-001–003 remain notification-design principles; no generic notification capability is implemented.
+- **Additional Check-In behavior:** Event/Plan/Trip association, expected-Check-In scheduling, reminders, missed-expectation notifications, updated expected arrival, location integration, post-creation status mutation, re-sharing and contextual recipients. REQ-SHARE-007/008/010 retain applicable future intent and the implemented standalone boundary.
+
+These deferred capabilities remain valid future scope, are not implemented, and are not Phase 9.5 closure gates. General Plan editing/lifecycle/completion and Trip completion also remain outside Phase 9.5 closure; their approved requirements are unchanged. Future work requires separate scope and authorization; this decision assigns no new phase and starts no next phase.
 
 ### REQ-PROD-013
 

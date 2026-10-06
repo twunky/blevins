@@ -1,7 +1,9 @@
 # Requirements Index
 
-**Status:** APPROVED - `CTX-1.36`
+**Status:** APPROVED - `CTX-1.37`
 **Purpose:** Traceability index only; normative wording lives at each canonical source.
+
+DEC-092 / REQ-PROD-014 records Phase 9.5 closure scope. Existing product-intent anchors remain approved; formal deferral does not mean implementation. Prior row baselines retain requirement provenance; CTX-1.37 is the active aggregate baseline.
 
 ## ID and lifecycle rules
 
@@ -49,6 +51,7 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-PROD-011` | Plans and Trips distinction | `product-contract.md#req-prod-011` | `APPROVED` | `CTX-1.0` | — |
 | `REQ-PROD-012` | Concern and Incident distinction; manual Start an Incident shortcut | `product-contract.md#req-prod-012` | `APPROVED` | `CTX-1.25`; amended `CTX-1.26` | — |
 | `REQ-PROD-013` | Minor and guardian functionality outside MVP | `product-contract.md#req-prod-013` | `APPROVED` | `CTX-1.14` | — |
+| `REQ-PROD-014` | Phase 9.5 implemented minimum and formally deferred future scope | `product-contract.md#req-prod-014` | `APPROVED` | `CTX-1.37` | DEC-092; WI-095-001–010 complete; no WI-095-011 required |
 
 ## UX
 
@@ -139,7 +142,7 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-EVT-010` | Event invitation and RSVP lifecycle | `../workflows/events.md#req-evt-010` | `APPROVED` | `CTX-1.19` | — |
 | `REQ-EVT-011` | Unified Event Needs and eligibility lifecycle | `../workflows/events.md#req-evt-011` | `APPROVED` | `CTX-1.19` | — |
 | `REQ-EVT-012` | Meaningful Event Updates and retained history | `../workflows/events.md#req-evt-012` | `APPROVED` | `CTX-1.19` | — |
-| `REQ-EVT-013` | Event Check-In, Home, and notification boundaries | `../workflows/events.md#req-evt-013` | `APPROVED` | `CTX-1.19` | DEC-090 / WI-095-009: live Home own-Pending RSVP attention only; broader notifications remain gated |
+| `REQ-EVT-013` | Event Check-In, Home, and notification boundaries | `../workflows/events.md#req-evt-013` | `APPROVED` | `CTX-1.19` | DEC-090 / WI-095-009: live Home own-Pending RSVP attention; DEC-092 / REQ-PROD-014: phase minimum satisfied, broader capability formally deferred |
 | `REQ-EVT-014` | First in-app invitation and self-RSVP lifecycle and discovery | `../workflows/events.md#req-evt-014` | `APPROVED` | `CTX-1.30` | — |
 
 ## Lightweight plans

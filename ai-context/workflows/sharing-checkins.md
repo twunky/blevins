@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL WORKFLOW — CTX-1.3
-Context-Baseline: CTX-1.35
-Version: 1.4
-Source: ../bootstrap/product-ux-source.md; DEC-057; DEC-086; DEC-087
+Context-Baseline: CTX-1.37
+Version: 1.5
+Source: ../bootstrap/product-ux-source.md; DEC-057; DEC-086; DEC-087; DEC-092
 Constrained-By:
   - ../core/product-contract.md
   - ../core/ux-contract.md
@@ -54,6 +54,8 @@ The first implemented Sharing Session is temporary, self-initiated current/last-
 
 OD-002 is resolved for this bounded temporary-only MVP by DEC-087; indefinite sharing remains excluded.
 
+DEC-092 / REQ-PROD-014 confirms WI-095-006 as the completed Phase 9.5 minimum. Broader modes and contextual behavior in REQ-SHARE-002/003/004/011 are formally deferred future scope, not implemented behavior or phase-closure gates. Context grants no audience, authorization or location access; future contextual scope requires separate approval.
+
 ## Check-ins
 
 ### REQ-SHARE-006
@@ -79,3 +81,5 @@ Trip context does not grant Sharing Session or another person's Check-In access.
 ### REQ-SHARE-010
 
 The first standalone Check-In slice is self-authored creation and read-only history. It uses exactly the five statuses in REQ-SHARE-006 and an optional plain-text note under REQ-SHARE-007. Status, note and explicitly chosen recipients are fixed at creation; post-creation editing, re-sharing, deletion and restore are excluded. Historical records remain stored without an invented expiry; their availability follows REQ-PRIV-030. No location, expected-arrival update, Event/Plan/Trip association, Sharing Session dependency, reminder, notification or automatic Concern/Incident/safety inference is included. Optional Safety Circle recipient presets follow REQ-PRIV-033; recipients remain explicit and fixed. A status is the author's report, not verified safety.
+
+DEC-092 / REQ-PROD-014 confirms WI-095-005 as the completed Phase 9.5 minimum. Additional integrations, scheduling/reminder execution, missed-expectation notifications and mutations are formally deferred future scope, not implemented behavior or phase-closure gates. REQ-SHARE-007/008 retain their applicable future intent; existing fixed-recipient privacy is unchanged.
