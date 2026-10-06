@@ -1240,3 +1240,11 @@ These questions are intentionally unresolved and are not requirements.
 - **Decision:** REQ-FAM-017 / REQ-PRIV-033 record private owner-only, one-Family presets with same-Family eligible adult profiles and zero protected authority. Ordinary loss permanently removes only the member row; owner loss permanently deletes circle/member rows, without retention/restore/transfer or automatic rejoin recreation. Optional Check-In/Sharing presets materialize confirmed explicit grants independently of later circle changes/deletion.
 - **Scope:** Bounded CRUD, creation presets, focused verification and one final regression; no other item authorized. Owner performs Git commits. WI-095-008 ends VERIFYING / OWNER REVIEW.
 - **Canonical effect:** CTX-1.35 succeeds CTX-1.34 after separate context verification; other permissions/lifecycles unchanged.
+
+## DEC-090 - Home Pending RSVP attention first trigger
+
+- **Status/date/authority:** ACCEPTED - explicit project-owner WI-095-009 continuation instruction, 2026-10-05.
+- **Decision:** Pending Event RSVP is the first Home attention trigger. Reuse live currently eligible exact-profile own-Pending invitations, with selected Family scoping only after server authorization; include past-dated Events. Home discovers and links to existing Event detail for RSVP. Resolved/revoked/ineligible/invisible entries disappear on reread.
+- **Boundary:** No notification storage/inbox/history, read/unread/dismiss/snooze, outbound push/email/SMS, preferences, generic infrastructure or other workflow attention. This does not complete Phase 9.5 notifications.
+- **Context effect:** Implements contemplated REQ-EVT-013 / REQ-UX-008 using unchanged REQ-EVT-010/014 and REQ-PRIV-028. Clarify current Home scope separately from WI-095-001's historical exclusion. CTX-1.35 remains ACTIVE: no new permission, lifecycle or baseline is required.
+- **Authorization:** Create and execute WI-095-009 only; hand back VERIFYING / OWNER REVIEW. WI-095-010 unauthorized. Owner performs all Git commits; no staging/commit/push/PR.

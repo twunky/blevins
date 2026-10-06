@@ -125,7 +125,7 @@
                 <span class="card-icon card-icon--attention"><app-icon name="alert" /></span>
                 <div>
                   <h2 id="home-attention-heading">Needs Your Attention</h2>
-                  <p class="card-sub">{{ hasRelationshipSuggestions() ? '1 item' : 'Nothing right now' }}</p>
+                  <p class="card-sub">{{ homeAttentionSummary() }}</p>
                 </div>
               </div>
               @if (relationshipLoading()) {
@@ -143,7 +143,24 @@
                     <button type="button" (click)="navigate('family')">Review in Family</button>
                   </div>
                 </div>
-              } @else {
+              }
+              @if (pendingEventInvitationsLoading()) {
+                <p role="status">Checking pending Event invitations…</p>
+              } @else if (pendingEventInvitationsError()) {
+                <p class="message message--error" role="alert">{{ pendingEventInvitationsError() }}</p>
+                <button type="button" class="button--secondary" (click)="loadPendingEventInvitations()">Retry loading pending invitations</button>
+              } @else if (pendingEventInvitations().length > 0) {
+                <ul class="attention-list">
+                  @for (invitation of pendingEventInvitations(); track invitation.invitationId) {
+                    <li class="attention-row">
+                      <span class="row-icon"><app-icon name="calendar" /></span>
+                      <div class="item-main"><strong><a class="item-link" [routerLink]="['/events', invitation.eventId]" [state]="focusHeadingState">{{ invitation.name }}</a></strong><span class="item-meta">{{ displayDateTime(invitation.date, invitation.time) }}</span><span class="item-meta">RSVP needed · Open Event to respond</span></div>
+                    </li>
+                  }
+                </ul>
+              }
+              @if (!relationshipLoading() && !relationshipError() && !hasRelationshipSuggestions()
+                && !pendingEventInvitationsLoading() && !pendingEventInvitationsError() && pendingEventInvitations().length === 0) {
                 <div class="attention-list home-attention-clear">
                   <span class="row-icon row-icon--clear"><app-icon name="check" /></span>
                   <div class="item-main"><strong>Nothing needs your attention right now.</strong><span class="item-meta">Items that need a response from you will appear here.</span></div>

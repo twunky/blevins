@@ -54,6 +54,7 @@ describe('Home and feature empty states', () => {
     http.expectOne('/api/profile').flush(ownProfile);
     http.expectOne('/api/family-groups/administered').flush(admins);
     http.expectOne('/api/family-groups/mine').flush(groups);
+    http.match(request => request.url.endsWith('/event-invitations/mine')).forEach(request => request.flush([]));
   }
 
   function familyReads(group = family, members = [{ profileId: ownProfile.profileId, displayName: 'Alex' }], relationships: object[] = []) {

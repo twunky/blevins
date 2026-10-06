@@ -27,6 +27,7 @@ public sealed class EventInvitationApiTests : IClassFixture<EventInvitationApiTe
     }
     private static readonly Guid ActorId = Guid.NewGuid();
     private static readonly Guid EventId = Guid.NewGuid();
+    private static readonly string[] PendingFields = ["date", "eventId", "invitationId", "name", "time"];
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     { Converters = { new JsonStringEnumConverter() } };
     private static readonly EventInvitationView Row = new(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, null, EventRsvpStatus.Pending, null, Guid.NewGuid());
@@ -72,6 +73,9 @@ public sealed class EventInvitationApiTests : IClassFixture<EventInvitationApiTe
         var pending = await (await Send("pending")).Content.ReadFromJsonAsync<PendingEventInvitationView[]>();
         Assert.Equal(EventId, Assert.Single(pending!).EventId);
         Assert.Equal(ActorId, factory.Repository.LastAccount);
+        using var pendingBody = JsonDocument.Parse(await (await Send("pending")).Content.ReadAsStringAsync());
+        Assert.Equal(PendingFields,
+            pendingBody.RootElement[0].EnumerateObject().Select(property => property.Name).Order());
         var body = await (await Send("own")).Content.ReadAsStringAsync();
         Assert.DoesNotContain("displayName", body, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("\"rsvpStatus\":\"Pending\"", body, StringComparison.Ordinal);

@@ -116,6 +116,7 @@ public sealed class EventInvitationPersistenceTests(ITestOutputHelper output)
             await SetMembership(w.Db, w.B.Profile, true);
             await w.Db.FamilyEventAudienceMembers.Where(a => a.EventId == w.EventId && a.ProfileId == w.B.Profile).ExecuteDeleteAsync();
             Assert.Null(await w.Repo.GetOwnAsync(w.B.Account, w.EventId, Ct));
+            Assert.Empty((await w.Repo.GetPendingAsync(w.B.Account, w.GroupId, Ct))!);
             Assert.Null(await w.Repo.RespondAsync(w.B.Account, w.EventId, new(row.InvitationId, row.Version, EventRsvpStatus.Going), Ct));
             // Same account with a different profile cannot use invitation provenance.
             // Production has one profile per Account. Deliberately remap the test
@@ -129,6 +130,7 @@ public sealed class EventInvitationPersistenceTests(ITestOutputHelper output)
             w.Db.FamilyEventAudienceMembers.Add(new(w.EventId, replacement.Id, false));
             await w.Db.SaveChangesAsync();
             Assert.Null((await w.Repo.GetOwnAsync(w.B.Account, w.EventId, Ct))!.Invitation);
+            Assert.Empty((await w.Repo.GetPendingAsync(w.B.Account, w.GroupId, Ct))!);
             Assert.Null(await w.Repo.RespondAsync(w.B.Account, w.EventId, new(row.InvitationId, row.Version, EventRsvpStatus.Going), Ct));
             await w.Db.FamilyGroupMemberships.Where(m => m.AdultProfileId == replacement.Id).ExecuteUpdateAsync(u => u.SetProperty(m => m.AdultProfileId, w.B.Profile));
             w.Db.ChangeTracker.Clear();
@@ -153,6 +155,8 @@ public sealed class EventInvitationPersistenceTests(ITestOutputHelper output)
             Assert.Equal(new DateOnly(2020, 1, 1), pending.Date);
             Assert.Equal(w.EventId, pending.EventId);
             Assert.Empty((await w.Repo.GetPendingAsync(w.Editor.Account, w.GroupId, Ct))!);
+            Assert.Empty((await w.Repo.GetPendingAsync(w.A.Account, w.GroupId, Ct))!); // Organizer is not the invitee.
+            Assert.Empty((await w.Repo.GetPendingAsync(w.Nonviewer.Account, w.GroupId, Ct))!); // Administrator gets no override.
             Assert.Null(await w.Repo.GetPendingAsync(w.B.Account, Guid.NewGuid(), Ct));
             var secondFamily = new FamilyGroup(Guid.NewGuid(), "Second invitation family", 100);
             w.Db.AddRange(secondFamily,
@@ -169,6 +173,7 @@ public sealed class EventInvitationPersistenceTests(ITestOutputHelper output)
             var earlierInvite = (await w.Repo.IssueAsync(w.A.Account, earlier.EventId, new(w.B.Profile), Ct))!;
             Assert.Equal(new[] { earlier.EventId, w.EventId }, (await w.Repo.GetPendingAsync(w.B.Account, w.GroupId, Ct))!.Select(i => i.EventId));
             await w.Repo.RevokeAsync(w.A.Account, earlier.EventId, earlierInvite.InvitationId, new(earlierInvite.Version), Ct);
+            Assert.Equal(w.EventId, Assert.Single((await w.Repo.GetPendingAsync(w.B.Account, w.GroupId, Ct))!).EventId);
             foreach (var state in new[] { EventRsvpStatus.Going, EventRsvpStatus.Maybe, EventRsvpStatus.NotGoing })
             {
                 row = (await w.Repo.RespondAsync(w.B.Account, w.EventId, new(row.InvitationId, row.Version, state), Ct))!;

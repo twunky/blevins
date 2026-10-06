@@ -2,8 +2,8 @@
 Status: APPROVED
 Authority: CANONICAL WORKFLOW
 Context-Baseline: CTX-1.31
-Version: 1.5
-Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-051; DEC-058; DEC-083; DEC-084
+Version: 1.6
+Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-051; DEC-058; DEC-083; DEC-084; DEC-090
 Constrained-By:
   - ../core/product-contract.md
   - ../core/ux-contract.md
@@ -89,6 +89,8 @@ A new invitation starts with RSVP Pending: a response has been requested, but cr
 Revoked invitations and their final RSVP remain inactive historical records retained for the parent Event record's lifecycle. A later re-invitation creates a new invitation record and ID. There is no independent RSVP revision-history table, public RSVP history, or separate invitation-retention timer. Future Event-level disposal/retention governs invitations unless a later explicit rule says otherwise; this does not define Event completion or a new parent retention policy. Retention supplies no alternate access path.
 
 The existing Events dashboard RSVP/attention area is the discovery surface: it shows the signed-in adult's own currently eligible, active Pending invitations for the selected Family, each linking to the existing Event item URL. Event detail is the self-RSVP action surface and organizer invitation-management surface. Pending invitations remain discoverable after the Event date because dates do not expire invitations. This slice adds no Home attention, outbound email, push, SMS, notification infrastructure or center, preferences, or generic activity feed. `REQ-EVT-013` remains a future capability boundary rather than authorization for those surfaces.
+
+Separately, DEC-090 / WI-095-009 authorizes Home Pending RSVP attention under `REQ-EVT-013` and `REQ-UX-008`. Home reuses that same server-authorized own-Pending discovery for the selected Family and links to Event detail for action. It projects live current state only; rereads remove resolved, revoked or currently ineligible/invisible invitations. Past dates do not expire invitations. No notification inbox, persistence, read/unread, dismiss/snooze, outbound delivery, preferences, generic infrastructure or other workflow attention is authorized. Existing invitation/privacy rules and CTX-1.35 remain unchanged.
 
 ## Completion
 

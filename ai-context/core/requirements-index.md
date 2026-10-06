@@ -139,7 +139,7 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-EVT-010` | Event invitation and RSVP lifecycle | `../workflows/events.md#req-evt-010` | `APPROVED` | `CTX-1.19` | — |
 | `REQ-EVT-011` | Unified Event Needs and eligibility lifecycle | `../workflows/events.md#req-evt-011` | `APPROVED` | `CTX-1.19` | — |
 | `REQ-EVT-012` | Meaningful Event Updates and retained history | `../workflows/events.md#req-evt-012` | `APPROVED` | `CTX-1.19` | — |
-| `REQ-EVT-013` | Event Check-In, Home, and notification boundaries | `../workflows/events.md#req-evt-013` | `APPROVED` | `CTX-1.19` | — |
+| `REQ-EVT-013` | Event Check-In, Home, and notification boundaries | `../workflows/events.md#req-evt-013` | `APPROVED` | `CTX-1.19` | DEC-090 / WI-095-009: live Home own-Pending RSVP attention only; broader notifications remain gated |
 | `REQ-EVT-014` | First in-app invitation and self-RSVP lifecycle and discovery | `../workflows/events.md#req-evt-014` | `APPROVED` | `CTX-1.30` | — |
 
 ## Lightweight plans

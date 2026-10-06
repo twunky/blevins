@@ -213,6 +213,13 @@ export class App implements OnInit {
     return this.familyRelationships().some(item => item.status === 'Pending' && item.isCurrentUserRecipient);
   }
 
+  protected homeAttentionSummary(): string {
+    if (this.relationshipLoading() || this.pendingEventInvitationsLoading()) return 'Checking attention…';
+    if (this.relationshipError() || this.pendingEventInvitationsError()) return 'Some attention could not be checked';
+    const count = this.pendingEventInvitations().length + (this.hasRelationshipSuggestions() ? 1 : 0);
+    return count === 0 ? 'Nothing right now' : `${count} ${count === 1 ? 'item' : 'items'}`;
+  }
+
   /** Family dashboard and Settings groupings of the relationships the server already returns; no new request or rule. */
   protected readonly incomingRelationshipSuggestions = computed(() =>
     this.familyRelationships().filter(item => item.status === 'Pending' && item.isCurrentUserRecipient));
@@ -790,7 +797,7 @@ export class App implements OnInit {
     this.loadRelationships();
     this.loadEvents();
     this.loadEventAudienceMembers();
-    if (this.view() === 'events') this.loadPendingEventInvitations();
+    if (this.view() === 'home' || this.view() === 'events') this.loadPendingEventInvitations();
     this.loadPlans();
     this.loadPlanAudienceMembers();
     // Home and the Events dashboard Trips card (WI-009-008 D3) share one read and one current-Family filter.
@@ -1493,7 +1500,7 @@ export class App implements OnInit {
 
   protected loadPendingEventInvitations(): void {
     const familyId = this.currentFamilyId();
-    if (!familyId || this.view() !== 'events') return;
+    if (!familyId || (this.view() !== 'home' && this.view() !== 'events')) return;
     const version = ++this.pendingEventInvitationsVersion;
     this.pendingEventInvitations.set([]);
     this.pendingEventInvitationsLoading.set(true);
