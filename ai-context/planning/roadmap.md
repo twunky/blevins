@@ -16,6 +16,7 @@ Approved phase status and remaining gates. The [project checkpoint](../project-s
 | Phase 9 | Integration & UX Refinement | `COMPLETE / CLOSED` |
 | Phase 9.5 | MVP Feature Completion | `COMPLETE / CLOSED` under DEC-092 |
 | Phase 10 | Testing & Verification / User-Testability Readiness | `CURRENT / IN PROGRESS` under DEC-093 |
+| Phase 10.5 | MVP Functional Completion | `APPROVED / NEXT IMPLEMENTATION PRIORITY` under DEC-094 |
 | Phase 11 | Pilot & Release Readiness | `FUTURE` |
 
 ## Phase 9.5 — MVP Feature Completion
@@ -37,7 +38,7 @@ COMPLETE / CLOSED under DEC-092, 2026-10-05. WI-095-001 through WI-095-010 are C
 
 The owner-approved minimum and full deferral boundary are canonical in [REQ-PROD-014](../core/product-contract.md#req-prod-014). WI-095-005 satisfies standalone Check-Ins, WI-095-006 satisfies bounded temporary location sharing, and WI-095-009 satisfies the first notification/attention slice through live eligible own-Pending RSVP Home attention. Broader/contextual Sharing Sessions, broader notifications and additional Check-In integrations/reminders are FORMALLY DEFERRED, not implemented or closure gates. OD-002 remains resolved only for the bounded temporary MVP under DEC-087; indefinite sharing remains excluded.
 
-DEC-092 supersedes the remaining Phase 9.5 gates under DEC-073 and DEC-090's notification-completion boundary only. Broader product intent and existing privacy/implementation permissions are preserved. General Plan editing/lifecycle/completion and Trip completion remain outside Phase 9.5 closure, without new phase placement. Any future capability or additional Event RSVP scope requires separate owner-approved scope, canonical updates where needed and execution authorization.
+DEC-092 supersedes the remaining Phase 9.5 gates under DEC-073 and DEC-090's notification-completion boundary only. Broader product intent and existing privacy/implementation permissions are preserved. General Plan editing/lifecycle/completion and Trip completion remain outside Phase 9.5 closure. DEC-094 now places only the owner-selected functional completion candidates in Phase 10.5; it does not reopen Phase 9.5 or authorize general Plan lifecycle work. Any future capability or additional Event RSVP scope requires separate owner-approved scope, canonical updates where needed and execution authorization.
 
 ## Phase 10 — Testing & Verification / User-Testability Readiness
 
@@ -46,6 +47,18 @@ CURRENT / IN PROGRESS under DEC-093. WI-010-001 through WI-010-003 automated/con
 First item: [WI-010-001 — Post-9.5 User-Testability Baseline](stories/WI-010-001-post-9-5-user-testability-baseline.md) COMPLETE / PASS — OWNER APPROVED, including bounded corrections to verified misleading presentation. [WI-010-002 — Connected Everyday Coordination Verification](stories/WI-010-002-connected-everyday-coordination-verification.md) COMPLETE / PASS — OWNER APPROVED, accepted 2026-10-05. [WI-010-003 — Connected Safety and Care Verification](stories/WI-010-003-connected-safety-care-verification.md) COMPLETE / PASS — OWNER APPROVED, accepted 2026-10-05; [verification](verification/VER-WI-010-003.md) COMPLETE / PASS, technical evidence SELF-VERIFIED. Affected journeys remain READY FOR FACILITATED TEST, meaning technically prepared for future MVP-end human validation; human results uncollected. [WI-010-004 — Facilitated Adult Usability Sessions](stories/WI-010-004-facilitated-adult-usability-sessions.md): APPROVED — Stage A PREPARATION COMPLETE; Stage B DEFERRED — MVP-END HUMAN VALIDATION by explicit owner decision. Reuse the prepared materials after MVP functional completion and before pilot/release readiness. Minimum useful round 3 adults, target 5; synthetic Development only. No WI-010-005 authorized. CTX-1.37 remains active because no canonical product/privacy behavior changes.
 
 Exit gates: critical adult journeys understandable and completable without unreasonable coaching; no blocking defect in tested critical paths or identified unintended privacy/access disclosure; deferred/unsupported behavior clearly communicated; remaining issues classified as blocking, bounded follow-up, deferred or production-readiness. Actual human observations and owner acceptance are still needed; automated evidence alone does not close Phase 10. DEC-092 deferrals remain active.
+
+## Phase 10.5 — MVP Functional Completion
+
+APPROVED / NEXT IMPLEMENTATION PRIORITY under [DEC-094](../decision-log.md#dec-094--establish-phase-105-mvp-functional-completion), 2026-10-06. Inserted between Phase 10 and Phase 11 using the decimal-phase precedent (DEC-062/073); historical phases retain their numbers and meanings. Phase 10 remains CURRENT / IN PROGRESS for verification/readiness. Phase 10.5 functional work precedes resumption of its deferred human-validation gate; numerical placement does not require Phase 10 closure before functional development.
+
+Purpose: close only the minimum remaining owner-selected functional MVP lifecycle gaps. Expected candidates are Explicit Creator-Only Trip Completion, Bounded Plan Activity/Timing Correction, and Final Functional MVP Readiness Review. No work items are created by this governance decision. The next authorized action is creation and bounded implementation of `WI-105-001 — Explicit Creator-Only Trip Completion`, using the prior owner-authorized scope and DEC-094 decisions, with canonical reconciliation before execution. Plan correction and final review require separately approved scope and authorization; no general Plan lifecycle/completion is authorized.
+
+Numbering follows `WI-075` / `WI-095` for decimal phases and DEC-093 for whole phases: Phase 10.5 uses `WI-105-###`. This roadmap owns phase scope and exit gates; no separate phase record or initial WI is required to establish it.
+
+Exit/human-resumption gates: required functional work owner-approved complete, no known blocking functional defect, and an accepted final functional readiness review. Only then may WI-010-004 Stage B facilitated adult validation resume using approved Stage A preparation; no observations are requested now. Phase closure and human-result acceptance remain owner decisions.
+
+DEC-092's broader/contextual Sharing Sessions, broader notifications and additional Check-In integrations/reminders remain deferred. Exclude child/minor support, production authentication, invitation delivery infrastructure, hosting/deployment, backup/restore, production observability, physical-device GPS validation, general Event completion and generic lifecycle/state-machine architecture. Phase 9.5 stays closed; Phase 11 retains its separate pilot/release boundary. CTX-1.37 remains active for this planning-only change (DEC-073/074 precedent); Trip requirement clarification follows normal canonical/baseline governance before implementation.
 
 ## Later phases
 
