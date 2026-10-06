@@ -1,3 +1,4 @@
+using FamilySafety.Domain.Households;
 using FamilySafety.Domain.SafetyCircles;
 using FamilySafety.Domain.Profiles;
 using FamilySafety.Domain.TrustedContacts;
@@ -17,6 +18,8 @@ namespace FamilySafety.Infrastructure.Persistence;
 public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext> options)
     : DbContext(options)
 {
+    public DbSet<FamilyHousehold> FamilyHouseholds => Set<FamilyHousehold>();
+    public DbSet<HouseholdAssignment> HouseholdAssignments => Set<HouseholdAssignment>();
     public DbSet<SafetyCircle> SafetyCircles => Set<SafetyCircle>();
     public DbSet<SafetyCircleMember> SafetyCircleMembers => Set<SafetyCircleMember>();
     public DbSet<Account> Accounts => Set<Account>();
@@ -73,6 +76,22 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var household = modelBuilder.Entity<FamilyHousehold>();
+        household.ToTable("FamilyHouseholds");
+        household.HasKey(h => h.Id);
+        household.HasAlternateKey(h => new { h.Id, h.FamilyGroupId });
+        household.Property(h => h.Name).HasMaxLength(100).IsRequired();
+        household.Property(h => h.NormalizedName).HasMaxLength(200).UseCollation("Latin1_General_100_BIN2").IsRequired();
+        household.Property(h => h.Version).IsConcurrencyToken();
+        household.HasIndex(h => new { h.FamilyGroupId, h.NormalizedName }).IsUnique();
+        household.HasOne<FamilyGroup>().WithMany().HasForeignKey(h => h.FamilyGroupId).OnDelete(DeleteBehavior.Restrict);
+        var assignment = modelBuilder.Entity<HouseholdAssignment>();
+        assignment.ToTable("HouseholdAssignments", t => t.HasTrigger("TR_HouseholdAssignments_Eligibility"));
+        assignment.HasKey(a => new { a.FamilyGroupId, a.ProfileId });
+        assignment.HasOne<FamilyHousehold>().WithMany().HasForeignKey(a => new { a.HouseholdId, a.FamilyGroupId })
+            .HasPrincipalKey(h => new { h.Id, h.FamilyGroupId }).OnDelete(DeleteBehavior.Cascade);
+        assignment.HasOne<AdultProfile>().WithMany().HasForeignKey(a => a.ProfileId).OnDelete(DeleteBehavior.Restrict);
+        assignment.HasOne<FamilyGroupMembership>().WithMany().HasForeignKey(a => a.MembershipId).OnDelete(DeleteBehavior.Restrict);
         var circle = modelBuilder.Entity<SafetyCircle>();
         circle.ToTable("SafetyCircles"); circle.HasKey(c => c.Id);
         circle.Property(c => c.Name).HasMaxLength(100).IsRequired();
@@ -171,6 +190,7 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
             table.HasTrigger("TR_CheckIns_MembershipLoss");
             table.HasTrigger("TR_SharingSessions_MembershipLoss");
             table.HasTrigger("TR_SafetyCircles_MembershipLoss");
+            table.HasTrigger("TR_Households_MembershipLoss");
         });
         membership.HasKey(entity => entity.Id);
         membership.HasIndex(entity => new { entity.AccountId, entity.FamilyGroupId }).IsUnique();

@@ -1,6 +1,6 @@
 # Requirements Index
 
-**Status:** APPROVED - `CTX-1.35`
+**Status:** APPROVED - `CTX-1.36`
 **Purpose:** Traceability index only; normative wording lives at each canonical source.
 
 ## ID and lifecycle rules
@@ -271,3 +271,10 @@ DEC-088 clarifies REQ-FAM-014/015 and REQ-PRIV-019/024 for this first slice; bro
 |---|---|---|---|---|---|
 | REQ-FAM-017 | Owner Safety Circle CRUD | product-contract.md#req-fam-017 | APPROVED | CTX-1.35 | - |
 | REQ-PRIV-033 | Circle privacy, provenance, deletion and target grants | privacy-safety-contract.md#req-priv-033 | APPROVED | CTX-1.35 | - |
+
+## Household organization (CTX-1.36)
+
+| ID | Short label | Canonical location | Status | Introduced | Superseded by |
+|---|---|---|---|---|---|
+| REQ-FAM-018 | Household organization, adult eligibility and lifecycle | product-contract.md#req-fam-018 | APPROVED | CTX-1.36 | - |
+| REQ-PRIV-034 | Household current Family visibility/admin checks and zero protected authority | privacy-safety-contract.md#req-priv-034 | APPROVED | CTX-1.36 | - |

@@ -1,0 +1,62 @@
+<section class="card households" aria-labelledby="households-heading">
+  <div class="card-header"><h2 id="households-heading">Households</h2></div>
+  <p>Household grouping helps organize members of this Family. Households do not change Family access or sharing permissions.</p>
+  @if (message()) { <p role="status">{{ message() }}</p> }
+  @if (error()) { <p role="alert">{{ error() }}</p> }
+  @if (state() === 'loading') { <p role="status">Loading Households...</p> }
+  @else if (state() === 'error') {
+    <p role="alert">Households could not be loaded.</p><button type="button" (click)="refresh()">Retry loading Households</button>
+  } @else if (state() === 'unavailable') {
+    <p>Household organization is unavailable. Current Family membership is required.</p>
+    <button type="button" class="button--secondary" (click)="refresh()">Refresh Households</button>
+  } @else if (structure(); as data) {
+    <div class="actions">
+      <button type="button" class="button--secondary" [disabled]="busy()" (click)="refresh()">Refresh Households</button>
+      @if (data.canManage) { <button type="button" [disabled]="busy() || formOpen()" (click)="open()">Create a Household</button> }
+    </div>
+    @if (!data.canManage) { <p>A Family administrator manages Household organization.</p> }
+    @if (data.canManage && formOpen()) {
+      <form (ngSubmit)="save()">
+        <label for="household-name">Household name</label>
+        <input id="household-name" name="name" [(ngModel)]="name" required maxlength="100" [disabled]="busy()" autocomplete="off" />
+        <div class="actions">
+          <button type="submit" [disabled]="busy() || !valid()">{{ editing() ? 'Save Household name' : 'Create Household' }}</button>
+          <button type="button" class="button--secondary" [disabled]="busy()" (click)="cancel()">Cancel Household edit</button>
+        </div>
+      </form>
+    }
+    @for (row of data.households; track row.householdId) {
+      <article class="household-row" [attr.aria-label]="row.name">
+        <h3>{{ row.name }}</h3>
+        <ul>
+          @for (member of row.members; track member.profileId) {
+            <li>{{ member.displayName }}
+              @if (data.canManage) { <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="unassign(row, member.profileId)" [attr.aria-label]="'Unassign ' + member.displayName + ' from ' + row.name">Unassign member</button> }
+            </li>
+          } @empty { <li>No members assigned.</li> }
+        </ul>
+        @if (data.canManage) {
+          <label [for]="'household-member-' + row.householdId">Assign or move a member to {{ row.name }}</label>
+          <select #member [id]="'household-member-' + row.householdId" [disabled]="busy() || formOpen()" (change)="assign(row, member.value); member.value = ''">
+            <option value="">Choose a Family member</option>
+            @for (person of choices(row); track person.profileId) { <option [value]="person.profileId">{{ person.label }}</option> }
+          </select>
+          <div class="actions">
+            <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="open(row)">Rename Household</button>
+            <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="removing.set(row.householdId)">Delete Household</button>
+          </div>
+          @if (removing() === row.householdId) {
+            <p>Delete {{ row.name }} permanently? Its members will become unassigned and remain in this Family. This cannot be restored.</p>
+            <div class="actions"><button type="button" [disabled]="busy()" (click)="deleteHousehold(row)">Confirm Household deletion</button>
+              <button type="button" class="button--secondary" [disabled]="busy()" (click)="removing.set(null)">Cancel Household deletion</button></div>
+          }
+        }
+      </article>
+    } @empty { <p>No Households in this Family yet.</p> }
+    <section aria-labelledby="household-unassigned-heading">
+      <h3 id="household-unassigned-heading">Unassigned members</h3>
+      <ul>@for (member of data.unassignedMembers; track member.profileId) { <li>{{ member.displayName }}</li> }
+        @empty { <li>All current members are assigned.</li> }</ul>
+    </section>
+  }
+</section>

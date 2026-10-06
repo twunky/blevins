@@ -699,6 +699,77 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.ToTable("SharedFamilyDateAssociations", (string)null);
                 });
 
+            modelBuilder.Entity("FamilySafety.Domain.Households.FamilyHousehold", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("FamilyGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FamilyGroupId", "NormalizedName")
+                        .IsUnique();
+
+                    b.ToTable("FamilyHouseholds", (string)null);
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Households.HouseholdAssignment", b =>
+                {
+                    b.Property<Guid>("FamilyGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("HouseholdId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MembershipId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MembershipVersion")
+                        .HasColumnType("int");
+
+                    b.HasKey("FamilyGroupId", "ProfileId");
+
+                    b.HasIndex("MembershipId");
+
+                    b.HasIndex("ProfileId");
+
+                    b.HasIndex("HouseholdId", "FamilyGroupId");
+
+                    b.ToTable("HouseholdAssignments", null, t =>
+                        {
+                            t.HasTrigger("TR_HouseholdAssignments_Eligibility");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
+                });
+
             modelBuilder.Entity("FamilySafety.Domain.Incidents.IncidentAuditEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1326,6 +1397,8 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                             t.HasTrigger("TR_CheckIns_MembershipLoss");
 
                             t.HasTrigger("TR_EventNeeds_MembershipLoss");
+
+                            t.HasTrigger("TR_Households_MembershipLoss");
 
                             t.HasTrigger("TR_SafetyCircles_MembershipLoss");
 
@@ -2094,6 +2167,37 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Households.FamilyHousehold", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroup", null)
+                        .WithMany()
+                        .HasForeignKey("FamilyGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilySafety.Domain.Households.HouseholdAssignment", b =>
+                {
+                    b.HasOne("FamilySafety.Domain.Profiles.FamilyGroupMembership", null)
+                        .WithMany()
+                        .HasForeignKey("MembershipId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Profiles.AdultProfile", null)
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FamilySafety.Domain.Households.FamilyHousehold", null)
+                        .WithMany()
+                        .HasForeignKey("HouseholdId", "FamilyGroupId")
+                        .HasPrincipalKey("Id", "FamilyGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

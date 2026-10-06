@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
-Authority: CANONICAL — CTX-1.35
-Context-Baseline: CTX-1.35
-Version: 1.11
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-059; DEC-071; DEC-088; DEC-089
+Authority: CANONICAL — CTX-1.36
+Context-Baseline: CTX-1.36
+Version: 1.12
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-059; DEC-071; DEC-088; DEC-089; DEC-091
 ---
 
 # Domain Glossary
@@ -54,7 +54,7 @@ The application-level operator responsible for platform configuration and contro
 
 ### Household
 
-A basic grouping of family members. Detailed household behavior is not defined by this foundation.
+A Family-owned organizational grouping under REQ-FAM-018 / REQ-PRIV-034. Current active members see organization; current Family admins manage it. Current MVP groups existing active adults only, at most one Household per member within a Family. Households grant no access and imply no residence or legal relationship. Membership loss clears assignment; deletion unassigns without ending Family membership. Minor grouping remains separately deferred.
 
 ### Safety Circle
 

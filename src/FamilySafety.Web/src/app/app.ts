@@ -27,6 +27,7 @@ import { SharedFamilyDates } from './family-dates/shared-family-dates';
 import { CheckIns } from './check-ins/check-ins';
 import { SharingSessions } from './sharing-sessions/sharing-sessions';
 import { SafetyCircles } from './safety-circles/safety-circles';
+import { Households } from './households/households';
 import { TrustedContacts } from './trusted-contacts/trusted-contacts';
 import { AdoptItemFamily, ItemKind, isItemId } from './item-route';
 import {
@@ -134,7 +135,7 @@ interface HomeTripPreview {
 
 @Component({
   selector: 'app-workspace',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, Trips, Concerns, Incidents, AppIcon, GroupLanding, SafetyDashboard, ItemUnavailable, EventParticipation, EventNeeds, EventUpdates, SharedFamilyDates, CheckIns, SharingSessions, TrustedContacts, SafetyCircles],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, Trips, Concerns, Incidents, AppIcon, GroupLanding, SafetyDashboard, ItemUnavailable, EventParticipation, EventNeeds, EventUpdates, SharedFamilyDates, CheckIns, SharingSessions, TrustedContacts, SafetyCircles, Households],
   styleUrls: ['./app.scss', './home.scss', './family.scss', './family-settings.scss', './events.scss', './events-dashboard.scss', './plans.scss'],
   templateUrl: './app.html',
 })

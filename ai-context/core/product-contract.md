@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.35
-Version: 1.19
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-045; DEC-046; DEC-047; DEC-053; DEC-059; DEC-068; DEC-071; DEC-088; DEC-089
+Context-Baseline: CTX-1.36
+Version: 1.20
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-045; DEC-046; DEC-047; DEC-053; DEC-059; DEC-068; DEC-071; DEC-088; DEC-089; DEC-091
 ---
 
 # Product Contract
@@ -240,3 +240,13 @@ The Incident keeps only a non-authorizing lineage reference to the originating C
 `OD-005` is resolved by `DEC-014`. See `../decision-log.md#resolved-product-decisions`.
 
 Invitation-only membership is approved by `DEC-016`. Controlled first Family Group and first Family Administrator bootstrap is approved by `DEC-018`. The normal-adult invitation lifecycle is approved by `DEC-030`. The adult Family Relationship contract is approved by `DEC-034` and active under `CTX-1.6`. Shared Family Dates are approved by `DEC-038` and active under `CTX-1.7`; their fields, single-date semantics, and 30-day retention period are approved under `CTX-1.9` and `CTX-1.10`. Sign-in/recovery method, production email provider, operator support process, long-term invitation-history retention, and minor/guardian behavior remain unresolved.
+
+## Household organization
+
+### REQ-FAM-018
+
+Under DEC-091, Households organize larger Family Groups. Current MVP assignments cover only existing active adult profiles with active membership in the same Family; minor/child grouping is deferred under REQ-PROD-013 and requires separately approved profile, membership, privacy and management rules.
+
+Only a current Family administrator may create, rename, assign/move/unassign members or delete a Household. Each member has zero or one Household within each Family; grouping changes no Family role. Names are short plain text (1–100 characters), unique within a Family using normalized comparison; different Families may reuse names. Names imply no address, residence, guardianship, custody, legal or financial relationship. Empty Households are allowed and are never automatically deleted.
+
+Membership loss immediately removes assignment. Rejoining restores nothing; replacement profiles inherit nothing. A current admin may explicitly assign an eligible member again. Household deletion is permanent with no restore/history/retention period: assignments disappear, members remain in the Family and become unassigned. Households belong to the Family, with no administrative owner; creating-admin membership/authority loss leaves them in place for another current admin. Stale rename, assignment/move/unassign and deletion must not silently overwrite newer organization. Visibility and zero-authority boundaries follow REQ-PRIV-034.

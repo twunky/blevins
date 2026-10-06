@@ -1293,6 +1293,10 @@
             }
           </div>
 
+          @if (view() === 'familySettings') {
+            <app-households [familyId]="family.familyGroupId" [ownProfileId]="ownerProfile()?.profileId ?? null" />
+          }
+
           <section class="card relationship-section family-relationship-panel" aria-labelledby="relationships-heading">
             <div class="card-header">
               <span class="card-icon"><app-icon name="heart" /></span>

@@ -1,0 +1,52 @@
+import { expect, test } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+import { resolve } from 'node:path';
+import { apiBaseUrl, apiJson, captureDirectory, recordScenario, useIsolatedScenario } from './fixtures/invitation-scenario';
+useIsolatedScenario({ tripAudienceAdult: true });
+
+test('admin organizes two Households, member reads organization, and deletion preserves Family membership', async ({ page, request }) => {
+  await recordScenario(test.info());
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const identities = (await (await request.get(apiBaseUrl + '/api/development/identities')).json()).identities as { accountId: string; label: string }[];
+  const admin = identities.find(i => i.label.startsWith('Adult A'))!, member = identities.find(i => i.label.startsWith('Adult C'))!;
+  const family = (await apiJson<{ familyGroupId: string }[]>(request, '/api/family-groups/mine', admin.accountId)).body[0];
+  const membersPath = '/api/family-groups/' + family.familyGroupId + '/members';
+  const beforeMembers = (await apiJson<unknown[]>(request, membersPath, admin.accountId)).body;
+  await page.goto('/family/settings'); await page.getByLabel('Active test identity').selectOption(admin.accountId);
+  const households = page.locator('app-households');
+  await expect(households).toContainText('No Households in this Family yet');
+  for (const name of ['Household A', 'Household B']) {
+    await households.getByRole('button', { name: 'Create a Household', exact: true }).click();
+    await households.getByLabel('Household name', { exact: true }).fill(name);
+    await households.getByRole('button', { name: 'Create Household', exact: true }).click();
+    await expect(households.getByRole('article', { name, exact: true })).toBeVisible();
+  }
+  const a = households.getByRole('article', { name: 'Household A', exact: true });
+  const b = households.getByRole('article', { name: 'Household B', exact: true });
+  await a.getByLabel('Assign or move a member to Household A').selectOption({ label: 'Development Audience Member' });
+  await expect(a.getByRole('button', { name: 'Unassign Development Audience Member from Household A' })).toBeVisible();
+  await b.getByLabel('Assign or move a member to Household B').selectOption({ label: 'Development Audience Member (from Household A)' });
+  await expect(a).toContainText('No members assigned'); await expect(b).toContainText('Development Audience Member');
+  await a.getByLabel('Assign or move a member to Household A').selectOption({ label: 'Development Adult' });
+  await expect(a.getByRole('button', { name: 'Unassign Development Adult from Household A' })).toBeVisible();
+  await page.screenshot({ path: resolve(captureDirectory('households'), 'admin-1440.png'), fullPage: true });
+  await households.getByRole('button', { name: 'Refresh Households', exact: true }).focus(); await page.keyboard.press('Enter');
+  await expect(a).toContainText('Development Adult');
+  await page.getByLabel('Active test identity').selectOption(member.accountId); await page.goto('/family/settings');
+  await expect(a).toContainText('Development Adult'); await expect(b).toContainText('Development Audience Member');
+  await expect(households.getByRole('button', { name: 'Create a Household', exact: true })).toHaveCount(0);
+  await expect(households.locator('select')).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.screenshot({ path: resolve(captureDirectory('households'), 'member-390.png'), fullPage: true });
+  await page.getByLabel('Active test identity').selectOption(admin.accountId); await page.goto('/family/settings');
+  await b.getByRole('button', { name: 'Delete Household', exact: true }).click();
+  await expect(b).toContainText('remain in this Family');
+  await b.getByRole('button', { name: 'Confirm Household deletion', exact: true }).focus(); await page.keyboard.press('Enter');
+  await expect(b).toHaveCount(0);
+  await expect(households.getByRole('region', { name: 'Unassigned members', exact: true })).toContainText('Development Audience Member');
+  expect((await apiJson<unknown[]>(request, membersPath, admin.accountId)).body).toEqual(beforeMembers);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});

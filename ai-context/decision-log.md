@@ -1248,3 +1248,11 @@ These questions are intentionally unresolved and are not requirements.
 - **Boundary:** No notification storage/inbox/history, read/unread/dismiss/snooze, outbound push/email/SMS, preferences, generic infrastructure or other workflow attention. This does not complete Phase 9.5 notifications.
 - **Context effect:** Implements contemplated REQ-EVT-013 / REQ-UX-008 using unchanged REQ-EVT-010/014 and REQ-PRIV-028. Clarify current Home scope separately from WI-095-001's historical exclusion. CTX-1.35 remains ACTIVE: no new permission, lifecycle or baseline is required.
 - **Authorization:** Create and execute WI-095-009 only; hand back VERIFYING / OWNER REVIEW. WI-095-010 unauthorized. Owner performs all Git commits; no staging/commit/push/PR.
+
+## DEC-091 — Household organization and adult-only MVP
+
+- **Status/date/authority:** ACCEPTED — explicit original WI-095-010 owner instruction and adult-only blocker-resolution decision, 2026-10-05.
+- **Decision:** Household grouping follows REQ-FAM-018 / REQ-PRIV-034. Only current Family admins manage; all current active members view same-Family organization. Zero-or-one assignment per active adult member; unique normalized Family names; empty Households allowed; immediate assignment removal on membership loss; no automatic rejoin/replacement inheritance. Permanent deletion unassigns only. Households belong to the Family and survive creator/admin authority loss.
+- **Boundary:** Organization/presentation only; zero feature authorization, audience, sharing, private contact visibility or admin privacy override. No address/residence/legal/custody/financial meaning. Current MVP supports existing active adults only; child grouping needs separately approved profile/membership/privacy/management rules under REQ-PROD-013. No minor-domain changes, generic groups, retention framework or feature integrations.
+- **Context effect:** Activate minimum successor CTX-1.36 after VER-CTX-1.36 PASS; supersedes CTX-1.35 as active aggregate baseline without changing unrelated contracts.
+- **Authorization:** Create/execute WI-095-010 only; hand back VERIFYING / OWNER REVIEW. WI-095-011 unauthorized; owner commits, no staging/commit/push/PR.

@@ -20,9 +20,9 @@ Approved phase status and remaining gates. The [project checkpoint](../project-s
 
 ## Phase 9.5 — MVP Feature Completion
 
-WI-095-001 through WI-095-009 are COMPLETE / PASS — OWNER APPROVED. WI-095-009 verification is COMPLETE / PASS; owner acceptance recorded 2026-10-05. Phase 9.5 remains CURRENT / IN PROGRESS. Next work item: NONE AUTHORIZED.
+WI-095-001 through WI-095-009 are COMPLETE / PASS — OWNER APPROVED. WI-095-009 verification is COMPLETE / PASS; owner acceptance recorded 2026-10-05. Phase 9.5 remains CURRENT / IN PROGRESS. Current item: WI-095-010 Household Grouping VERIFYING / OWNER REVIEW under DEC-091 / CTX-1.36; technical PASS / SELF-VERIFIED, owner acceptance pending; active adults only. WI-095-011 unauthorized.
 
-Remaining capabilities include broader Sharing Session scope, Household grouping, and notifications. Any additional Check-In or Event RSVP scope remains separately gated. OD-002 is resolved for the temporary-only bounded MVP by DEC-087; broader sharing remains separately gated.
+Household grouping is the bounded current WI-095-010. Remaining capabilities include broader Sharing Session scope and notifications. Any additional Check-In or Event RSVP scope remains separately gated. OD-002 is resolved for the temporary-only bounded MVP by DEC-087; broader sharing remains separately gated.
 
 DEC-073 defines phase placement, not capability behavior, order, or implementation scope. Each later capability requires owner/work-item approval, canonical updates where needed, and separate execution authorization. Home attention and outbound/notification delivery were excluded from WI-095-001. DEC-090 separately authorizes live Home own-Pending RSVP attention only, with no generic notification capability or outbound delivery. No blanket Phase 9.5 authorization exists.
 

@@ -1,14 +1,14 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.35
-Version: 1.27
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087; DEC-088; DEC-089
+Context-Baseline: CTX-1.36
+Version: 1.28
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087; DEC-088; DEC-089; DEC-091
 ---
 
 # Privacy and Safety Contract
 
-Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.35`.
+Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.36`.
 
 ## Consent and sharing control
 
@@ -435,3 +435,11 @@ Supported notification purposes may include event invitation or RSVP, event task
 - `OD-003`
 
 See `../decision-log.md#open-product-decisions`. Remaining open questions are not approved requirements. `OD-004` is resolved by `DEC-071` through `REQ-PRIV-026`.
+
+## Household privacy
+
+### REQ-PRIV-034
+
+Under DEC-091 / REQ-FAM-018, every Household read rechecks current active Family membership and every mutation rechecks existing current Family-administrator authority on the server. All current active members may see their Family's Household names, current active member display names/assignments and unassigned members. A selected Family scopes presentation only; known Household IDs grant nothing. Missing/denied specific operations use nondisclosing unavailable responses; protected responses are not cached.
+
+Households are organization/presentation only, never an authorization boundary, audience, sharing grant, Safety Circle or replacement membership. Assignment, move, unassignment, rename and deletion grant/remove no protected access or authority over Events, Plans, Trips, Check-Ins, Sharing Sessions, Safety Circles, Trusted Contacts, Shared Family Dates, Concerns, Incidents, profiles, Family administration or any other feature. Existing feature-specific authorization stays authoritative; Family admin Household management supplies no private-data override. Organization views expose no other Family data, private contact fields, recipient grants, location, Event participation or other protected content. Future feature integration requires its own approved work item.
