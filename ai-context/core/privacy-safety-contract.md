@@ -8,6 +8,8 @@ Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; D
 
 # Privacy and Safety Contract
 
+**Future production scope:** [DEC-097's production-entry contract](production-entry-contract.md) is APPROVED / UNIMPLEMENTED for Phase 11. The targeted notes below distinguish future replacements from current MVP privacy rules; CTX-1.39 and existing domain authorization remain unchanged.
+
 Privacy, consent, trust, and autonomy are foundational approved product requirements through `CTX-1.37`.
 
 ## Consent and sharing control
@@ -87,11 +89,15 @@ The Trip creator's continued own-Trip access under `REQ-PRIV-022` and the standa
 
 ### REQ-PRIV-012
 
+**CURRENT MVP / historical operator-bootstrap boundary.** Future self-service bootstrap and bounded continuity recovery follow [REQ-FAM-019](production-entry-contract.md#req-fam-019) / [REQ-FAM-023](production-entry-contract.md#req-fam-023), preserving the absence of protected-content overrides.
+
 Application-operator authority to configure Family Group capacity or perform controlled first Family Group bootstrap does not grant routine access to private Family Group content, Safety Circle information, location-related information, safety findings, or other private user information.
 
 ## Adult profile privacy and access
 
 ### REQ-PRIV-013
+
+**CURRENT MVP scope.** The MVP's per-field visibility choices apply broadly across active Families; they are not independent per-Family choices. [REQ-PRIV-036](production-entry-contract.md#req-priv-036) replaces this sharing behavior for future production onboarding only; no MVP retrofit is authorized.
 
 For the first adult self-profile slice:
 
@@ -108,6 +114,8 @@ For the first adult self-profile slice:
 ## Adult membership invitation privacy
 
 ### REQ-PRIV-014
+
+**CURRENT MVP scope.** Future verified-email recipient reconciliation is required by [REQ-PRIV-035](production-entry-contract.md#req-priv-035). Future bounded retention follows [REQ-PRIV-037](production-entry-contract.md#req-priv-037), with exact periods still open; lifecycle token/security boundaries below are preserved.
 
 For normal adult membership invitations:
 

@@ -72,6 +72,8 @@ Critical mobile actions should require minimal interaction, including check-in, 
 
 ### REQ-UX-011
 
+**CURRENT MVP navigation/entry scope.** The no-Family invitation/operator guidance below is replaced only for future Phase 11 production onboarding by [REQ-UX-015](production-entry-contract.md#req-ux-015) under DEC-097. Current runtime and selected-Family authorization boundaries remain unchanged.
+
 The approved conceptual UX destinations are Home, Family, Events, Plans & Trips, Safety, and Me / Settings, matching the conceptual product areas in `product-contract.md#req-prod-007`. The approved MVP primary navigation for these destinations is defined by `REQ-UX-013`.
 
 For the MVP application shell, automatically use the user's sole active Family membership as the current Family context. When the user has multiple active Family memberships, require an explicit selection in a clear shell-level Family selector; do not treat the first returned membership as the selected context. The only other way the current Family may change is the authorized item-link rule in `REQ-UX-014`. With no active Family membership, select no Family and use the approved invitation/operator-provisioned entry path. Retain the selection only for the current application/page session.

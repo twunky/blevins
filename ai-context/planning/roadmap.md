@@ -60,9 +60,31 @@ Phase 10.5 exit gates are satisfied: the selected implementation items are owner
 
 DEC-092's broader/contextual Sharing Sessions, broader notifications and additional Check-In integrations/reminders remain deferred. General Event completion and explicit Plan completion remain deferred until after human testing; Trip reopen/undo and child/minor/guardian support remain out of MVP. Production authentication/recovery, invitation delivery, provisioning, hosting/deployment, configuration/secrets, backup/restore, observability/support operations, physical-device GPS and browser/mobile background/suspension behavior remain later production/pilot dependencies. Phase 9.5 stays closed; Phase 11 retains its separate pilot/release boundary. CTX-1.39 remains active under DEC-095; CTX-1.37 remains the historical Phase 9.5 closure baseline. DEC-096 closes Phase 10.5; Phase 10 remains CURRENT / IN PROGRESS until human validation and owner acceptance.
 
-## Later phases
+## Phase 11 — Pilot & Release Readiness
 
-Phase 11 — Pilot & Release Readiness remains FUTURE. Completion of functional MVP scope is followed by the deferred WI-010-004 facilitated adult usability gate before the MVP is considered ready for pilot/release readiness. Real signup/sign-in/recovery, production invitation delivery, hosting, provisioning, backup-aging/restore evidence (DEC-068, DEC-071) and physical-device location validation remain separate production/pilot dependencies. They do not block continued MVP feature development; Development verification and phase closure do not establish deployment readiness.
+**FUTURE — planning only; no implementation authorized.** [DEC-097](../decision-log.md#dec-097--approve-future-phase-11-production-entry-model) approves the [future production-entry contract](../core/production-entry-contract.md), not current runtime behavior. CTX-1.39 remains active. No successor CTX, new phase or implementation WI is created. The bounded adult MVP remains FUNCTIONALLY COMPLETE; Phases 9.5/10.5 stay closed and Phase 10 human usability work remains current. WI-010-004 human evidence and owner acceptance remain required before pilot/release readiness.
+
+Phase 11 owns production account entry, Family bootstrap, invitation delivery, membership onboarding, identity-provider integration, required per-Family profile privacy, administrator continuity, and pilot security/readiness. Normative requirements and the narrow current/future reconciliation live in the future contract; provider selection remains open.
+
+Likely future sequence, without execution authorization:
+
+1. Provider-neutral identity architecture.
+2. Identity-provider evaluation/proof against the approved capabilities.
+3. Production signup/sign-in/verification/recovery.
+4. No-Family landing and minimum profile bootstrap.
+5. Self-service Family creation and initial administrator assignment.
+6. Adult-member invitation authority and invitation management.
+7. Bounded reliable email delivery, designed with invitation lifecycle.
+8. Verified-recipient invitation reconciliation.
+9. Existing/new-account joining and multi-Family onboarding.
+10. Per-Family profile privacy.
+11. Bounded member/admin lifecycle, continuity and fresh-invitation rejoin.
+12. Production-entry verification before pilot.
+13. Later conveniences such as QR/SMS/general links, only after separate justification/approval; general/multi-use links are excluded from initial production scope.
+
+Pilot gates include the approved production-entry/privacy/security contract, bounded administrator continuity rules, MFA available to all and required for Family administrators subject to provider integration/recovery design, and owner-approved final invitation retention periods with backup/restore review. Identity/email provider choices and detailed recovery/control mechanics require later evaluation/design; no vendor is selected here. These gates are future requirements, not claims of verification or readiness.
+
+Hosting/deployment, configuration/secrets, backup-aging/restore evidence (DEC-068, DEC-071), observability/support operations and physical-device GPS/browser/mobile background behavior remain separate production/pilot dependencies. Operator-provisioned first-Family bootstrap is replaced for future production by self-service creation; current Development fixtures remain unchanged. Development verification and completed MVP phases do not establish deployment readiness.
 
 ## Phase 9 — Integration & UX Refinement
 

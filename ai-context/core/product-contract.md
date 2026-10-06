@@ -8,6 +8,8 @@ Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; D
 
 # Product Contract
 
+**Scope reconciliation:** Current MVP requirements below remain in force under the active aggregate CTX-1.39 baseline. [DEC-097's future production-entry contract](production-entry-contract.md#current-rule-reconciliation) separately governs APPROVED / UNIMPLEMENTED Phase 11 planning. Its targeted replacements do not change MVP runtime behavior or imply production bootstrap is implemented.
+
 This contract includes the narrow manual Trusted Contact clarification under `CTX-1.34` / `DEC-088`. Shared Family Dates v1 use a required title, description, and one specific calendar date; they do not recur automatically. Trusted Contacts remain owner-managed and private by default. Minor and guardian functionality is outside the MVP and reserved for future work under `DEC-053`; this does not define that future behavior.
 
 ## Identity and purpose
@@ -94,9 +96,13 @@ Family Group membership capacity must be controlled by an application-operator c
 
 ### REQ-FAM-005
 
+**CURRENT MVP scope.** Future production membership/bootstrap and adult-member invitation authority: [REQ-FAM-019](production-entry-contract.md#req-fam-019) / [REQ-FAM-020](production-entry-contract.md#req-fam-020).
+
 Family Group membership in MVP is private and invitation-only. A Family Administrator may issue and revoke a membership invitation for a specific intended person. Membership becomes active only after the recipient explicitly accepts the invitation. Public Family Group discovery, self-service join requests, and automatic membership are outside MVP.
 
 ### REQ-FAM-006
+
+**CURRENT MVP / historical bootstrap contract assumption.** This is not an implemented production operator workflow. Future production replaces this path with [REQ-FAM-019](production-entry-contract.md#req-fam-019); Development fixtures remain unchanged.
 
 The first Family Group and first Family Administrator must be created through controlled application-operator provisioning. The application operator may provision the initial private Family Group and initiate the first Family Administrator invitation. The intended first administrator must still sign in and explicitly accept the invitation before membership becomes active. After activation, normal Family Administrator invitation rules apply. Public self-service Family Group creation is outside MVP.
 
@@ -116,6 +122,8 @@ The first slice must not include profile photo, birth year, street address, prec
 ## Adult membership invitation contract
 
 ### REQ-FAM-008
+
+**CURRENT MVP scope.** Future production authority, lifecycle and verified-recipient acceptance are [REQ-FAM-020](production-entry-contract.md#req-fam-020), [REQ-FAM-021](production-entry-contract.md#req-fam-021) and [REQ-PRIV-035](production-entry-contract.md#req-priv-035). Existing MVP behavior is preserved.
 
 For normal adult Family Group membership invitations:
 

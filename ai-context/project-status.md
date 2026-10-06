@@ -18,10 +18,13 @@
 
 - OD-002 - resolved for bounded temporary-only MVP by DEC-087; indefinite sharing excluded.
 - OD-003 — Minor/guardian functionality; outside MVP under DEC-053.
+- OD-006 — Exact production invitation retention periods OPEN under [DEC-097](decision-log.md#dec-097--approve-future-phase-11-production-entry-model); bounded retention/minimal metadata required, no exact 30-day / 90-day policy approved.
 
 Open decisions are not requirements. Resolved decisions and their canonical references are in the [full decision log](decision-log.md#open-product-decisions).
 
 ## Dependencies
+
+[DEC-097](decision-log.md#dec-097--approve-future-phase-11-production-entry-model) records the owner-approved [future production-entry contract](core/production-entry-contract.md), APPROVED / UNIMPLEMENTED for Phase 11. CTX-1.39 remains active; no successor CTX or implementation WI is created and no implementation is authorized. The [Phase 11 game plan](planning/roadmap.md#phase-11--pilot--release-readiness) covers production entry/privacy/security. Identity and email providers, exact invitation retention, and detailed administrator continuity/recovery rules remain open. MFA integration/recovery and other bounded production mechanics need later design/proof. Current MVP, completed phase status and WI-010-004 human-testing checkpoint above are unchanged.
 
 Production authentication, hosting, and backup-aging/restore evidence remain separate predeployment work. Development verification and phase closure do not certify deployment readiness. See DEC-068 and DEC-071 in the full decision log.
 

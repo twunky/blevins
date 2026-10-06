@@ -8,11 +8,15 @@ Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; D
 
 # Domain Glossary
 
+**Scope:** The entry/bootstrap/invitation and profile-visibility descriptions below retain current MVP and historical contract meaning. APPROVED / UNIMPLEMENTED Phase 11 production definitions are in [DEC-097's future contract](production-entry-contract.md#current-rule-reconciliation); CTX-1.39 remains active.
+
 These are approved nontechnical product concepts under `CTX-1.20`. This file does not define tables, schemas, payloads, services, persistence, or implementation entities.
 
 ## People and family
 
 ### Family Group
+
+Future production bootstrap/private joining: [REQ-FAM-019](production-entry-contract.md#req-fam-019).
 
 The private extended-family context coordinated by the product. Its operator-configured membership capacity follows `REQ-FAM-004`; membership is invitation-only under `REQ-FAM-005`; the first Family Group bootstrap follows `REQ-FAM-006`; and Family Administrators do not control the platform capacity limit.
 
@@ -26,6 +30,8 @@ The self-managed profile for an adult Family Member in the first Phase 5 slice. 
 
 ### Profile Field Visibility
 
+Future production replaces broad optional-field sharing with per-Family choices: [REQ-PRIV-036](production-entry-contract.md#req-priv-036).
+
 The first adult-profile slice supports only **Only me** and **Active Family Group** visibility for optional profile fields. Display name is visible to active members of the same Family Group. Visibility does not grant membership, administrator responsibility, operator access, Household access, relationship-based access, Safety Circle access, or public access.
 
 ### Family Relationship
@@ -38,6 +44,8 @@ A birthday or other important date shared within one Family Group. Under the fir
 
 ### Family Administrator
 
+Future production separates adult-member invitation permission from administration and requires continuity: [REQ-FAM-020](production-entry-contract.md#req-fam-020) / [REQ-FAM-023](production-entry-contract.md#req-fam-023).
+
 A family member with responsibility for membership or family structure. A Family Administrator may issue or revoke a Family Group membership invitation. This responsibility does not automatically grant access to private information or membership in another person's Safety Circle.
 
 ### Account
@@ -46,9 +54,13 @@ A signed-in application identity. Having an Account does not by itself establish
 
 ### Membership Invitation
 
+The description below is current MVP scope; future adult-member invitation authority and verified-email acceptance follow [REQ-FAM-020](production-entry-contract.md#req-fam-020) / [REQ-PRIV-035](production-entry-contract.md#req-priv-035).
+
 A revocable, one-time invitation issued by a Family Administrator for a specific intended adult to join one Family Group. It is delivered by email through a provider-neutral boundary, expires after seven days, and grants no Family Group access until a signed-in adult explicitly accepts and active membership is created. The delivery email is not an Adult Profile contact field or authentication identifier. The first Family Administrator invitation follows the separate controlled bootstrap rule in `REQ-FAM-006`.
 
 ### Application Operator
+
+Controlled bootstrap below is a historical/current MVP contract assumption, not an implemented production operator workflow. Future self-service bootstrap and any bounded continuity recovery follow [REQ-FAM-019](production-entry-contract.md#req-fam-019) / [REQ-FAM-023](production-entry-contract.md#req-fam-023).
 
 The application-level operator responsible for platform configuration and controlled first Family Group provisioning. This is not a Family Group role. Operator responsibility does not grant routine access to private Family Group content or private user information.
 

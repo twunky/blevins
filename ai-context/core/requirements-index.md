@@ -19,6 +19,8 @@ Phase 10.5 Plan trace: [WI-105-002](../planning/stories/WI-105-002-bounded-creat
 
 Statuses are `PROPOSED`, `APPROVED`, `SUPERSEDED`, or `RETIRED`. Product/UX extraction requirements are approved under the baseline shown in each row. Existing AI operating and verification requirements remain approved independently of those baselines.
 
+DEC-097's future-target requirements use status `APPROVED` with a separate **Phase 11 / UNIMPLEMENTED** target column, not an active CTX assignment. Current MVP IDs remain approved for their original scope; future replacements have new IDs and do not globally supersede MVP truth. See the [future-target trace](#future-phase-11-production-entry-dec-097).
+
 ## Namespaces
 
 | Namespace | Area |
@@ -286,3 +288,22 @@ DEC-088 clarifies REQ-FAM-014/015 and REQ-PRIV-019/024 for this first slice; bro
 |---|---|---|---|---|---|
 | REQ-FAM-018 | Household organization, adult eligibility and lifecycle | product-contract.md#req-fam-018 | APPROVED | CTX-1.36 | - |
 | REQ-PRIV-034 | Household current Family visibility/admin checks and zero protected authority | privacy-safety-contract.md#req-priv-034 | APPROVED | CTX-1.36 | - |
+
+## Future Phase 11 production entry (DEC-097)
+
+All rows are approved future product requirements, **UNIMPLEMENTED**, outside the active CTX-1.39 MVP baseline. Authority: [DEC-097](../decision-log.md#dec-097--approve-future-phase-11-production-entry-model). Canonical wording: [production-entry contract](production-entry-contract.md). No implementation WI or execution authorization.
+
+| ID | Requirement | Canonical source | Status | Target / implementation | Current scope reconciled |
+|---|---|---|---|---|---|
+| REQ-PROD-015 | Open adult Account signup, zero-Family state, no implicit access | [production-entry-contract.md#req-prod-015](production-entry-contract.md#req-prod-015) | APPROVED | Phase 11 / UNIMPLEMENTED | Preserves REQ-PRIV-011 access boundary |
+| REQ-FAM-019 | Self-service atomic Family bootstrap and private existing-Family joining | [production-entry-contract.md#req-fam-019](production-entry-contract.md#req-fam-019) | APPROVED | Phase 11 / UNIMPLEMENTED | Future replacement for REQ-FAM-005/006 bootstrap paths; capacity unchanged |
+| REQ-FAM-020 | Adult-member invitation authority and bounded management | [production-entry-contract.md#req-fam-020](production-entry-contract.md#req-fam-020) | APPROVED | Phase 11 / UNIMPLEMENTED | Future replacement for REQ-FAM-005/008 admin-only authority |
+| REQ-FAM-021 | Invitation lifecycle, permanent authority-loss invalidation and delivery | [production-entry-contract.md#req-fam-021](production-entry-contract.md#req-fam-021) | APPROVED | Phase 11 / UNIMPLEMENTED | REQ-FAM-008 lifecycle retained and extended for production |
+| REQ-PRIV-035 | Explicit authenticated acceptance and matching verified-email control | [production-entry-contract.md#req-priv-035](production-entry-contract.md#req-priv-035) | APPROVED | Phase 11 / UNIMPLEMENTED | REQ-PRIV-014 / REQ-FAM-008 recipient boundary strengthened |
+| REQ-FAM-022 | Shared Account/Profile, separate memberships, fresh-invitation return | [production-entry-contract.md#req-fam-022](production-entry-contract.md#req-fam-022) | APPROVED | Phase 11 / UNIMPLEMENTED | Preserves resource-specific grant/own-access rules |
+| REQ-UX-015 | No-Family first use and Trusted Contact separation | [production-entry-contract.md#req-ux-015](production-entry-contract.md#req-ux-015) | APPROVED | Phase 11 / UNIMPLEMENTED | Future replacement for REQ-UX-011 entry guidance only |
+| REQ-PRIV-036 | Per-Family optional-profile privacy, private on new membership | [production-entry-contract.md#req-priv-036](production-entry-contract.md#req-priv-036) | APPROVED | Phase 11 / UNIMPLEMENTED | Future replacement for REQ-PRIV-013 broad sharing |
+| REQ-FAM-023 | Multiple administrators and bounded continuity/recovery | [production-entry-contract.md#req-fam-023](production-entry-contract.md#req-fam-023) | APPROVED | Phase 11 / UNIMPLEMENTED | Preserves REQ-PRIV-006/012 no protected-content override |
+| REQ-PROD-016 | Provider-neutral identity mapping, capabilities, domain boundary and MFA | [production-entry-contract.md#req-prod-016](production-entry-contract.md#req-prod-016) | APPROVED | Phase 11 / UNIMPLEMENTED | Provider selection remains open; no MVP auth change |
+| REQ-PRIV-037 | Bounded invitation retention with exact periods open | [production-entry-contract.md#req-priv-037](production-entry-contract.md#req-priv-037) | APPROVED | Phase 11 / UNIMPLEMENTED | OD-006; no 30-day / 90-day policy approved |
+| REQ-UX-016 | Later QR convenience uses the same secure invitation semantics | [production-entry-contract.md#req-ux-016](production-entry-contract.md#req-ux-016) | APPROVED | Phase 11 later convenience / UNIMPLEMENTED | No initial general/multi-use links, SMS or short-code authorization |

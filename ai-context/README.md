@@ -41,6 +41,10 @@ Do not recursively read the entire `ai-context/` tree. Bootstrap, archived, supe
 
 A decision that changes canonical context is not operational until the affected canonical files and references are updated.
 
+### Future-target contracts
+
+Under [DEC-097](decision-log.md#dec-097--approve-future-phase-11-production-entry-model), an owner-approved contract may explicitly target a future phase while the active MVP context baseline remains unchanged. The [production-entry contract](core/production-entry-contract.md) is CANONICAL — FUTURE TARGET ONLY, APPROVED / UNIMPLEMENTED for Phase 11; it is not part of the active CTX-1.39 runtime baseline or implementation authorization. Load it for future production-entry planning. Its scoped replacements do not rewrite current MVP rules or historical evidence. Any later implementation needs bounded scope, a compatible approved planning baseline and explicit execution authorization.
+
 ## Context loading
 
 After the mandatory entry files, select context by task:
