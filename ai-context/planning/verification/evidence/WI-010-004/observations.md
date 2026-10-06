@@ -1,6 +1,6 @@
 # WI-010-004 — First-round human observation record
 
-**State:** TEMPLATE ONLY / HUMAN EVIDENCE UNCOLLECTED. No sessions or observations recorded. Human execution is DEFERRED until MVP functional completion, before pilot/release readiness. [Guide](facilitator-guide.md) / [work item](../../../stories/WI-010-004-facilitated-adult-usability-sessions.md). Preparation is not a participant result.
+**State:** TEMPLATE ONLY / HUMAN EVIDENCE UNCOLLECTED. No sessions or observations recorded. The MVP is functionally complete under DEC-096; Stage B preparation is reconciled to CTX-1.39 and READY FOR P1. Actual human evidence remains uncollected, before pilot/release readiness. [Guide](facilitator-guide.md) / [work item](../../../stories/WI-010-004-facilitated-adult-usability-sessions.md). Preparation is not a participant result.
 
 ## Session register — owner fills after actual sessions
 
@@ -13,7 +13,7 @@ Minimum useful round 3 adults; target 5. Only P1–P5; no names, contact details
 ## Per participant / task — copy this blank block within this file
 
 - **Participant ID:**
-- **Task ID:** T1–T7
+- **Task ID:** T1–T7 (record T3a and T3b separately)
 - **Attempted:** (YES / NOT ATTEMPTED; if not attempted, reason and leave outcome blank)
 - **Outcome:** (COMPLETED INDEPENDENTLY / COMPLETED WITH MINOR COACHING / COMPLETED WITH MAJOR COACHING / NOT COMPLETED / BLOCKED BY DEFECT)
 - **Coaching level:** (NONE / MINOR / MAJOR)
@@ -32,6 +32,32 @@ Minimum useful round 3 adults; target 5. Only P1–P5; no names, contact details
 Outcomes are not a simple pass/fail score. MINOR is one broad orientation hint; MAJOR includes direct routes/controls, repeated hints or takeover. A defect outcome can still have any actual coaching level. For omissions, leave coaching blank if there was no attempt. Record misconceptions before correcting them; absence of a comment is not proof of understanding.
 
 Privacy prompts to check in the relevant task: selected Family does not grant access; a Safety Circle is only a reusable preset and cannot change earlier audiences; a manual Trusted Contact grants no account/access or automatic sharing; Check-In is visible only to its author and authorized recipients; Sharing has its own fixed audience/end; current/last-reported location is not history/background tracking; Concerns/Incidents have independent explicit access, with no automatic escalation or administrator override. Record uncertainty or a misunderstanding even when implementation is correct.
+
+## Task 3 cues — blank until actual human observation
+
+Copy the appropriate blank fields into each actual T3a/T3b record. Use the common outcome/coaching fields above separately for each part; omissions remain NOT ATTEMPTED.
+
+**T3a — Plan correction**
+
+- Correction discovery:
+- Correction outcome / corrected current value understood:
+- Facts versus Notes distinction / Note preservation:
+- Required activity/date/time or optional date/time pair validation confusion:
+- Expected Check-In reminder/scheduled-action misunderstanding:
+- Exact correction coaching / trigger:
+
+**T3b — Trip completion**
+
+- Completion discovery:
+- Confirmation understanding:
+- One-way understanding:
+- Archive/delete expectation:
+- Home current exclusion understanding:
+- Continued list/detail navigation/access:
+- Editing/Notes availability understanding:
+- Sharing stops automatically expectation:
+- Exact completion coaching / trigger:
+
 
 ## Closing responses — copy within this file per actual adult
 
@@ -52,4 +78,4 @@ No findings, readiness decision, success estimate or phase exit is recorded. Do 
 |---|---|---|---|---|---|
 | | | | | | |
 
-**Readiness matrix updates / owner acceptance:** PENDING until the MVP-end human validation gate. WI-010-004 Stage B is deferred; no session has occurred. No WI-010-005 or implementation fix is authorized by this template.
+**Readiness matrix updates / owner acceptance:** PENDING until the MVP-end human validation gate. WI-010-004 Stage B preparation is READY FOR P1; no session has occurred. No WI-010-005 or implementation fix is authorized by this template.
