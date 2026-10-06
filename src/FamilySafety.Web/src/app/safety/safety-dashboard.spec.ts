@@ -176,7 +176,7 @@ describe('SafetyDashboard (WI-009-009)', () => {
     const { root } = render([concern('c1', 'Avery', 'Open')], [incident('i1', 'Drew', 'Open')]);
     expect(root.querySelectorAll('button, form, input, select, textarea')).toHaveLength(0);
     const linkTargets = Array.from(root.querySelectorAll('a')).map(a => a.getAttribute('href'));
-    expect(linkTargets.sort()).toEqual(['#check-ins', '/concerns', '/concerns/c1', '/incidents', '/incidents/i1']);
+    expect(linkTargets.sort()).toEqual(['/concerns', '/concerns/c1', '/incidents', '/incidents/i1', '/safety#check-ins']);
     expect(root.textContent).not.toMatch(/create a|start an incident|resolve|\bcall\b|send message|settings|emergency/i);
   });
 
@@ -185,7 +185,7 @@ describe('SafetyDashboard (WI-009-009)', () => {
     const placeholder = card('Recent Check-Ins');
     expect(placeholder.querySelector('.safety-future-note')?.textContent?.trim()).toBe('View personal status reports sent by you or explicitly shared with you.');
     expect(placeholder.querySelectorAll('button, input, ul, li, img, time')).toHaveLength(0);
-    expect(placeholder.querySelector('a')?.getAttribute('href')).toBe('#check-ins');
+    expect(placeholder.querySelector('a')?.getAttribute('href')).toBe('/safety#check-ins');
     // render() already proved the only requests were the two list reads.
   });
 
