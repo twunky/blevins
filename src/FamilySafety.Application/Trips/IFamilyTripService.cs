@@ -2,6 +2,8 @@ namespace FamilySafety.Application.Trips;
 
 public interface IFamilyTripService
 {
+    Task<FamilyTripView> CompleteAsync(Guid tripId, CompleteFamilyTripRequest request,
+        CancellationToken cancellationToken);
     Task<IReadOnlyList<FamilyTripView>> GetVisibleAsync(CancellationToken cancellationToken);
     Task<FamilyTripView> GetAsync(Guid tripId, CancellationToken cancellationToken);
     Task<FamilyTripView> CreateAsync(Guid familyGroupId, CreateFamilyTripRequest request,

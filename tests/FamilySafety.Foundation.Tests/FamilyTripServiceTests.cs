@@ -143,6 +143,8 @@ public sealed class FamilyTripServiceTests
 
     private sealed class StubRepository : IFamilyTripRepository
     {
+        public Task<FamilyTripView?> CompleteAsync(Guid accountId, Guid tripId,
+            Guid version, CancellationToken cancellationToken) => Task.FromResult<FamilyTripView?>(null);
         public int CreateCalls { get; private set; }
         public Task<IReadOnlyList<FamilyTripView>> GetVisibleAsync(Guid accountId, CancellationToken cancellationToken) =>
             Task.FromResult<IReadOnlyList<FamilyTripView>>([]);

@@ -9,7 +9,7 @@ function date(days: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-test('Home navigation reaches Plan and Trip creation, supported Notes, and domain returns without implying completion', async ({ page, request }) => {
+test('Home navigation reaches Plan and Trip creation, supported Notes, and domain returns', async ({ page, request }) => {
   test.setTimeout(240_000);
   page.setDefaultTimeout(15_000);
   await recordScenario(test.info());
@@ -80,7 +80,7 @@ test('Home navigation reaches Plan and Trip creation, supported Notes, and domai
     await page.getByRole('button', { name: 'Add note', exact: true }).click();
     await expect(page.locator('.trip-note-list')).toContainText('Pack a raincoat.');
     await expect(page.getByRole('button', { name: 'Edit trip details', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: /complete trip/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Complete Trip', exact: true })).toBeVisible();
     await page.reload();
     await expect(page.locator('.trip-note-list')).toContainText('Pack a raincoat.');
     await page.waitForLoadState('networkidle');

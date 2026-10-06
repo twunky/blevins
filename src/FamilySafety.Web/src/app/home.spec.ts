@@ -468,13 +468,14 @@ describe('Home and feature empty states', () => {
     http.expectOne('/api/trips').flush([
       trip('ended-1', -10, -4), trip('ended-2', -8, -1), trip('ended-3', -6, -2),
       trip('outside', -5, 2, 'other-family'), trip('ongoing', -3, 0),
+      { ...trip('completed-current', -4, 3), isCompleted: true },
       trip('next', 1, 2), trip('later', 3, 4), trip('fourth', 5, 6),
     ]);
     harness.detectChanges();
     const card = harness.routeNativeElement!.querySelector('[aria-labelledby="home-trips-heading"]')!;
     expect(Array.from(card.querySelectorAll('li a')).map(link => [link.textContent?.trim(), link.getAttribute('href')]))
       .toEqual([['ongoing', '/trips/ongoing'], ['next', '/trips/next'], ['later', '/trips/later']]);
-    expect(card.textContent).not.toMatch(/ended|outside|fourth/);
+    expect(card.textContent).not.toMatch(/ended|outside|fourth|completed-current/);
   });
 
   it('shows the real Trip empty state when only ended Trips remain', async () => {

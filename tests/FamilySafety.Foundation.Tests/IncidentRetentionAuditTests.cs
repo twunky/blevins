@@ -605,9 +605,9 @@ public sealed class IncidentRetentionAuditTests
             var group = Group(db);
             var creator = Join(db, group, "Existing creator");
             var subject = Join(db, group, "Existing subject");
-            db.Add(new FamilyTrip(Guid.NewGuid(), group.Id, creator.ProfileId, TripAudienceType.FamilyGroup, "Coast trip",
-                "Seaside", new DateOnly(2026, 10, 10), new DateOnly(2026, 10, 12), null, null, null, null, null, null));
             await db.SaveChangesAsync();
+            // Seed the historical schema directly: the current Trip model includes later completion columns.
+            await db.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO FamilyTrips (Id, FamilyGroupId, CreatorProfileId, AudienceType, Title, PrimaryDestination, StartDate, EndDate) VALUES ({Guid.NewGuid()}, {group.Id}, {creator.ProfileId}, N'FamilyGroup', N'Coast trip', N'Seaside', '20261010', '20261012')");
             var concerns = new EfConcernRepository(db, clock);
             var concern = await concerns.CreateAsync(creator.AccountId, group.Id,
                 new CreateConcernRequest(subject.ProfileId, "Existing Concern", [subject.ProfileId]), default);

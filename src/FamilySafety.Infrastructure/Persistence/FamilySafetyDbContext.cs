@@ -398,6 +398,8 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
         var trip = modelBuilder.Entity<FamilyTrip>();
         trip.ToTable("FamilyTrips");
         trip.HasKey(entity => entity.Id);
+        trip.Property(entity => entity.IsCompleted).HasDefaultValue(false);
+        trip.Property(entity => entity.Version).IsConcurrencyToken();
         trip.Property(entity => entity.Title).HasMaxLength(100).IsRequired();
         trip.Property(entity => entity.PrimaryDestination).HasMaxLength(200).IsRequired();
         trip.Property(entity => entity.StartDate).HasColumnType("date");

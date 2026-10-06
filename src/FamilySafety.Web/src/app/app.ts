@@ -125,6 +125,7 @@ interface FamilyPlanView {
 }
 
 interface HomeTripPreview {
+  isCompleted: boolean;
   tripId: string;
   familyGroupId: string;
   title: string;
@@ -277,7 +278,7 @@ export class App implements OnInit {
     const today = localDateString(new Date());
     return this.homeTripResults()
       // Summary freshness only: passing the end date never completes a Trip (REQ-TRIP-011).
-      .filter(trip => trip.familyGroupId === this.currentFamilyId() && trip.endDate.slice(0, 10) >= today)
+      .filter(trip => trip.familyGroupId === this.currentFamilyId() && !trip.isCompleted && trip.endDate.slice(0, 10) >= today)
       .slice()
       .sort((left, right) => left.startDate.localeCompare(right.startDate)
         || left.tripId.localeCompare(right.tripId))

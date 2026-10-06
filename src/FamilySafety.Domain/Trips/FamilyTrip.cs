@@ -38,11 +38,21 @@ public sealed class FamilyTrip
     public DateOnly? ExpectedArrivalDate { get; private set; }
     public TimeOnly? ExpectedArrivalTime { get; private set; }
     public string? ExpectedArrivalTimeZone { get; private set; }
+    public bool IsCompleted { get; private set; }
+    public Guid Version { get; private set; } = Guid.NewGuid();
+
+    public void Complete()
+    {
+        if (IsCompleted) throw new InvalidOperationException("The Trip is already completed.");
+        IsCompleted = true;
+        Version = Guid.NewGuid();
+    }
 
     public void ReplaceAudience(TripAudienceType audienceType)
     {
         if (!Enum.IsDefined(audienceType)) throw new ArgumentOutOfRangeException(nameof(audienceType));
         AudienceType = audienceType;
+        Version = Guid.NewGuid();
     }
 
     public void Update(string title, string primaryDestination, DateOnly startDate,
@@ -67,6 +77,7 @@ public sealed class FamilyTrip
         ExpectedArrivalDate = expectedArrivalDate;
         ExpectedArrivalTime = expectedArrivalTime;
         ExpectedArrivalTimeZone = NormalizeOptional(expectedArrivalTimeZone);
+        Version = Guid.NewGuid();
     }
 
     private static string? NormalizeOptional(string? value) =>

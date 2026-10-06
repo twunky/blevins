@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL WORKFLOW
-Context-Baseline: CTX-1.29
-Version: 1.7
-Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-054; DEC-055; DEC-056; DEC-057; DEC-060; DEC-082
+Context-Baseline: CTX-1.38
+Version: 1.8
+Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-054; DEC-055; DEC-056; DEC-057; DEC-060; DEC-082; DEC-094
 Constrained-By:
   - ../core/product-contract.md
   - ../core/ux-contract.md
@@ -79,11 +79,13 @@ MVP Trips must support trip title, travelers, destinations, dates and times, acc
 
 The standard Trip flow is:
 
-`Create Trip → Travelers → Destination(s) → Important travel information → Expected arrival → Choose item audience (per REQ-PRIV-020) → Check-in preference → Separate location-sharing decision → Travel begins → Check-ins / updates → Arrival → Sharing expires → Trip completes`
+`Create Trip → Travelers → Destination(s) → Important travel information → Expected arrival → Choose item audience (per REQ-PRIV-020) → Check-in preference → Separate location-sharing decision → Travel begins → Check-ins / updates → Creator explicitly marks Trip complete`
+
+Arrival is not verified or required by completion. Independent Sharing follows its own authorized controls under `REQ-TRIP-011`.
 
 ### REQ-TRIP-005
 
-Trip progress may include check-ins and updates through arrival. Any associated temporary Sharing Session expires according to its authorized duration, including arrival or trip completion where selected.
+Trip progress may include check-ins and updates through arrival. Independent temporary Sharing Sessions follow their separately authorized duration and stop controls. Explicit Trip completion does not stop them; Trip-associated Sharing execution remains deferred under DEC-092.
 
 ### REQ-TRIP-006
 
@@ -95,7 +97,7 @@ For MVP Trip roles and editing:
 
 - The account that creates the Trip is its creator and organizer. There is no separate permission-bearing Organizer role. The creator does not have to be a traveler.
 - The creator retains access to the Trip as creator if their eligible Family Group membership later ends. Creator access is distinct from audience membership. The Trip is not transferred to another owner.
-- The creator may edit Trip title, description, dates, primary destination, travelers, non-system contacts, expected arrival, transportation and accommodation notes, audience, and completion status.
+- The creator may edit Trip title, description, dates, primary destination, travelers, non-system contacts, expected arrival, transportation and accommodation notes, and audience. Completion uses the separate explicit action under `REQ-TRIP-011`.
 - Traveler status alone grants no Trip visibility, Trip editing, Trip Notes access, or Sharing Session access. A traveler can view or contribute only when separately included in the Trip audience and granted the corresponding audience capability.
 - A Trip viewer is an eligible in-system member included in the Trip audience. Audience membership grants Trip viewing and Trip Notes access as defined by `REQ-TRIP-010`; it does not grant core Trip editing.
 - Changing the Trip audience is a creator-only capability and must be separately authorized for implementation. Each change is explicit, takes effect immediately, and must identify the access change before confirmation so information is not silently exposed to newly added viewers.
@@ -136,8 +138,12 @@ For MVP expected arrival, Check-Ins, and Trip completion:
 
 - Expected arrival is optional and distinct from Trip start date, end date, and completion status. A missed expected arrival represents uncertainty, not confirmed danger.
 - Check-Ins remain optional, personal, and voluntary. A Trip creator cannot require another traveler to check in, provide current location, or start a Sharing Session. Existing Check-In rules remain authoritative.
-- Only the Trip creator may mark a Trip complete. Passing the end date does not automatically complete the Trip or raise a Concern. Missing location does not automatically raise a Concern.
-- Trip open/completion status does not itself start, restart, or extend a Sharing Session. Any session follows its own separately authorized sharing choices, duration, and stop controls.
+- Only the exact Trip creator may explicitly mark a Trip complete, including through retained creator authority under `REQ-TRIP-007` / `REQ-PRIV-022`. Selected Family, audience, traveler or collaborator status, Family administration, and a known Trip ID grant no completion authority.
+- Completion is one-way for the current MVP under DEC-094. Require deliberate confirmation that the Trip will be marked complete and cannot currently be undone. No reopen, undo, or generic status transition is available.
+- Completion is a status change only: the creator explicitly indicates this Trip is complete. It does not verify arrival, location, expected arrival or safety; finalize Notes; archive/delete the Trip; or resolve a Concern or Incident.
+- Completed Trips remain in existing authorized list/detail navigation with a bounded Completed indicator. Existing authorized editing, collaborative Notes, audience and visibility continue; completion does not make the Trip read-only or revoke access. Exclude explicitly completed Trips from Home's current preview in addition to its existing date and Family criteria.
+- Dates, expected arrival, Check-Ins, location and Sharing state never automatically complete a Trip. Passing the end date or missing location does not automatically raise a Concern. Completion creates no Check-In, Concern, Incident or notification.
+- Trip open/completion status does not itself start, stop, restart, or extend a Sharing Session. Any session follows its own separately authorized sharing choices, duration, and stop controls.
 
 ### REQ-TRIP-012
 
@@ -145,6 +151,6 @@ The MVP Trip product flow is:
 
 `Trips Overview → Create Trip → Trip Detail`
 
-Creation includes required fields and explicit audience selection. The form may use sections or dialogs for travelers, contacts, and audience. A separate Review & Create screen is not required. Upcoming/Past/All filters, traveler avatars, destination cards, status chips, richer filtering, and quick actions such as Leaving Now, Delayed, or Arrived remain UX guidance/prototype concepts, not MVP product requirements.
+Creation includes required fields and explicit audience selection. The form may use sections or dialogs for travelers, contacts, and audience. A separate Review & Create screen is not required. A bounded Completed indicator is required by `REQ-TRIP-011`. Upcoming/Past/All filters, traveler avatars, destination cards, other status chips, richer filtering, and quick actions such as Leaving Now, Delayed, or Arrived remain UX guidance/prototype concepts, not MVP product requirements.
 
 The create flow does not itself start or authorize a Check-In or Sharing Session. Those remain optional, separately controlled capabilities under `REQ-TRIP-011` and the Sharing workflow.

@@ -17,7 +17,7 @@ function trip(canEdit: boolean) {
     tripId: '55555555-5555-5555-5555-555555555555',
     familyGroupId: group.familyGroupId, familyGroupName: group.name,
     creatorProfileId: creator.profileId, creatorDisplayName: creator.displayName,
-    canEdit, title: 'Family visit', primaryDestination: 'Atlanta',
+    canEdit, isCompleted: false, version: '88888888-8888-8888-8888-888888888888', title: 'Family visit', primaryDestination: 'Atlanta',
     startDate: '2026-10-01', endDate: '2026-10-05',
     description: 'Visiting relatives', transportationNotes: null,
     accommodationNotes: null, expectedArrivalDate: '2026-10-01',
@@ -40,6 +40,88 @@ describe('Trips', () => {
   });
 
   afterEach(() => { http.verify(); });
+
+  function openCompletionTrip(value = trip(true)) {
+    const fixture = TestBed.createComponent(Trips);
+    fixture.componentRef.setInput('tripId', value.tripId);
+    fixture.componentRef.setInput('ownProfileId', creator.profileId);
+    fixture.detectChanges();
+    http.expectOne(`/api/trips/${value.tripId}`).flush(value);
+    http.expectOne(`/api/trips/${value.tripId}/notes`).flush([]);
+    fixture.detectChanges();
+    const click = (label: string) => {
+      const button = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'))
+        .find(b => b.textContent?.trim() === label)!;
+      expect(button).toBeTruthy(); button.click(); fixture.detectChanges();
+    };
+    return { fixture, click, element: fixture.nativeElement as HTMLElement };
+  }
+
+  it('requires deliberate irreversible-action confirmation, disables saving, then preserves edit, Notes and audience', () => {
+    const { fixture, click, element } = openCompletionTrip();
+    click('Complete Trip');
+    expect(element.textContent).toContain('This Trip will be marked complete. This action cannot currently be undone.');
+    http.expectNone(`/api/trips/${trip(true).tripId}/complete`);
+    click('Cancel completion');
+    expect(element.querySelector('[aria-label="Complete Trip confirmation"]')).toBeNull();
+    click('Complete Trip'); click('Confirm completion');
+    const request = http.expectOne(`/api/trips/${trip(true).tripId}/complete`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ version: trip(true).version });
+    expect(Array.from(element.querySelectorAll('button')).find(b => b.textContent?.trim() === 'Completing…')?.disabled).toBe(true);
+    const complete = { ...trip(true), isCompleted: true, version: 'new-version' };
+    request.flush(complete);
+    http.expectOne('/api/trips').flush([complete]);
+    fixture.detectChanges();
+    expect(element.querySelector('[role="status"]')?.textContent).toBe('Completed');
+    expect(element.textContent).toContain('Edit trip details');
+    expect(element.textContent).toContain('Change audience');
+    expect(element.querySelector('#trip-note-new')).not.toBeNull();
+    expect(element.querySelector('[aria-label="Complete Trip confirmation"]')).toBeNull();
+    expect(Array.from(element.querySelectorAll('button')).some(b => b.textContent?.trim() === 'Complete Trip')).toBe(false);
+    expect(element.textContent).not.toMatch(/reopen|undo completion/i);
+  });
+
+  for (const [name, value] of [
+    ['noncreator', trip(false)],
+    ['already completed creator', { ...trip(true), isCompleted: true }],
+  ] as const) {
+    it(`has no completion action for ${name}`, () => {
+      const { element } = openCompletionTrip(value);
+      expect(Array.from(element.querySelectorAll('button')).some(b => b.textContent?.trim() === 'Complete Trip')).toBe(false);
+      if (value.isCompleted) expect(element.textContent).toContain('Completed');
+    });
+  }
+
+  for (const status of [409, 500]) {
+    it(`shows ${status} completion feedback and requires confirmation after refreshing`, () => {
+      const { fixture, click, element } = openCompletionTrip();
+      click('Complete Trip'); click('Confirm completion');
+      http.expectOne(`/api/trips/${trip(true).tripId}/complete`).flush(null, { status, statusText: 'Error' });
+      fixture.detectChanges();
+      expect(element.querySelector('[role="alert"]')?.textContent).toContain(status === 409 ? 'The Trip changed' : 'could not be completed');
+      expect(element.querySelector('[aria-label="Complete Trip confirmation"]')).toBeNull();
+      click('Refresh Trip');
+      http.expectOne(`/api/trips/${trip(true).tripId}`).flush({ ...trip(true), version: 'fresh-version' });
+      fixture.detectChanges();
+      click('Complete Trip'); click('Confirm completion');
+      const retry = http.expectOne(`/api/trips/${trip(true).tripId}/complete`);
+      expect(retry.request.body.version).toBe('fresh-version');
+      retry.flush({ ...trip(true), isCompleted: true });
+      http.expectOne('/api/trips').flush([]);
+    });
+  }
+
+  it('keeps completed Trips on the normal list with a text indicator', () => {
+    const fixture = TestBed.createComponent(Trips);
+    fixture.componentRef.setInput('currentFamilyId', group.familyGroupId);
+    fixture.componentRef.setInput('allActiveGroups', [group]);
+    fixture.detectChanges();
+    http.expectOne('/api/trips').flush([{ ...trip(true), isCompleted: true }]);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.trip-list a').textContent).toContain('Completed');
+    expect(fixture.nativeElement.querySelector('.trip-list a').getAttribute('href')).toBe(`/trips/${trip(true).tripId}`);
+  });
 
   it('shows the selected Family Trips without retaining other active Family items', () => {
     const fixture = TestBed.createComponent(Trips);

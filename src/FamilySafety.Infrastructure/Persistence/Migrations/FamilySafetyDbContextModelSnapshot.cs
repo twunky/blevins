@@ -1732,6 +1732,11 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("FamilyGroupId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("PrimaryDestination")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1748,6 +1753,10 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.Property<string>("TransportationNotes")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 

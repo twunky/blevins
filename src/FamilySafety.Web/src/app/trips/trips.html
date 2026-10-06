@@ -172,6 +172,22 @@
         <div class="trips-heading">
           <span class="date-tile date-tile--large" aria-hidden="true"><small>{{ dateTile(trip.startDate).month }}</small>{{ dateTile(trip.startDate).day }}</span>
           <h2>{{ trip.title }}</h2></div>
+        @if (trip.isCompleted) { <p class="status-pill trip-completed" role="status">Completed</p> }
+        @else if (trip.canEdit && trip.creatorProfileId === ownProfileId && !changingAudience()) {
+          @if (completionPending()) {
+            <div class="trip-confirmation" role="group" aria-label="Complete Trip confirmation">
+              <p role="status">This Trip will be marked complete. This action cannot currently be undone.</p>
+              <button type="button" [disabled]="completing()" (click)="confirmCompletion()">{{ completing() ? 'Completing…' : 'Confirm completion' }}</button>
+              <button type="button" class="button--secondary" [disabled]="completing()" (click)="cancelCompletion()">Cancel completion</button>
+            </div>
+          } @else {
+            <button type="button" class="button--secondary" [disabled]="completing()" (click)="requestCompletion()">Complete Trip</button>
+          }
+        }
+        @if (completionError()) {
+          <p class="trip-error" role="alert">{{ completionError() }}</p>
+          <button type="button" class="button--secondary" [disabled]="completing()" (click)="refreshCompletionState()">Refresh Trip</button>
+        }
         <div class="trip-facts">
           <p><strong>Destination:</strong> {{ trip.primaryDestination }}</p>
           <p><strong>Dates:</strong> {{ displayRange(trip.startDate, trip.endDate) }}</p>
@@ -195,7 +211,7 @@
             </p>
           }
           @if (trip.canEdit) {
-            <button type="button" class="button--secondary" (click)="beginAudienceChange()">Change audience</button>
+            <button type="button" class="button--secondary" [disabled]="completing()" (click)="beginAudienceChange()">Change audience</button>
           }
         </section>
       </div>
@@ -336,7 +352,7 @@
           <textarea id="trip-note-new" [formControl]="noteDraft" maxlength="1000" rows="4"></textarea>
           <button type="button" [disabled]="noteSaving()" (click)="addNote()">Add note</button></div>
       </section>
-      @if (trip.canEdit) { <div class="trip-management"><button type="button" (click)="beginEdit()">Edit trip details</button></div> }
+      @if (trip.canEdit) { <div class="trip-management"><button type="button" [disabled]="completing()" (click)="beginEdit()">Edit trip details</button></div> }
     </article>
   } @else {
     <section class="card trip-card" aria-labelledby="trip-list-heading">
@@ -360,6 +376,7 @@
               <span class="date-tile date-tile--large" aria-hidden="true"><small>{{ dateTile(trip.startDate).month }}</small>{{ dateTile(trip.startDate).day }}</span>
               <span class="trip-list-main">
                 <strong>{{ trip.title }}</strong>
+                @if (trip.isCompleted) { <span class="status-pill trip-completed">Completed</span> }
                 <span class="trip-list-dates">{{ displayRange(trip.startDate, trip.endDate) }}</span>
                 <span class="trip-list-destination">{{ trip.primaryDestination }}</span>
               </span>
@@ -385,6 +402,7 @@
               <span class="date-tile date-tile--large" aria-hidden="true"><small>{{ dateTile(trip.startDate).month }}</small>{{ dateTile(trip.startDate).day }}</span>
               <span class="trip-list-main">
                 <strong>{{ trip.title }}</strong>
+                @if (trip.isCompleted) { <span class="status-pill trip-completed">Completed</span> }
                 <span class="trip-list-dates">{{ displayRange(trip.startDate, trip.endDate) }}</span>
                 <span class="trip-list-destination">{{ trip.primaryDestination }}</span>
               </span>

@@ -9,6 +9,33 @@ namespace FamilySafety.Infrastructure.Persistence;
 
 public sealed class EfFamilyTripRepository(FamilySafetyDbContext dbContext) : IFamilyTripRepository
 {
+    public async Task<FamilyTripView?> CompleteAsync(Guid accountId, Guid tripId,
+        Guid version, CancellationToken cancellationToken)
+    {
+        var profileId = await GetProfileIdAsync(accountId, cancellationToken);
+        if (profileId is null) return null;
+        var groupId = await dbContext.FamilyTrips.AsNoTracking()
+            .Where(trip => trip.Id == tripId && trip.CreatorProfileId == profileId.Value)
+            .Select(trip => (Guid?)trip.FamilyGroupId).SingleOrDefaultAsync(cancellationToken);
+        if (groupId is null) return null;
+
+        // Preserve Trip creator access after membership loss and the existing Family lock order.
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(
+            IsolationLevel.Serializable, cancellationToken);
+        if (!await LockFamilyGroupAsync(groupId.Value, cancellationToken)) return null;
+        var trip = await dbContext.FamilyTrips.SingleOrDefaultAsync(
+            item => item.Id == tripId && item.CreatorProfileId == profileId.Value, cancellationToken);
+        if (trip is null) return null;
+        // Reload any tracked instance; another request may have changed it since this context read it.
+        await dbContext.Entry(trip).ReloadAsync(cancellationToken);
+        if (trip.IsCompleted || trip.Version != version) throw new FamilyTripCompletionConflictException();
+        trip.Complete();
+        try { await dbContext.SaveChangesAsync(cancellationToken); }
+        catch (DbUpdateConcurrencyException) { throw new FamilyTripCompletionConflictException(); }
+        await transaction.CommitAsync(cancellationToken);
+        return await GetViewAsync(profileId.Value, tripId, cancellationToken);
+    }
+
     public async Task<IReadOnlyList<FamilyTripView>> GetVisibleAsync(
         Guid accountId, CancellationToken cancellationToken)
     {
@@ -364,7 +391,7 @@ public sealed class EfFamilyTripRepository(FamilySafetyDbContext dbContext) : IF
             trip.Title, trip.PrimaryDestination, trip.StartDate, trip.EndDate,
             trip.Description, trip.TransportationNotes, trip.AccommodationNotes,
             trip.ExpectedArrivalDate, trip.ExpectedArrivalTime, trip.ExpectedArrivalTimeZone,
-            trip.AudienceType, travelers, contacts, audience);
+            trip.AudienceType, travelers, contacts, audience, trip.IsCompleted, trip.Version);
     }
 
     private Task<Guid?> GetProfileIdAsync(Guid accountId, CancellationToken cancellationToken) =>

@@ -29,6 +29,8 @@ interface Trip {
   creatorProfileId: string;
   creatorDisplayName: string;
   canEdit: boolean;
+  isCompleted: boolean;
+  version: string;
   title: string;
   primaryDestination: string;
   startDate: string;
@@ -117,6 +119,55 @@ export class Trips implements OnInit, OnChanges {
   protected readonly audienceError = signal('');
   protected readonly audienceBusy = signal(false);
   protected readonly timeZones = supportedTimeZones();
+  protected readonly completionPending = signal(false);
+  protected readonly completing = signal(false);
+  protected readonly completionError = signal('');
+
+  protected requestCompletion(): void {
+    const trip = this.selectedTrip();
+    if (!trip?.canEdit || trip.creatorProfileId !== this.ownProfileId || trip.isCompleted || this.completing()) return;
+    this.completionError.set('');
+    this.completionPending.set(true);
+  }
+
+  protected cancelCompletion(): void { this.completionPending.set(false); }
+
+  protected confirmCompletion(): void {
+    const trip = this.selectedTrip();
+    if (!this.completionPending() || !trip?.canEdit || trip.creatorProfileId !== this.ownProfileId
+      || trip.isCompleted || this.completing()) return;
+    this.completing.set(true);
+    this.completionError.set('');
+    this.http.post<Trip>(`/api/trips/${encodeURIComponent(trip.tripId)}/complete`, { version: trip.version })
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.completing.set(false))).subscribe({
+        next: updated => {
+          this.selectedTrip.set(updated);
+          this.completionPending.set(false);
+          this.loadTrips();
+        },
+        error: (response: HttpErrorResponse) => {
+          this.completionPending.set(false);
+          this.completionError.set(response.status === 409
+            ? 'The Trip changed or is already completed. Refresh the Trip and review its current state.'
+            : 'The Trip could not be completed. Please try again.');
+        },
+      });
+  }
+
+  protected refreshCompletionState(): void {
+    const trip = this.selectedTrip();
+    if (!trip || this.completing()) return;
+    this.completing.set(true);
+    this.http.get<Trip>(`/api/trips/${encodeURIComponent(trip.tripId)}`)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.completing.set(false))).subscribe({
+        next: updated => {
+          this.selectedTrip.set(updated);
+          this.completionPending.set(false);
+          this.completionError.set('');
+        },
+        error: () => this.completionError.set('The Trip could not be refreshed. Please try again.'),
+      });
+  }
 
   protected currentTrips(): readonly Trip[] {
     return this.trips().filter(trip => trip.familyGroupId === this.currentFamilyId);
@@ -183,7 +234,8 @@ export class Trips implements OnInit, OnChanges {
 
   protected beginEdit(): void {
     const trip = this.selectedTrip();
-    if (!trip?.canEdit) return;
+    if (!trip?.canEdit || this.completing()) return;
+    this.completionPending.set(false);
     this.error.set('');
     this.editingTripId.set(trip.tripId);
     this.tripForm.reset({
@@ -255,6 +307,8 @@ export class Trips implements OnInit, OnChanges {
   }
 
   protected closeDetail(): void {
+    this.completionPending.set(false);
+    this.completionError.set('');
     this.selectedTrip.set(null);
     this.noteRemovalPending.set(null);
     this.notes.set([]);
@@ -268,7 +322,8 @@ export class Trips implements OnInit, OnChanges {
 
   protected beginAudienceChange(): void {
     const trip = this.selectedTrip();
-    if (!trip?.canEdit) return;
+    if (!trip?.canEdit || this.completing()) return;
+    this.completionPending.set(false);
     const canBrowse = this.canBrowseTripGroup(trip);
     this.audienceMode.set(canBrowse ? trip.audienceType : 'SelectedPeople');
     this.audienceRecipientIds.set(trip.audienceRecipients.map(person => person.profileId));

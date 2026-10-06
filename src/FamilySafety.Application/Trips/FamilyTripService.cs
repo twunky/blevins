@@ -8,6 +8,21 @@ public sealed class FamilyTripService(
     ICurrentAccountAccessor currentAccountAccessor,
     IFamilyTripRepository repository) : IFamilyTripService
 {
+    public async Task<FamilyTripView> CompleteAsync(Guid tripId, CompleteFamilyTripRequest request,
+        CancellationToken cancellationToken)
+    {
+        var accountId = RequireAccountId();
+        if (tripId == Guid.Empty) throw new FamilyTripUnavailableException();
+        // Authorize before validation/conflict feedback so a known ID reveals nothing.
+        var trip = await repository.GetAsync(accountId, tripId, cancellationToken);
+        if (trip is null || !trip.CanEdit) throw new FamilyTripUnavailableException();
+        if (request.Version is null)
+            throw new FamilyTripValidationException(new Dictionary<string, string[]>
+                { ["Version"] = ["Refresh the Trip before completing it."] });
+        return await repository.CompleteAsync(accountId, tripId, request.Version.Value, cancellationToken)
+            ?? throw new FamilyTripUnavailableException();
+    }
+
     public Task<IReadOnlyList<FamilyTripView>> GetVisibleAsync(CancellationToken cancellationToken) =>
         repository.GetVisibleAsync(RequireAccountId(), cancellationToken);
 

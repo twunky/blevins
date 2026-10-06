@@ -1,9 +1,9 @@
 # Requirements Index
 
-**Status:** APPROVED - `CTX-1.37`
+**Status:** APPROVED - `CTX-1.38`
 **Purpose:** Traceability index only; normative wording lives at each canonical source.
 
-DEC-092 / REQ-PROD-014 records Phase 9.5 closure scope. Existing product-intent anchors remain approved; formal deferral does not mean implementation. Prior row baselines retain requirement provenance; CTX-1.37 is the active aggregate baseline.
+DEC-092 / REQ-PROD-014 records Phase 9.5 closure scope. Existing product-intent anchors remain approved; formal deferral does not mean implementation. Prior row baselines retain requirement provenance; CTX-1.38 is the active aggregate baseline under DEC-094 for bounded Trip completion; CTX-1.37 remains the historical Phase 9.5 closure baseline.
 
 Phase 10 trace: [WI-010-001](../planning/stories/WI-010-001-post-9-5-user-testability-baseline.md) / [verification](../planning/verification/VER-WI-010-001.md) evaluates REQ-PROD-014, REQ-UX-006/008/011/014, REQ-PLAN-002 and REQ-SHARE-010 without changing them. DEC-093 authorizes testing and bounded presentation fixes; no new requirement or CTX baseline.
 
@@ -166,15 +166,15 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-TRIP-001` | Structured Trip definition | `../workflows/plans-trips.md#req-trip-001` | `APPROVED` | `CTX-1.0` | — |
 | `REQ-TRIP-002` | Trip information | `../workflows/plans-trips.md#req-trip-002` | `APPROVED` | `CTX-1.0` | — |
 | `REQ-TRIP-003` | MVP Trip capabilities | `../workflows/plans-trips.md#req-trip-003` | `APPROVED` | `CTX-1.0` | — |
-| `REQ-TRIP-004` | Trip workflow | `../workflows/plans-trips.md#req-trip-004` | `APPROVED` | `CTX-1.0` | — |
-| `REQ-TRIP-005` | Trip updates, arrival, and sharing expiration | `../workflows/plans-trips.md#req-trip-005` | `APPROVED` | `CTX-1.0` | — |
+| `REQ-TRIP-004` | Trip workflow | `../workflows/plans-trips.md#req-trip-004` | `APPROVED` | `CTX-1.0` | DEC-094 / CTX-1.38: explicit completion independent of arrival/Sharing |
+| `REQ-TRIP-005` | Trip updates, arrival, and sharing expiration | `../workflows/plans-trips.md#req-trip-005` | `APPROVED` | `CTX-1.0` | DEC-094 / CTX-1.38: one-way status-only creator completion |
 | `REQ-TRIP-006` | Trip MVP exclusions | `../workflows/plans-trips.md#req-trip-006` | `APPROVED` | `CTX-1.0` | — |
-| `REQ-TRIP-007` | Trip roles and edit permissions | `../workflows/plans-trips.md#req-trip-007` | `APPROVED` | `CTX-1.18` | — |
+| `REQ-TRIP-007` | Trip roles and edit permissions | `../workflows/plans-trips.md#req-trip-007` | `APPROVED` | `CTX-1.18` | DEC-094 / CTX-1.38: one-way status-only creator completion |
 | `REQ-TRIP-008` | Required and optional Trip fields | `../workflows/plans-trips.md#req-trip-008` | `APPROVED` | `CTX-1.18` | — |
 | `REQ-TRIP-009` | Informational non-system Trip contacts | `../workflows/plans-trips.md#req-trip-009` | `APPROVED` | `CTX-1.18` | — |
 | `REQ-TRIP-010` | Collaborative Trip Notes, creator access, and retained states | `../workflows/plans-trips.md#req-trip-010` | `APPROVED` | `CTX-1.18` | — |
-| `REQ-TRIP-011` | Expected arrival, Check-Ins, and completion | `../workflows/plans-trips.md#req-trip-011` | `APPROVED` | `CTX-1.18` | — |
-| `REQ-TRIP-012` | MVP Trip creation flow and UX boundary | `../workflows/plans-trips.md#req-trip-012` | `APPROVED` | `CTX-1.18` | — |
+| `REQ-TRIP-011` | Expected arrival, Check-Ins, and completion | `../workflows/plans-trips.md#req-trip-011` | `APPROVED` | `CTX-1.18` | DEC-094 / CTX-1.38: one-way status-only creator completion |
+| `REQ-TRIP-012` | MVP Trip creation flow and UX boundary | `../workflows/plans-trips.md#req-trip-012` | `APPROVED` | `CTX-1.18` | DEC-094 / CTX-1.38: one-way status-only creator completion |
 
 ## Sharing and check-ins
 

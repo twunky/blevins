@@ -24,6 +24,31 @@ public sealed class FamilyTripApiTests : IClassFixture<FamilyTripApiTests.TripAp
     }
 
     [Fact]
+    public async Task ExplicitCompletionRouteUsesVersionAndStandardNondisclosingAndConflictResponses()
+    {
+        var tripId = Guid.NewGuid(); var version = Guid.NewGuid();
+        service.Result = View(Guid.NewGuid()) with { IsCompleted = true, Version = Guid.NewGuid() };
+        var response = await client.PostAsJsonAsync($"/api/trips/{tripId:D}/complete", new { version });
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(tripId, service.LastTripId);
+        Assert.Equal(version, service.LastComplete!.Version);
+        using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.True(json.RootElement.GetProperty("isCompleted").GetBoolean());
+        service.Invalid = true;
+        Assert.Equal(HttpStatusCode.Conflict,
+            (await client.PostAsJsonAsync($"/api/trips/{tripId:D}/complete", new { version })).StatusCode);
+        service.Invalid = false; service.Unavailable = true;
+        response = await client.PostAsJsonAsync($"/api/trips/{tripId:D}/complete", new { version });
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal("", await response.Content.ReadAsStringAsync());
+        service.Unavailable = false; service.Unauthenticated = true;
+        Assert.Equal(HttpStatusCode.Unauthorized,
+            (await client.PostAsJsonAsync($"/api/trips/{tripId:D}/complete", new { version })).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound,
+            (await client.PostAsJsonAsync($"/api/trips/{tripId:D}/reopen", new { version })).StatusCode);
+    }
+
+    [Fact]
     public async Task CreateEndpointPassesTripFieldsAndInitialAudience()
     {
         var groupId = Guid.NewGuid();
@@ -173,6 +198,16 @@ public sealed class FamilyTripApiTests : IClassFixture<FamilyTripApiTests.TripAp
 
     public sealed class StubTripService : IFamilyTripService
     {
+        public CompleteFamilyTripRequest? LastComplete { get; private set; }
+        public Task<FamilyTripView> CompleteAsync(Guid tripId, CompleteFamilyTripRequest request,
+            CancellationToken cancellationToken)
+        {
+            LastTripId = tripId; LastComplete = request;
+            if (Unauthenticated) throw new CurrentAccountUnavailableException();
+            if (Unavailable) throw new FamilyTripUnavailableException();
+            if (Invalid) throw new FamilyTripCompletionConflictException();
+            return Task.FromResult(Result!);
+        }
         public Guid LastGroupId { get; private set; }
         public Guid LastTripId { get; private set; }
         public CreateFamilyTripRequest? LastCreate { get; private set; }

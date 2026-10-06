@@ -14,7 +14,12 @@ public sealed record FamilyTripView(
     string? ExpectedArrivalTimeZone, TripAudienceType AudienceType,
     IReadOnlyList<TripPersonView> Travelers,
     IReadOnlyList<TripContactView> Contacts,
-    IReadOnlyList<TripPersonView> AudienceRecipients);
+    IReadOnlyList<TripPersonView> AudienceRecipients,
+    bool IsCompleted = false, Guid Version = default);
+
+public sealed record CompleteFamilyTripRequest(Guid? Version);
+
+public sealed class FamilyTripCompletionConflictException : Exception;
 
 public sealed record TripContactInput(string? Name, string? RelationshipRole, string? Phone, string? Email);
 

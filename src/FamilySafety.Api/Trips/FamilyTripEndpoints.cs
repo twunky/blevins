@@ -10,10 +10,27 @@ public static class FamilyTripEndpoints
         endpoints.MapGet("/api/trips", GetVisibleAsync);
         endpoints.MapGet("/api/trips/{tripId:guid}", GetAsync);
         endpoints.MapPut("/api/trips/{tripId:guid}", UpdateAsync);
+        endpoints.MapPost("/api/trips/{tripId:guid}/complete", CompleteAsync);
         endpoints.MapPost("/api/trips/{tripId:guid}/audience/preview", PreviewAudienceAsync);
         endpoints.MapPost("/api/trips/{tripId:guid}/audience/confirm", ConfirmAudienceAsync);
         endpoints.MapPost("/api/family-groups/{familyGroupId:guid}/trips", CreateAsync);
         return endpoints;
+    }
+
+    private static async Task<IResult> CompleteAsync(Guid tripId,
+        CompleteFamilyTripRequest request, IFamilyTripService service, CancellationToken cancellationToken)
+    {
+        try { return Results.Ok(await service.CompleteAsync(tripId, request, cancellationToken)); }
+        catch (CurrentAccountUnavailableException) { return Results.Unauthorized(); }
+        catch (FamilyTripUnavailableException) { return Results.NotFound(); }
+        catch (FamilyTripCompletionConflictException)
+        {
+            return Results.Conflict(new { message = "The Trip changed or is already completed. Refresh the Trip before trying again." });
+        }
+        catch (FamilyTripValidationException exception)
+        {
+            return Results.ValidationProblem(exception.Errors.ToDictionary(error => error.Key, error => error.Value));
+        }
     }
 
     private static async Task<IResult> GetVisibleAsync(
