@@ -28,7 +28,7 @@ public sealed class EfFamilyPlanRepository(FamilySafetyDbContext dbContext) : IF
             .ThenBy(row => row.Plan.Time)
             .ThenBy(row => row.Plan.ActivityOrDestination)
             .ToListAsync(cancellationToken);
-        return plans.Select(row => ToView(row.Plan, row.CreatorDisplayName)).ToArray();
+        return plans.Select(row => ToView(row.Plan, row.CreatorDisplayName, row.CanCorrectActivityTiming)).ToArray();
     }
 
     public async Task<FamilyPlanView?> GetAsync(
@@ -41,7 +41,7 @@ public sealed class EfFamilyPlanRepository(FamilySafetyDbContext dbContext) : IF
         var row = await QueryVisiblePlans(accountId)
             .Where(item => item.Plan.Id == planId)
             .SingleOrDefaultAsync(cancellationToken);
-        return row is null ? null : ToView(row.Plan, row.CreatorDisplayName);
+        return row is null ? null : ToView(row.Plan, row.CreatorDisplayName, row.CanCorrectActivityTiming);
     }
 
     public async Task<FamilyPlanView?> CreateAsync(
@@ -100,8 +100,11 @@ public sealed class EfFamilyPlanRepository(FamilySafetyDbContext dbContext) : IF
         string? notes,
         CancellationToken cancellationToken)
     {
+        var familyId = await GetStoredPlanFamilyAsync(planId, cancellationToken);
+        if (familyId is null) return null;
         await using var transaction = await dbContext.Database.BeginTransactionAsync(
             IsolationLevel.Serializable, cancellationToken);
+        if (await LockFamilyGroupAsync(familyId.Value, cancellationToken) == 0) return null;
 
         // Resolve the Plan and current creator membership together for every write.
         // Missing, non-creator, and inactive-creator requests share the same result.
@@ -125,6 +128,45 @@ public sealed class EfFamilyPlanRepository(FamilySafetyDbContext dbContext) : IF
         return updated;
     }
 
+    public async Task<FamilyPlanView?> CorrectActivityTimingAsync(
+        Guid accountId, Guid planId, CorrectFamilyPlanActivityTimingRequest request,
+        CancellationToken cancellationToken)
+    {
+        var familyId = await GetStoredPlanFamilyAsync(planId, cancellationToken);
+        if (familyId is null) return null;
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(
+            IsolationLevel.Serializable, cancellationToken);
+        if (await LockFamilyGroupAsync(familyId.Value, cancellationToken) == 0) return null;
+
+        // This is the creator branch of current Plan visibility: exact creator and
+        // active membership in the stored Family, protected until transaction commit.
+        // No client Family, administrator status or retained Trip authority is used.
+        var plan = await (from item in dbContext.FamilyPlans
+                          join membership in dbContext.FamilyGroupMemberships
+                              on item.FamilyGroupId equals membership.FamilyGroupId
+                          where item.Id == planId
+                              && item.CreatorProfileId == membership.AdultProfileId
+                              && membership.AccountId == accountId && membership.IsActive
+                          select item).SingleOrDefaultAsync(cancellationToken);
+        if (plan is null) return null;
+        if (plan.Version != request.Version) throw new FamilyPlanConflictException();
+
+        plan.CorrectActivityTiming(request.ActivityOrDestination, request.Date!.Value, request.Time!.Value,
+            request.ExpectedReturnDate, request.ExpectedReturnTime,
+            request.ExpectedCheckInDate, request.ExpectedCheckInTime);
+        try { await dbContext.SaveChangesAsync(cancellationToken); }
+        catch (DbUpdateConcurrencyException) { throw new FamilyPlanConflictException(); }
+        var updated = await GetPlanViewAsync(planId, cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        return updated;
+    }
+
+    // Resolve before acquiring transaction locks, matching the Trip write lock order.
+    // Authorization is rechecked from the stored Plan after the Family lock.
+    private Task<Guid?> GetStoredPlanFamilyAsync(Guid planId, CancellationToken cancellationToken) =>
+        dbContext.FamilyPlans.AsNoTracking().Where(p => p.Id == planId)
+            .Select(p => (Guid?)p.FamilyGroupId).SingleOrDefaultAsync(cancellationToken);
+
     // The only definition of Plan read visibility (REQ-PLAN-005): the caller has an
     // active membership in the Plan's Family and is its creator, or the Plan is
     // shared with the whole Family, or the caller was individually selected. A
@@ -142,7 +184,11 @@ public sealed class EfFamilyPlanRepository(FamilySafetyDbContext dbContext) : IF
             || dbContext.FamilyPlanAudienceMembers.Any(audienceMember =>
                 audienceMember.PlanId == plan.Id
                 && audienceMember.ProfileId == membership.AdultProfileId)
-        select new VisiblePlanRow { Plan = plan, CreatorDisplayName = creator.DisplayName };
+        select new VisiblePlanRow
+        {
+            Plan = plan, CreatorDisplayName = creator.DisplayName,
+            CanCorrectActivityTiming = plan.CreatorProfileId == membership.AdultProfileId,
+        };
 
     private Task<Guid?> GetActiveProfileIdAsync(
         Guid accountId,
@@ -176,10 +222,10 @@ public sealed class EfFamilyPlanRepository(FamilySafetyDbContext dbContext) : IF
          join creator in dbContext.AdultProfiles.AsNoTracking()
              on plan.CreatorProfileId equals creator.Id
          where plan.Id == planId
-         select ToView(plan, creator.DisplayName))
+         select ToView(plan, creator.DisplayName, true))
         .SingleOrDefaultAsync(cancellationToken);
 
-    private static FamilyPlanView ToView(FamilyPlan plan, string creatorDisplayName) => new(
+    private static FamilyPlanView ToView(FamilyPlan plan, string creatorDisplayName, bool canCorrectActivityTiming) => new(
         plan.Id,
         plan.FamilyGroupId,
         plan.ActivityOrDestination,
@@ -192,7 +238,9 @@ public sealed class EfFamilyPlanRepository(FamilySafetyDbContext dbContext) : IF
         plan.AudienceType,
         plan.CreatorProfileId,
         creatorDisplayName,
-        plan.Notes);
+        plan.Notes,
+        plan.Version,
+        canCorrectActivityTiming);
 
     private Task<int> LockFamilyGroupAsync(Guid familyGroupId, CancellationToken cancellationToken) =>
         dbContext.FamilyGroups
@@ -207,5 +255,6 @@ public sealed class EfFamilyPlanRepository(FamilySafetyDbContext dbContext) : IF
     {
         public required FamilyPlan Plan { get; init; }
         public required string CreatorDisplayName { get; init; }
+        public bool CanCorrectActivityTiming { get; init; }
     }
 }

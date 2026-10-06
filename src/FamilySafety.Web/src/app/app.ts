@@ -122,6 +122,8 @@ interface FamilyPlanView {
   creatorProfileId: string;
   creatorDisplayName: string;
   notes: string | null;
+  version: string;
+  canCorrectActivityTiming: boolean;
 }
 
 interface HomeTripPreview {
@@ -472,6 +474,19 @@ export class App implements OnInit {
     expectedCheckInTime: [''],
     notes: ['', Validators.maxLength(1000)],
   });
+  protected readonly planCorrectionForm = this.formBuilder.group({
+    activityOrDestination: ['', [Validators.required, Validators.maxLength(200)]],
+    date: ['', Validators.required], time: ['', Validators.required],
+    expectedReturnDate: [''], expectedReturnTime: [''],
+    expectedCheckInDate: [''], expectedCheckInTime: [''],
+  });
+  protected readonly editingPlanFactsId = signal<string | null>(null);
+  protected readonly planCorrectionSaving = signal(false);
+  protected readonly planCorrectionError = signal('');
+  protected readonly planCorrectionMessage = signal('');
+  protected readonly planCorrectionConflict = signal(false);
+  private planCorrectionVersion: string | null = null;
+
   protected readonly planNoteForm = this.formBuilder.group({
     notes: ['', Validators.maxLength(1000)],
   });
@@ -645,6 +660,8 @@ export class App implements OnInit {
     const id = this.routeItemId();
     this.cancelPlanNoteEdit();
     this.planNoteMessage.set('');
+    this.cancelPlanCorrection();
+    this.planCorrectionMessage.set('');
     if (!isItemId(id)) {
       this.itemStatus.set('unavailable');
       return;
@@ -858,6 +875,8 @@ export class App implements OnInit {
     this.planMessage.set('');
     this.cancelPlanNoteEdit();
     this.planNoteMessage.set('');
+    this.cancelPlanCorrection();
+    this.planCorrectionMessage.set('');
     this.homeTripResults.set([]);
     this.homeTripsLoading.set(false);
     this.homeTripsError.set('');
@@ -1136,8 +1155,83 @@ export class App implements OnInit {
       });
   }
 
+  protected canCorrectPlan(plan: FamilyPlanView): boolean {
+    return plan.canCorrectActivityTiming && plan.creatorProfileId === this.ownerProfile()?.profileId
+      && this.activeFamilyGroups().some(family => family.familyGroupId === plan.familyGroupId);
+  }
+
+  protected beginPlanCorrection(plan: FamilyPlanView): void {
+    if (!this.canCorrectPlan(plan) || this.planCorrectionSaving()) return;
+    this.planCorrectionError.set('');
+    this.planCorrectionMessage.set('');
+    this.planCorrectionConflict.set(false);
+    this.planCorrectionVersion = plan.version;
+    this.planCorrectionForm.reset({
+      activityOrDestination: plan.activityOrDestination, date: plan.date.slice(0, 10), time: plan.time,
+      expectedReturnDate: plan.expectedReturnDate?.slice(0, 10) ?? '', expectedReturnTime: plan.expectedReturnTime ?? '',
+      expectedCheckInDate: plan.expectedCheckInDate?.slice(0, 10) ?? '', expectedCheckInTime: plan.expectedCheckInTime ?? '',
+    });
+    this.editingPlanFactsId.set(plan.planId);
+  }
+
+  protected cancelPlanCorrection(): void {
+    this.editingPlanFactsId.set(null);
+    this.planCorrectionVersion = null;
+    this.planCorrectionError.set('');
+    this.planCorrectionConflict.set(false);
+    this.planCorrectionForm.reset();
+  }
+
+  protected savePlanCorrection(plan: FamilyPlanView): void {
+    if (!this.canCorrectPlan(plan) || this.editingPlanFactsId() !== plan.planId
+      || this.planCorrectionSaving() || this.planNoteSaving() || !this.planCorrectionVersion) return;
+    this.planCorrectionForm.markAllAsTouched();
+    this.planCorrectionError.set('');
+    const value = this.planCorrectionForm.getRawValue();
+    const incompleteReturn = !!value.expectedReturnDate !== !!value.expectedReturnTime;
+    const incompleteCheckIn = !!value.expectedCheckInDate !== !!value.expectedCheckInTime;
+    if (this.planCorrectionForm.invalid || !value.activityOrDestination?.trim()
+      || incompleteReturn || incompleteCheckIn) {
+      this.planCorrectionError.set(incompleteReturn || incompleteCheckIn
+        ? 'Enter both date and time for each optional timing, or leave both empty.'
+        : 'Enter activity / destination (up to 200 characters), date and time.');
+      return;
+    }
+    this.planCorrectionSaving.set(true);
+    this.http.put<FamilyPlanView>(`/api/plans/${encodeURIComponent(plan.planId)}/activity-timing`, {
+      activityOrDestination: value.activityOrDestination.trim(), date: value.date, time: value.time,
+      expectedReturnDate: value.expectedReturnDate || null, expectedReturnTime: value.expectedReturnTime || null,
+      expectedCheckInDate: value.expectedCheckInDate || null, expectedCheckInTime: value.expectedCheckInTime || null,
+      version: this.planCorrectionVersion,
+    }).pipe(takeUntil(this.familyScopeChanged), finalize(() => this.planCorrectionSaving.set(false)),
+      takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: updated => {
+        if (this.view() !== 'planItem' || this.routeItemId() !== updated.planId) return;
+        this.itemPlan.set(updated);
+        this.familyPlans.update(plans => plans.map(current => current.planId === updated.planId ? updated : current));
+        this.cancelPlanCorrection();
+        this.planCorrectionMessage.set('Plan activity and timing saved.');
+      },
+      error: (error: HttpErrorResponse) => {
+        if (this.view() !== 'planItem' || this.routeItemId() !== plan.planId) return;
+        if (error.status === 404) {
+          this.itemPlan.set(null);
+          this.itemStatus.set('unavailable');
+          this.cancelPlanCorrection();
+          return;
+        }
+        this.planCorrectionConflict.set(error.status === 409);
+        this.planCorrectionError.set(error.status === 409
+          ? 'The Plan changed. Reload the Plan and review its current values before correcting it again.'
+          : error.status === 401 ? 'Your session may have ended. Please sign in again.'
+          : error.status === 400 ? 'Check the activity and timing values before saving.'
+          : 'The Plan could not be corrected. Please try again.');
+      },
+    });
+  }
+
   protected beginPlanNoteEdit(plan: FamilyPlanView): void {
-    if (plan.creatorProfileId !== this.ownerProfile()?.profileId) return;
+    if (plan.creatorProfileId !== this.ownerProfile()?.profileId || this.planCorrectionSaving()) return;
     this.planNoteClearPendingId.set(null);
     this.planNoteError.set('');
     this.planNoteMessage.set('');
@@ -1153,7 +1247,7 @@ export class App implements OnInit {
   }
 
   protected requestPlanNoteClear(plan: FamilyPlanView): void {
-    if (plan.creatorProfileId !== this.ownerProfile()?.profileId || !plan.notes || this.planNoteSaving()) return;
+    if (plan.creatorProfileId !== this.ownerProfile()?.profileId || !plan.notes || this.planNoteSaving() || this.planCorrectionSaving()) return;
     this.planNoteClearPendingId.set(plan.planId);
   }
 
@@ -1168,7 +1262,7 @@ export class App implements OnInit {
   }
 
   protected savePlanNote(plan: FamilyPlanView, clear = false): void {
-    if (plan.creatorProfileId !== this.ownerProfile()?.profileId || this.planNoteSaving()) return;
+    if (plan.creatorProfileId !== this.ownerProfile()?.profileId || this.planNoteSaving() || this.planCorrectionSaving()) return;
     if (!clear) this.planNoteForm.markAllAsTouched();
     this.planNoteError.set('');
     if (!clear && this.planNoteForm.invalid) {

@@ -27,6 +27,7 @@ const planView = (familyGroupId: string) => ({
   planId: itemId, familyGroupId, activityOrDestination: 'Hike to the falls', date: '2026-11-02', time: '08:00:00',
   expectedReturnDate: null, expectedReturnTime: null, expectedCheckInDate: null, expectedCheckInTime: null,
   audienceType: 'SelectedPeople', creatorProfileId: 'person-b', creatorDisplayName: 'Blair', notes: 'Trail map in the car',
+  version: '50000000-0000-4000-8000-000000000005', canCorrectActivityTiming: false,
 });
 const tripView = (familyGroupId: string) => ({
   tripId: itemId, familyGroupId, familyGroupName: 'Name from the item response', creatorProfileId: ownProfile.profileId,
@@ -329,6 +330,129 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
     expect(article.textContent).toContain('Trail map in the car');
     expect(article.querySelectorAll('button, a')).toHaveLength(0);
     expect(root(harness).querySelector('a.item-back')?.getAttribute('href')).toBe('/plans');
+  });
+
+  async function openCorrectionPlan(eligible = true, creator = ownProfile.profileId) {
+    const harness = await visit(`/plans/${itemId}`);
+    shellReads().flush([one]);
+    familyReads(one);
+    const plan = { ...planView(one.familyGroupId), creatorProfileId: creator, canCorrectActivityTiming: eligible,
+      expectedReturnDate: '2026-11-03', expectedReturnTime: '17:00:00',
+      expectedCheckInDate: '2026-11-02', expectedCheckInTime: '12:00:00' };
+    http.expectOne(`/api/plans/${itemId}`).flush(plan);
+    await settle(harness);
+    return { harness, plan, article: root(harness).querySelector<HTMLElement>('article[aria-label="Plan details"]')! };
+  }
+
+  function clickWithin(element: Element, name: string) {
+    const button = Array.from(element.querySelectorAll<HTMLButtonElement>('button'))
+      .find(button => button.textContent?.trim() === name)!;
+    expect(button).toBeTruthy(); button.click();
+  }
+  function setCorrectionInput(article: Element, field: string, value: string) {
+    const input = article.querySelector<HTMLInputElement>(`#plan-correction-${field}`)!;
+    input.value = value; input.dispatchEvent(new Event('input'));
+  }
+
+  it.each([[false, ownProfile.profileId], [true, 'person-b']])('hides correction for ineligible server hint/identity (%s, %s)', async (hint, creator) => {
+    const { article } = await openCorrectionPlan(hint, creator);
+    expect(article.textContent).not.toContain('Correct activity and timing');
+  });
+
+  it('prefills exactly the bounded facts, cancels without writes, and keeps Notes controls separate', async () => {
+    const { harness, article, plan } = await openCorrectionPlan();
+    clickWithin(article, 'Correct activity and timing'); harness.detectChanges();
+    const form = article.querySelector('form[aria-label="Correct activity and timing"]')!;
+    expect(form.querySelectorAll('input')).toHaveLength(7);
+    expect(form.querySelector('textarea')).toBeNull();
+    expect(form.querySelector<HTMLInputElement>('#plan-correction-activity')!.value).toBe(plan.activityOrDestination);
+    expect(form.querySelector<HTMLInputElement>('#plan-correction-date')!.value).toBe(plan.date);
+    expect(form.querySelector<HTMLInputElement>('#plan-correction-time')!.value).toMatch(/^08:00/);
+    expect(form.querySelector<HTMLInputElement>('#plan-correction-return-date')!.value).toBe(plan.expectedReturnDate);
+    expect(form.querySelector<HTMLInputElement>('#plan-correction-return-time')!.value).toMatch(/^17:00/);
+    expect(form.querySelector<HTMLInputElement>('#plan-correction-checkin-date')!.value).toBe(plan.expectedCheckInDate);
+    expect(form.querySelector<HTMLInputElement>('#plan-correction-checkin-time')!.value).toMatch(/^12:00/);
+    expect(form.textContent).toContain('It does not schedule a Check-In or send reminders.');
+    expect(article.textContent).toContain('Edit note');
+    setCorrectionInput(article, 'activity', 'Unsaved change');
+    clickWithin(form, 'Cancel'); harness.detectChanges();
+    http.expectNone(`/api/plans/${itemId}/activity-timing`);
+    expect(article.textContent).toContain(plan.activityOrDestination);
+    expect(article.querySelector('form[aria-label="Correct activity and timing"]')).toBeNull();
+  });
+
+  it('validates required facts, whitespace, length, and partial optional pairs before sending', async () => {
+    const { harness, article } = await openCorrectionPlan();
+    clickWithin(article, 'Correct activity and timing'); harness.detectChanges();
+    const form = article.querySelector('form[aria-label="Correct activity and timing"]')!;
+    for (const value of ['', '   ', 'x'.repeat(201)]) {
+      setCorrectionInput(article, 'activity', value); clickWithin(form, 'Save'); harness.detectChanges();
+      expect(form.textContent).toContain('Enter activity / destination');
+      http.expectNone(`/api/plans/${itemId}/activity-timing`);
+    }
+    setCorrectionInput(article, 'activity', 'New activity');
+    setCorrectionInput(article, 'date', ''); clickWithin(form, 'Save'); harness.detectChanges();
+    http.expectNone(`/api/plans/${itemId}/activity-timing`);
+    setCorrectionInput(article, 'date', '2026-11-04');
+    setCorrectionInput(article, 'return-time', ''); clickWithin(form, 'Save'); harness.detectChanges();
+    expect(form.textContent).toContain('Enter both date and time');
+    http.expectNone(`/api/plans/${itemId}/activity-timing`);
+    setCorrectionInput(article, 'return-date', '');
+    setCorrectionInput(article, 'checkin-date', ''); clickWithin(form, 'Save'); harness.detectChanges();
+    expect(form.textContent).toContain('Enter both date and time');
+    http.expectNone(`/api/plans/${itemId}/activity-timing`);
+  });
+
+  it('saves a complete correction with optional clears, shows current facts, and leaves Notes unchanged', async () => {
+    const { harness, article, plan } = await openCorrectionPlan();
+    clickWithin(article, 'Correct activity and timing'); harness.detectChanges();
+    setCorrectionInput(article, 'activity', 'Corrected walk');
+    setCorrectionInput(article, 'date', '2026-11-04');
+    for (const field of ['return-date', 'return-time', 'checkin-date', 'checkin-time']) setCorrectionInput(article, field, '');
+    const form = article.querySelector('form[aria-label="Correct activity and timing"]')!;
+    clickWithin(form, 'Save'); harness.detectChanges();
+    expect(form.textContent).toContain('Saving activity and timing');
+    expect(Array.from(form.querySelectorAll('button')).find(b => b.textContent?.trim() === 'Save')!.disabled).toBe(true);
+    const save = http.expectOne(`/api/plans/${itemId}/activity-timing`);
+    expect(save.request.method).toBe('PUT');
+    expect(save.request.body).toEqual({ activityOrDestination: 'Corrected walk', date: '2026-11-04', time: '08:00:00',
+      expectedReturnDate: null, expectedReturnTime: null, expectedCheckInDate: null, expectedCheckInTime: null, version: plan.version });
+    http.expectNone(`/api/plans/${itemId}/notes`);
+    save.flush({ ...plan, ...save.request.body, version: '60000000-0000-4000-8000-000000000006' });
+    await settle(harness);
+    expect(article.textContent).toContain('Corrected walk');
+    expect(article.textContent).toContain('Plan activity and timing saved.');
+    expect(article.textContent).toContain('Trail map in the car');
+    expect(article.querySelector('form[aria-label="Correct activity and timing"]')).toBeNull();
+    clickWithin(article, 'Edit note'); harness.detectChanges();
+    expect(article.querySelector<HTMLTextAreaElement>('#item-plan-note')!.value).toBe(plan.notes);
+    expect(article.querySelectorAll('form')).toHaveLength(1);
+  });
+
+  it.each([409, 500, 401, 400, 404])('handles correction failure %s without presenting a successful write', async statusCode => {
+    const { harness, article, plan } = await openCorrectionPlan();
+    clickWithin(article, 'Correct activity and timing'); harness.detectChanges();
+    setCorrectionInput(article, 'activity', 'Unsaved correction');
+    clickWithin(article.querySelector('form[aria-label="Correct activity and timing"]')!, 'Save');
+    http.expectOne(`/api/plans/${itemId}/activity-timing`).flush({}, { status: statusCode, statusText: 'Failure' });
+    await settle(harness);
+    if (statusCode === 404) {
+      expect(root(harness).querySelector('app-item-unavailable')).not.toBeNull();
+      expect(root(harness).querySelector('article[aria-label="Plan details"]')).toBeNull();
+    } else {
+      expect(article.textContent).toContain(plan.activityOrDestination);
+      expect(article.textContent).not.toContain('Plan activity and timing saved.');
+      expect(article.querySelector<HTMLInputElement>('#plan-correction-activity')!.value).toBe('Unsaved correction');
+      expect(article.querySelector('[role="alert"]')).not.toBeNull();
+      if (statusCode === 409) {
+        expect(article.textContent).toContain('The Plan changed. Reload');
+        clickWithin(article, 'Reload Plan');
+        http.expectOne(`/api/plans/${itemId}`).flush({ ...plan, activityOrDestination: 'Other correction', version: 'new-version' });
+        await settle(harness);
+        expect(article.textContent).toContain('Other correction');
+        expect(article.querySelector('form[aria-label="Correct activity and timing"]')).toBeNull();
+      }
+    }
   });
 
   it('lets the creator edit, cancel, save, and clear the Plan note', async () => {

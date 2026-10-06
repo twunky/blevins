@@ -17,6 +17,12 @@ Migration `20261005040757_ManualTrustedContacts` adds one personal owner-profile
 
 `/api/trusted-contacts` lists/adds current-adult contacts; `/{contactId}` reads/edits/removes only that adult's records. Missing/denied IDs return the same empty 404 and responses are `no-store`. Updates take `version` in the body, deletes in the query; stale versions return 409 (`ContactChanged`), normalized phone/email collisions return 409 (`DuplicateContact`). Phone accepts 7–15 digits with an optional +/00 international prefix and ordinary separators, up to 32 display characters; no country is guessed for local numbers. Email uses the existing profile validator. Safety contains the manual forms and explicit removal confirmation, with no contact lookup or automatic product sharing.
 
+## Plan activity/timing correction (WI-105-002)
+
+WI-105-002 migration `20261006050157_PlanActivityTimingConcurrency` adds only a non-null Guid `FamilyPlans.Version`, backfilling existing rows with `NEWID()`. Facts rotate the EF concurrency token; Notes do not. Correction and Notes serialize with the existing stored-Family write lock and only modify their own columns. The isolated SQL tests exercise old-schema migration; no ordinary user database is modified by validation.
+
+`PUT /api/plans/{planId}/activity-timing` accepts only seven complete activity/timing facts and their captured version. Only the original creator with current Plan access and active stored-Family membership may write. Stale versions return 409; missing/denied Plans return the existing empty 404. Notes remain on `/notes`, audience is unchanged and expected Check-In is descriptive only.
+
 ## Prerequisites
 
 - Windows with the .NET 10 SDK. The repository pins SDK `10.0.401` in `global.json`.
@@ -87,7 +93,7 @@ The current UI includes:
 
 New local databases start with the development Family Group and two adult members but no sample Events, Plans, or Trips. Create records in the UI to explore those features.
 
-Phase 9 and Phase 9.5 are `COMPLETE / CLOSED` under `DEC-081` / `DEC-092`; Phase 10 is current under `DEC-093`, with CTX-1.38 active for the Phase 10.5 Trip completion slice under DEC-094. The [readiness matrix](../ai-context/planning/phase-10-readiness.md) prepares facilitated adult Development testing. Standalone Check-Ins and temporary Sharing Sessions are available in Safety; Trip-associated Check-In/Sharing execution remains deferred. Creator-controlled Trip audience editing and explicit one-way completion are available. Completed Trips retain editing, Notes and list/detail access, and leave Home current previews.
+Phase 9 and Phase 9.5 are `COMPLETE / CLOSED` under `DEC-081` / `DEC-092`; Phase 10 is current under `DEC-093`, with CTX-1.39 active for bounded Phase 10.5 Plan correction under DEC-095, preserving Trip completion. The [readiness matrix](../ai-context/planning/phase-10-readiness.md) prepares facilitated adult Development testing. Standalone Check-Ins and temporary Sharing Sessions are available in Safety; Trip-associated Check-In/Sharing execution remains deferred. Creator-controlled Trip audience editing and explicit one-way completion are available. Completed Trips retain editing, Notes and list/detail access, and leave Home current previews.
 
 ## Invited-adult scenario (WI-075-001)
 

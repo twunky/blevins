@@ -6,6 +6,63 @@ namespace FamilySafety.Foundation.Tests;
 
 public sealed class FamilyPlanServiceTests
 {
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(false, false)]
+    public async Task CorrectionRejectsEitherHalfOfEachOptionalTiming(bool returnPair, bool dateOnly)
+    {
+        var service = CreateService(Guid.NewGuid(), new StubRepository());
+        var date = new DateOnly(2026, 10, 4);
+        var time = new TimeOnly(12, 0);
+        var request = new CorrectFamilyPlanActivityTimingRequest("Lake", date, time,
+            returnPair && dateOnly ? date : null, returnPair && !dateOnly ? time : null,
+            !returnPair && dateOnly ? date : null, !returnPair && !dateOnly ? time : null, Guid.NewGuid());
+        var error = await Assert.ThrowsAsync<FamilyPlanValidationException>(() =>
+            service.CorrectActivityTimingAsync(Guid.NewGuid(), request, CancellationToken.None));
+        Assert.Single(error.Errors);
+        Assert.Contains(returnPair ? nameof(request.ExpectedReturnDate) : nameof(request.ExpectedCheckInDate), error.Errors.Keys);
+    }
+
+    [Fact]
+    public async Task CorrectionReusesCreationValidationAndRequiresVersion()
+    {
+        var repository = new StubRepository();
+        var service = CreateService(Guid.NewGuid(), repository);
+        var invalid = new CorrectFamilyPlanActivityTimingRequest(new string('x', 201), null, null,
+            new DateOnly(2026, 10, 3), null, null, new TimeOnly(12, 0), Guid.Empty);
+        var error = await Assert.ThrowsAsync<FamilyPlanValidationException>(() =>
+            service.CorrectActivityTimingAsync(Guid.NewGuid(), invalid, CancellationToken.None));
+        Assert.Equal(6, error.Errors.Count);
+        Assert.Contains(nameof(invalid.Version), error.Errors.Keys);
+        var blank = invalid with { ActivityOrDestination = "   ", Date = DateOnly.MinValue };
+        error = await Assert.ThrowsAsync<FamilyPlanValidationException>(() =>
+            service.CorrectActivityTimingAsync(Guid.NewGuid(), blank, CancellationToken.None));
+        Assert.Contains(nameof(invalid.ActivityOrDestination), error.Errors.Keys);
+        Assert.Contains(nameof(invalid.Date), error.Errors.Keys);
+    }
+
+    [Fact]
+    public async Task CorrectionPassesAccountAndCompleteFactsAndPreservesRepositoryFailures()
+    {
+        var account = Guid.NewGuid();
+        var id = Guid.NewGuid();
+        var repository = new StubRepository { Updated = View(Guid.NewGuid()) };
+        var service = CreateService(account, repository);
+        var request = new CorrectFamilyPlanActivityTimingRequest("Lake", new DateOnly(2026, 10, 4),
+            new TimeOnly(12, 0), null, null, null, null, Guid.NewGuid());
+        Assert.Same(repository.Updated, await service.CorrectActivityTimingAsync(id, request, CancellationToken.None));
+        Assert.Equal(account, repository.AccountId);
+        Assert.Equal(id, repository.PlanId);
+        Assert.Equal(request, repository.CorrectionRequest);
+        await Assert.ThrowsAsync<FamilyPlanUnavailableException>(() =>
+            CreateService(account, new StubRepository()).CorrectActivityTimingAsync(id, request, CancellationToken.None));
+        await Assert.ThrowsAsync<CurrentAccountUnavailableException>(() =>
+            new FamilyPlanService(new StubCurrentAccountAccessor(null), repository)
+                .CorrectActivityTimingAsync(id, request, CancellationToken.None));
+    }
+
     [Fact]
     public async Task CreateRejectsSelectedPeopleAudienceWithoutRecipients()
     {
@@ -259,6 +316,17 @@ public sealed class FamilyPlanServiceTests
 
     private sealed class StubRepository : IFamilyPlanRepository
     {
+        public CorrectFamilyPlanActivityTimingRequest? CorrectionRequest { get; private set; }
+
+        public Task<FamilyPlanView?> CorrectActivityTimingAsync(Guid accountId, Guid planId,
+            CorrectFamilyPlanActivityTimingRequest request, CancellationToken cancellationToken)
+        {
+            AccountId = accountId;
+            PlanId = planId;
+            CorrectionRequest = request;
+            return Task.FromResult(Updated);
+        }
+
         public Guid AccountId { get; private set; }
         public Guid GroupId { get; private set; }
         public CreateFamilyPlanRequest? Request { get; private set; }

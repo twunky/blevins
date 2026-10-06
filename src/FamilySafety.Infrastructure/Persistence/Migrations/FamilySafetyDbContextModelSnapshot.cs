@@ -1227,6 +1227,10 @@ namespace FamilySafety.Infrastructure.Persistence.Migrations
                     b.Property<TimeOnly>("Time")
                         .HasColumnType("time");
 
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatorProfileId");

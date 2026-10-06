@@ -34,13 +34,8 @@ public sealed class FamilyPlan
         Id = id;
         FamilyGroupId = familyGroupId;
         CreatorProfileId = creatorProfileId;
-        ActivityOrDestination = activityOrDestination.Trim();
-        Date = date;
-        Time = time;
-        ExpectedReturnDate = expectedReturnDate;
-        ExpectedReturnTime = expectedReturnTime;
-        ExpectedCheckInDate = expectedCheckInDate;
-        ExpectedCheckInTime = expectedCheckInTime;
+        CorrectActivityTiming(activityOrDestination, date, time, expectedReturnDate,
+            expectedReturnTime, expectedCheckInDate, expectedCheckInTime);
         AudienceType = audienceType;
         Notes = string.IsNullOrWhiteSpace(notes) ? null : notes;
     }
@@ -57,6 +52,30 @@ public sealed class FamilyPlan
     public TimeOnly? ExpectedCheckInTime { get; private set; }
     public PlanAudienceType AudienceType { get; private set; }
     public string? Notes { get; private set; }
+    public Guid Version { get; private set; } = Guid.NewGuid();
+
+    public void CorrectActivityTiming(
+        string activityOrDestination, DateOnly date, TimeOnly time,
+        DateOnly? expectedReturnDate, TimeOnly? expectedReturnTime,
+        DateOnly? expectedCheckInDate, TimeOnly? expectedCheckInTime)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(activityOrDestination);
+        if (activityOrDestination.Length > 200) throw new ArgumentOutOfRangeException(nameof(activityOrDestination));
+        ArgumentOutOfRangeException.ThrowIfEqual(date, DateOnly.MinValue);
+        if (expectedReturnDate.HasValue != expectedReturnTime.HasValue)
+            throw new ArgumentException("Expected return requires both date and time.");
+        if (expectedCheckInDate.HasValue != expectedCheckInTime.HasValue)
+            throw new ArgumentException("Expected check-in requires both date and time.");
+
+        ActivityOrDestination = activityOrDestination.Trim();
+        Date = date;
+        Time = time;
+        ExpectedReturnDate = expectedReturnDate;
+        ExpectedReturnTime = expectedReturnTime;
+        ExpectedCheckInDate = expectedCheckInDate;
+        ExpectedCheckInTime = expectedCheckInTime;
+        Version = Guid.NewGuid();
+    }
 
     public void UpdateNotes(string? notes)
     {

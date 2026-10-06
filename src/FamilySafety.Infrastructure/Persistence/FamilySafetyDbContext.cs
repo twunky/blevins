@@ -373,6 +373,7 @@ public sealed class FamilySafetyDbContext(DbContextOptions<FamilySafetyDbContext
         familyPlan.Property(entity => entity.ExpectedCheckInTime).HasColumnType("time");
         familyPlan.Property(entity => entity.AudienceType).HasConversion<string>().HasMaxLength(32).IsRequired();
         familyPlan.Property(entity => entity.Notes).HasMaxLength(1000);
+        familyPlan.Property(entity => entity.Version).IsConcurrencyToken();
         familyPlan.HasIndex(entity => new { entity.FamilyGroupId, entity.Date });
         familyPlan.HasOne<FamilyGroup>()
             .WithMany()

@@ -47,26 +47,9 @@ public sealed class FamilyPlanService(
 
         ArgumentNullException.ThrowIfNull(request);
         var errors = new Dictionary<string, string[]>();
-        AddRequired(errors, nameof(request.ActivityOrDestination), request.ActivityOrDestination);
-        if (request.Date is null || request.Date == DateOnly.MinValue)
-        {
-            errors[nameof(request.Date)] = ["Enter a plan date."];
-        }
-
-        if (request.Time is null)
-        {
-            errors[nameof(request.Time)] = ["Enter a plan time."];
-        }
-
-        if (request.ExpectedReturnDate.HasValue != request.ExpectedReturnTime.HasValue)
-        {
-            errors[nameof(request.ExpectedReturnDate)] = ["Enter both expected return date and time, or leave both empty."];
-        }
-
-        if (request.ExpectedCheckInDate.HasValue != request.ExpectedCheckInTime.HasValue)
-        {
-            errors[nameof(request.ExpectedCheckInDate)] = ["Enter both expected check-in date and time, or leave both empty."];
-        }
+        AddActivityTimingErrors(errors, request.ActivityOrDestination, request.Date, request.Time,
+            request.ExpectedReturnDate, request.ExpectedReturnTime,
+            request.ExpectedCheckInDate, request.ExpectedCheckInTime);
 
         if (request.Notes?.Length > 1000)
         {
@@ -130,6 +113,38 @@ public sealed class FamilyPlanService(
         return await repository.UpdateNotesAsync(
             RequireAccountId(), planId, request.Notes, cancellationToken)
             ?? throw new FamilyPlanUnavailableException();
+    }
+
+    public async Task<FamilyPlanView> CorrectActivityTimingAsync(
+        Guid planId, CorrectFamilyPlanActivityTimingRequest request, CancellationToken cancellationToken)
+    {
+        if (planId == Guid.Empty) throw new FamilyPlanUnavailableException();
+        ArgumentNullException.ThrowIfNull(request);
+        var errors = new Dictionary<string, string[]>();
+        AddActivityTimingErrors(errors, request.ActivityOrDestination, request.Date, request.Time,
+            request.ExpectedReturnDate, request.ExpectedReturnTime,
+            request.ExpectedCheckInDate, request.ExpectedCheckInTime);
+        if (request.Version == Guid.Empty) errors[nameof(request.Version)] = ["Refresh the Plan before correcting it."];
+        if (errors.Count > 0) throw new FamilyPlanValidationException(errors);
+        return await repository.CorrectActivityTimingAsync(RequireAccountId(), planId, request, cancellationToken)
+            ?? throw new FamilyPlanUnavailableException();
+    }
+
+    private static void AddActivityTimingErrors(
+        Dictionary<string, string[]> errors, string activityOrDestination, DateOnly? date, TimeOnly? time,
+        DateOnly? expectedReturnDate, TimeOnly? expectedReturnTime,
+        DateOnly? expectedCheckInDate, TimeOnly? expectedCheckInTime)
+    {
+        AddRequired(errors, nameof(CreateFamilyPlanRequest.ActivityOrDestination), activityOrDestination);
+        if (activityOrDestination?.Length > 200)
+            errors[nameof(CreateFamilyPlanRequest.ActivityOrDestination)] = ["Activity or destination cannot exceed 200 characters."];
+        if (date is null || date == DateOnly.MinValue)
+            errors[nameof(CreateFamilyPlanRequest.Date)] = ["Enter a plan date."];
+        if (time is null) errors[nameof(CreateFamilyPlanRequest.Time)] = ["Enter a plan time."];
+        if (expectedReturnDate.HasValue != expectedReturnTime.HasValue)
+            errors[nameof(CreateFamilyPlanRequest.ExpectedReturnDate)] = ["Enter both expected return date and time, or leave both empty."];
+        if (expectedCheckInDate.HasValue != expectedCheckInTime.HasValue)
+            errors[nameof(CreateFamilyPlanRequest.ExpectedCheckInDate)] = ["Enter both expected check-in date and time, or leave both empty."];
     }
 
     private Guid RequireAccountId() => currentAccountAccessor.Current?.AccountId

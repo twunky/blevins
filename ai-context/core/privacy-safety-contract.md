@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL
-Context-Baseline: CTX-1.37
-Version: 1.29
-Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087; DEC-088; DEC-089; DEC-091; DEC-092
+Context-Baseline: CTX-1.39
+Version: 1.30
+Source: ../bootstrap/product-ux-source.md; DEC-016; DEC-018; DEC-028; DEC-029; DEC-030; DEC-031; DEC-034; DEC-038; DEC-040; DEC-042; DEC-047; DEC-048; DEC-051; DEC-057; DEC-058; DEC-059; DEC-061; DEC-068; DEC-071; DEC-074; DEC-083; DEC-084; DEC-085; DEC-086; DEC-087; DEC-088; DEC-089; DEC-091; DEC-092; DEC-095
 ---
 
 # Privacy and Safety Contract
@@ -80,6 +80,8 @@ Creating a Concern or Safety Incident does not bypass privacy settings or unlock
 ### REQ-PRIV-011
 
 Signing in or receiving an invitation does not itself grant Family Group data access. A pending, expired, revoked, or already-used membership invitation grants no Family Group access. Ending active membership ends access to that Family Group's data. Family membership and Family Administrator responsibility remain separate from access to private information.
+
+Plan fact correction under `REQ-PLAN-008` requires the exact original creator's current Plan access and active membership in the stored Plan Family; it creates no retained authority after membership loss.
 
 The Trip creator's continued own-Trip access under `REQ-PRIV-022` and the standalone Check-In author's own historical access under `REQ-PRIV-030` are narrow feature-specific exceptions after membership ends. Neither restores Family Group membership or access to other Family Group data.
 

@@ -2,6 +2,11 @@ namespace FamilySafety.Application.Plans;
 
 public interface IFamilyPlanService
 {
+    Task<FamilyPlanView> CorrectActivityTimingAsync(
+        Guid planId,
+        CorrectFamilyPlanActivityTimingRequest request,
+        CancellationToken cancellationToken);
+
     Task<IReadOnlyList<FamilyPlanView>> GetVisibleAsync(
         Guid familyGroupId,
         CancellationToken cancellationToken);

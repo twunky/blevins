@@ -967,6 +967,37 @@
               @if (itemPlan(); as plan) {
                 <article class="card plans-card item-detail" aria-label="Plan details">
                   <ng-container *ngTemplateOutlet="planCard; context: { $implicit: plan, detail: true }" />
+                  @if (canCorrectPlan(plan)) {
+                    @if (editingPlanFactsId() === plan.planId) {
+                      <form class="plans-note-editor" aria-label="Correct activity and timing" [formGroup]="planCorrectionForm" (ngSubmit)="savePlanCorrection(plan)" novalidate>
+                        <h3>Correct activity and timing</h3>
+                        <div class="field">
+                          <label for="plan-correction-activity">Activity / destination</label>
+                          <input id="plan-correction-activity" formControlName="activityOrDestination" maxlength="200" required />
+                        </div>
+                        <div class="field-grid">
+                          <div class="field"><label for="plan-correction-date">Date</label><input id="plan-correction-date" type="date" formControlName="date" required /></div>
+                          <div class="field"><label for="plan-correction-time">Time</label><input id="plan-correction-time" type="time" step="any" formControlName="time" required /></div>
+                          <div class="field"><label for="plan-correction-return-date">Expected return date</label><input id="plan-correction-return-date" type="date" formControlName="expectedReturnDate" /></div>
+                          <div class="field"><label for="plan-correction-return-time">Expected return time</label><input id="plan-correction-return-time" type="time" step="any" formControlName="expectedReturnTime" /></div>
+                          <div class="field"><label for="plan-correction-checkin-date">Expected Check-In date</label><input id="plan-correction-checkin-date" type="date" formControlName="expectedCheckInDate" aria-describedby="plan-correction-checkin-help" /></div>
+                          <div class="field"><label for="plan-correction-checkin-time">Expected Check-In time</label><input id="plan-correction-checkin-time" type="time" step="any" formControlName="expectedCheckInTime" aria-describedby="plan-correction-checkin-help" /></div>
+                        </div>
+                        <p class="field-hint" id="plan-correction-checkin-help">Expected Check-In records a planned time only. It does not schedule a Check-In or send reminders.</p>
+                        <p class="field-hint">Supply both date and time for each optional timing, or clear both. Other timing values stay as entered.</p>
+                        @if (planCorrectionError()) { <p class="message message--error" role="alert">{{ planCorrectionError() }}</p> }
+                        @if (planCorrectionConflict()) { <button type="button" class="button--secondary" (click)="retryRoutedItem()">Reload Plan</button> }
+                        @if (planCorrectionSaving()) { <p role="status">Saving activity and timing…</p> }
+                        <div class="button-row">
+                          <button type="submit" [disabled]="planCorrectionSaving() || planNoteSaving() || planCorrectionConflict()">Save</button>
+                          <button type="button" class="button--secondary" [disabled]="planCorrectionSaving()" (click)="cancelPlanCorrection()">Cancel</button>
+                        </div>
+                      </form>
+                    } @else {
+                      <div class="plans-note-actions"><button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="beginPlanCorrection(plan)">Correct activity and timing</button></div>
+                    }
+                    @if (planCorrectionMessage()) { <p class="message message--success" role="status">{{ planCorrectionMessage() }}</p> }
+                  }
                   @if (plan.creatorProfileId === ownerProfile()?.profileId) {
                     @if (editingPlanNoteId() === plan.planId) {
                       <form class="plans-note-editor" [formGroup]="planNoteForm" (ngSubmit)="savePlanNote(plan)" novalidate>
@@ -978,31 +1009,31 @@
                         @if (planNoteClearPendingId() === plan.planId) {
                           <p role="status">Clear this note? This removes the note from the Plan.</p>
                           <div class="button-row">
-                            <button type="button" [disabled]="planNoteSaving()" (click)="confirmPlanNoteClear(plan)">Confirm clear</button>
+                            <button type="button" [disabled]="planNoteSaving() || planCorrectionSaving()" (click)="confirmPlanNoteClear(plan)">Confirm clear</button>
                             <button type="button" class="button--secondary" (click)="cancelPlanNoteClear()">Cancel</button>
                           </div>
                         } @else {
                           <div class="button-row">
-                            <button type="submit" [disabled]="planNoteSaving()">Save note</button>
-                            <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="cancelPlanNoteEdit()">Cancel</button>
+                            <button type="submit" [disabled]="planNoteSaving() || planCorrectionSaving()">Save note</button>
+                            <button type="button" class="button--secondary" [disabled]="planNoteSaving() || planCorrectionSaving()" (click)="cancelPlanNoteEdit()">Cancel</button>
                             @if (plan.notes) {
-                              <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="requestPlanNoteClear(plan)">Clear note</button>
+                              <button type="button" class="button--secondary" [disabled]="planNoteSaving() || planCorrectionSaving()" (click)="requestPlanNoteClear(plan)">Clear note</button>
                             }
                           </div>
                         }
                       </form>
                     } @else {
                       <div class="plans-note-actions">
-                        <button type="button" class="button--secondary" (click)="beginPlanNoteEdit(plan)">{{ plan.notes ? 'Edit note' : 'Add note' }}</button>
+                        <button type="button" class="button--secondary" [disabled]="planCorrectionSaving()" (click)="beginPlanNoteEdit(plan)">{{ plan.notes ? 'Edit note' : 'Add note' }}</button>
                         @if (plan.notes) {
-                          <button type="button" class="button--secondary" [disabled]="planNoteSaving()" (click)="requestPlanNoteClear(plan)">Clear note</button>
+                          <button type="button" class="button--secondary" [disabled]="planNoteSaving() || planCorrectionSaving()" (click)="requestPlanNoteClear(plan)">Clear note</button>
                         }
                       </div>
                     }
                     @if (editingPlanNoteId() !== plan.planId && planNoteClearPendingId() === plan.planId) {
                       <p role="status">Clear this note? This removes the note from the Plan.</p>
                       <div class="button-row">
-                        <button type="button" [disabled]="planNoteSaving()" (click)="confirmPlanNoteClear(plan)">Confirm clear</button>
+                        <button type="button" [disabled]="planNoteSaving() || planCorrectionSaving()" (click)="confirmPlanNoteClear(plan)">Confirm clear</button>
                         <button type="button" class="button--secondary" (click)="cancelPlanNoteClear()">Cancel</button>
                       </div>
                     }

@@ -26,6 +26,62 @@ public sealed class FamilyPlanApiTests : IClassFixture<FamilyPlanApiTests.PlanAp
     }
 
     [Fact]
+    public async Task CorrectionEndpointReturnsCurrentPlanAndStandardFailures()
+    {
+        var id = Guid.NewGuid();
+        var version = Guid.NewGuid();
+        service.Item = View(id, PlanAudienceType.SelectedPeople) with { Version = version, Notes = "Keep note" };
+        var request = new CorrectFamilyPlanActivityTimingRequest("Corrected lake", new(2026, 10, 4), new(13, 0),
+            null, null, null, null, version);
+        var saved = await client.PutAsJsonAsync($"/api/plans/{id}/activity-timing", request);
+        Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
+        using var json = JsonDocument.Parse(await saved.Content.ReadAsStringAsync());
+        Assert.Equal("Corrected lake", json.RootElement.GetProperty("activityOrDestination").GetString());
+        Assert.Equal("Keep note", json.RootElement.GetProperty("notes").GetString());
+        Assert.NotEqual(version, json.RootElement.GetProperty("version").GetGuid());
+        Assert.Equal(HttpStatusCode.Conflict,
+            (await client.PutAsJsonAsync($"/api/plans/{id}/activity-timing", request)).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PutAsJsonAsync($"/api/plans/{id}/activity-timing", request with { Version = Guid.Empty })).StatusCode);
+        var missing = await client.PutAsJsonAsync($"/api/plans/{Guid.NewGuid()}/activity-timing", request);
+        Assert.Equal(HttpStatusCode.NotFound, missing.StatusCode);
+        Assert.Empty(await missing.Content.ReadAsByteArrayAsync());
+        service.NoCurrentAccount = true;
+        Assert.Equal(HttpStatusCode.Unauthorized,
+            (await client.PutAsJsonAsync($"/api/plans/{id}/activity-timing", request)).StatusCode);
+    }
+
+    [Theory]
+    [InlineData("notes")]
+    [InlineData("audienceType")]
+    [InlineData("audienceProfileIds")]
+    [InlineData("creatorProfileId")]
+    [InlineData("familyGroupId")]
+    [InlineData("isCompleted")]
+    public async Task CorrectionRejectsFieldsOutsideItsBoundedRequest(string field)
+    {
+        var body = new Dictionary<string, object?>
+        {
+            ["activityOrDestination"] = "Lake", ["date"] = "2026-10-04", ["time"] = "13:00",
+            ["expectedReturnDate"] = null, ["expectedReturnTime"] = null,
+            ["expectedCheckInDate"] = null, ["expectedCheckInTime"] = null,
+            ["version"] = Guid.NewGuid(), [field] = "forbidden",
+        };
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PutAsJsonAsync($"/api/plans/{Guid.NewGuid()}/activity-timing", body)).StatusCode);
+        Assert.Equal(Guid.Empty, service.LastPlanId);
+    }
+
+    [Fact]
+    public async Task CorrectionRequiresTheCompleteFactSetIncludingExplicitOptionalClears()
+    {
+        var response = await client.PutAsJsonAsync($"/api/plans/{Guid.NewGuid()}/activity-timing",
+            new { activityOrDestination = "Lake", date = "2026-10-04", time = "13:00", version = Guid.NewGuid() });
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(Guid.Empty, service.LastPlanId);
+    }
+
+    [Fact]
     public async Task CreateEndpointPassesSelectedAudienceToService()
     {
         var planId = Guid.NewGuid();
@@ -87,9 +143,9 @@ public sealed class FamilyPlanApiTests : IClassFixture<FamilyPlanApiTests.PlanAp
         Assert.Equal(planId, service.LastPlanId);
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         Assert.Equal(
-            ["activityOrDestination", "audienceType", "creatorDisplayName", "creatorProfileId", "date",
+            ["activityOrDestination", "audienceType", "canCorrectActivityTiming", "creatorDisplayName", "creatorProfileId", "date",
                 "expectedCheckInDate", "expectedCheckInTime", "expectedReturnDate", "expectedReturnTime",
-                "familyGroupId", "notes", "planId", "time"],
+                "familyGroupId", "notes", "planId", "time", "version"],
             json.RootElement.EnumerateObject().Select(property => property.Name).Order(StringComparer.Ordinal));
         Assert.Equal(StubFamilyPlanService.GroupId, json.RootElement.GetProperty("familyGroupId").GetGuid());
         Assert.Equal("Bring water.", json.RootElement.GetProperty("notes").GetString());
@@ -211,6 +267,20 @@ public sealed class FamilyPlanApiTests : IClassFixture<FamilyPlanApiTests.PlanAp
 
     public sealed class StubFamilyPlanService : IFamilyPlanService
     {
+        public Task<FamilyPlanView> CorrectActivityTimingAsync(Guid planId,
+            CorrectFamilyPlanActivityTimingRequest request, CancellationToken cancellationToken)
+        {
+            LastPlanId = planId;
+            if (NoCurrentAccount) throw new CurrentAccountUnavailableException();
+            if (Item is null || Item.PlanId != planId) throw new FamilyPlanUnavailableException();
+            if (request.Version == Guid.Empty) throw new FamilyPlanValidationException(
+                new Dictionary<string, string[]> { [nameof(request.Version)] = ["Version required."] });
+            if (request.Version != Item.Version) throw new FamilyPlanConflictException();
+            Item = Item with { ActivityOrDestination = request.ActivityOrDestination,
+                Date = request.Date!.Value, Time = request.Time!.Value, Version = Guid.NewGuid() };
+            return Task.FromResult(Item);
+        }
+
         public static readonly Guid GroupId = Guid.Parse("33333333-3333-3333-3333-333333333333");
         public Guid LastGroupId { get; private set; }
         public CreateFamilyPlanRequest? LastRequest { get; private set; }

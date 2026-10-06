@@ -15,7 +15,25 @@ public static class FamilyPlanEndpoints
         // Family is disclosed (REQ-PRIV-027). Missing and unauthorized are both 404.
         endpoints.MapGet("/api/plans/{planId:guid}", GetAsync);
         endpoints.MapPut("/api/plans/{planId:guid}/notes", UpdateNotesAsync);
+        endpoints.MapPut("/api/plans/{planId:guid}/activity-timing", CorrectActivityTimingAsync);
         return endpoints;
+    }
+
+    private static async Task<IResult> CorrectActivityTimingAsync(
+        Guid planId, CorrectFamilyPlanActivityTimingRequest request,
+        IFamilyPlanService service, CancellationToken cancellationToken)
+    {
+        try { return Results.Ok(await service.CorrectActivityTimingAsync(planId, request, cancellationToken)); }
+        catch (CurrentAccountUnavailableException) { return Results.Unauthorized(); }
+        catch (FamilyPlanUnavailableException) { return Results.NotFound(); }
+        catch (FamilyPlanValidationException exception)
+        {
+            return Results.ValidationProblem(exception.Errors.ToDictionary(error => error.Key, error => error.Value));
+        }
+        catch (FamilyPlanConflictException)
+        {
+            return Results.Conflict(new { message = "The Plan changed. Reload the Plan before correcting it again." });
+        }
     }
 
     private static async Task<IResult> GetAsync(

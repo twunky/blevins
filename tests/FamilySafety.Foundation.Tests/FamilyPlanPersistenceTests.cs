@@ -3,11 +3,191 @@ using FamilySafety.Domain.Plans;
 using FamilySafety.Domain.Profiles;
 using FamilySafety.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FamilySafety.Foundation.Tests;
 
 public sealed class FamilyPlanPersistenceTests
 {
+    [Fact]
+    public async Task CorrectionRequiresCurrentOriginalCreatorAndPreservesAudienceAndNotes()
+    {
+        if (Environment.GetEnvironmentVariable("RUN_FAMILYSAFETY_SQL_TESTS") != "1") return;
+        await WithTestDatabaseAsync(async db =>
+        {
+            var creator = AddAdult(db, "Creator");
+            var viewer = AddAdult(db, "Viewer");
+            var admin = AddAdult(db, "Admin");
+            var outsider = AddAdult(db, "Other Family");
+            var family = new FamilyGroup(Guid.NewGuid(), "Plan Family", 100);
+            var other = new FamilyGroup(Guid.NewGuid(), "Selected Other Family", 100);
+            var membership = Membership(creator, family);
+            var adminMembership = Membership(admin, family);
+            db.AddRange(family, other, membership, Membership(viewer, family), adminMembership,
+                new FamilyAdministratorAssignment(Guid.NewGuid(), adminMembership.Id),
+                Membership(creator, other), Membership(outsider, other));
+            await db.SaveChangesAsync();
+            var repo = new EfFamilyPlanRepository(db);
+            var plan = (await repo.CreateAsync(creator.AccountId, family.Id,
+                Request(PlanAudienceType.SelectedPeople, [viewer.ProfileId]) with { Notes = "Keep note" }, CancellationToken.None))!;
+            Assert.True(plan.CanCorrectActivityTiming);
+            Assert.False((await repo.GetAsync(viewer.AccountId, plan.PlanId, CancellationToken.None))!.CanCorrectActivityTiming);
+            var request = Correction(plan.Version);
+            foreach (var caller in new[] { viewer.AccountId, admin.AccountId, outsider.AccountId })
+                Assert.Null(await repo.CorrectActivityTimingAsync(caller, plan.PlanId, request, CancellationToken.None));
+            Assert.Null(await repo.CorrectActivityTimingAsync(creator.AccountId, Guid.NewGuid(), request, CancellationToken.None));
+            var corrected = (await repo.CorrectActivityTimingAsync(creator.AccountId, plan.PlanId, request, CancellationToken.None))!;
+            Assert.Equal("Corrected destination", corrected.ActivityOrDestination);
+            Assert.Equal(request.Date, corrected.Date);
+            Assert.Equal(request.Time, corrected.Time);
+            Assert.Equal(request.ExpectedReturnDate, corrected.ExpectedReturnDate);
+            Assert.Equal(request.ExpectedReturnTime, corrected.ExpectedReturnTime);
+            Assert.Equal(request.ExpectedCheckInDate, corrected.ExpectedCheckInDate);
+            Assert.Equal(request.ExpectedCheckInTime, corrected.ExpectedCheckInTime);
+            Assert.Equal("Keep note", corrected.Notes);
+            Assert.Equal(plan.CreatorProfileId, corrected.CreatorProfileId);
+            Assert.Equal(plan.FamilyGroupId, corrected.FamilyGroupId);
+            Assert.Equal(plan.AudienceType, corrected.AudienceType);
+            Assert.Equal(viewer.ProfileId, (await db.FamilyPlanAudienceMembers.SingleAsync()).ProfileId);
+            Assert.Equal(corrected with { CanCorrectActivityTiming = false },
+                await repo.GetAsync(viewer.AccountId, plan.PlanId, CancellationToken.None));
+            Assert.Equal(corrected with { CanCorrectActivityTiming = false },
+                Assert.Single((await repo.GetVisibleAsync(viewer.AccountId, family.Id, CancellationToken.None))!));
+
+            // Active membership in another (selected) Family cannot rescue the creator.
+            membership.End();
+            await db.SaveChangesAsync();
+            Assert.Null(await repo.GetAsync(creator.AccountId, plan.PlanId, CancellationToken.None));
+            Assert.Null(await repo.CorrectActivityTimingAsync(creator.AccountId, plan.PlanId,
+                request with { Version = corrected.Version }, CancellationToken.None));
+            Assert.Equal(corrected with { CanCorrectActivityTiming = false },
+                await repo.GetAsync(viewer.AccountId, plan.PlanId, CancellationToken.None));
+        });
+    }
+
+    [Fact]
+    public async Task CorrectionVersionsProtectFactsWhileIndependentNotesAndDynamicAudienceStayCurrent()
+    {
+        if (Environment.GetEnvironmentVariable("RUN_FAMILYSAFETY_SQL_TESTS") != "1") return;
+        await WithTestDatabaseAsync(async db =>
+        {
+            var creator = AddAdult(db, "Creator");
+            var family = new FamilyGroup(Guid.NewGuid(), "Family", 100);
+            db.AddRange(family, Membership(creator, family));
+            await db.SaveChangesAsync();
+            var repo = new EfFamilyPlanRepository(db);
+            var plan = (await repo.CreateAsync(creator.AccountId, family.Id,
+                Request(PlanAudienceType.FamilyGroup, []), CancellationToken.None))!;
+            var request = Correction(plan.Version);
+            await using (var notesDb = CreateContext(db.Database.GetConnectionString()!))
+            {
+                var notes = await new EfFamilyPlanRepository(notesDb).UpdateNotesAsync(
+                    creator.AccountId, plan.PlanId, "Latest independent note", CancellationToken.None);
+                Assert.Equal(plan.Version, notes!.Version);
+            }
+            // The original context still tracks the old Notes. Only facts are marked modified.
+            var corrected = (await repo.CorrectActivityTimingAsync(creator.AccountId, plan.PlanId, request, CancellationToken.None))!;
+            Assert.Equal("Latest independent note", corrected.Notes);
+            Assert.NotEqual(plan.Version, corrected.Version);
+            await using (var staleDb = CreateContext(db.Database.GetConnectionString()!))
+                await Assert.ThrowsAsync<FamilyPlanConflictException>(() =>
+                    new EfFamilyPlanRepository(staleDb).CorrectActivityTimingAsync(creator.AccountId, plan.PlanId,
+                        request with { ActivityOrDestination = "Stale overwrite" }, CancellationToken.None));
+            Assert.Equal(corrected, await repo.GetAsync(creator.AccountId, plan.PlanId, CancellationToken.None));
+            var changed = (await repo.CorrectActivityTimingAsync(creator.AccountId, plan.PlanId,
+                request with { Version = corrected.Version, Date = new(2026, 10, 9),
+                    ExpectedReturnDate = new(2026, 10, 10), ExpectedReturnTime = new(20, 0),
+                    ExpectedCheckInDate = new(2026, 10, 9), ExpectedCheckInTime = new(19, 0) }, CancellationToken.None))!;
+            Assert.Equal(new DateOnly(2026, 10, 10), changed.ExpectedReturnDate);
+            Assert.Equal(new TimeOnly(20, 0), changed.ExpectedReturnTime);
+            Assert.Equal(new DateOnly(2026, 10, 9), changed.ExpectedCheckInDate);
+            Assert.Equal(new TimeOnly(19, 0), changed.ExpectedCheckInTime);
+            var cleared = (await repo.CorrectActivityTimingAsync(creator.AccountId, plan.PlanId,
+                request with { Version = changed.Version, ExpectedReturnDate = null, ExpectedReturnTime = null,
+                    ExpectedCheckInDate = null, ExpectedCheckInTime = null }, CancellationToken.None))!;
+            Assert.Null(cleared.ExpectedReturnDate);
+            Assert.Null(cleared.ExpectedReturnTime);
+            Assert.Null(cleared.ExpectedCheckInDate);
+            Assert.Null(cleared.ExpectedCheckInTime);
+            Assert.Equal("Latest independent note", cleared.Notes);
+            var newcomer = AddAdult(db, "New member");
+            db.Add(Membership(newcomer, family));
+            await db.SaveChangesAsync();
+            Assert.Equal(cleared with { CanCorrectActivityTiming = false },
+                await repo.GetAsync(newcomer.AccountId, plan.PlanId, CancellationToken.None));
+            Assert.Empty(await db.FamilyPlanAudienceMembers.ToListAsync());
+            await repo.UpdateNotesAsync(creator.AccountId, plan.PlanId, "Later note", CancellationToken.None);
+            var current = (await repo.GetAsync(creator.AccountId, plan.PlanId, CancellationToken.None))!;
+            Assert.Equal(cleared.Version, current.Version);
+            Assert.Equal(cleared.ActivityOrDestination, current.ActivityOrDestination);
+            Assert.Equal("Later note", current.Notes);
+        });
+    }
+
+    [Fact]
+    public async Task ConcurrentCorrectionsAcceptExactlyOneCompleteReplacement()
+    {
+        if (Environment.GetEnvironmentVariable("RUN_FAMILYSAFETY_SQL_TESTS") != "1") return;
+        await WithTestDatabaseAsync(async db =>
+        {
+            var creator = AddAdult(db, "Creator");
+            var family = new FamilyGroup(Guid.NewGuid(), "Family", 100);
+            db.AddRange(family, Membership(creator, family));
+            await db.SaveChangesAsync();
+            var repo = new EfFamilyPlanRepository(db);
+            var plan = (await repo.CreateAsync(creator.AccountId, family.Id,
+                Request(PlanAudienceType.FamilyGroup, []), CancellationToken.None))!;
+            var first = Correction(plan.Version);
+            var second = first with { ActivityOrDestination = "Other destination", Date = new(2026, 10, 8) };
+            async Task<FamilyPlanView?> Attempt(CorrectFamilyPlanActivityTimingRequest request)
+            {
+                await using var context = CreateContext(db.Database.GetConnectionString()!);
+                try
+                {
+                    return await new EfFamilyPlanRepository(context).CorrectActivityTimingAsync(
+                        creator.AccountId, plan.PlanId, request, CancellationToken.None);
+                }
+                catch (FamilyPlanConflictException) { return null; }
+            }
+            var outcomes = await Task.WhenAll(Attempt(first), Attempt(second));
+            var accepted = Assert.Single(outcomes, o => o is not null)!;
+            Assert.Single(outcomes, o => o is null);
+            Assert.Equal(accepted, await repo.GetAsync(creator.AccountId, plan.PlanId, CancellationToken.None));
+        });
+    }
+
+    [Fact]
+    public async Task ExistingPlanMigratesWithUsableNonemptyVersionAndPreservedValues()
+    {
+        if (Environment.GetEnvironmentVariable("RUN_FAMILYSAFETY_SQL_TESTS") != "1") return;
+        await WithTestDatabaseAsync(async db =>
+        {
+            var migrator = db.GetService<IMigrator>();
+            await migrator.MigrateAsync("20261006042642_ExplicitTripCompletion");
+            var creator = AddAdult(db, "Creator");
+            var family = new FamilyGroup(Guid.NewGuid(), "Old Family", 100);
+            db.AddRange(family, Membership(creator, family));
+            await db.SaveChangesAsync();
+            var id = Guid.NewGuid();
+            await db.Database.ExecuteSqlInterpolatedAsync($"""
+                INSERT INTO FamilyPlans (Id, FamilyGroupId, CreatorProfileId, ActivityOrDestination, Date, Time, AudienceType, Notes)
+                VALUES ({id}, {family.Id}, {creator.ProfileId}, N'Old activity', '2026-10-03', '10:00', N'FamilyGroup', N'Old note')
+                """);
+            await migrator.MigrateAsync();
+            var repo = new EfFamilyPlanRepository(db);
+            var old = (await repo.GetAsync(creator.AccountId, id, CancellationToken.None))!;
+            Assert.NotEqual(Guid.Empty, old.Version);
+            Assert.Equal("Old activity", old.ActivityOrDestination);
+            Assert.Equal("Old note", old.Notes);
+            Assert.NotNull(await repo.CorrectActivityTimingAsync(creator.AccountId, id, Correction(old.Version), CancellationToken.None));
+        });
+    }
+
+    private static CorrectFamilyPlanActivityTimingRequest Correction(Guid version) => new(
+        "Corrected destination", new(2026, 10, 4), new(13, 0), new(2026, 10, 5), new(18, 0),
+        new(2026, 10, 4), new(15, 0), version);
+
     [Fact]
     public async Task OnlyActiveCreatorCanUpdateAddOrClearNoteAndReadersSeeTheSamePlan()
     {
@@ -35,7 +215,8 @@ public sealed class FamilyPlanPersistenceTests
 
             var added = await repository.UpdateNotesAsync(creator.AccountId, planId, "Meet outside.", CancellationToken.None);
             Assert.Equal("Meet outside.", added?.Notes);
-            Assert.Equal(added, await repository.GetAsync(selected.AccountId, planId, CancellationToken.None));
+            Assert.Equal(added! with { CanCorrectActivityTiming = false },
+                await repository.GetAsync(selected.AccountId, planId, CancellationToken.None));
             Assert.Null(await repository.GetAsync(outsider.AccountId, planId, CancellationToken.None));
 
             var changed = await repository.UpdateNotesAsync(creator.AccountId, planId, "Bring water.", CancellationToken.None);

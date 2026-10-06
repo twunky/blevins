@@ -1,11 +1,13 @@
 # Requirements Index
 
-**Status:** APPROVED - `CTX-1.38`
+**Status:** APPROVED - `CTX-1.39`
 **Purpose:** Traceability index only; normative wording lives at each canonical source.
 
-DEC-092 / REQ-PROD-014 records Phase 9.5 closure scope. Existing product-intent anchors remain approved; formal deferral does not mean implementation. Prior row baselines retain requirement provenance; CTX-1.38 is the active aggregate baseline under DEC-094 for bounded Trip completion; CTX-1.37 remains the historical Phase 9.5 closure baseline.
+DEC-092 / REQ-PROD-014 records Phase 9.5 closure scope. Existing product-intent anchors remain approved; formal deferral does not mean implementation. Prior row baselines retain requirement provenance; CTX-1.39 is the active aggregate baseline under DEC-095 for bounded Plan fact correction, preserving CTX-1.38 Trip completion; CTX-1.37 remains the historical Phase 9.5 closure baseline.
 
 Phase 10 trace: [WI-010-001](../planning/stories/WI-010-001-post-9-5-user-testability-baseline.md) / [verification](../planning/verification/VER-WI-010-001.md) evaluates REQ-PROD-014, REQ-UX-006/008/011/014, REQ-PLAN-002 and REQ-SHARE-010 without changing them. DEC-093 authorizes testing and bounded presentation fixes; no new requirement or CTX baseline.
+
+Phase 10.5 Plan trace: [WI-105-002](../planning/stories/WI-105-002-bounded-creator-plan-activity-timing-correction.md) implements REQ-PLAN-008 while preserving REQ-PLAN-005/007 and REQ-PRIV-011/020/027. DEC-095 records the owner-approved boundary.
 
 ## ID and lifecycle rules
 
@@ -158,6 +160,7 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-PLAN-005` | Plan audience choices, current-group access, and creator-departure retention | `../workflows/plans-trips.md#req-plan-005` | `APPROVED` | `CTX-1.16` | — |
 | `REQ-PLAN-006` | Optional Plan notes at creation | `../workflows/plans-trips.md#req-plan-006` | `APPROVED` | `CTX-1.17` | — |
 | `REQ-PLAN-007` | Creator edit or clear of existing optional Plan note | `../workflows/plans-trips.md#req-plan-007` | `APPROVED` | `CTX-1.29` | — |
+| `REQ-PLAN-008` | Bounded original-creator activity/timing correction with current stored-Family access | `../workflows/plans-trips.md#req-plan-008` | `APPROVED` | `CTX-1.39` | — |
 
 ## Trips
 

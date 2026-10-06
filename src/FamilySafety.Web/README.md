@@ -14,6 +14,8 @@ WI-095-009 reuses `/api/family-groups/{familyId}/event-invitations/mine` for liv
 
 ## Structure and extraction
 
+WI-105-002 keeps bounded Plan activity/timing correction in the existing App detail. The action requires the server's authorized creator hint plus current creator/active stored-Family membership display checks. A prefilled seven-field form submits a complete replacement with its captured Guid token to `/api/plans/{planId}/activity-timing`; conflict requires reload/review. Notes remain a separate form/request. Success updates current detail/list state; normal Home/list loads read current facts using existing date-based relevance. Expected Check-In remains a recorded planned time only.
+
 `households/households` owns WI-095-010 Family Settings organization reads/forms, server-derived management controls and versioned create/rename/assign/move/unassign/delete requests. It cancels pending requests and clears organization/drafts/confirmations on Family or identity changes. Existing active adult members may view their Family's structure; current Family administrators manage it. Households supply no feature audience, grants, profile contact access or administrative override.
 
 `trusted-contacts/trusted-contacts` owns WI-095-007 private manual contact list/forms and owner-only requests in Safety. App supplies only the current owner profile; there is no feature Family input/selector, contact profile lookup/link or downstream permission grant. Identity changes cancel pending requests and discard contacts/drafts. Add/edit use owner-scoped duplicate validation and optimistic concurrency; confirmed removal permanently deletes the record.

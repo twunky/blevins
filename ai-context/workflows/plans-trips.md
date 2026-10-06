@@ -1,9 +1,9 @@
 ---
 Status: APPROVED
 Authority: CANONICAL WORKFLOW
-Context-Baseline: CTX-1.38
-Version: 1.8
-Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-054; DEC-055; DEC-056; DEC-057; DEC-060; DEC-082; DEC-094
+Context-Baseline: CTX-1.39
+Version: 1.9
+Source: ../bootstrap/product-ux-source.md; DEC-048; DEC-054; DEC-055; DEC-056; DEC-057; DEC-060; DEC-082; DEC-094; DEC-095
 Constrained-By:
   - ../core/product-contract.md
   - ../core/ux-contract.md
@@ -32,7 +32,7 @@ The standard Plan flow is:
 
 ### REQ-PLAN-004
 
-A Plan may be updated, checked in against, and explicitly completed. Location sharing is optional and, when selected, is governed by the Sharing workflow.
+A Plan may be updated, checked in against, and explicitly completed. Location sharing is optional and, when selected, is governed by the Sharing workflow. Current MVP implements only separate Notes (REQ-PLAN-007) and bounded fact correction (REQ-PLAN-008); contextual Check-Ins remain deferred under DEC-092, and Plan completion remains optional and outside WI-105-002.
 
 ### REQ-PLAN-005
 
@@ -60,6 +60,18 @@ Optional Plan notes at creation:
 ### REQ-PLAN-007
 
 The Plan creator may edit or clear the existing optional Plan note after creation. Only the creator with current Plan access may write it; losing active membership in the Plan's Family also removes this write access. The same Plan `Notes` field is used, with the existing plain-text, 1,000-character, line-break, blank-as-absent, and Plan-audience read rules. No separate authored notes, note author metadata, revision history, or general Plan editing is introduced.
+
+### REQ-PLAN-008
+
+Bounded creator activity/timing correction:
+
+- Only the exact original Plan creator with current Plan access and active membership in the Plan's actual stored Family may correct facts. The server rechecks these conditions at write acceptance. Departure removes correction authority; Trip retained-creator authority does not apply. Administrator status, selected Family, audience membership, known ID and previous membership grant no override.
+- One atomic complete replacement changes only `ActivityOrDestination`, `Date`, `Time`, `ExpectedReturnDate`, `ExpectedReturnTime`, `ExpectedCheckInDate`, `ExpectedCheckInTime`. Require activity (maximum 200 characters), date and time using creation rules. Each optional date/time pair is either fully supplied or fully cleared. Changing the start never shifts another timing implicitly.
+- Require an optimistic Guid fact-concurrency token; stale corrections conflict without partial writes. Notes remain the separate REQ-PLAN-007 surface and are not overwritten by correction.
+- Creator, Family, audience mode and individually selected recipient storage are immutable in this operation. REQ-PLAN-005 visibility stays unchanged, including dynamic current active membership for whole-Family audiences. Retaining a Plan after departure grants no correction permission.
+- Authorized subsequent reads show the corrected current canonical facts on detail/list/Home. No previous values, revision history, change log, acknowledgement or notification is added.
+- Expected Check-In timing records a planned time only: correction does not schedule/create a Check-In or reminder, send a notification, trigger a Concern/Incident or imply safety. DEC-092 remains in force.
+- This bounded recovery operation is not general Plan editing/lifecycle. Plan completion remains optional for the current MVP and unimplemented; no complete/reopen/archive/delete, ownership transfer or Family reassignment. Existing date-based Home relevance does not infer completion.
 
 ## Trips
 
