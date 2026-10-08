@@ -8,7 +8,7 @@ The application includes Home, Family and Family Settings, Events, Plans & Trips
 
 **Project state:** The bounded adult MVP is FUNCTIONALLY COMPLETE under [DEC-096](ai-context/decision-log.md#dec-096--close-phase-105-and-accept-functional-mvp-completion). Phases 9.5/10.5 are COMPLETE / CLOSED; Phase 10 remains CURRENT / IN PROGRESS for human usability validation. CTX-1.39 is active, WI-010-004 Stage B is PREPARATION COMPLETE / READY FOR P1, and no human session/result or next implementation WI is claimed. Existing deferrals remain intact. See [project status](ai-context/project-status.md) and [AI context](ai-context/README.md) for the current checkpoint and authority.
 
-**Future production:** [DEC-097](ai-context/decision-log.md#dec-097--approve-future-phase-11-production-entry-model) approves the [Phase 11 production-entry contract](ai-context/core/production-entry-contract.md) for future planning only: APPROVED / UNIMPLEMENTED, no provider selected and no implementation authorized. Current MVP runtime behavior is unchanged.
+**Future production:** [DEC-097](ai-context/decision-log.md#dec-097--approve-future-phase-11-production-entry-model) and [DEC-098](ai-context/decision-log.md#dec-098--approve-provider-neutral-identity-and-production-entry-architecture) approve the [Phase 11 production-entry contract](ai-context/core/production-entry-contract.md), v1.1, and same-origin Angular / ASP.NET Core OIDC with server-side application sessions. [WI-011-001](ai-context/planning/stories/WI-011-001-provider-neutral-identity-and-production-entry-architecture.md) is APPROVED architecture planning only: production behavior UNIMPLEMENTED, no provider selected and no implementation authorized. CTX-1.39 and current MVP runtime behavior remain unchanged.
 
 For local setup, development database behavior, seeded accounts, and current screens, see [Local development](docs/local-development.md).
 
@@ -59,7 +59,7 @@ npm test -- --watch=false
 
 ## Deferred decisions
 
-- Production authentication and identity provider
+- Production authentication implementation and identity provider selection (future architecture approved under DEC-098)
 - Production database edition/licensing and operations
 - Notifications, maps/location providers, file storage, background jobs, and real-time services
 - Hosting, deployment, infrastructure, monitoring, and production operations

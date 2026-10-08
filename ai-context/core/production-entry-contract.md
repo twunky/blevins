@@ -2,8 +2,8 @@
 Status: APPROVED
 Authority: CANONICAL — FUTURE TARGET ONLY
 Target-Phase: Phase 11 — Pilot & Release Readiness
-Decision: DEC-097
-Version: 1.0
+Decision: DEC-097; DEC-098
+Version: 1.1
 ---
 
 # Future Production Entry Contract
@@ -11,6 +11,8 @@ Version: 1.0
 Owner-approved under [DEC-097](../decision-log.md#dec-097--approve-future-phase-11-production-entry-model), 2026-10-06. All requirements here are **APPROVED FUTURE PHASE 11 behavior, UNIMPLEMENTED**. They govern future production-entry planning, not current runtime behavior. CTX-1.39 remains the active MVP baseline; this future-target contract does not activate a successor CTX, start Phase 11, or authorize implementation or implementation work items. Phase 10 human usability work remains current; the functionally complete MVP and closed Phases 9.5/10.5 are preserved.
 
 Normative future-entry wording lives here. The [requirements index](requirements-index.md#future-phase-11-production-entry-dec-097) traces the target separately from the active baseline. Existing resource-specific contracts remain authoritative outside the narrow replacements below.
+
+[DEC-098](../decision-log.md#dec-098--approve-provider-neutral-identity-and-production-entry-architecture) approves the initial web identity architecture below. [WI-011-001](../planning/stories/WI-011-001-provider-neutral-identity-and-production-entry-architecture.md) records architecture planning and governance checks only. All production behavior remains UNIMPLEMENTED; no provider selection, runtime change or Phase 11 implementation authorization follows.
 
 ## Account entry
 
@@ -114,13 +116,106 @@ Map trusted external issuer + subject to a stable local Account. Email may suppo
 
 No identity provider is selected. Required provider-neutral capabilities are:
 
-- OIDC; OAuth authorization-code flow with PKCE where appropriate; practical ASP.NET Core integration.
+- OIDC; OAuth authorization-code flow with PKCE; practical ASP.NET Core integration. REQ-PROD-017 makes PKCE mandatory for the initial web topology under DEC-098.
 - Signup/registration, verified email, sign-in, recovery and stable subject identifiers.
 - Secure sessions/logout, signing-key rotation and MFA support.
 - Accessible web/mobile flows and continuation back to an application-owned invitation after registration/verification.
 - Suitable pilot operational/support controls.
 
-Evaluate passkeys, social login, multiple verified addresses and broader federation later; they are not initial required capabilities. The Phase 11 security target is MFA available to all users and required for Family administrators before pilot/release readiness, subject to provider integration and recovery design. This is not a current MVP requirement. Provider evaluation/proof, verification evidence handling, identity linking, secure continuation/session details and recovery implementation require later bounded design and authorization.
+Evaluate passkeys, social login, multiple verified addresses and broader federation later; they are not initial required capabilities. DEC-098's requirements below approve the initial session, bootstrap, assurance and continuation policies and mandatory provider proof gate. Provider integration, detailed mechanics and all implementation still require later bounded authorization. These are not current MVP requirements.
+
+## Initial web authentication topology
+
+### REQ-PROD-017
+
+Use same-origin Angular with the existing ASP.NET Core backend managing OIDC authentication and a Family Safety application session. The browser authenticates to Family Safety through a secure application session cookie. Do not use SPA-managed reusable provider tokens for the initial production web application. Do not introduce a separate BFF service without a future concrete need and decision.
+
+Use standard ASP.NET Core authentication/OIDC handlers rather than a custom OIDC framework. Require OpenID Connect, OAuth authorization-code flow, PKCE, state, nonce, exact registered redirects, trusted issuer validation and audience/signature/lifetime validation. ASP.NET Core exchanges the authorization code. An ID token is never a browser API credential; provider tokens remain server-side when required.
+
+This topology applies to the initial web application. Preserve a future native-client boundary for standards-based OAuth access tokens to the Family Safety API, resolving to the same local Account and domain authorization. No further mobile authentication design is approved here.
+
+## Local identity, bootstrap and eligibility
+
+### REQ-PROD-018
+
+Map validated trusted Issuer + Subject to a stable local Family Safety Account. Neither email nor display name is a stable Account key. A future conceptual structure may include Account, ExternalIdentity / LoginIdentity, verified-contact evidence/snapshot and adult-eligibility attestation; this is not schema authorization.
+
+Before creating a new local production Account/Profile require validated trusted issuer/subject, one usable primary verified email, a user-confirmed display name, explicit adult eligibility attestation and required approved application acknowledgments. Create the Account, external identity mapping, minimum AdultProfile, verified-contact evidence and attestation atomically. Optional profile data stays optional/private; never automatically copy authentication email into optional profile contact fields.
+
+For the initial adult product/pilot, use verified email plus explicit adult attestation captured inside Family Safety after authentication. Verified email does not prove age. Retain the approved attestation wording/version and server timestamp. Final wording/legal threshold remains open. Stronger age assurance is a later policy decision unless deployment requirements demand it.
+
+One trustworthy primary verified email is sufficient initially. Accept verification evidence only from validated provider evidence. Authentication-contact evidence stays separate from optional profile contact information; profile email must never reconcile invitations. A provider unable to supply sufficiently trustworthy verified-email evidence must demonstrate a bounded verification solution before selection.
+
+Defer user-facing Account linking until multiple login methods create a concrete need. Never merge Accounts because emails, names or profile details match or look similar. Future linking requires proof of control of both identities and recent authentication under REQ-PROD-020. No administrator email-based linking shortcut is approved.
+
+## Application sessions, cookies, CSRF and logout
+
+### REQ-PROD-019
+
+Use a revocable server-side Family Safety session with a secure HttpOnly application cookie. Initial pilot defaults are 30-minute idle expiration, 12-hour absolute expiration and no persistent "remember me". These defaults may later be tuned using operational/usability evidence. Background polling must not keep sessions alive indefinitely. Sliding renewal cannot override absolute expiry or recent-authentication requirements.
+
+Require HTTPS, Secure, HttpOnly, a host-only cookie, Path=/, suitable SameSite behavior and session rotation. All unsafe cookie-authenticated mutations require antiforgery/CSRF validation. Angular's readable antiforgery request token is distinct from the HttpOnly authentication cookie. HttpOnly does not solve XSS; continue normal Angular/browser XSS protections.
+
+Logout reliably revokes the Family Safety session, clears its cookie and selected-Family/account-scoped browser state, and propagates across application tabs. Attempt provider-session logout where supported; provider logout failure must not undo local logout. Global logout across every provider/device/application is not an initial requirement.
+
+## MFA, recent authentication and recovery
+
+### REQ-PROD-020
+
+MFA is available to all users and required for any session acting as a Family administrator before pilot readiness. Require sufficient MFA assurance before self-service Family creation because it grants initial administration. Family creation remains application-owned and transactional: Family + membership + administrator assignment + idempotent result under REQ-FAM-019.
+
+The provider owns factor enrollment, challenge and factor recovery. Family Safety determines whether current local authorization requires MFA; Family roles are never authoritative provider roles/claims.
+
+Initial recent-authentication window: five minutes for assigning/removing administrators, destructive member/Family actions, future identity linking, and credential/MFA/verified-contact security changes. Use real provider reauthentication/assurance evidence. Refreshing the application cookie does not satisfy recent authentication. Ordinary viewing, coordination and invitation acceptance do not require universal step-up; applicable administrator-session assurance still holds.
+
+The provider owns credentials, MFA factors and their recovery. Family Safety owns the stable Account, Profile, memberships, ownership, grants and application-session revocation. Recovery must return to the same stable issuer/subject mapping. A different Subject must not be repaired by matching email; require a bounded account-control/recovery process. Detailed administrator continuity/recovery rules remain a separate open decision under REQ-FAM-023.
+
+## Invitation continuation and authenticated entry
+
+### REQ-UX-017
+
+Preserve invitation intent in application-owned server state through sign-in, registration and verification. Never put raw invitation tokens in provider metadata. Authentication return restores invitation REVIEW only; it never accepts membership. Revalidate under REQ-PRIV-035 and require explicit acceptance. Continuation must protect against tampering, replay, open redirect, account/session confusion, user switching, concurrent tabs and token leakage.
+
+After successful authentication, a valid invitation continuation takes priority. Otherwise, zero Families shows REQ-UX-015's approved no-Family first use; one Family is selected and Home opens; multiple Families reuse a still-valid current-session selection or require explicit Family selection. A protected deep link must authorize the actual requested resource before presentation Family context changes. Selected Family remains navigation/presentation context only, never authorization.
+
+After explicit invitation acceptance: reload authoritative memberships, select the newly joined Family, show a brief per-Family privacy review with optional fields private for that Family under REQ-PRIV-036, then continue to that Family Home. A failed membership reload must be retryable without repeating acceptance.
+
+## Provider-neutral API and Development boundary
+
+### REQ-PROD-021
+
+ASP.NET Core authentication establishes the current local Account through a small request-user abstraction such as the existing CurrentAccount / ICurrentAccountAccessor boundary. Unauthenticated or expired sessions produce 401 / login flow; authenticated callers lacking resource authorization retain existing nondisclosing 404/unavailable behavior. Lists continue omitting unauthorized records.
+
+Retain a Development-only authentication scheme. Production OIDC/cookie and Development authentication resolve to the same local Account abstraction; the domain must not know which scheme produced it. Production must never accept X-Development-Account, fallback fixture identities or Development identity switching. Development auth remains unchanged in this governance task.
+
+Limit provider-specific integration to OIDC configuration/registration, claims normalization, verified-email extraction, assurance/reauthentication interpretation, registration/recovery/logout integration and provider revocation/security-event integration where available. Account identity, bootstrap, attestation, session records, invitation continuation, Family memberships, administrator assignments, profile privacy and resource authorization remain application-owned. Acceptable provider revocation latency remains open.
+
+## Identity-provider proof gate
+
+### REQ-PROD-022
+
+No provider may be selected solely from documentation or marketing comparison. Each candidate must demonstrate an isolated proof of every required flow below, including relevant negative/error behavior. The proof itself requires later bounded authorization; it is not performed or authorized by this architecture task.
+
+| Required proof | Required behavior / relevant failure evidence |
+|---|---|
+| Registration | Complete the eligible-adult registration path; show rejected/incomplete registration behavior |
+| Verified email | Demonstrate trustworthy validated evidence, or a bounded verification solution; reject missing/unverified/untrusted evidence |
+| Sign-in | Demonstrate the approved OIDC flow and validated return; reject invalid flow/identity evidence |
+| Credential + MFA recovery | Demonstrate both recovery paths and stable identity; no email-based repair for changed Subject |
+| Server-side Family Safety session | Demonstrate revocation, idle/absolute expiry and polling/renewal boundaries |
+| ASP.NET Core integration | Demonstrate standard handlers, server-side exchange and secure cookie/CSRF behavior |
+| Invitation continuation through auth | Restore review through sign-in/registration/verification; reject tampering/replay/confusion without automatic acceptance |
+| Stable Issuer/Subject → Account mapping | Reuse the same local Account; reject email/name-based merging and invalid mapping/bootstrap |
+| MFA/admin assurance | Demonstrate admin and creation gates, real recent authentication, and failed/insufficient assurance |
+| Logout/session behavior | Demonstrate local revocation, cookie/state clearing and cross-tab logout even on provider-logout failure |
+
+Only candidates passing this required-flow gate proceed to comparison of cost, operational burden, support, portability and hosting requirements. No identity provider or email delivery vendor is selected here.
+
+## Minimum authentication telemetry
+
+### REQ-PROD-023
+
+Plan outcome categories for login; Account mapping/bootstrap failures; invitation continuation/reconciliation failures; MFA/reauthentication outcomes; and session expiry/revocation/logout. Never log passwords, secrets, authorization codes, provider tokens, session cookies, invitation tokens or full invitation URLs. This is planning only; no telemetry implementation is authorized.
 
 ## Bounded invitation retention
 
@@ -151,4 +246,14 @@ Operator provisioning is a historical/current MVP contract assumption, not a cla
 
 ## Planning and unresolved choices
 
-The [Phase 11 roadmap](../planning/roadmap.md#phase-11--pilot--release-readiness) owns the likely sequence and pilot gates. Provider selection, email vendor, exact invitation retention periods, and detailed administrator-continuity/recovery rules remain unresolved. MFA integration/recovery, eligibility enforcement and creation/delivery abuse-control parameters require future design/proof within this approved direction. Passkeys/social login/multiple verified addresses/federation and invitation conveniences remain optional later evaluation. These unresolved mechanics do not reopen the approved product model.
+The [Phase 11 roadmap](../planning/roadmap.md#phase-11--pilot--release-readiness) owns the planned sequence and pilot gates. The following remain future bounded decisions and must not be resolved by this canonicalization:
+
+- OD-006 exact invitation retention durations.
+- Detailed administrator continuity/recovery rules.
+- Final adult-attestation wording/legal threshold.
+- Invitation abuse/rate-limit parameters.
+- Acceptable identity-provider revocation latency.
+- Identity provider selection.
+- Email delivery vendor selection.
+
+MFA/provider integration, recovery, eligibility enforcement and creation/delivery mechanics require later bounded design/proof within the approved architecture. Passkeys/social login/multiple verified addresses/federation and invitation conveniences remain optional later evaluation. These unresolved mechanics do not reopen the approved product model or authorize implementation.

@@ -19,7 +19,7 @@ Phase 10.5 Plan trace: [WI-105-002](../planning/stories/WI-105-002-bounded-creat
 
 Statuses are `PROPOSED`, `APPROVED`, `SUPERSEDED`, or `RETIRED`. Product/UX extraction requirements are approved under the baseline shown in each row. Existing AI operating and verification requirements remain approved independently of those baselines.
 
-DEC-097's future-target requirements use status `APPROVED` with a separate **Phase 11 / UNIMPLEMENTED** target column, not an active CTX assignment. Current MVP IDs remain approved for their original scope; future replacements have new IDs and do not globally supersede MVP truth. See the [future-target trace](#future-phase-11-production-entry-dec-097).
+DEC-097/098's future-target requirements use status `APPROVED` with a separate **Phase 11 / UNIMPLEMENTED** target column, not an active CTX assignment. Current MVP IDs remain approved for their original scope; future replacements have new IDs and do not globally supersede MVP truth. See the [future-target trace](#future-phase-11-production-entry-dec-097).
 
 ## Namespaces
 
@@ -291,7 +291,7 @@ DEC-088 clarifies REQ-FAM-014/015 and REQ-PRIV-019/024 for this first slice; bro
 
 ## Future Phase 11 production entry (DEC-097)
 
-All rows are approved future product requirements, **UNIMPLEMENTED**, outside the active CTX-1.39 MVP baseline. Authority: [DEC-097](../decision-log.md#dec-097--approve-future-phase-11-production-entry-model). Canonical wording: [production-entry contract](production-entry-contract.md). No implementation WI or execution authorization.
+All rows are approved future product/architecture requirements, **UNIMPLEMENTED**, outside the active CTX-1.39 MVP baseline. Authority: [DEC-097](../decision-log.md#dec-097--approve-future-phase-11-production-entry-model) and [DEC-098](../decision-log.md#dec-098--approve-provider-neutral-identity-and-production-entry-architecture). Canonical wording: [production-entry contract](production-entry-contract.md), v1.1. [WI-011-001](../planning/stories/WI-011-001-provider-neutral-identity-and-production-entry-architecture.md) is APPROVED architecture planning only; no implementation WI or production execution authorization.
 
 | ID | Requirement | Canonical source | Status | Target / implementation | Current scope reconciled |
 |---|---|---|---|---|---|
@@ -307,3 +307,11 @@ All rows are approved future product requirements, **UNIMPLEMENTED**, outside th
 | REQ-PROD-016 | Provider-neutral identity mapping, capabilities, domain boundary and MFA | [production-entry-contract.md#req-prod-016](production-entry-contract.md#req-prod-016) | APPROVED | Phase 11 / UNIMPLEMENTED | Provider selection remains open; no MVP auth change |
 | REQ-PRIV-037 | Bounded invitation retention with exact periods open | [production-entry-contract.md#req-priv-037](production-entry-contract.md#req-priv-037) | APPROVED | Phase 11 / UNIMPLEMENTED | OD-006; no 30-day / 90-day policy approved |
 | REQ-UX-016 | Later QR convenience uses the same secure invitation semantics | [production-entry-contract.md#req-ux-016](production-entry-contract.md#req-ux-016) | APPROVED | Phase 11 later convenience / UNIMPLEMENTED | No initial general/multi-use links, SMS or short-code authorization |
+| REQ-PROD-017 | Same-origin web cookie topology, mandatory OIDC code/PKCE and future native boundary | [production-entry-contract.md#req-prod-017](production-entry-contract.md#req-prod-017) | APPROVED | Phase 11 / UNIMPLEMENTED | DEC-098; tightens REQ-PROD-016 conditional PKCE; no SPA reusable provider tokens or separate BFF |
+| REQ-PROD-018 | Stable identity, atomic adult bootstrap, verified contact, attestation and deferred linking | [production-entry-contract.md#req-prod-018](production-entry-contract.md#req-prod-018) | APPROVED | Phase 11 / UNIMPLEMENTED | DEC-098; extends REQ-PROD-015/016; wording/legal threshold open |
+| REQ-PROD-019 | Revocable server session, pilot expiry defaults, cookie/CSRF and local/cross-tab logout | [production-entry-contract.md#req-prod-019](production-entry-contract.md#req-prod-019) | APPROVED | Phase 11 / UNIMPLEMENTED | DEC-098; 30-minute idle / 12-hour absolute; no initial persistent login |
+| REQ-PROD-020 | MFA/admin/creation gates, five-minute recent authentication and stable recovery | [production-entry-contract.md#req-prod-020](production-entry-contract.md#req-prod-020) | APPROVED | Phase 11 / UNIMPLEMENTED | DEC-098; extends REQ-FAM-019/023; no universal step-up |
+| REQ-UX-017 | Server-owned invitation review continuation, authorized entry and retryable post-join | [production-entry-contract.md#req-ux-017](production-entry-contract.md#req-ux-017) | APPROVED | Phase 11 / UNIMPLEMENTED | DEC-098; preserves REQ-PRIV-035/036; no implicit acceptance or selected-Family authority |
+| REQ-PROD-021 | Local Account API boundary, production/Development separation and provider integration limits | [production-entry-contract.md#req-prod-021](production-entry-contract.md#req-prod-021) | APPROVED | Phase 11 / UNIMPLEMENTED | DEC-098; 401 vs nondisclosing unavailable; revocation latency open |
+| REQ-PROD-022 | Isolated ten-flow provider proof with negative/error gate before comparison/selection | [production-entry-contract.md#req-prod-022](production-entry-contract.md#req-prod-022) | APPROVED | Phase 11 / UNIMPLEMENTED | DEC-098; proof and provider selection require later authorization |
+| REQ-PROD-023 | Minimum authentication outcome telemetry with sensitive-material exclusions | [production-entry-contract.md#req-prod-023](production-entry-contract.md#req-prod-023) | APPROVED | Phase 11 / UNIMPLEMENTED | DEC-098; planning only |

@@ -62,27 +62,26 @@ DEC-092's broader/contextual Sharing Sessions, broader notifications and additio
 
 ## Phase 11 — Pilot & Release Readiness
 
-**FUTURE — planning only; no implementation authorized.** [DEC-097](../decision-log.md#dec-097--approve-future-phase-11-production-entry-model) approves the [future production-entry contract](../core/production-entry-contract.md), not current runtime behavior. CTX-1.39 remains active. No successor CTX, new phase or implementation WI is created. The bounded adult MVP remains FUNCTIONALLY COMPLETE; Phases 9.5/10.5 stay closed and Phase 10 human usability work remains current. WI-010-004 human evidence and owner acceptance remain required before pilot/release readiness.
+**FUTURE — planning only; no implementation authorized.** [DEC-097](../decision-log.md#dec-097--approve-future-phase-11-production-entry-model) approves the product model and [DEC-098](../decision-log.md#dec-098--approve-provider-neutral-identity-and-production-entry-architecture) approves provider-neutral architecture in the [future production-entry contract](../core/production-entry-contract.md), v1.1. [WI-011-001 — Provider-Neutral Identity and Production-Entry Architecture](stories/WI-011-001-provider-neutral-identity-and-production-entry-architecture.md) is APPROVED architecture planning only, with governance canonicalization complete; all production behavior is UNIMPLEMENTED. CTX-1.39 remains active. No successor CTX, new phase or implementation WI is created. The bounded adult MVP remains FUNCTIONALLY COMPLETE; Phases 9.5/10.5 stay closed and Phase 10 human usability work remains current. WI-010-004 human evidence and owner acceptance remain required before pilot/release readiness.
 
 Phase 11 owns production account entry, Family bootstrap, invitation delivery, membership onboarding, identity-provider integration, required per-Family profile privacy, administrator continuity, and pilot security/readiness. Normative requirements and the narrow current/future reconciliation live in the future contract; provider selection remains open.
 
-Likely future sequence, without execution authorization:
+Planned implementation sequence only, without slice/WI or execution authorization:
 
-1. Provider-neutral identity architecture.
-2. Identity-provider evaluation/proof against the approved capabilities.
-3. Production signup/sign-in/verification/recovery.
-4. No-Family landing and minimum profile bootstrap.
-5. Self-service Family creation and initial administrator assignment.
-6. Adult-member invitation authority and invitation management.
-7. Bounded reliable email delivery, designed with invitation lifecycle.
-8. Verified-recipient invitation reconciliation.
-9. Existing/new-account joining and multi-Family onboarding.
-10. Per-Family profile privacy.
-11. Bounded member/admin lifecycle, continuity and fresh-invitation rejoin.
-12. Production-entry verification before pilot.
-13. Later conveniences such as QR/SMS/general links, only after separate justification/approval; general/multi-use links are excluded from initial production scope.
+1. Identity/provider proof against REQ-PROD-022's isolated required-flow and negative/error gate.
+2. Identity foundation + returning-user sign-in.
+3. New-adult signup/recovery/bootstrap.
+4. No-Family entry.
+5. Self-service Family creation.
+6. Invitation authority/management/email delivery.
+7. Verified-recipient joining.
+8. Per-Family privacy + multi-Family onboarding.
+9. Administrator/member continuity.
+10. Production-entry verification.
 
-Pilot gates include the approved production-entry/privacy/security contract, bounded administrator continuity rules, MFA available to all and required for Family administrators subject to provider integration/recovery design, and owner-approved final invitation retention periods with backup/restore review. Identity/email provider choices and detailed recovery/control mechanics require later evaluation/design; no vendor is selected here. These gates are future requirements, not claims of verification or readiness.
+Pilot gates include the approved production-entry/privacy/security contract; passing provider proof before selection; bounded administrator continuity rules; MFA available to all and required for administrator sessions and before self-service Family creation; real five-minute recent authentication for the approved sensitive actions; and owner-approved final invitation retention periods with backup/restore review. Integration/recovery and control mechanics require later bounded design/proof; no vendor is selected here. These gates are future requirements, not claims of verification or readiness.
+
+Open bounded decisions: OD-006 exact invitation retention; detailed administrator continuity/recovery; final adult-attestation wording/legal threshold; invitation abuse/rate-limit parameters; acceptable provider revocation latency; identity provider selection; email delivery vendor selection. Later conveniences such as QR/SMS/general links need separate justification/approval; general/multi-use links remain excluded from initial production scope. Architecture planning authorizes none of these implementations.
 
 Hosting/deployment, configuration/secrets, backup-aging/restore evidence (DEC-068, DEC-071), observability/support operations and physical-device GPS/browser/mobile background behavior remain separate production/pilot dependencies. Operator-provisioned first-Family bootstrap is replaced for future production by self-service creation; current Development fixtures remain unchanged. Development verification and completed MVP phases do not establish deployment readiness.
 
