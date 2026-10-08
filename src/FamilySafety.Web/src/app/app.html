@@ -1,4 +1,4 @@
-<div class="app-frame" [class.app-frame--focused]="view() === 'invitation' || view() === 'handoff'">
+<div class="app-frame" [class.app-frame--home]="view() === 'home'" [class.app-frame--focused]="view() === 'invitation' || view() === 'handoff'">
   <header class="app-topbar">
     <p class="brand"><span class="brand-mark"><app-icon name="users" /></span><span class="brand-name">Family Safety</span></p>
     <div class="topbar-context">
@@ -106,13 +106,14 @@
       <section class="home-dashboard" aria-label="Family welcome">
         <header class="page-title home-title">
           <div>
+            <p class="home-eyebrow">Your family, connected</p>
             <h1 id="profile-title" tabindex="-1">{{ pageTitle() }}</h1>
             @if (selectedFamily()) { <p>{{ pageSubtitle() }}</p> }
           </div>
           <div class="home-title-aside">
             <p class="page-date">{{ today | date:'EEE, MMM d, y' }}</p>
             @if (selectedFamily()) {
-              <button type="button" class="button--secondary home-family-button" (click)="navigate('family')"><app-icon name="users" />View Family</button>
+              <button type="button" class="home-family-button" (click)="navigate('family')"><app-icon name="users" />View Family</button>
             }
           </div>
         </header>
@@ -478,15 +479,17 @@
                 autocomplete="email"
                 aria-describedby="contact-email-help contact-email-error"
               />
-              <p id="contact-email-help" class="help">
-                This is separate from your sign-in information.
-              </p>
-              @if (
-                profileForm.controls.contactEmail.touched &&
-                profileForm.controls.contactEmail.invalid
-              ) {
-                <p id="contact-email-error" class="field-error">Enter a valid contact email.</p>
-              }
+              <div class="field-feedback">
+                <p id="contact-email-help" class="help">
+                  This is separate from your sign-in information.
+                </p>
+                @if (
+                  profileForm.controls.contactEmail.touched &&
+                  profileForm.controls.contactEmail.invalid
+                ) {
+                  <p id="contact-email-error" class="field-error">Enter a valid contact email.</p>
+                }
+              </div>
             </div>
             <div class="field">
               <label for="contact-email-visibility">Who can see your contact email?</label>
@@ -1017,7 +1020,7 @@
                         @if (planNoteClearPendingId() === plan.planId) {
                           <p role="status">Clear this note? This removes the note from the Plan.</p>
                           <div class="button-row">
-                            <button type="button" [disabled]="planNoteSaving() || planCorrectionSaving()" (click)="confirmPlanNoteClear(plan)">Confirm clear</button>
+                            <button class="button--danger" type="button" [disabled]="planNoteSaving() || planCorrectionSaving()" (click)="confirmPlanNoteClear(plan)">Confirm clear</button>
                             <button type="button" class="button--secondary" (click)="cancelPlanNoteClear()">Cancel</button>
                           </div>
                         } @else {
@@ -1041,7 +1044,7 @@
                     @if (editingPlanNoteId() !== plan.planId && planNoteClearPendingId() === plan.planId) {
                       <p role="status">Clear this note? This removes the note from the Plan.</p>
                       <div class="button-row">
-                        <button type="button" [disabled]="planNoteSaving() || planCorrectionSaving()" (click)="confirmPlanNoteClear(plan)">Confirm clear</button>
+                        <button class="button--danger" type="button" [disabled]="planNoteSaving() || planCorrectionSaving()" (click)="confirmPlanNoteClear(plan)">Confirm clear</button>
                         <button type="button" class="button--secondary" (click)="cancelPlanNoteClear()">Cancel</button>
                       </div>
                     }
@@ -1264,7 +1267,7 @@
                 <h2 id="family-updates-heading">Recent Family Updates</h2>
               </div>
               <p class="home-future-note">A Family activity feed is not available here. Read Event Updates on an Event you can access.</p>
-              <a routerLink="/events" [state]="focusHeadingState">Open Events for Updates</a>
+              <a class="button-link button--secondary" routerLink="/events" [state]="focusHeadingState">Open Events for Updates</a>
             </section>
 
             <section class="card home-future family-future" aria-labelledby="family-checkins-heading">
@@ -1273,7 +1276,7 @@
                 <h2 id="family-checkins-heading">Recent Check-Ins</h2>
               </div>
               <p class="home-future-note">See your sent Check-Ins and those explicitly shared with you in Safety. This card does not show a Family-wide Check-In feed.</p>
-              <a routerLink="/safety" [state]="focusHeadingState">Open Safety for Check-Ins</a>
+              <a class="button-link button--secondary" routerLink="/safety" [state]="focusHeadingState">Open Safety for Check-Ins</a>
             </section>
           </div>
         }
@@ -1321,7 +1324,7 @@
                   </button>
                   <button
                     type="button"
-                    class="button--secondary"
+                    class="button--danger button--secondary"
                     [disabled]="invitationBusy()"
                     (click)="revokeInvitation()"
                   >
@@ -1498,7 +1501,7 @@
                         <div class="button-row">
                           <button
                             type="button"
-                            class="button--secondary"
+                            class="button--danger button--secondary"
                             [disabled]="relationshipBusyId() === relationship.relationshipId"
                             (click)="respondToRelationship(relationship, 'remove')"
                           >

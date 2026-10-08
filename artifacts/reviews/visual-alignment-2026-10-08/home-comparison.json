@@ -1,0 +1,38 @@
+[
+  {
+    "width": 1440,
+    "before": [
+      1440,
+      1082
+    ],
+    "after": [
+      1440,
+      1082
+    ],
+    "changedPixels": 0
+  },
+  {
+    "width": 768,
+    "before": [
+      768,
+      1697
+    ],
+    "after": [
+      768,
+      1697
+    ],
+    "changedPixels": 0
+  },
+  {
+    "width": 390,
+    "before": [
+      390,
+      2607
+    ],
+    "after": [
+      390,
+      2607
+    ],
+    "changedPixels": 0
+  }
+]

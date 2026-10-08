@@ -1,0 +1,18 @@
+{
+  "clock": "2026-10-08T03:45:00Z",
+  "timezone": "America/New_York",
+  "comparisons": [
+    {
+      "width": 1440,
+      "beforeHeight": 1038,
+      "afterHeight": 1038,
+      "differentPixels": 0
+    },
+    {
+      "width": 390,
+      "beforeHeight": 2304,
+      "afterHeight": 2304,
+      "differentPixels": 0
+    }
+  ]
+}

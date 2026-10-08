@@ -4,8 +4,8 @@ h4 { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); f
 .incident-tl { --marker: var(--color-primary); display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: var(--space-3); border-radius: var(--radius-sm); }
 .incident-tl--summary { --marker: var(--color-primary-strong); }
 .incident-tl--unknown { --marker: var(--color-warning); }
-.incident-tl--contact { --marker: #0e7490; }
-.incident-tl--task { --marker: #4f46e5; }
+.incident-tl--contact { --marker: var(--color-primary); }
+.incident-tl--task { --marker: var(--color-icon); }
 .incident-tl--people, .incident-tl--state { --marker: var(--color-border-strong); }
 .incident-tl-time { display: grid; align-content: start; color: var(--color-muted); font-size: 0.86rem; }
 .incident-tl-time span { font-size: 0.78rem; }

@@ -1,0 +1,51 @@
+[
+  {
+    "id": "birthday-month",
+    "top": 882.640625,
+    "height": 44.390625,
+    "labelTop": 849.84375,
+    "labelHeight": 24.796875
+  },
+  {
+    "id": "birthday-day",
+    "top": 882.640625,
+    "height": 44.390625,
+    "labelTop": 849.84375,
+    "labelHeight": 24.796875
+  },
+  {
+    "id": "birthday-visibility",
+    "top": 883.03125,
+    "height": 44,
+    "labelTop": 850.234375,
+    "labelHeight": 24.796875
+  },
+  {
+    "id": "contact-email",
+    "top": 1117.828125,
+    "height": 44.390625,
+    "labelTop": 1085.03125,
+    "labelHeight": 24.796875
+  },
+  {
+    "id": "contact-email-visibility",
+    "top": 1125.828125,
+    "height": 44,
+    "labelTop": 1093.03125,
+    "labelHeight": 24.796875
+  },
+  {
+    "id": "contact-phone",
+    "top": 1240.125,
+    "height": 44.390625,
+    "labelTop": 1207.328125,
+    "labelHeight": 24.796875
+  },
+  {
+    "id": "contact-phone-visibility",
+    "top": 1248.125,
+    "height": 44,
+    "labelTop": 1215.328125,
+    "labelHeight": 24.796875
+  }
+]

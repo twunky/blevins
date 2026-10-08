@@ -104,7 +104,7 @@ export const developmentIdentityInterceptor: HttpInterceptorFn = (request, next)
     }
     .development-tools p { margin: 0; }
     .development-tools p:has(a), .development-tools [role='alert'] { flex-basis: 100%; }
-    .development-tools a { color: #513d00; font-weight: 700; }
+    .development-tools a { color: var(--color-warning); font-weight: 700; }
     .development-tools :is(select, button, a):focus-visible {
       outline: 3px solid var(--color-focus);
       outline-offset: 3px;

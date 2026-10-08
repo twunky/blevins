@@ -1,4 +1,4 @@
-/* Safety dashboard (WI-009-009) — references/ux/home-dashboard panel ④, in calm blue tones (no alarm surfaces).
+/* Safety dashboard (WI-009-009) — calm charcoal surfaces from the approved Home dashboard.
    DOM order is the narrow reading order; at sidebar widths the grid builds panel ④'s 2 × 2 with Concerns and
    Incidents as equal peers. Cards, rows, avatars, and View all links come from styles.scss. */
 :host { display: block; min-width: 0; }
@@ -12,7 +12,7 @@ a.safety-view-all { align-items: center; display: inline-flex; flex: none; font-
 .safety-row-top { align-items: center; display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); }
 /* The existing Open state, as text in a neutral pill; never a colour-only or alarm signal. */
 .safety-state {
-  background: var(--color-primary-soft); border-color: #dbe7fb; color: var(--color-primary-strong); padding: 0.1rem 0.6rem;
+  background: var(--color-primary-soft); border-color: var(--color-border); color: var(--color-primary-strong); padding: 0.1rem 0.6rem;
 }
 /* Row title links are at least 44 px tall touch targets. */
 .safety-rows a.item-link { align-items: center; display: inline-flex; min-height: 2.75rem; }
@@ -31,11 +31,11 @@ a.safety-view-all { align-items: center; display: inline-flex; flex: none; font-
 
 /* Placeholder, matching the Home and Events placeholders: no data and no actions. The card may match its row
    neighbour's height (O14), but the note keeps its natural size at the top. */
-.safety-future .card-icon { background: #eef2f8; color: #64748b; }
+.safety-future .card-icon { background: var(--color-secondary); color: var(--color-icon); }
 .safety-future-note {
-  border: 1px dashed var(--color-border-strong); border-radius: var(--radius-md); color: var(--color-muted);
-  flex: none; font-size: 0.9rem; line-height: 1.5; margin: 0; padding: var(--space-3) var(--space-4);
+  color: var(--color-muted); flex: 1; font-size: 0.875rem; line-height: 1.65; margin: 0;
 }
+.safety-checkins-link { align-self: flex-start; margin-top: 20px; }
 
 .safety-about { display: grid; gap: var(--space-3); margin: 0; }
 .safety-about dt { color: var(--color-primary-strong); font-weight: 700; }
@@ -55,6 +55,7 @@ a.safety-view-all { align-items: center; display: inline-flex; flex: none; font-
 
 /* Narrow: View all becomes a full-width touch target below the card heading. */
 @media (max-width: 43.99rem) {
+  .safety-checkins-link { align-self: stretch; }
   .safety-card .card-header { flex-wrap: wrap; }
   a.safety-view-all { border: 1px solid var(--color-border); justify-content: center; width: 100%; }
 }

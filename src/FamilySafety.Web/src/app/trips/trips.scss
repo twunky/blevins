@@ -37,6 +37,13 @@
 .trip-form-section > h3, .trip-detail-panel > h3, .trip-notes > h3, .trip-audience-editor h3 { font-size: 1.05rem; margin: 0 0 var(--space-2); }
 .trip-field { display: grid; gap: var(--space-2); margin-top: var(--space-4); min-width: 0; }
 .trip-grid, .trip-optional-grid, .trip-people-grid, .trip-detail-grid, .trip-optional-facts { display: grid; gap: var(--space-4); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.trip-grid, .trip-optional-grid { margin-top: var(--space-4); }
+:is(.trip-grid, .trip-optional-grid) > .trip-field { margin-top: 0; }
+@media (min-width: 44rem) {
+  :is(.trip-grid, .trip-optional-grid) > .trip-field { grid-row: span 2; grid-template-rows: subgrid; row-gap: var(--space-2); }
+  :is(.trip-grid, .trip-optional-grid) > .trip-field > label { align-self: start; }
+  .trip-grid input { height: 2.75rem; }
+}
 input[type='radio'], input[type='checkbox'] { min-height: 1.2rem; width: 1.2rem; }
 .trip-fieldset { background: var(--color-surface-soft); border: 1px solid var(--color-border); border-radius: var(--radius-md); margin: var(--space-4) 0 0; min-width: 0; padding: var(--space-3) var(--space-4) var(--space-4); }
 .trip-help { margin: var(--space-2) 0; }

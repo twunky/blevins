@@ -35,7 +35,7 @@
           <div class="confirmation">
             <p>Delete this date? It will disappear immediately for everyone it is shared with. You cannot restore it here.</p>
             <div class="actions">
-              <button type="button" [disabled]="busy() || needsRefresh()" (click)="remove(entry)">Confirm delete</button>
+              <button class="button--danger" type="button" [disabled]="busy() || needsRefresh()" (click)="remove(entry)">Confirm delete</button>
               <button type="button" class="button--secondary" [disabled]="busy()" (click)="deleting.set(null)">Cancel deletion</button>
             </div>
           </div>

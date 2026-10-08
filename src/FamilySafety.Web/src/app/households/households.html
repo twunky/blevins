@@ -47,7 +47,7 @@
           </div>
           @if (removing() === row.householdId) {
             <p>Delete {{ row.name }} permanently? Its members will become unassigned and remain in this Family. This cannot be restored.</p>
-            <div class="actions"><button type="button" [disabled]="busy()" (click)="deleteHousehold(row)">Confirm Household deletion</button>
+            <div class="actions"><button class="button--danger" type="button" [disabled]="busy()" (click)="deleteHousehold(row)">Confirm Household deletion</button>
               <button type="button" class="button--secondary" [disabled]="busy()" (click)="removing.set(null)">Cancel Household deletion</button></div>
           }
         }

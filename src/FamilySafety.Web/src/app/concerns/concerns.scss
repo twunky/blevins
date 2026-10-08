@@ -20,7 +20,7 @@ p { margin: 0; line-height: 1.5; }
 .concerns-heading-text { flex: 1 1 14rem; }
 .concerns-card { align-content: start; }
 .concerns-page .concerns-quiet, .concerns-page .concerns-back {
-  min-height: 2.25rem; padding: 0.3rem 0.75rem; font-size: 0.9rem;
+  min-height: 2.75rem; padding: 0.3rem 0.75rem; font-size: 0.9rem;
   background: var(--color-surface); border-color: var(--color-border); color: var(--color-primary);
 }
 .concerns-page .concerns-back { justify-self: start; background: none; border-color: transparent; padding-inline: 0; }
@@ -32,7 +32,7 @@ p { margin: 0; line-height: 1.5; }
   padding: 0.15rem 0.65rem;
   background: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-border);
 }
-.concerns-state--frozen, .concerns-state--resolved { background: #eef2f2; color: #45575a; }
+.concerns-state--frozen, .concerns-state--resolved { background: var(--color-neutral-bg); color: var(--color-neutral-text); }
 .concerns-category { background: var(--color-surface-soft); color: var(--color-primary-strong); }
 .concerns-avatar {
   display: inline-grid; place-items: center; flex: none; width: 2.25rem; height: 2.25rem; border-radius: 50%;
@@ -42,7 +42,7 @@ p { margin: 0; line-height: 1.5; }
 
 .concerns-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: var(--space-3); list-style: none; margin: 0; padding: 0; }
 .concerns-page .concern-card { display: flex; align-items: flex-start; justify-content: flex-start; gap: var(--space-3); width: 100%; height: 100%; text-align: left; color: var(--color-text); font-weight: 400; box-shadow: none; }
-.concerns-page .concern-card--open { background: var(--color-primary-soft); border-color: #cfe0fb; }
+.concerns-page .concern-card--open { background: var(--color-primary-soft); border-color: var(--color-border-strong); }
 .concern-card:not(.concern-card--open) .concerns-avatar { background: var(--color-primary-soft); }
 .concern-card-body { display: grid; flex: 1; gap: var(--space-1); min-width: 0; }
 .concern-card-top strong { color: var(--color-primary-strong); font-size: 1.05rem; }

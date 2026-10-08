@@ -1,37 +1,48 @@
-/* Design system for the reference mockups (claude-handoff/reference): blue palette,
-   sidebar + slim top-bar shell, white cards on a light blue-gray page. */
+/* Application palette from the approved Home Dashboard. Feature SCSS owns layout;
+   shared surfaces, controls, and the shell use these semantic tokens. */
 :root {
-  --color-primary: #2563eb;
-  --color-primary-strong: #1e3a8a;
-  --color-primary-soft: #eff6ff;
-  --color-accent: #93c5fd;
-  --color-page: #f3f7fd;
-  --color-surface: #ffffff;
-  --color-surface-soft: #f7f9fe;
-  --color-text: #1e293b;
-  --color-muted: #475569;
-  --color-border: #e3eaf5;
-  --color-border-strong: #b8c6dc;
-  --color-success: #15803d;
-  --color-success-bg: #dcfce7;
-  --color-warning: #92400e;
-  --color-warning-bg: #fef3c7;
-  --color-error: #b91c1c;
-  --color-error-bg: #fee2e2;
-  --color-attention-bg: #fff1f2;
-  --color-focus: #1d4ed8;
+  --color-primary: #00d4ff;
+  --color-primary-strong: #fff;
+  --color-primary-soft: #142126;
+  --color-accent: #00d4ff;
+  --color-page: #000;
+  --color-surface: #111;
+  --color-surface-soft: #17191c;
+  --color-text: #fff;
+  --color-muted: #a5adb9;
+  --color-border: #ffffff14;
+  --color-border-strong: #59616d;
+  --color-success: #8de0b0;
+  --color-success-bg: #13271c;
+  --color-warning: #f4cb89;
+  --color-warning-bg: #302519;
+  --color-error: #ffadb5;
+  --color-error-bg: #321b20;
+  --color-attention-bg: #302519;
+  --color-focus: #00d4ff;
+  --color-primary-hover: #79e8ff;
+  --color-on-primary: #001418;
+  --color-secondary: #202328;
+  --color-secondary-hover: #30363e;
+  --color-secondary-text: #f1f4f8;
+  --color-secondary-border-hover: #8795a6;
+  --color-shell: #0b0c0e;
+  --color-icon: #bdc7d4;
+  --color-neutral-text: #e1e7ee;
+  --color-neutral-bg: #24282d;
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
-  --shadow-card: 0 1px 2px rgb(30 58 138 / 4%), 0 4px 16px rgb(30 58 138 / 6%);
+  --shadow-card: 0 12px 32px #0003;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
   --space-5: 1.5rem;
   --space-6: 2rem;
-  --sidebar-width: 14.5rem;
+  --sidebar-width: 13.5rem;
   color: var(--color-text);
+  color-scheme: dark;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-synthesis: none;
 }
@@ -53,11 +64,20 @@ app-root input, app-root select, app-root textarea {
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
   color: var(--color-text);
-  min-height: 2.6rem;
+  min-height: 2.75rem;
   padding: 0.55rem 0.75rem;
   width: 100%;
 }
 app-root textarea { min-height: 6rem; resize: vertical; }
+app-root :is(input, textarea)::placeholder { color: var(--color-muted); opacity: 1; }
+app-root :is(input, select, textarea):disabled { cursor: not-allowed; opacity: 0.6; }
+app-root :is(input, textarea)[readonly] { background: var(--color-surface-soft); }
+app-root :is(input[type='checkbox'], input[type='radio']) { flex: none; min-height: 1.2rem; width: 1.2rem; }
+app-root option { background: var(--color-surface-soft); color: var(--color-text); }
+app-root fieldset { background: var(--color-surface-soft); border: 1px solid var(--color-border); border-radius: var(--radius-md); min-width: 0; padding: var(--space-4); }
+app-root legend { padding-inline: var(--space-1); }
+app-root summary { border-radius: var(--radius-sm); cursor: pointer; min-height: 44px; }
+app-root summary:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 app-root input:hover, app-root select:hover, app-root textarea:hover { border-color: var(--color-primary); }
 app-root :is(input, select, textarea, button, a):focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 
@@ -66,36 +86,39 @@ app-root button {
   align-items: center;
   background: var(--color-primary);
   border: 1px solid var(--color-primary);
-  border-radius: 0.625rem;
-  color: #fff;
+  border-radius: 10px;
+  color: var(--color-on-primary);
   cursor: pointer;
   display: inline-flex;
-  font-weight: 650;
+  font-size: 0.875rem;
+  font-weight: 600;
   gap: var(--space-2);
   justify-content: center;
-  min-height: 2.5rem;
+  line-height: 1.4;
+  min-height: 2.75rem;
   padding: 0.5rem 1rem;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
-app-root button:hover:not(:disabled) { background: #1d4ed8; border-color: #1d4ed8; }
+app-root button:hover:not(:disabled) { background: var(--color-primary-hover); border-color: var(--color-primary-hover); color: var(--color-on-primary); }
 app-root button:disabled { cursor: not-allowed; opacity: 0.55; }
 app-root .button--secondary {
-  background: var(--color-primary-soft);
-  border-color: #dbe7fb;
-  color: #1d4ed8;
+  background: var(--color-secondary);
+  border-color: var(--color-border-strong);
+  color: var(--color-secondary-text);
 }
 app-root .button--secondary:hover:not(:disabled) {
-  background: #dbeafe;
-  border-color: var(--color-accent);
+  background: var(--color-secondary-hover);
+  border-color: var(--color-secondary-border-hover);
   color: var(--color-primary-strong);
 }
 app-root .link-button {
   white-space: nowrap;
   background: transparent;
   border-color: transparent;
-  color: var(--color-primary);
+  color: var(--color-primary-hover);
   font-size: 0.86rem;
   margin-left: auto;
-  min-height: 2rem;
+  min-height: 2.75rem;
   padding: 0.25rem 0.5rem;
 }
 app-root .link-button:hover:not(:disabled) { background: var(--color-primary-soft); border-color: transparent; color: var(--color-primary-strong); }
@@ -107,14 +130,22 @@ app-root :is(h2, h3, strong) > a.item-link:hover { text-decoration: underline; }
 app-root a.button-link {
   align-items: center;
   border: 1px solid var(--color-primary);
-  border-radius: 0.625rem;
+  background: var(--color-primary);
+  border-radius: 10px;
+  color: var(--color-on-primary);
   display: inline-flex;
-  font-weight: 650;
+  font-size: 0.875rem;
+  font-weight: 600;
   justify-content: center;
-  min-height: 2.5rem;
+  line-height: 1.4;
+  min-height: 2.75rem;
   padding: 0.5rem 1rem;
   text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
+app-root a.button-link:hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); color: var(--color-on-primary); }
+app-root a.button-link.button--secondary { background: var(--color-secondary); border-color: var(--color-border-strong); color: var(--color-secondary-text); }
+app-root a.button-link.button--secondary:hover { background: var(--color-secondary-hover); border-color: var(--color-secondary-border-hover); color: var(--color-text); }
 .item-back { margin-bottom: var(--space-4); }
 app-root a.detail-back-link {
   align-items: center; border-radius: var(--radius-sm); color: var(--color-primary); display: inline-flex;
@@ -143,45 +174,49 @@ app-root .message--success { background: var(--color-success-bg); border-left: 4
 
 /* Shell: slim top bar + left sidebar + content */
 .app-frame {
+  background: var(--color-page);
   display: grid;
   grid-template-areas: 'top top' 'side main';
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   grid-template-rows: auto 1fr;
   min-height: 100dvh;
+  line-height: 1.55;
 }
 .app-frame--focused { grid-template-areas: 'top' 'main'; grid-template-columns: minmax(0, 1fr); }
 .app-topbar {
   align-items: center;
-  background: var(--color-surface);
+  background: var(--color-shell);
   border-bottom: 1px solid var(--color-border);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3) var(--space-5);
   grid-area: top;
   justify-content: space-between;
-  min-height: 4rem;
+  min-height: 76px;
   padding: 0.6rem clamp(1rem, 2.5vw, 1.75rem);
 }
-.brand { align-items: center; color: var(--color-primary-strong); display: flex; font-size: 1.2rem; font-weight: 800; gap: var(--space-2); letter-spacing: -0.01em; margin: 0; }
-.brand-mark { align-items: center; background: var(--color-primary); border-radius: 0.6rem; color: #fff; display: inline-flex; height: 2.1rem; justify-content: center; width: 2.1rem; }
+.brand { align-items: center; color: var(--color-primary-strong); display: flex; font-size: 1.05rem; font-weight: 650; gap: var(--space-2); letter-spacing: -0.03em; margin: 0; }
+.brand-mark { align-items: center; background: #182327; border-radius: 0.6rem; color: var(--color-accent); display: inline-flex; height: 2.1rem; justify-content: center; width: 2.1rem; }
 .topbar-context { align-items: center; display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .current-family {
-  background: var(--color-primary-soft);
+  background: #191c20;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
   color: var(--color-primary-strong);
   font-size: 0.9rem;
   margin: 0;
   padding: 0.4rem 0.85rem;
 }
+.current-family strong { font-weight: 600; }
 .family-context-choice { align-items: center; display: flex; gap: var(--space-2); }
 .family-context-choice label { font-size: 0.88rem; white-space: nowrap; }
 .family-context-choice select { min-width: 12rem; }
-.profile-chip { align-items: center; color: var(--color-primary-strong); display: flex; font-weight: 650; gap: var(--space-2); margin: 0; }
+.profile-chip { align-items: center; color: var(--color-primary-strong); display: flex; font-size: 0.875rem; font-weight: 650; gap: var(--space-2); margin: 0; }
 .avatar {
   align-items: center;
-  background: #dbeafe;
+  background: var(--color-neutral-bg);
   border-radius: 50%;
-  color: var(--color-primary-strong);
+  color: var(--color-neutral-text);
   display: inline-flex;
   flex: none;
   font-size: 0.8rem;
@@ -194,31 +229,34 @@ app-root .message--success { background: var(--color-success-bg); border-left: 4
 
 .main-navigation {
   align-content: start;
+  background: var(--color-shell);
+  border-right: 1px solid var(--color-border);
   display: grid;
-  gap: var(--space-1);
+  gap: 6px;
   grid-area: side;
-  padding: var(--space-5) var(--space-3);
+  padding: 28px 12px;
 }
 /* Main navigation: six router links (REQ-UX-013) */
 app-root .nav-button {
   align-items: center;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  color: var(--color-primary-strong);
+  border-radius: 10px;
+  color: var(--color-muted);
   display: flex;
   font-weight: 550;
+  font-size: 0.9rem;
   gap: var(--space-2);
   justify-content: flex-start;
-  min-height: 2.75rem;
+  min-height: 48px;
   padding: 0.55rem 0.85rem;
   text-decoration: none;
   width: 100%;
 }
-app-root .nav-button:hover { background: var(--color-surface); color: var(--color-primary); }
-app-root .nav-button.is-active { background: #dfeafd; color: #1d4ed8; font-weight: 750; }
+app-root .nav-button:hover { background: #1a1d21; color: var(--color-text); }
+app-root .nav-button.is-active { background: #132328; color: var(--color-primary-hover); font-weight: 600; }
 
-.app-main { grid-area: main; max-width: 76rem; min-width: 0; padding: clamp(1rem, 2.5vw, 1.75rem) clamp(1rem, 3vw, 2.25rem) var(--space-6); width: 100%; }
+.app-main { grid-area: main; justify-self: center; max-width: 1264px; min-width: 0; padding: 40px 32px; width: 100%; }
 .page-title { align-items: flex-start; display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); justify-content: space-between; margin-bottom: var(--space-5); }
 .page-title h1 { color: var(--color-primary-strong); font-size: clamp(1.6rem, 2.6vw, 2rem); letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 var(--space-1); }
 .page-title p { color: var(--color-muted); margin: 0; max-width: 52rem; }
@@ -241,7 +279,7 @@ app-root .page-title h1:focus-visible { border-radius: var(--radius-sm); outline
 .card-header h2 { font-size: 1.1rem; margin: 0; }
 .card-icon { align-items: center; background: var(--color-primary-soft); border-radius: 0.6rem; color: var(--color-primary); display: inline-flex; flex: none; height: 2.25rem; justify-content: center; width: 2.25rem; }
 .card-sub { color: var(--color-muted); font-size: 0.86rem; margin: 0.15rem 0 0; }
-.card-count { background: var(--color-primary-soft); border-radius: 999px; color: #1d4ed8; font-size: 0.8rem; font-weight: 700; margin-left: auto; padding: 0.15rem 0.6rem; }
+.card-count { background: var(--color-primary-soft); border-radius: 999px; color: var(--color-primary-hover); font-size: 0.8rem; font-weight: 600; margin-left: auto; padding: 0.15rem 0.6rem; }
 .status-pill { border: 1px solid var(--color-border); border-radius: 999px; display: inline-block; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
 .row-list, .member-list, .relationship-list, .checkbox-list { display: grid; gap: var(--space-2); list-style: none; margin: 0; padding: 0; }
 .row-list > li { border-top: 1px solid var(--color-border); padding-top: var(--space-3); }
@@ -253,7 +291,7 @@ app-root .page-title h1:focus-visible { border-radius: var(--radius-sm); outline
 .date-tile {
   align-items: center;
   background: var(--color-primary-soft);
-  border: 1px solid #dbe7fb;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-primary-strong);
   display: inline-flex;
@@ -270,7 +308,7 @@ app-root .page-title h1:focus-visible { border-radius: var(--radius-sm); outline
 .date-tile--large { height: 4rem; width: 4rem; font-size: 1.35rem; }
 .info-bar, .empty-state {
   background: var(--color-primary-soft);
-  border: 1px solid #dbe7fb;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-primary-strong);
   line-height: 1.5;
@@ -288,10 +326,10 @@ app-root .page-title h1:focus-visible { border-radius: var(--radius-sm); outline
 .landing-choice .item-meta { margin-bottom: var(--space-4); }
 app-root .landing-link {
   align-items: center;
-  background: var(--color-primary-soft);
-  border: 1px solid #dbe7fb;
-  border-radius: 0.625rem;
-  color: #1d4ed8;
+  background: var(--color-secondary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  color: var(--color-secondary-text);
   display: inline-flex;
   font-weight: 650;
   justify-self: start;
@@ -299,13 +337,16 @@ app-root .landing-link {
   padding: 0.5rem 1rem;
   text-decoration: none;
 }
-app-root .landing-link:hover { background: #dbeafe; border-color: var(--color-accent); color: var(--color-primary-strong); }
+app-root .landing-link:hover { background: var(--color-secondary-hover); border-color: var(--color-secondary-border-hover); color: var(--color-text); }
 @media (min-width: 44rem) { .landing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* Fields and grouped choices */
 .field, .field-grid, .birthday-grid { display: grid; gap: var(--space-2); }
-.field { margin-top: var(--space-4); }
-.field-grid, .birthday-grid { gap: var(--space-3) var(--space-4); margin-top: var(--space-2); }
+.field { margin-top: var(--space-4); min-width: 0; }
+.field-grid, .birthday-grid { gap: var(--space-4); margin-top: var(--space-4); }
+.field-grid > .field, .birthday-grid > .field { margin-top: 0; }
+.field-feedback { display: grid; gap: var(--space-2); }
+.field-feedback > p { margin: 0; }
 .button-row, .event-actions, .action-bar { align-items: center; display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); }
 :is(.button-row, .event-actions) button { margin: 0; }
 form > button { margin-top: var(--space-4); }
@@ -334,7 +375,18 @@ app-root .checkbox-label input { flex: none; min-height: 1.2rem; width: 1.2rem; 
 
 @media (min-width: 44rem) {
   .field-grid { align-items: start; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .birthday-grid { align-items: end; grid-template-columns: 6rem 6rem minmax(12rem, 1fr); }
+  .birthday-grid { align-items: start; grid-template-columns: 6rem 6rem minmax(12rem, 1fr); }
+  /* Paired fields share label/control tracks, including when a label wraps.
+     Feedback has its own track, so validation cannot move a neighboring control. */
+  .field-grid, .birthday-grid { --field-rows: 2; }
+  .field-grid:has(> .field > .field-feedback) { --field-rows: 3; }
+  :is(.field-grid, .birthday-grid) > .field {
+    grid-row: span var(--field-rows);
+    grid-template-rows: subgrid;
+    row-gap: var(--space-2);
+  }
+  :is(.field-grid, .birthday-grid) > .field > label { align-self: start; }
+  :is(.field-grid, .birthday-grid) > .field > :is(input, select) { height: 2.75rem; }
 }
 
 /* Narrow (REQ-UX-013, WI-009-003 D2): top bar, then the same six destinations in the same order as a
@@ -342,19 +394,78 @@ app-root .checkbox-label input { flex: none; min-height: 1.2rem; width: 1.2rem; 
 @media (max-width: 63.99rem) {
   .app-frame { grid-template-areas: 'top' 'side' 'main'; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
   .main-navigation {
-    background: var(--color-surface);
+    background: var(--color-shell);
     border-bottom: 1px solid var(--color-border);
+    border-right: 0;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    padding: var(--space-2) clamp(0.75rem, 2.5vw, 1.75rem);
+    padding: 12px 20px;
   }
+  .app-main { padding: 32px 24px; }
   app-root .nav-button { justify-content: center; text-align: center; }
 }
 @media (max-width: 43.99rem) {
-  .main-navigation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .app-topbar { padding-inline: var(--space-3); }
-  .topbar-context { width: 100%; }
+  .main-navigation { gap: 4px; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px; }
+  app-root .nav-button { justify-content: flex-start; font-size: 0.85rem; padding-inline: 12px; }
+  .app-topbar { gap: 14px; padding: 20px; }
+  .app-main { padding: 28px 16px; }
+  .topbar-context { gap: 12px; min-width: 0; width: 100%; }
+  .current-family { border-radius: 10px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .family-context-choice { align-items: stretch; flex-direction: column; width: 100%; }
+  .family-context-choice select { min-width: 0; }
   .profile-chip span:last-child { display: none; }
   .event-access-list li { align-items: stretch; grid-template-columns: minmax(0, 1fr); }
   :is(.button-row, .event-actions) > button { flex: 1 1 12rem; }
   .page-title .page-date { display: none; }
+}
+
+/* Interior pages share Home's surfaces and spacing, with a quieter heading scale.
+   Home retains its approved page-specific measurements in home.scss. */
+.app-frame:not(.app-frame--home) {
+  a:not(.nav-button):not(.button-link):not(.landing-link) { color: var(--color-primary-hover); }
+  .page-title { gap: 16px 24px; margin-bottom: 32px; }
+  .page-title h1 { font-size: clamp(1.75rem, 2.8vw, 2.25rem); font-weight: 550; letter-spacing: -0.04em; line-height: 1.2; margin-bottom: 10px; overflow-wrap: anywhere; }
+  .page-title p { line-height: 1.65; }
+  .card, .focused-state { padding: 24px; }
+  .card-header { align-items: flex-start; gap: 12px; margin-bottom: 22px; }
+  .card-header > :is(div, h2) { flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; }
+  .card-header h2 { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.4; padding-top: 6px; }
+  .card-icon { background: var(--color-secondary); color: var(--color-icon); }
+  .card-sub { font-size: 0.8rem; line-height: 1.55; margin-top: 6px; }
+  .item-main { gap: 5px; }
+  .item-main strong, .item-main h3 { font-weight: 550; line-height: 1.5; }
+  .item-meta { font-size: 0.85rem; line-height: 1.6; }
+  .date-tile { background: #1d2227; font-weight: 550; }
+  .date-tile small { color: var(--color-muted); font-weight: 550; }
+  .info-bar, .empty-state { background: var(--color-surface-soft); color: var(--color-muted); }
+  .split-layout, .landing-grid { gap: 20px; }
+  .landing-link { font-size: 0.875rem; font-weight: 600; }
+  :is(.family-card-link, .family-back-link, .events-back-link, .safety-back-link, .detail-back-link) { min-height: 44px; }
+  .status-pill { max-width: 100%; white-space: normal; }
+  :is(.checkbox-label, .recipient-choice, .person-choice, .concerns-check, .incident-option, .trip-choice) { min-height: 44px; }
+  :is(button, a.button-link, a.landing-link):focus-visible { outline-offset: 4px; }
+  :is(.confirmation, .trip-confirmation) { background: var(--color-surface-soft); border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); padding: 16px; }
+  :is(.actions, .button-row, .action-bar) { row-gap: 12px; }
+}
+
+/* Destructive operations keep their labels and confirmations and have their own
+   treatment. Stopping location sharing is an ordinary, prominent privacy action. */
+app-root button.button--danger {
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+app-root button.button--danger:hover:not(:disabled) { background: #4a242b; border-color: #ffc6cb; color: #ffc6cb; }
+
+@media (max-width: 43.99rem) {
+  .app-frame:not(.app-frame--home) {
+    .page-title { margin-bottom: 24px; }
+    .card, .focused-state { padding: 20px; }
+    .card-header { flex-wrap: wrap; margin-bottom: 18px; }
+    :is(.actions, .button-row, .action-bar) > :is(button, a.button-link) { flex: 1 1 100%; }
+    :is(input, select, textarea, fieldset) { min-width: 0; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  app-root :is(button, a.button-link) { transition: none; }
 }

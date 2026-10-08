@@ -339,7 +339,7 @@
                   @if (pending.noteId === note.noteId) {
                     <p role="status">{{ pending.action === 'delete' ? 'Delete this note? This note will no longer appear in the Trip.' : 'Hide this note? This note will no longer be visible in the Trip Notes view.' }}</p>
                     <div class="trip-note-actions">
-                      <button type="button" [disabled]="noteSaving()" (click)="confirmNoteRemoval(note)">{{ pending.action === 'delete' ? 'Confirm delete' : 'Confirm hide' }}</button>
+                      <button class="button--danger" type="button" [disabled]="noteSaving()" (click)="confirmNoteRemoval(note)">{{ pending.action === 'delete' ? 'Confirm delete' : 'Confirm hide' }}</button>
                       <button type="button" class="button--secondary" (click)="cancelNoteRemoval()">Cancel</button>
                     </div>
                   }

@@ -41,8 +41,8 @@ test('Home Pending attention opens Event RSVP and disappears on return and reloa
   await expect(attention).toContainText('RSVP needed');
   await expect(attention).toContainText('2020');
   await expect(attention.getByRole('button', { name: 'Save RSVP' })).toHaveCount(0);
-  // Two routine captures only; verify the existing composition and narrow layout.
-  for (const width of [1440, 390]) {
+  // Verify attention at the Dashboard's desktop, tablet, and mobile breakpoints.
+  for (const width of [1440, 768, 390]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
@@ -62,8 +62,8 @@ test('Home Pending attention opens Event RSVP and disappears on return and reloa
   await page.reload();
   await expect(attention).toContainText('No pending RSVPs or relationship suggestions.');
   await expect(link).toHaveCount(0);
-  // Phase 10: follow the clarified discovery links using keyboard activation at both widths.
-  for (const width of [1440, 390]) {
+  // Follow the discovery links using keyboard activation at all three widths.
+  for (const width of [1440, 768, 390]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
     for (const source of ['/home', '/family']) {
       await page.goto(source);
@@ -75,11 +75,11 @@ test('Home Pending attention opens Event RSVP and disappears on return and reloa
       if (isHome) {
         await expect(updates).toHaveClass(/button-link.*button--secondary|button--secondary.*button-link/);
         await expect(updates).toHaveCSS('border-radius', '10px');
-        await expect(updates).toHaveCSS('border-color', 'rgb(219, 231, 251)');
+        await expect(updates).toHaveCSS('border-color', 'rgb(89, 97, 109)');
         await expect(updates).toHaveCSS('text-decoration-line', 'none');
         await expect(updates.locator('svg')).toHaveAttribute('aria-hidden', 'true');
         await updates.hover();
-        await expect(updates).toHaveCSS('background-color', 'rgb(219, 234, 254)');
+        await expect(updates).toHaveCSS('background-color', 'rgb(48, 54, 62)');
       }
       await updates.focus();
       if (isHome) {
@@ -99,7 +99,7 @@ test('Home Pending attention opens Event RSVP and disappears on return and reloa
         await expect(checkIns).toHaveAttribute('href', '/safety#check-ins');
         await expect(checkIns).toHaveClass(/button-link.*button--secondary|button--secondary.*button-link/);
         await expect(checkIns).toHaveCSS('border-radius', '10px');
-        await expect(checkIns).toHaveCSS('border-color', 'rgb(219, 231, 251)');
+        await expect(checkIns).toHaveCSS('border-color', 'rgb(89, 97, 109)');
         await expect(checkIns).toHaveCSS('text-decoration-line', 'none');
         await expect(checkIns.locator('svg')).toHaveAttribute('aria-hidden', 'true');
       }

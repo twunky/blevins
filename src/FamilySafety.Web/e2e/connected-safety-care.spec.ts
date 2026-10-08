@@ -36,8 +36,14 @@ function post(request: APIRequestContext, actor: Identity, path: string, data: u
 async function actAs(page: Page, actor: Identity, family: Family) {
   await page.goto('/home');
   await page.getByLabel('Active test identity').selectOption(actor.accountId);
+  // Identity switching replaces the route and reloads memberships. Do not use
+  // count() to decide whether a selector exists before that read has finished.
+  await page.waitForLoadState('networkidle');
   const selector = page.getByLabel('Current Family', { exact: true });
-  if (await selector.count()) await selector.selectOption(family.familyGroupId);
+  if (await selector.count()) {
+    await selector.selectOption(family.familyGroupId);
+    await expect(selector).toHaveValue(family.familyGroupId);
+  }
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Safety', exact: true }).click();
   await expect(page.locator('main h1')).toHaveText('Safety');
   await expect(page.locator('app-check-ins')).not.toContainText('Loading Check-Ins');

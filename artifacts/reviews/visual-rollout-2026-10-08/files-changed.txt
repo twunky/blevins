@@ -1,0 +1,29 @@
+ M src/FamilySafety.Web/e2e/connected-safety-care.spec.ts
+ M src/FamilySafety.Web/e2e/home-pending-rsvp.spec.ts
+ M src/FamilySafety.Web/src/app/app.html
+ M src/FamilySafety.Web/src/app/app.ts
+ M src/FamilySafety.Web/src/app/concerns/concerns.scss
+ M src/FamilySafety.Web/src/app/development-session.ts
+ M src/FamilySafety.Web/src/app/events-dashboard.scss
+ M src/FamilySafety.Web/src/app/events/event-needs.html
+ M src/FamilySafety.Web/src/app/events/event-participation.html
+ M src/FamilySafety.Web/src/app/family-dates/shared-family-dates.html
+ M src/FamilySafety.Web/src/app/family-settings.scss
+ M src/FamilySafety.Web/src/app/family.scss
+ M src/FamilySafety.Web/src/app/home.scss
+ M src/FamilySafety.Web/src/app/households/households.html
+ M src/FamilySafety.Web/src/app/incidents/incident-common.scss
+ M src/FamilySafety.Web/src/app/incidents/incident-list.scss
+ M src/FamilySafety.Web/src/app/incidents/incident-timeline.scss
+ M src/FamilySafety.Web/src/app/safety-circles/safety-circles.html
+ M src/FamilySafety.Web/src/app/safety/safety-dashboard.html
+ M src/FamilySafety.Web/src/app/safety/safety-dashboard.scss
+ M src/FamilySafety.Web/src/app/sharing-sessions/sharing-sessions.scss
+ M src/FamilySafety.Web/src/app/trips/trips.html
+ M src/FamilySafety.Web/src/app/trusted-contacts/trusted-contacts.html
+ M src/FamilySafety.Web/src/styles.scss
+?? artifacts/reviews/visual-rollout-2026-10-08/
+?? src/FamilySafety.Web/e2e/visual-design-rollout.spec.ts
+?? src/FamilySafety.Web/src/app/home-shell.scss
+
+The review folder includes README.md, comparison results, screenshot hashes and 29 PNG captures.

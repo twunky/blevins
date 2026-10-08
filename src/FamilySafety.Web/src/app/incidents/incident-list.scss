@@ -8,7 +8,7 @@
   text-align: left; font-weight: 400; color: var(--color-text);
   background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-4);
 }
-.incident-row--open { background: var(--color-primary-soft); border-color: #cfe0fb; }
+.incident-row--open { background: var(--color-primary-soft); border-color: var(--color-border-strong); }
 .incident-row:hover:not(:disabled) { background: var(--color-primary-soft); border-color: var(--color-accent); color: var(--color-text); }
 .incident-row-body { display: grid; flex: 1; gap: var(--space-1); min-width: 0; overflow-wrap: anywhere; }
 .incident-row-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }

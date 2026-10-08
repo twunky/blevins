@@ -63,7 +63,7 @@
         @if (removing() === need.needId) {
           <div class="confirmation">
             <p>Remove “{{ need.title }}” and its responsibility history?</p>
-            <button type="button" [disabled]="busy() || needsRefresh()" (click)="act(need, 'remove')">Confirm remove</button>
+            <button class="button--danger" type="button" [disabled]="busy() || needsRefresh()" (click)="act(need, 'remove')">Confirm remove</button>
             <button type="button" class="button--secondary" [disabled]="busy()" (click)="removing.set(null)">Cancel</button>
           </div>
         }

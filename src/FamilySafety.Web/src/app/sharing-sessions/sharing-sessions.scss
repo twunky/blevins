@@ -1,4 +1,11 @@
 :host { display: block; margin-top: 1rem; min-width: 0; }
+/* Preserve the approved Home summary's measurements. Both routes use the shared palette. */
+:host-context(.app-frame--home) {
+  .card { padding: 24px; }
+  .card-header { flex-wrap: wrap; }
+  a { color: var(--color-accent); display: inline-block; padding-block: 10px; text-underline-offset: 4px; }
+  :is(a, button):focus-visible { outline: 3px solid var(--color-focus); outline-offset: 4px; }
+}
 .session-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-top: 1.25rem; }
 form { display: grid; gap: .65rem; margin-top: 1rem; }
 fieldset { min-width: 0; border: 1px solid var(--color-border); border-radius: .75rem; padding: 1rem; }

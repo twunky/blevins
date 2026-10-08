@@ -12,12 +12,13 @@
 /* Me / Settings: card grid */
 .profile-form { display: grid; gap: var(--space-4); grid-template-columns: minmax(0, 1fr); }
 .profile-form .card-header { margin-bottom: var(--space-2); }
-.profile-form .field:first-of-type { margin-top: var(--space-2); }
+.profile-form > .form-section > .field:first-of-type { margin-top: var(--space-2); }
 .action-bar { margin: 0; }
 .profile-review-intro { align-items: center; display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: space-between; }
 .profile-review-end { margin-top: var(--space-2); }
 
-@media (min-width: 64rem) {
+/* Keep the birthday's three fields inside the card at sidebar widths. */
+@media (min-width: 80rem) {
   .profile-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .profile-contact, .action-bar { grid-column: 1 / -1; }
 }

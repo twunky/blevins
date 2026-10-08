@@ -1,0 +1,8 @@
+/* Home keeps its approved link, focus, and selector measurements. The shell and
+   palette now live in styles.scss for every application area. */
+.app-frame--home {
+  a:not(.nav-button):not(.button-link) { color: var(--color-accent); }
+  button.link-button { font-size: 0.875rem; padding-inline: 8px; }
+  :is(a, button, select):focus-visible { outline: 3px solid var(--color-focus); outline-offset: 4px; }
+  :is(input, select, textarea) { min-height: 2.6rem; }
+}

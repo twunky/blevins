@@ -29,7 +29,7 @@
         <h3>{{ row.name }}</h3>
         <ul>
           @for (member of row.members; track member.profileId) {
-            <li>{{ member.displayName }} <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="removeMember(row, member.profileId)" [attr.aria-label]="'Remove ' + member.displayName + ' from ' + row.name">Remove member</button></li>
+            <li>{{ member.displayName }} <button type="button" class="button--danger button--secondary" [disabled]="busy() || formOpen()" (click)="removeMember(row, member.profileId)" [attr.aria-label]="'Remove ' + member.displayName + ' from ' + row.name">Remove member</button></li>
           } @empty { <li>No members selected yet.</li> }
         </ul>
         <label [for]="'circle-member-' + row.safetyCircleId">Add eligible Family member to {{ row.name }}</label>
@@ -43,7 +43,7 @@
         </div>
         @if (removing() === row.safetyCircleId) {
           <p>Delete {{ row.name }} permanently? Existing Check-Ins and Sharing Sessions keep their own recipients.</p>
-          <div class="actions"><button type="button" [disabled]="busy()" (click)="deleteCircle(row)">Confirm circle deletion</button>
+          <div class="actions"><button class="button--danger" type="button" [disabled]="busy()" (click)="deleteCircle(row)">Confirm circle deletion</button>
           <button type="button" class="button--secondary" [disabled]="busy()" (click)="removing.set(null)">Cancel circle deletion</button></div>
         }
       </article>
