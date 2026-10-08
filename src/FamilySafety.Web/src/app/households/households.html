@@ -1,7 +1,7 @@
 <section class="card households" aria-labelledby="households-heading">
   <div class="card-header"><h2 id="households-heading">Households</h2></div>
   <p>Household grouping helps organize members of this Family. Households do not change Family access or sharing permissions.</p>
-  @if (message()) { <p role="status">{{ message() }}</p> }
+  @if (message()) { <p class="message--success" role="status">{{ message() }}</p> }
   @if (error()) { <p role="alert">{{ error() }}</p> }
   @if (state() === 'loading') { <p role="status">Loading Households...</p> }
   @else if (state() === 'error') {
@@ -28,19 +28,33 @@
     @for (row of data.households; track row.householdId) {
       <article class="household-row" [attr.aria-label]="row.name">
         <h3>{{ row.name }}</h3>
-        <ul>
+        <h4>Current members ({{ row.members.length }})</h4>
+        <ul class="member-list">
           @for (member of row.members; track member.profileId) {
             <li>{{ member.displayName }}
-              @if (data.canManage) { <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="unassign(row, member.profileId)" [attr.aria-label]="'Unassign ' + member.displayName + ' from ' + row.name">Unassign member</button> }
+              @if (data.canManage) { <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="unassign(row, member.profileId)" [attr.aria-label]="'Remove ' + member.displayName + ' from ' + row.name">Remove from Household</button> }
             </li>
           } @empty { <li>No members assigned.</li> }
         </ul>
         @if (data.canManage) {
-          <label [for]="'household-member-' + row.householdId">Assign or move a member to {{ row.name }}</label>
-          <select #member [id]="'household-member-' + row.householdId" [disabled]="busy() || formOpen()" (change)="assign(row, member.value); member.value = ''">
-            <option value="">Choose a Family member</option>
-            @for (person of choices(row); track person.profileId) { <option [value]="person.profileId">{{ person.label }}</option> }
-          </select>
+          <section class="member-management" [attr.aria-label]="'Manage Members in ' + row.name">
+            <h4>Manage Members</h4>
+            <p class="help">Add an existing active adult member of this Family. Choosing someone from another Household moves them here.</p>
+            @if (choices(row).length) {
+              <label [for]="'household-member-' + row.householdId">Family member to add to {{ row.name }}</label>
+              <select [id]="'household-member-' + row.householdId" [disabled]="busy() || formOpen()"
+                [ngModel]="memberSelections()[row.householdId] ?? ''" (ngModelChange)="selectMember(row, $event)" [ngModelOptions]="{ standalone: true }">
+                <option value="">Choose a Family member</option>
+                @for (person of choices(row); track person.profileId) { <option [value]="person.profileId">{{ person.label }}</option> }
+              </select>
+              @if (selectedSource(row); as source) { <p class="help">This member will move from {{ source.name }} to {{ row.name }}.</p> }
+              <div class="actions">
+                <button type="button" [disabled]="busy() || formOpen() || !memberSelections()[row.householdId]" (click)="addSelectedMember(row)">
+                  {{ selectedSource(row) ? 'Move Member' : 'Add Member' }}
+                </button>
+              </div>
+            } @else { <p>All eligible Family members already belong to {{ row.name }}.</p> }
+          </section>
           <div class="actions">
             <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="open(row)">Rename Household</button>
             <button type="button" class="button--secondary" [disabled]="busy() || formOpen()" (click)="removing.set(row.householdId)">Delete Household</button>

@@ -23,6 +23,7 @@ export class Households implements OnChanges {
   protected readonly removing = signal<string | null>(null);
   protected readonly message = signal('');
   protected readonly error = signal('');
+  protected readonly memberSelections = signal<Record<string, string>>({});
   protected name = '';
 
   ngOnChanges(): void { this.refresh(); }
@@ -39,7 +40,7 @@ export class Households implements OnChanges {
     });
   }
 
-  protected cancel(): void { this.formOpen.set(false); this.editing.set(null); this.removing.set(null); this.name = ''; }
+  protected cancel(): void { this.formOpen.set(false); this.editing.set(null); this.removing.set(null); this.memberSelections.set({}); this.name = ''; }
   private canMutate(): boolean { return this.state() === 'ready' && !!this.structure()?.canManage && !this.busy(); }
   protected open(row: Household | null = null): void {
     if (!this.canMutate()) return;
@@ -61,16 +62,33 @@ export class Households implements OnChanges {
         h.members.map(m => ({ profileId: m.profileId, label: m.displayName + ' (from ' + h.name + ')' })))];
   }
 
+  protected selectMember(row: Household, profileId: string): void {
+    this.memberSelections.update(selections => ({ ...selections, [row.householdId]: profileId }));
+  }
+
+  protected selectedSource(row: Household): Household | undefined {
+    const profileId = this.memberSelections()[row.householdId];
+    return this.structure()?.households.find(h => h.members.some(m => m.profileId === profileId));
+  }
+
+  protected addSelectedMember(row: Household): void {
+    const profileId = this.memberSelections()[row.householdId];
+    if (this.formOpen() || !this.choices(row).some(person => person.profileId === profileId)) return;
+    this.assign(row, profileId);
+  }
+
   protected assign(row: Household, profileId: string): void {
     if (!profileId || !this.canMutate()) return;
     const source = this.structure()?.households.find(h => h.members.some(m => m.profileId === profileId));
+    const member = [...(this.structure()?.unassignedMembers ?? []), ...(source?.members ?? [])].find(m => m.profileId === profileId);
     this.mutate(this.http.post(this.url + '/' + row.householdId + '/members', {
       version: row.version, profileId, currentHouseholdId: source?.householdId ?? null, sourceVersion: source?.version ?? null,
-    }), source ? 'Member moved.' : 'Member assigned.');
+    }), source ? `${member?.displayName} moved from ${source.name} to ${row.name}.` : `${member?.displayName} added to ${row.name}.`);
   }
 
   protected unassign(row: Household, profileId: string): void {
-    this.mutate(this.http.delete(this.url + '/' + row.householdId + '/members/' + profileId + '?version=' + row.version), 'Member is now unassigned.');
+    this.mutate(this.http.delete(this.url + '/' + row.householdId + '/members/' + profileId + '?version=' + row.version),
+      `${row.members.find(m => m.profileId === profileId)?.displayName} removed from ${row.name}. They remain in this Family and are now unassigned.`);
   }
 
   protected deleteHousehold(row: Household): void {

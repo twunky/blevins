@@ -30,6 +30,9 @@ describe('Household organization (WI-095-010)', () => {
   function assign(household: string, profile = 'member') {
     const select = root().querySelector<HTMLSelectElement>('#household-member-' + household)!;
     select.value = profile; select.dispatchEvent(new Event('change')); fixture.detectChanges();
+    const row = select.closest('article')!;
+    [...row.querySelectorAll<HTMLButtonElement>('button')].find(b => /^(Add|Move) Member$/.test(b.textContent!.trim()))!.click();
+    fixture.detectChanges();
   }
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [Households], providers: [provideHttpClient(), provideHttpClientTesting()] }).compileComponents();
@@ -74,13 +77,14 @@ describe('Household organization (WI-095-010)', () => {
     assign('b'); const move = http.expectOne(path + '/b/members');
     expect(move.request.body).toEqual({ version: 'vb', profileId: 'member', currentHouseholdId: 'a', sourceVersion: 'va2' });
     move.flush(null); read({ ...view, households: [a, { ...b, version: 'vb2', members: [member] }], unassignedMembers: [] });
-    expect(text()).toContain('Member moved');
+    expect(text()).toContain('Pat moved from Home A to Home B');
   });
 
   it('unassigns and confirms permanent deletion while keeping member organization', () => {
     create(); read({ ...view, households: [{ ...a, members: [member] }, b], unassignedMembers: [] });
-    button('Unassign member').click(); const remove = http.expectOne(path + '/a/members/member?version=va');
-    expect(remove.request.method).toBe('DELETE'); remove.flush(null); read(); expect(text()).toContain('Member is now unassigned');
+    button('Remove from Household').click(); const remove = http.expectOne(path + '/a/members/member?version=va');
+    expect(remove.request.method).toBe('DELETE'); remove.flush(null); read(); expect(text()).toContain('Pat removed from Home A');
+    expect(text()).toContain('They remain in this Family and are now unassigned');
     button('Delete Household').click(); fixture.detectChanges();
     expect(text()).toContain('remain in this Family'); http.expectNone(r => r.method === 'DELETE');
     button('Cancel Household deletion').click(); fixture.detectChanges(); expect(button('Confirm Household deletion')).toBeUndefined();
@@ -95,6 +99,33 @@ describe('Household organization (WI-095-010)', () => {
     root().querySelector('form')!.dispatchEvent(new Event('submit'));
     http.expectOne(path).flush({ code: 'DuplicateHouseholdName' }, { status: 409, statusText: 'Conflict' }); fixture.detectChanges();
     expect(text()).toContain('already has a Household'); expect(root().querySelector('form')).not.toBeNull();
+  });
+
+  it('requires an explicit Add Member action, disables it during saving, and clears selection after the authoritative reload', async () => {
+    create(); read(); await fixture.whenStable(); fixture.detectChanges();
+    expect(button('Add Member').disabled).toBe(true);
+    const select = root().querySelector<HTMLSelectElement>('#household-member-a')!;
+    select.value = 'member'; select.dispatchEvent(new Event('change')); fixture.detectChanges();
+    http.expectNone(r => r.method === 'POST'); expect(button('Add Member').disabled).toBe(false);
+    button('Add Member').click(); fixture.detectChanges(); expect(button('Add Member').disabled).toBe(true);
+    http.expectOne(path + '/a/members').flush(null);
+    read({ ...view, households: [{ ...a, version: 'va2', members: [member] }, b], unassignedMembers: [] });
+    await fixture.whenStable(); fixture.detectChanges();
+    expect(text()).toContain('Pat added to Home A');
+    expect(text()).toContain('All eligible Family members already belong to Home A');
+    expect(root().querySelector<HTMLSelectElement>('#household-member-b')!.value).toBe('');
+    expect(button('Add Member').disabled).toBe(true);
+    expect(root().querySelector('#household-member-b')!.textContent).toContain('Pat (from Home A)');
+  });
+
+  it('discards selected members on Family changes without sending an assignment', async () => {
+    create(); read(); await fixture.whenStable(); fixture.detectChanges();
+    const select = root().querySelector<HTMLSelectElement>('#household-member-a')!;
+    select.value = 'member'; select.dispatchEvent(new Event('change')); fixture.detectChanges();
+    fixture.componentRef.setInput('familyId', 'family-b'); fixture.detectChanges(); read(view, 'family-b');
+    await fixture.whenStable(); fixture.detectChanges();
+    expect(root().querySelector<HTMLSelectElement>('#household-member-a')!.value).toBe('');
+    expect(button('Add Member').disabled).toBe(true); http.expectNone(r => r.method === 'POST');
   });
 
   for (const status of [409, 404, 500]) {
