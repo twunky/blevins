@@ -35,7 +35,7 @@
     </nav>
   }
 
-  <main class="app-main" [class.app-main--activities]="currentArea() === 'activities'" [class.app-main--family]="view() === 'family'" [class.app-main--profile]="view() === 'profile'" [class.app-main--safety]="view() === 'safety'" aria-labelledby="profile-title">
+  <main class="app-main" [class.app-main--activities]="currentArea() === 'activities'" [class.app-main--family]="view() === 'family'" [class.app-main--family-secondary]="view() === 'familySettings' || view() === 'memberProfile'" [class.app-main--profile]="view() === 'profile'" [class.app-main--safety]="view() === 'safety'" [class.app-main--safety-secondary]="view() === 'concerns' || view() === 'concernItem' || view() === 'incidents'" aria-labelledby="profile-title">
     @if (view() === 'familySettings') {
       <p class="family-back"><a class="family-back-link" routerLink="/family" [state]="focusHeadingState"><app-icon name="back" />Back to Family</a></p>
     }

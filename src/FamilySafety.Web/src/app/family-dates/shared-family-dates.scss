@@ -1,4 +1,5 @@
 :host { display: block; min-width: 0; }
+:host-context(.app-main--family-secondary) .family-dates { background: linear-gradient(145deg, #11181e, #0b1014 80%); }
 .family-dates, form, .date-row, .confirmation { display: grid; gap: var(--space-3); }
 h2, h3, p { margin: 0; }
 .date-row { padding-block: var(--space-3); border-bottom: 1px solid var(--color-border); }
@@ -6,6 +7,8 @@ h2, h3, p { margin: 0; }
 .description { white-space: pre-wrap; }
 .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
 form { min-width: 0; }
+form { gap: var(--space-2); border-top: 1px solid var(--color-border); padding-top: var(--space-4); }
+form > :is(label, fieldset, .actions) { margin-top: var(--space-2); }
 input:not([type='checkbox']), textarea { width: 100%; min-width: 0; box-sizing: border-box; }
 fieldset { min-width: 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); }
 .person-choice { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-2); }

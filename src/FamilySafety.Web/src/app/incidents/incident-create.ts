@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { Subscription, finalize } from 'rxjs';
 import { FamilyMember, Incident, IncidentApi, IncidentSummary } from './incident-api';
 import { IncidentProvenanceFields } from './incident-provenance-fields';
 import {
@@ -32,7 +33,7 @@ const fieldMessages: FieldErrors = {
   templateUrl: './incident-create.html',
   styleUrls: ['./incident-common.scss', './incident-forms.scss', './incident-create.scss'],
 })
-export class IncidentCreate implements OnInit {
+export class IncidentCreate implements OnInit, OnChanges {
   @Input() familyGroupId: string | null = null;
   @Input() familyName = '';
   @Input() ownProfileId: string | null = null;
@@ -42,6 +43,8 @@ export class IncidentCreate implements OnInit {
   @Output() readonly showList = new EventEmitter<void>();
 
   private readonly api = inject(IncidentApi);
+  private readonly destroyRef = inject(DestroyRef);
+  private memberRead?: Subscription;
 
   protected readonly members = signal<readonly FamilyMember[]>([]);
   protected readonly loadingMembers = signal(false);
@@ -65,11 +68,27 @@ export class IncidentCreate implements OnInit {
     focusById('create-incident-heading');
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const family = changes['familyGroupId'];
+    if (family && !family.firstChange) {
+      // Direct entry may receive its Family after initialization. A later switch
+      // must discard choices/selections from the previous Family before reading.
+      this.form.controls.subjectProfileId.setValue('');
+      this.peopleIds.set([]);
+      this.loadMembers();
+    }
+  }
+
   protected loadMembers(): void {
+    this.memberRead?.unsubscribe();
+    this.members.set([]);
+    this.membersError.set('');
+    this.loadingMembers.set(false);
     if (!this.familyGroupId) return;
     this.loadingMembers.set(true);
-    this.membersError.set('');
-    this.api.members(this.familyGroupId).pipe(finalize(() => this.loadingMembers.set(false))).subscribe({
+    this.memberRead = this.api.members(this.familyGroupId).pipe(
+      takeUntilDestroyed(this.destroyRef), finalize(() => this.loadingMembers.set(false)),
+    ).subscribe({
       next: members => {
         this.members.set(members);
         const subject = this.origin?.subjectProfileId;

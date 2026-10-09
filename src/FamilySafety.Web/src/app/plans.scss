@@ -6,6 +6,7 @@
 .plans-fact dt { color: var(--color-muted); }
 .plans-fact dt::after { content: ':'; }
 .plans-fact dd { font-weight: 650; margin: 0; }
+.plans-fact { min-width: 0; max-width: 100%; flex-wrap: wrap; overflow-wrap: anywhere; }
 .plans-note { background: var(--color-surface-soft); border-radius: var(--radius-sm); margin: var(--space-3) 0 0 calc(4rem + var(--space-3)); overflow-wrap: anywhere; padding: var(--space-3); }
 .plans-card-kicker { color: var(--color-muted); font-size: 0.74rem; font-weight: 750; letter-spacing: 0.06em; margin: 0 0 var(--space-1); text-transform: uppercase; }
 .plan-notes { line-height: 1.55; margin: 0; white-space: pre-wrap; }

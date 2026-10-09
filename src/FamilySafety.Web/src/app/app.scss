@@ -8,6 +8,7 @@
 :is(.context-prompt, .home-no-family) { display: grid; gap: var(--space-3); justify-items: start; }
 :is(.context-prompt, .home-no-family) p { margin: 0; }
 .home-no-family { max-width: 44rem; }
+.app-main--safety-secondary, .app-frame--focused .app-main { background: radial-gradient(ellipse at 40% 0, #04141e 0, transparent 55%); }
 
 /* Me / Settings: one cohesive form using the established Family surfaces. */
 .app-main.app-main--profile { background: radial-gradient(ellipse at 40% 0, #04141e 0, transparent 55%); }

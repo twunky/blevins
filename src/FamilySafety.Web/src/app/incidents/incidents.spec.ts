@@ -201,6 +201,83 @@ describe('Incident creation', () => {
     fixture.detectChanges();
   }
 
+  it('loads authorized choices when the Family arrives after creation initialization', () => {
+    const fixture = TestBed.createComponent(IncidentCreate);
+    fixture.componentRef.setInput('familyGroupId', null);
+    fixture.componentRef.setInput('ownProfileId', aId);
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    http.expectNone(request => request.url.endsWith('/members'));
+    type(control<HTMLTextAreaElement>(root, 'Why are you starting this Incident?'), 'Draft reason');
+    fixture.componentRef.setInput('familyGroupId', groupId);
+    fixture.detectChanges();
+    const read = http.expectOne(`/api/family-groups/${groupId}/members`);
+    expect(text(root)).toContain('Loading active adult family members');
+    expect(button(root, 'Create Incident')!.disabled).toBe(true);
+    expect(group(root, 'People with access').querySelectorAll('input')).toHaveLength(0);
+    read.flush(members);
+    fixture.detectChanges();
+    expect(Array.from(control<HTMLSelectElement>(root, 'Who is this Incident about?').options).map(option => text(option)))
+      .toEqual(['Choose a person', 'Adult A (you)', 'Adult B', 'Adult C']);
+    expect(control<HTMLTextAreaElement>(root, 'Why are you starting this Incident?').value).toBe('Draft reason');
+    expect(button(root, 'Create Incident')!.disabled).toBe(false);
+    http.expectNone(request => request.method === 'POST');
+  });
+
+  for (const status of [401, 404, 500]) {
+    it(`keeps member choices unavailable on ${status} and retries the authorized read`, () => {
+      const fixture = TestBed.createComponent(IncidentCreate);
+      fixture.componentRef.setInput('familyGroupId', null);
+      fixture.componentRef.setInput('ownProfileId', aId);
+      fixture.detectChanges();
+      fixture.componentRef.setInput('familyGroupId', groupId);
+      fixture.detectChanges();
+      http.expectOne(`/api/family-groups/${groupId}/members`).flush({}, { status, statusText: 'Read failed' });
+      fixture.detectChanges();
+      const root = fixture.nativeElement as HTMLElement;
+      expect(root.querySelector('[role="alert"]')).not.toBeNull();
+      expect(button(root, 'Create Incident')!.disabled).toBe(true);
+      expect(group(root, 'People with access').querySelectorAll('input')).toHaveLength(0);
+      expect(text(root)).not.toContain('Adult B');
+      button(root, 'Retry loading family members')!.click();
+      fixture.detectChanges();
+      http.expectOne(`/api/family-groups/${groupId}/members`).flush([members[0], members[1]]);
+      fixture.detectChanges();
+      expect(text(root)).not.toContain('Adult C');
+      expect(control<HTMLSelectElement>(root, 'Who is this Incident about?').options.length).toBe(3);
+      http.expectNone(request => request.method === 'POST');
+    });
+  }
+
+  it('cancels old Family reads, clears old choices and selections, and stops reading on destruction', () => {
+    const { root, fixture } = start();
+    type(control<HTMLSelectElement>(root, 'Who is this Incident about?'), bId);
+    control(root, /^Adult B/).click();
+    fixture.componentRef.setInput('familyGroupId', otherGroupId);
+    fixture.detectChanges();
+    const pending = http.expectOne(`/api/family-groups/${otherGroupId}/members`);
+    expect(control<HTMLSelectElement>(root, 'Who is this Incident about?').value).toBe('');
+    expect(group(root, 'People with access').querySelectorAll('input')).toHaveLength(0);
+    fixture.componentRef.setInput('familyGroupId', null);
+    fixture.detectChanges();
+    expect(pending.cancelled).toBe(true);
+    expect(text(root)).not.toContain('Adult B');
+    fixture.componentRef.setInput('familyGroupId', groupId);
+    fixture.detectChanges();
+    const current = http.expectOne(`/api/family-groups/${groupId}/members`);
+    current.flush(members);
+    fixture.detectChanges();
+    expect(Array.from(group(root, 'People with access').querySelectorAll<HTMLInputElement>('input')).every(box => !box.checked)).toBe(true);
+    button(root, 'Create Incident')!.click();
+    fixture.detectChanges();
+    http.expectNone(request => request.method === 'POST');
+    fixture.componentRef.setInput('familyGroupId', otherGroupId);
+    fixture.detectChanges();
+    const destroyedRead = http.expectOne(`/api/family-groups/${otherGroupId}/members`);
+    fixture.destroy();
+    expect(destroyedRead.cancelled).toBe(true);
+  });
+
   it('offers self as subject, excludes the creator from people, and preselects nobody', () => {
     const { root } = start();
     const subjectOptions = Array.from(control<HTMLSelectElement>(root, 'Who is this Incident about?').options).map(option => text(option));

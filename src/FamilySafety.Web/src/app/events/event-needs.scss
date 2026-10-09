@@ -7,5 +7,7 @@ h2, h3, p { margin: 0; }
 .item-row > strong { flex: 1; min-width: 0; }
 .status-pill { padding: 0.25rem 0.65rem; background: var(--color-primary-soft); color: var(--color-primary-strong); }
 .assignment, form { max-width: 36rem; }
+form { gap: var(--space-2); border-top: 1px solid var(--color-border); padding-top: var(--space-4); }
+form > :is(label, .actions) { margin-top: var(--space-2); }
 .needs > button, .assignment > button { justify-self: start; }
 summary { cursor: pointer; padding-block: var(--space-2); }
