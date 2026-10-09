@@ -4,7 +4,7 @@
  * the server authorizes it, and only then does the shell decide the Family context.
  */
 
-export type ItemKind = 'event' | 'plan' | 'trip' | 'concern' | 'incident';
+export type ItemKind = 'event' | 'plan' | 'trip' | 'concern' | 'incident' | 'member';
 
 /**
  * The shell's Family decision for an item the server has just returned (200):
@@ -15,8 +15,8 @@ export type ItemKind = 'event' | 'plan' | 'trip' | 'concern' | 'incident';
  */
 export type ItemFamilyOutcome = 'current' | 'switched' | 'retained' | 'unavailable';
 
-/** Call only with the FamilyGroupId of an item the server has just returned. Hosts render after it resolves. */
-export type AdoptItemFamily = (familyGroupId: string, kind: ItemKind) => Promise<ItemFamilyOutcome>;
+/** Call only after authorized reads. An optional generation guard prevents a departed member view adopting context after a pending membership read. */
+export type AdoptItemFamily = (familyGroupId: string, kind: ItemKind, isCurrent?: () => boolean) => Promise<ItemFamilyOutcome>;
 
 const guidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

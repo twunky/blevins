@@ -1,3 +1,21 @@
+@if (summary) {
+<section class="card family-summary" aria-labelledby="household-summary-heading">
+  <div class="card-header"><span class="card-icon"><app-icon name="home" /></span><div><h2 id="household-summary-heading">Households</h2><p class="card-sub">Manage family households and see which members are part of each.</p></div><a class="summary-view-all" routerLink="/family/settings" fragment="household-management" [state]="focusHeadingState">View all<span class="visually-hidden"> Households</span><app-icon name="chevron" /></a></div>
+  @if (state() === 'loading') { <p role="status">Loading Households...</p> }
+  @else if (state() === 'error') { <p role="alert">Households could not be loaded.</p><button type="button" class="button--secondary" (click)="refresh()">Retry loading Households</button> }
+  @else if (state() === 'unavailable') { <p>Household organization is unavailable.</p> }
+  @else if (structure(); as data) {
+    <ul class="summary-list">
+      @for (row of data.households.slice(0, 4); track row.householdId) {
+        <li><a class="household-summary-row" routerLink="/family/settings" fragment="household-management" [state]="focusHeadingState">
+          <span class="household-symbol"><app-icon name="home" /></span><span class="summary-copy"><strong>{{ row.name }}</strong><span>{{ row.members.length }} {{ row.members.length === 1 ? 'member' : 'members' }}</span></span>
+          <span class="household-avatars" aria-hidden="true">@for (member of row.members.slice(0, 4); track member.profileId) { <span class="avatar">{{ initials(member.displayName) }}</span> }@if (row.members.length > 4) { <span class="avatar">+{{ row.members.length - 4 }}</span> }</span><app-icon name="chevron" />
+        </a></li>
+      } @empty { <li class="summary-empty">No Households have been created yet.@if (data.canManage) { <a routerLink="/family/settings" fragment="household-management" [state]="focusHeadingState">Manage Households</a> }</li> }
+    </ul>
+  }
+</section>
+} @else {
 <section class="card households" aria-labelledby="households-heading">
   <div class="card-header"><h2 id="households-heading">Households</h2></div>
   <p>Household grouping helps organize members of this Family. Households do not change Family access or sharing permissions.</p>
@@ -74,3 +92,5 @@
     </section>
   }
 </section>
+
+}

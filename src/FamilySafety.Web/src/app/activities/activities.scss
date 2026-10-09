@@ -1,0 +1,42 @@
+:host { display: block; min-width: 0; }
+.activity-tools, .activity-layout { display: grid; grid-template-columns: minmax(0, 2.5fr) minmax(16rem, 1fr); gap: 1.25rem; }
+.activity-tools { margin-bottom: 1.5rem; }
+.activity-filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; }
+.activity-filters button { gap: .65rem; min-height: 3.25rem; }
+.activity-filters button[aria-pressed=true] { border-color: var(--color-primary); color: var(--color-primary); background: #06212a; }
+.activity-filters span, .activity-card-heading > span { background: var(--color-surface-soft); padding: .2rem .55rem; border-radius: 2rem; }
+.activity-search input { height: 3.25rem; width: 100%; }
+.activity-list-heading, .activity-card-heading { display: flex; align-items: center; gap: .75rem; }
+.activity-list-heading { justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; }
+h2 { font-size: 1.2rem; margin: 0; }
+.activity-list-heading label { display: flex; align-items: center; gap: .5rem; color: var(--color-muted); font-size: .9rem; }
+.activity-list-heading select { width: auto; }
+.activity-list, .activity-pending { list-style: none; padding: 0; margin: 0; }
+.activity-list { display: grid; gap: .75rem; }
+.activity-row { display: grid; grid-template-columns: 4rem 7rem minmax(0, 1fr) 1.25rem; align-items: center; gap: 1.25rem; padding: 1rem; min-height: 7.5rem; color: var(--color-text); text-decoration: none; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+.activity-row:hover { border-color: var(--color-primary); background: var(--color-surface-soft); }
+.activity-date { display: grid; text-align: center; padding: .65rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-soft); }
+.activity-date small { color: var(--color-muted); }
+.activity-date strong { font-size: 1.8rem; line-height: 1.4; }
+.activity-badge { display: inline-flex; align-items: center; gap: .5rem; padding: .75rem; border: 1px solid currentColor; border-radius: var(--radius-md); font-size: .9rem; width: fit-content; }
+.activity-event { color: #64e7ff; background: #082637; }
+.activity-plan { color: #51e7a0; background: #072b1d; }
+.activity-trip { color: #d895ff; background: #28123a; }
+.activity-copy { display: grid; gap: .45rem; overflow-wrap: anywhere; }
+.activity-copy strong { font-size: 1.2rem; }
+.activity-row .activity-copy strong, .activity-date strong { color: var(--color-text); }
+.activity-copy > span { color: var(--color-muted); font-size: .9rem; }
+.activity-sidebar { display: grid; gap: 1.25rem; align-content: start; }
+.activity-sidebar .card { padding: 1rem; }
+.activity-card-heading > app-icon { color: var(--color-primary); }
+.activity-card-heading > span { margin-left: auto; }
+.activity-pending { margin-top: 1rem; }
+.activity-pending li { padding: 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.activity-empty { text-align: center; padding: 2rem 1rem; color: var(--color-muted); }
+.activity-empty app-icon { display: block; width: 20px; color: var(--color-primary); margin: 1.5rem auto; transform: scale(2); }
+.activity-empty h3 { color: var(--color-text); }
+.activity-empty p { line-height: 1.6; }
+.activity-caption { color: var(--color-muted); font-size: .85rem; }
+.activity-insight { display: flex; align-items: center; gap: 1rem; margin-top: .8rem; }
+@media (max-width: 65rem) { .activity-tools, .activity-layout { grid-template-columns: minmax(0, 1fr); } .activity-sidebar { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 40rem) { .activity-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } .activity-sidebar { grid-template-columns: minmax(0, 1fr); } .activity-row { grid-template-columns: 3.5rem minmax(0, 1fr) 1.25rem; gap: .75rem; } .activity-badge { grid-column: 2; padding: .35rem .6rem; } .activity-date { grid-row: 1 / 3; } .activity-copy { grid-column: 2; } .activity-row > app-icon { grid-column: 3; grid-row: 1 / 3; } }

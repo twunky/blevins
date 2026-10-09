@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
 import { routes } from './app.routes';
@@ -104,6 +104,87 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
   const selector = (harness: RouterTestingHarness) => root(harness).querySelector<HTMLSelectElement>('#current-family')!;
   const retryButton = (harness: RouterTestingHarness, name: string) =>
     Array.from(root(harness).querySelectorAll('button')).find(button => button.textContent?.trim() === name);
+
+  describe.each([
+    { kind: 'Event', path: 'events', title: 'Lake picnic', form: '.events-edit-form',
+      item: (editable: boolean) => eventView(one.familyGroupId, editable) },
+    { kind: 'Plan', path: 'plans', title: 'Hike to the falls', form: 'form[aria-label="Correct activity and timing"]',
+      item: (editable: boolean) => ({ ...planView(one.familyGroupId), creatorProfileId: ownProfile.profileId, canCorrectActivityTiming: editable }) },
+    { kind: 'Trip', path: 'trips', title: 'Coast drive', form: '.trip-form',
+      item: (editable: boolean) => ({ ...tripView(one.familyGroupId), canEdit: editable }) },
+  ])('$kind direct edit route', ({ kind, path, title, form, item }) => {
+    const detailUrl = `/${path}/${itemId}`;
+    const editUrl = `${detailUrl}/edit`;
+
+    async function openEdit() {
+      const harness = await RouterTestingHarness.create(editUrl);
+      shellReads().flush([one]);
+      familyReads(one);
+      await settle(harness);
+      expect(TestBed.inject(Router).url).toBe(editUrl);
+      expect(root(harness).querySelector(form)).toBeNull();
+      expect(root(harness).textContent).not.toContain(title);
+      expect(root(harness).textContent).toContain(`Loading ${kind}`);
+      return harness;
+    }
+
+    it('keeps an editable item on Edit with its prefilled form', async () => {
+      const harness = await openEdit();
+      http.expectOne(`/api/${path}/${itemId}`).flush(item(true));
+      await settle(harness);
+      await settle(harness);
+      expect(TestBed.inject(Router).url).toBe(editUrl);
+      expect(root(harness).querySelector(form)).not.toBeNull();
+      expect(root(harness).querySelector<HTMLInputElement>(`${form} input`)?.value).toBe(title);
+    });
+
+    it('replaces a viewable noneditable edit URL with the read-only detail route', async () => {
+      const harness = await openEdit();
+      http.expectOne(`/api/${path}/${itemId}`).flush(item(false));
+      await settle(harness);
+      await settle(harness);
+      expect(TestBed.inject(Router).url).toBe(detailUrl);
+      expect(root(harness).querySelector(form)).toBeNull();
+      shellReads().flush([one]);
+      familyReads(one);
+      harness.detectChanges();
+      http.expectOne(`/api/${path}/${itemId}`).flush(item(false));
+      await settle(harness);
+      await settle(harness);
+      if (path === 'trips') http.expectOne(`/api/trips/${itemId}/notes`).flush([]);
+      harness.detectChanges();
+      expect(itemHeading(harness)).toBe(title);
+      expect(root(harness).querySelector('h1')?.textContent).toBe(kind + 's');
+      expect(root(harness).querySelector(form)).toBeNull();
+    });
+
+    it('keeps an unavailable item on the generic unavailable screen without details', async () => {
+      const harness = await openEdit();
+      http.expectOne(`/api/${path}/${itemId}`).flush(null, { status: 404, statusText: 'Not Found' });
+      await settle(harness);
+      expect(TestBed.inject(Router).url).toBe(editUrl);
+      expect(itemHeading(harness)).toBe(`This ${kind} is unavailable`);
+      expect(root(harness).querySelector(form)).toBeNull();
+      expect(root(harness).textContent).not.toContain(title);
+    });
+  });
+
+  it('waits for the owner profile before deciding a directly opened Plan edit route', async () => {
+    const harness = await RouterTestingHarness.create(`/plans/${itemId}/edit`);
+    const profileRead = http.expectOne('/api/profile');
+    http.expectOne('/api/family-groups/administered').flush([]);
+    http.expectOne('/api/family-groups/mine').flush([one]);
+    familyReads(one);
+    http.expectOne(`/api/plans/${itemId}`).flush({ ...planView(one.familyGroupId),
+      creatorProfileId: ownProfile.profileId, canCorrectActivityTiming: true });
+    await settle(harness);
+    expect(TestBed.inject(Router).url).toBe(`/plans/${itemId}/edit`);
+    expect(root(harness).querySelector('form[aria-label="Correct activity and timing"]')).toBeNull();
+    profileRead.flush(ownProfile);
+    await settle(harness);
+    expect(TestBed.inject(Router).url).toBe(`/plans/${itemId}/edit`);
+    expect(root(harness).querySelector<HTMLInputElement>('#plan-correction-activity')?.value).toBe('Hike to the falls');
+  });
 
   it('accepts only GUID item IDs', () => {
     expect(isItemId(itemId)).toBe(true);
@@ -329,7 +410,7 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
     const article = root(harness).querySelector('article.item-detail')!;
     expect(article.textContent).toContain('Trail map in the car');
     expect(article.querySelectorAll('button, a')).toHaveLength(0);
-    expect(root(harness).querySelector('a.item-back')?.getAttribute('href')).toBe('/plans');
+    expect(root(harness).querySelector('a.item-back')?.getAttribute('href')).toBe('/activities');
   });
 
   async function openCorrectionPlan(eligible = true, creator = ownProfile.profileId) {
@@ -354,6 +435,98 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
     input.value = value; input.dispatchEvent(new Event('input'));
   }
 
+  async function openPlanEditForFeedback() {
+    const harness = await visit(`/plans/${itemId}/edit`);
+    shellReads().flush([one]);
+    familyReads(one);
+    const plan = { ...planView(one.familyGroupId), creatorProfileId: ownProfile.profileId, canCorrectActivityTiming: true };
+    http.expectOne(`/api/plans/${itemId}`).flush(plan);
+    await settle(harness);
+    const article = root(harness).querySelector('article[aria-label="Plan details"]')!;
+    return { harness, plan, article };
+  }
+
+  it('carries successful Edit feedback to the authorized Detail as a status, without leaking to another Plan or a later visit', async () => {
+    const { harness, plan, article } = await openPlanEditForFeedback();
+    setCorrectionInput(article, 'activity', 'Corrected on Edit');
+    clickWithin(article.querySelector('form')!, 'Save');
+    harness.detectChanges();
+    expect(article.textContent).toContain('Saving activity and timing');
+    const save = http.expectOne(`/api/plans/${itemId}/activity-timing`);
+    const updated = { ...plan, ...save.request.body, version: '60000000-0000-4000-8000-000000000006' };
+    save.flush(updated);
+    await settle(harness);
+    expect(TestBed.inject(Router).url).toBe(`/plans/${itemId}`);
+    shellReads().flush([one]);
+    familyReads(one);
+    expect(root(harness).textContent).not.toContain('Plan activity and timing saved.');
+    http.expectOne(`/api/plans/${itemId}`).flush(updated);
+    await settle(harness);
+    const detail = root(harness).querySelector('article[aria-label="Plan details"]')!;
+    expect(detail.textContent).toContain('Corrected on Edit');
+    expect(detail.textContent).toContain(plan.notes);
+    expect(detail.querySelector('.message--success[role="status"]')?.textContent).toBe('Plan activity and timing saved.');
+
+    // A retry in the same component must not announce the completed write again.
+    (harness.routeDebugElement!.componentInstance as any).retryRoutedItem();
+    http.expectOne(`/api/plans/${itemId}`).flush(updated);
+    await settle(harness);
+    expect(root(harness).textContent).not.toContain('Plan activity and timing saved.');
+
+    const otherId = '70000000-0000-4000-8000-000000000007';
+    await harness.navigateByUrl('/family', App);
+    shellReads().flush([one]);
+    familyReads(one);
+    await settle(harness);
+    await harness.navigateByUrl(`/plans/${otherId}`, App);
+    shellReads().flush([one]);
+    familyReads(one);
+    http.expectOne(`/api/plans/${otherId}`).flush({ ...plan, planId: otherId, activityOrDestination: 'Another Plan' });
+    await settle(harness);
+    expect(root(harness).textContent).toContain('Another Plan');
+    expect(root(harness).textContent).not.toContain('Plan activity and timing saved.');
+    await harness.navigateByUrl('/family', App);
+    shellReads().flush([one]);
+    familyReads(one);
+    await settle(harness);
+    await harness.navigateByUrl(`/plans/${itemId}`, App);
+    shellReads().flush([one]);
+    familyReads(one);
+    http.expectOne(`/api/plans/${itemId}`).flush(updated);
+    await settle(harness);
+    expect(root(harness).textContent).toContain('Corrected on Edit');
+    expect(root(harness).textContent).not.toContain('Plan activity and timing saved.');
+  });
+
+  it('returns from canceled Edit without save feedback or a write', async () => {
+    const { harness, plan, article } = await openPlanEditForFeedback();
+    setCorrectionInput(article, 'activity', 'Canceled correction');
+    clickWithin(article.querySelector('form')!, 'Cancel');
+    await settle(harness);
+    expect(TestBed.inject(Router).url).toBe(`/plans/${itemId}`);
+    http.expectNone(`/api/plans/${itemId}/activity-timing`);
+    shellReads().flush([one]);
+    familyReads(one);
+    http.expectOne(`/api/plans/${itemId}`).flush(plan);
+    await settle(harness);
+    expect(root(harness).textContent).toContain(plan.activityOrDestination);
+    expect(root(harness).textContent).not.toContain('Canceled correction');
+    expect(root(harness).textContent).not.toContain('Plan activity and timing saved.');
+  });
+
+  it('keeps a failed Edit on its form with the error and no save feedback', async () => {
+    const { harness, article } = await openPlanEditForFeedback();
+    setCorrectionInput(article, 'activity', 'Unsaved edit');
+    clickWithin(article.querySelector('form')!, 'Save');
+    http.expectOne(`/api/plans/${itemId}/activity-timing`).flush({}, { status: 500, statusText: 'Failure' });
+    await settle(harness);
+    expect(TestBed.inject(Router).url).toBe(`/plans/${itemId}/edit`);
+    expect(article.querySelector<HTMLInputElement>('#plan-correction-activity')!.value).toBe('Unsaved edit');
+    expect(article.querySelector('[role="alert"]')?.textContent).toContain('The Plan could not be corrected');
+    expect(article.textContent).not.toContain('Plan activity and timing saved.');
+    expect(article.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false);
+  });
+
   it.each([[false, ownProfile.profileId], [true, 'person-b']])('hides correction for ineligible server hint/identity (%s, %s)', async (hint, creator) => {
     const { article } = await openCorrectionPlan(hint, creator);
     expect(article.textContent).not.toContain('Correct activity and timing');
@@ -361,7 +534,7 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
 
   it('prefills exactly the bounded facts, cancels without writes, and keeps Notes controls separate', async () => {
     const { harness, article, plan } = await openCorrectionPlan();
-    clickWithin(article, 'Correct activity and timing'); harness.detectChanges();
+    (harness.routeDebugElement!.componentInstance as any).beginPlanCorrection(plan); harness.detectChanges();
     const form = article.querySelector('form[aria-label="Correct activity and timing"]')!;
     expect(form.querySelectorAll('input')).toHaveLength(7);
     expect(form.querySelector('textarea')).toBeNull();
@@ -382,8 +555,8 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
   });
 
   it('validates required facts, whitespace, length, and partial optional pairs before sending', async () => {
-    const { harness, article } = await openCorrectionPlan();
-    clickWithin(article, 'Correct activity and timing'); harness.detectChanges();
+    const { harness, article, plan } = await openCorrectionPlan();
+    (harness.routeDebugElement!.componentInstance as any).beginPlanCorrection(plan); harness.detectChanges();
     const form = article.querySelector('form[aria-label="Correct activity and timing"]')!;
     for (const value of ['', '   ', 'x'.repeat(201)]) {
       setCorrectionInput(article, 'activity', value); clickWithin(form, 'Save'); harness.detectChanges();
@@ -405,7 +578,7 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
 
   it('saves a complete correction with optional clears, shows current facts, and leaves Notes unchanged', async () => {
     const { harness, article, plan } = await openCorrectionPlan();
-    clickWithin(article, 'Correct activity and timing'); harness.detectChanges();
+    (harness.routeDebugElement!.componentInstance as any).beginPlanCorrection(plan); harness.detectChanges();
     setCorrectionInput(article, 'activity', 'Corrected walk');
     setCorrectionInput(article, 'date', '2026-11-04');
     for (const field of ['return-date', 'return-time', 'checkin-date', 'checkin-time']) setCorrectionInput(article, field, '');
@@ -431,7 +604,7 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
 
   it.each([409, 500, 401, 400, 404])('handles correction failure %s without presenting a successful write', async statusCode => {
     const { harness, article, plan } = await openCorrectionPlan();
-    clickWithin(article, 'Correct activity and timing'); harness.detectChanges();
+    (harness.routeDebugElement!.componentInstance as any).beginPlanCorrection(plan); harness.detectChanges();
     setCorrectionInput(article, 'activity', 'Unsaved correction');
     clickWithin(article.querySelector('form[aria-label="Correct activity and timing"]')!, 'Save');
     http.expectOne(`/api/plans/${itemId}/activity-timing`).flush({}, { status: statusCode, statusText: 'Failure' });
@@ -566,8 +739,8 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
     familyReads(one);
     http.expectOne(`/api/events/${itemId}`).flush(eventView(one.familyGroupId, true));
     await settle(harness);
-    const edit = Array.from(root(harness).querySelectorAll<HTMLButtonElement>('article button')).find(button => button.textContent?.includes('Edit event details'))!;
-    edit.click();
+    expect(root(harness).querySelector('article a.button-link')?.getAttribute('href')).toBe('/events/' + itemId + '/edit');
+    (harness.routeDebugElement!.componentInstance as any).beginEventEdit(eventView(one.familyGroupId, true));
     harness.detectChanges();
     const name = root(harness).querySelector<HTMLInputElement>(`#item-edit-event-name-${itemId}`)!;
     name.value = 'Lake picnic and swim';
@@ -707,9 +880,9 @@ describe('Item URLs and the authorize-first Family decision (WI-009-005)', () =>
   });
 
   it.each([
-    ['/events/' + itemId, 'Events', 'Events'],
-    ['/plans/' + itemId, 'Plans & Trips', 'Plans'],
-    ['/trips/' + itemId, 'Plans & Trips', 'Trips'],
+    ['/events/' + itemId, 'Activities', 'Events'],
+    ['/plans/' + itemId, 'Activities', 'Plans'],
+    ['/trips/' + itemId, 'Activities', 'Trips'],
     ['/concerns/' + itemId, 'Safety', 'Concerns'],
     ['/incidents/' + itemId, 'Safety', 'Safety Incidents'],
   ])('marks %s as part of %s with one h1 "%s" (AC-29)', async (url, area, h1) => {

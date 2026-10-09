@@ -64,9 +64,9 @@ describe('Returning-user routed shell', () => {
     expect(TestBed.inject(CurrentFamilyContext).familyId()).toBe(a.familyGroupId);
     expect(harness.routeNativeElement?.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe('Home');
     const destinations = [
-      ['/family', 'Family', 'Family', 'page'], ['/events', 'Events', 'Events', 'page'],
-      ['/plans-trips', 'Plans & Trips', 'Plans & Trips', 'page'], ['/plans', 'Plans', 'Plans & Trips', 'true'],
-      ['/trips', 'Trips', 'Plans & Trips', 'true'], ['/safety', 'Safety', 'Safety', 'page'],
+      ['/family', 'Family A', 'Family', 'page'], ['/activities', 'Activities', 'Activities', 'page'],
+      ['/plans/new', 'Create Activity', 'Activities', 'true'],
+      ['/trips', 'Trips', 'Activities', 'true'], ['/safety', 'Safety', 'Safety', 'page'],
       ['/me', 'Your profile', 'Me / Settings', 'page'],
     ] as const;
     for (const [url, heading, navLabel, current] of destinations) {
@@ -75,7 +75,7 @@ describe('Returning-user routed shell', () => {
       familyReads(a.familyGroupId);
       harness.detectChanges();
       // The Events dashboard (WI-009-008 D3) reads Trips for its summary card, as Home does.
-      if (url === '/trips' || url === '/events') http.expectOne('/api/trips').flush([]);
+      if (url === '/trips' || url === '/activities') http.expectOne('/api/trips').flush([]);
       expect(TestBed.inject(Router).url).toBe(url);
       expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain(heading);
       expect(harness.routeNativeElement?.querySelector(`nav [aria-current="${current}"]`)?.textContent?.trim())
@@ -136,24 +136,21 @@ describe('Returning-user routed shell', () => {
     expect(harness.routeNativeElement?.textContent).toContain('happening with Family A today');
     const state = harness.routeDebugElement!.componentInstance as {
       directoryMembers: () => readonly { displayName: string }[];
-      selectDirectoryMember: (member: { profileId: string; displayName: string }) => void;
-      selectedMember: () => object | null;
+      directorySearch: { set: (value: string) => void; (): string };
       familyEvents: () => readonly object[];
       eventForm: { patchValue: (value: object) => void; controls: { name: { value: string | null } } };
       planForm: { patchValue: (value: object) => void; controls: { notes: { value: string | null } } };
       ownerProfile: () => { displayName: string } | null;
     };
     expect(state.directoryMembers()[0].displayName).toBe('A Member');
-    state.selectDirectoryMember({ profileId: 'a-member', displayName: 'A Member' });
-    const oldMemberProfile = http.expectOne('/api/family-members/a-member/profile');
+    state.directorySearch.set('A Member');
     state.eventForm.patchValue({ name: 'Private A draft' });
     state.planForm.patchValue({ notes: 'Private A notes' });
     selector.value = b.familyGroupId;
     selector.dispatchEvent(new Event('change'));
     harness.detectChanges();
     expect(state.directoryMembers()).toEqual([]);
-    expect(state.selectedMember()).toBeNull();
-    expect(oldMemberProfile.cancelled).toBe(true);
+    expect(state.directorySearch()).toBe('');
     expect(state.eventForm.controls.name.value).toBe('');
     expect(state.planForm.controls.notes.value).toBe('');
     expect(state.ownerProfile()?.displayName).toBe('Alex');
@@ -208,7 +205,7 @@ describe('Returning-user routed shell', () => {
     return Array.from(harness.routeNativeElement!.querySelectorAll<HTMLAnchorElement>('nav[aria-label="Main navigation"] a'));
   }
 
-  it('renders exactly six main-navigation links in order, with real URLs and no buttons (AC-01)', async () => {
+  it('renders exactly five main-navigation links in order, with real URLs and no buttons (AC-01)', async () => {
     const harness = await visit('/home');
     initial([a]);
     familyReads(a.familyGroupId);
@@ -216,17 +213,17 @@ describe('Returning-user routed shell', () => {
     harness.detectChanges();
     const links = navLinks(harness);
     expect(links.map(link => link.textContent?.trim()))
-      .toEqual(['Home', 'Family', 'Events', 'Plans & Trips', 'Safety', 'Me / Settings']);
+      .toEqual(['Home', 'Family', 'Activities', 'Safety', 'Me / Settings']);
     expect(links.map(link => link.getAttribute('href')))
-      .toEqual(['/home', '/family', '/events', '/plans-trips', '/safety', '/me']);
+      .toEqual(['/home', '/family', '/activities', '/safety', '/me']);
     expect(harness.routeNativeElement!.querySelectorAll('nav button')).toHaveLength(0);
     expect(links.every(link => link.querySelector('svg')?.getAttribute('aria-hidden') === 'true')).toBe(true);
   });
 
   it.each([
-    ['/home', 'Home', 'page'], ['/family', 'Family', 'page'], ['/events', 'Events', 'page'],
-    ['/events/new', 'Events', 'true'], ['/events/all', 'Events', 'true'],
-    ['/plans-trips', 'Plans & Trips', 'page'], ['/plans', 'Plans & Trips', 'true'], ['/trips', 'Plans & Trips', 'true'],
+    ['/home', 'Home', 'page'], ['/family', 'Family', 'page'], ['/activities', 'Activities', 'page'],
+    ['/events/new', 'Activities', 'true'], ['/activities/new', 'Activities', 'true'],
+    ['/plans/new', 'Activities', 'true'], ['/trips/new', 'Activities', 'true'], ['/trips', 'Activities', 'true'],
     ['/safety', 'Safety', 'page'], ['/concerns', 'Safety', 'true'], ['/incidents', 'Safety', 'true'],
     ['/incidents/new', 'Safety', 'true'], ['/incidents/some-incident', 'Safety', 'true'], ['/me', 'Me / Settings', 'page'],
   ] as const)('selects exactly one area on %s: %s with aria-current="%s" (AC-08)', async (url, label, current) => {
@@ -266,7 +263,7 @@ describe('Returning-user routed shell', () => {
     await harness.fixture.whenStable();
     expect(router.url).toBe('/family');
     expect(document.activeElement?.tagName).toBe('H1');
-    expect(document.activeElement?.textContent?.trim()).toBe('Family');
+    expect(document.activeElement?.textContent?.trim()).toBe('Family A');
     expect(document.activeElement?.getAttribute('tabindex')).toBe('-1');
 
     // A navigation without the link's state (for example an in-page button) does not move focus.
@@ -286,7 +283,7 @@ describe('Returning-user routed shell', () => {
   // DEC-079 (WI-009-009): /safety is now the Safety dashboard, so the Safety half follows its View all link, not a landing link.
   it('follows the Plans & Trips landing link and the Safety dashboard View all link, and focuses their h1 (AC-05, AC-06, D4)', async () => {
     const router = TestBed.inject(Router);
-    const harness = await visit('/plans-trips');
+    const harness = await visit('/activities/new');
     initial([a]);
     familyReads(a.familyGroupId);
     harness.detectChanges();
@@ -304,9 +301,9 @@ describe('Returning-user routed shell', () => {
       harness.detectChanges();
       await harness.fixture.whenStable();
     };
-    await follow('Open Plans');
-    expect(router.url).toBe('/plans');
-    expect(document.activeElement?.textContent).toContain('Plans');
+    await follow('PlanA lightweight plan for a future activity or destination.');
+    expect(router.url).toBe('/plans/new');
+    expect(document.activeElement?.textContent).toContain('Create Activity');
     expect(document.activeElement?.tagName).toBe('H1');
 
     await harness.navigateByUrl('/safety', App);

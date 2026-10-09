@@ -15,7 +15,7 @@
 - Server authorization is authoritative; client checks are display hints. Selected Family is not authorization.
 - Preserve privacy boundaries, nondisclosing denied access, and separation between Family, Safety, Sharing, Check-In, location, Trip, and profile permissions. Load the relevant canonical contract/workflow via [routing](CONTEXT-ROUTING.md).
 - No implicit administrator override, automatic escalation, danger determination, risk scoring, notification, or emergency dispatch.
-- For UI work, follow [mockup alignment](MOCKUP-ALIGNMENT.md); unsupported mockup functionality remains excluded. Preserve required copy, calm tone, accessibility, and the approved visual system. Obtain owner visual approval where the item requires it.
+- For UI work, follow the [UI Visual Design Contract](../ai-context/ui-visual-design-contract.md); unsupported mockup functionality remains excluded. Preserve required copy, calm tone, accessibility, and the approved visual system. Obtain owner visual approval where the item requires it.
 - Do not raise build budget thresholds, add screenshot golden baselines, or overwrite/delete existing verification evidence without authorization.
 
 ## Lean validation

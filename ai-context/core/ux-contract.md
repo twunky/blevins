@@ -2,13 +2,15 @@
 Status: APPROVED
 Authority: CANONICAL — CTX-1.28
 Context-Baseline: CTX-1.28
-Version: 1.2
-Source: ../bootstrap/product-ux-source.md; DEC-064; DEC-074; DEC-075
+Version: 1.3
+Source: ../bootstrap/product-ux-source.md; DEC-064; DEC-074; DEC-075; owner navigation reconciliation, 2026-10-08
 ---
 
 # UX Contract
 
 This contract defines approved experience rules under `CTX-1.28`. `REQ-UX-011` was clarified under `CTX-1.24` and amended under `CTX-1.27`; `REQ-UX-013` and `REQ-UX-014` were added under `CTX-1.27`; `REQ-UX-014` was amended under `CTX-1.28` (authorized items with no selectable Family, and the one-time Family-list refresh).
+
+Owner reconciliation on 2026-10-08 supersedes the six-destination rule in `REQ-UX-013` with [REQ-UX-018](#req-ux-018), reflecting the approved Activities consolidation. This bounded documentation update does not create a new aggregate context baseline or change unrelated experience, domain, privacy, or authorization requirements.
 
 ## Experience posture
 
@@ -74,21 +76,25 @@ Critical mobile actions should require minimal interaction, including check-in, 
 
 **CURRENT MVP navigation/entry scope.** The no-Family invitation/operator guidance below is replaced only for future Phase 11 production onboarding by [REQ-UX-015](production-entry-contract.md#req-ux-015) under DEC-097. Current runtime and selected-Family authorization boundaries remain unchanged.
 
-The approved conceptual UX destinations are Home, Family, Events, Plans & Trips, Safety, and Me / Settings, matching the conceptual product areas in `product-contract.md#req-prod-007`. The approved MVP primary navigation for these destinations is defined by `REQ-UX-013`.
+The approved conceptual product areas remain Home, Family, Events, Plans & Trips, Safety, and Me / Settings, as defined in `product-contract.md#req-prod-007`. The approved MVP primary navigation groups Events and Plans & Trips under Activities, as defined by [REQ-UX-018](#req-ux-018); conceptual areas are not separate sidebar requirements.
 
 For the MVP application shell, automatically use the user's sole active Family membership as the current Family context. When the user has multiple active Family memberships, require an explicit selection in a clear shell-level Family selector; do not treat the first returned membership as the selected context. The only other way the current Family may change is the authorized item-link rule in `REQ-UX-014`. With no active Family membership, select no Family and use the approved invitation/operator-provisioned entry path. Retain the selection only for the current application/page session.
 
 The selected Family is presentation/application context only. It grants no access and does not change membership, Event/Plan/Trip audiences, profile visibility, administrator authority, Sharing permissions, or Safety permissions. On a Family context change, clear prior Family-scoped client state and reload data authorized for the newly selected Family so prior Family directories, items, and forms are not visually retained. These rules do not change production authentication behavior.
 
-`OD-001` is resolved by `DEC-074` through `REQ-UX-013`.
+`OD-001` was resolved by `DEC-074` through `REQ-UX-013`; the current navigation is governed by its owner-approved replacement, `REQ-UX-018`.
 
 ### REQ-UX-013
 
-The MVP primary navigation has exactly six areas, in this order, at desktop and narrow widths: **Home**, **Family**, **Events**, **Plans & Trips**, **Safety**, and **Me / Settings**.
+**SUPERSEDED by [REQ-UX-018](#req-ux-018), owner reconciliation 2026-10-08.** The former rule required six primary destinations: Home, Family, Events, Plans & Trips, Safety, and Me / Settings. It is retained for provenance and no longer governs current navigation.
 
-- **Plans & Trips** is a navigation grouping only. It gives clear access to Plans and to Trips. Plans and Trips remain separate product domains with their own routes, data, audiences, authorization, and lifecycle. The grouping must not merge their screens, APIs, records, or rules.
+### REQ-UX-018
+
+The MVP primary navigation has exactly five areas, in this order, at desktop and narrow widths: **Home**, **Family**, **Activities**, **Safety**, and **Me / Settings**. This replaces the obsolete six-destination rule under the owner's confirmation of the approved Activities redesign, 2026-10-08.
+
+- **Activities** is a navigation grouping only. It consolidates the former Events and Plans & Trips sidebar destinations and gives clear access to Events, Plans, and Trips. Events, Plans, and Trips remain separate product domains with their own routes, data, audiences, authorization, and lifecycle. The grouping must not merge their domain screens, APIs, records, or rules.
 - **Safety** is a navigation grouping only. It gives clear access to Concerns and to Safety Incidents. Concerns and Incidents remain separate workflows with their own routes, access rules, lifecycle, and privacy (`REQ-SAFE-015`, `REQ-SAFE-016`, `REQ-PRIV-025`, `REQ-PRIV-026`). Reaching Safety grants no access to any Concern or Incident and must not imply that one exists.
-- A grouping may use a simple landing page or an equivalent control that reaches both of its parts. Existing direct routes for Plans, Trips, Concerns, and Incidents remain available and refresh-safe.
+- A grouping may use a landing page or equivalent controls that reach its parts. Activities may present a combined listing with type filters while preserving distinct domain workflows. Existing Event, Plan, Trip, Concern, and Incident item URLs remain available and refresh-safe; listing entry routes may redirect into Activities without merging domains or granting access.
 - No other primary destination is added without a new decision. Messages, search, notifications, and location are not navigation areas.
 
 For the MVP, the navigation model is adequately validated only when all of the following are true: owner visual review; rendered evidence at desktop and narrow widths; a keyboard and navigation accessibility review (logical order, visible focus, current destination announced); and automated end-to-end verification that every implemented primary area is reachable through main navigation at both widths. Automated accessibility scanning may supplement, but does not replace, the keyboard and manual review. A later formal usability study may revisit this model through a new decision.

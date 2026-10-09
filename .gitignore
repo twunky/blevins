@@ -29,3 +29,10 @@ TestResults/
 coverage/
 **/test-results/
 **/playwright-report/
+
+# Disposable UI milestone logs and one-off review output
+/src/FamilySafety.Web/activities-*.log
+/src/FamilySafety.Web/family-*.log
+/artifacts/reviews/home-alignment-*/
+/artifacts/reviews/profile-redesign-*/
+/artifacts/reviews/safety-alignment-*/

@@ -1,6 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, Input, OnChanges, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { AppIcon } from '../icon';
+import { focusHeadingState } from '../navigation';
 import { FormsModule } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { displayDate } from '../date-format';
@@ -14,10 +17,13 @@ export interface SharedFamilyDatesView { canCreate: boolean; dates: SharedFamily
 
 /** Owns the date workflow; selected Family is navigation, and the server supplies all permissions. */
 @Component({
-  selector: 'app-shared-family-dates', imports: [FormsModule],
-  templateUrl: './shared-family-dates.html', styleUrl: './shared-family-dates.scss',
+  selector: 'app-shared-family-dates', imports: [FormsModule, RouterLink, AppIcon],
+  templateUrl: './shared-family-dates.html', styleUrls: ['./shared-family-dates.scss', '../family-summary.scss'],
 })
 export class SharedFamilyDates implements OnChanges {
+  @Input() summary = false;
+  protected readonly focusHeadingState = focusHeadingState;
+  protected initials(name: string): string { return name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toLocaleUpperCase(); }
   @Input({ required: true }) familyId!: string;
   @Input({ required: true }) ownProfileId: string | null = null;
   private readonly http = inject(HttpClient);
@@ -60,6 +66,14 @@ export class SharedFamilyDates implements OnChanges {
         if (generation === this.generation) this.status.set(error.status === 404 || error.status === 401 ? 'unavailable' : 'error');
       },
     });
+  }
+  protected summaryDates(): SharedFamilyDate[] {
+    const today = new Date();
+    const key = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, '0'), String(today.getDate()).padStart(2, '0')].join('-');
+    const dates = [...(this.data()?.dates ?? [])];
+    const upcoming = dates.filter(date => date.date.slice(0, 10) >= key).sort((a, b) => a.date.localeCompare(b.date));
+    const recent = dates.filter(date => date.date.slice(0, 10) < key).sort((a, b) => b.date.localeCompare(a.date));
+    return [...upcoming, ...recent].slice(0, 4);
   }
   protected create(): void { this.cancel(); this.formOpen.set(true); this.loadPeople(); }
   protected edit(entry: SharedFamilyDate): void {

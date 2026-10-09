@@ -5,12 +5,12 @@ This directory provides session guidance. [ai-context](../ai-context/README.md) 
 ## Where to start
 
 1. Read [AI operating rules](../ai-context/README.md) and [project status](../ai-context/project-status.md).
-2. Read [CURRENT-TASK](CURRENT-TASK.md) and [WORKING-RULES](WORKING-RULES.md).
+2. Read [WORKING-RULES](WORKING-RULES.md); current authority is already in project status.
 3. Use [CONTEXT-ROUTING](CONTEXT-ROUTING.md) only to select sources for the requested task; load the authorized item's required-context manifest when one exists.
 
 Read [PROJECT-STATE](PROJECT-STATE.md) only for architecture orientation, [VALIDATION](VALIDATION.md) when choosing checks, and [SESSION-CLOSEOUT](SESSION-CLOSEOUT.md) when handing back work.
 
-For authorized UI work, consult [MOCKUP-ALIGNMENT](MOCKUP-ALIGNMENT.md) and its mapped images in reference/ before editing. They guide presentation only; canonical contracts and later owner decisions control behavior. Generated screenshots are evidence, not design authority.
+For authorized UI work, read the [UI Visual Design Contract](../ai-context/ui-visual-design-contract.md) and inspect the current screen implementation. [Historical reference routing](MOCKUP-ALIGNMENT.md) is needed only for provenance questions.
 
 Before adding or moving Angular folders, read the [client structure rule](../src/FamilySafety.Web/README.md#structure-and-extraction).
 

@@ -1,4 +1,4 @@
-import { expect, test, type APIRequestContext, type Locator, type Page } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import { resolve } from 'node:path';
 import {
   apiBaseUrl,
@@ -10,7 +10,7 @@ import {
   useIsolatedScenario,
 } from './fixtures/invitation-scenario';
 
-// WI-009-008: the Events dashboard (/events), Create event (/events/new), All events (/events/all), and the item page.
+// Event discovery through Activities (REQ-UX-018), legacy redirects, Create Event and item routes.
 // Family 1 ("Development Family"): A (administrator), B (joins by invitation), C. Family 2: A and B; C is not a member.
 useIsolatedScenario({ tripAudienceAdult: true, secondFamily: true });
 
@@ -21,8 +21,10 @@ interface FamilyMember { profileId: string; displayName: string }
 const captures = captureDirectory('events-dashboard');
 const heading = (page: Page) => page.locator('main h1');
 const mainNavigation = (page: Page) => page.getByRole('navigation', { name: 'Main navigation' });
-const card = (page: Page, name: 'upcoming' | 'trips' | 'links' | 'rsvps') => page.locator(`.events-dash--${name}`);
-const rows = (locator: Locator) => locator.locator('li a.item-link');
+const rows = (page: Page, type: 'Event' | 'Trip') => page.locator('.activity-row')
+  .filter({ has: page.locator('.activity-badge', { hasText: new RegExp(`^${type}$`) }) });
+const titles = (page: Page, type: 'Event' | 'Trip') => rows(page, type).locator('.activity-copy > strong');
+const pending = (page: Page) => page.getByRole('region', { name: 'Pending RSVPs' });
 
 function futureDate(days: number): string {
   const date = new Date();
@@ -106,18 +108,25 @@ async function useIdentity(page: Page, identity: DevelopmentIdentity, path: stri
   await expect(selector).toHaveValue(identity.accountId);
 }
 
-async function expectEventsCurrent(page: Page, value: 'page' | 'true'): Promise<void> {
+async function expectActivitiesCurrent(page: Page, value: 'page' | 'true'): Promise<void> {
   const current = mainNavigation(page).locator('a[aria-current]');
   await expect(current).toHaveCount(1);
-  await expect(current).toHaveText('Events');
+  await expect(current).toHaveText('Activities');
   await expect(current).toHaveAttribute('aria-current', value);
+}
+
+async function filterType(page: Page, type: 'All' | 'Events' | 'Trips'): Promise<void> {
+  const button = page.getByRole('group', { name: 'Activity type' })
+    .getByRole('button', { name: new RegExp(`^${type} \\d+$`) });
+  await button.click();
+  await expect(button).toHaveAttribute('aria-pressed', 'true');
 }
 
 async function expectNoOverflow(page: Page): Promise<void> {
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 }
 
-test('direct entry, privacy, item links, Quick Links, All events, create → item, and responsive layouts', async ({ page, request }) => {
+test('Activities discovery, privacy, item links, date filters, RSVP navigation, create → item, and responsive layouts', async ({ page, request }) => {
   test.setTimeout(180_000);
   const w = await setUpWorld(request);
   const apiPaths: string[] = [];
@@ -125,28 +134,40 @@ test('direct entry, privacy, item links, Quick Links, All events, create → ite
   await page.setViewportSize({ width: 1440, height: 1000 });
 
   // Direct entry as C (single Family; not an administrator).
-  await useIdentity(page, w.c, '/events');
-  await expect(heading(page)).toHaveText('Events');
+  await useIdentity(page, w.c, '/home');
+  await page.waitForLoadState('networkidle');
+  apiPaths.length = 0;
+  await page.goto('/events');
+  await expect(page).toHaveURL(/\/activities\?type=Event$/);
+  await expect(heading(page)).toHaveText('Activities');
   await expect(page.locator('.page-title')).toContainText(w.family1.name);
-  await expectEventsCurrent(page, 'page');
-  await expect(page.locator('.events-grid h2')).toHaveText(['Upcoming Events', 'Trips', 'Quick Links', 'RSVPs Needed']);
-  await expect(rows(card(page, 'upcoming'))).toHaveText(['Lantern Walk', 'Bay Picnic']);
-  await expect(rows(card(page, 'trips'))).toHaveText(['Lantern Trip']);
+  await expectActivitiesCurrent(page, 'page');
+  await expect(page.getByRole('group', { name: 'Activity type' }).getByRole('button', { name: /^Events / })).toHaveAttribute('aria-pressed', 'true');
+  await expect(titles(page, 'Event')).toHaveText(['Lantern Walk', 'Bay Picnic']);
+  await expect(rows(page, 'Trip')).toHaveCount(0);
+  await filterType(page, 'All');
+  await expect(titles(page, 'Event')).toHaveText(['Lantern Walk', 'Bay Picnic']);
+  await expect(titles(page, 'Trip')).toHaveText(['Lantern Trip']);
   // Privacy: an Event outside C's audience and items of a Family C does not belong to never appear.
   await expect(page.locator('main')).not.toContainText(/Private Supper|Second Family/);
   // Audience creation issues zero invitations; the protected own-Pending query is empty.
-  await expect(card(page, 'rsvps').locator('p')).toHaveText('You have no pending Event invitations in this Family.');
-  await expect(card(page, 'rsvps').locator('button, a, input, select, img, li')).toHaveCount(0);
-  await expect(card(page, 'rsvps')).not.toContainText(/\d/);
+  await expect(pending(page)).toContainText('You have no pending event invitations in this family.');
+  await expect(pending(page).locator('button, a, input, select, img')).toHaveCount(0);
+  await expect(pending(page).locator('.activity-card-heading > span')).toHaveText('0');
   await expect(page.locator('main')).not.toContainText(/Going|Maybe|Respond/);
   await page.waitForLoadState('networkidle');
   expect(apiPaths.filter(path => /event-invitations/i.test(path)),
     'the dashboard uses the protected selected-Family own-Pending read').toEqual([`/api/family-groups/${w.family1.familyGroupId}/event-invitations/mine`]);
-  // Quick Links: six real destinations.
-  const quick = card(page, 'links').getByRole('link');
-  await expect(quick).toHaveCount(6);
-  expect(await quick.evaluateAll(links => links.map(link => link.getAttribute('href'))))
-    .toEqual(['/events/new', '/events/all', '/trips', '/plans', '/family', '/me']);
+  // Type/search controls replace the former dashboard cards and Quick Links.
+  await filterType(page, 'Trips');
+  await expect(titles(page, 'Trip')).toHaveText(['Lantern Trip']);
+  await expect(rows(page, 'Event')).toHaveCount(0);
+  await filterType(page, 'Events');
+  await page.getByRole('searchbox', { name: 'Search activities' }).fill('Lantern');
+  await expect(titles(page, 'Event')).toHaveText(['Lantern Walk']);
+  await page.getByRole('searchbox', { name: 'Search activities' }).fill('');
+  await expect(titles(page, 'Event')).toHaveText(['Lantern Walk', 'Bay Picnic']);
+  await filterType(page, 'All');
   await page.screenshot({ path: resolve(captures, 'events-1440.png'), fullPage: true });
   for (const viewport of [{ width: 1024, height: 900 }, { width: 768, height: 1000 }, { width: 390, height: 844 }]) {
     await page.setViewportSize(viewport);
@@ -155,59 +176,71 @@ test('direct entry, privacy, item links, Quick Links, All events, create → ite
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
 
-  // Dashboard → Event item → Back to Events.
-  await rows(card(page, 'upcoming')).filter({ hasText: 'Lantern Walk' }).click();
+  // Activities → Event item → Back to Activities.
+  await rows(page, 'Event').filter({ hasText: 'Lantern Walk' }).click();
   await expect(page).toHaveURL(new RegExp(`/events/${w.ids.lantern}$`));
   await expect(heading(page)).toHaveText('Events');
   await expect(heading(page)).toBeFocused();
-  await expectEventsCurrent(page, 'true');
+  await expectActivitiesCurrent(page, 'true');
   await expect(page.getByRole('heading', { level: 2, name: 'Lantern Walk' })).toBeVisible();
-  await page.getByRole('link', { name: 'Back to Events' }).click();
-  await expect(page).toHaveURL(/\/events$/);
+  await expect(page.getByRole('link', { name: 'Edit event details', exact: true })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
+  await expect(page).toHaveURL(/\/activities$/);
 
-  // Dashboard → Trip item, in the Plans & Trips area.
-  await rows(card(page, 'trips')).filter({ hasText: 'Lantern Trip' }).click();
+  // Activities → authorized Trip item, still a distinct domain route.
+  await rows(page, 'Trip').filter({ hasText: 'Lantern Trip' }).click();
   await expect(page).toHaveURL(new RegExp(`/trips/${w.ids.lanternTrip}$`));
   await expect(heading(page)).toHaveText('Trips');
-  await expect(mainNavigation(page).locator('a[aria-current]')).toHaveText('Plans & Trips');
-  await page.goBack();
-  await expect(page).toHaveURL(/\/events$/);
+  await expectActivitiesCurrent(page, 'true');
+  await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
+  await expect(page).toHaveURL(/\/activities$/);
 
-  // Quick Link → Your profile, then back; View all → All events.
-  await card(page, 'links').getByRole('link', { name: /Your profile/ }).click();
+  // Main navigation → profile, then back; type/date controls retain all-Event listing coverage.
+  await mainNavigation(page).getByRole('link', { name: 'Me / Settings', exact: true }).click();
   await expect(page).toHaveURL(/\/me$/);
   await expect(heading(page)).toHaveText('Your profile');
   await page.goBack();
-  await card(page, 'upcoming').getByRole('link', { name: 'View all Events' }).click();
-  await expect(page).toHaveURL(/\/events\/all$/);
-  await expect(heading(page)).toHaveText('All events');
-  await expect(heading(page)).toBeFocused();
-  await expectEventsCurrent(page, 'true');
-  await expect(page.locator('.events-overview li a.item-link')).toHaveText(['Lantern Walk', 'Bay Picnic']);
+  await expect(page).toHaveURL(/\/activities$/);
+  await filterType(page, 'Events');
+  await page.getByLabel('Activity dates').selectOption('all');
+  await expect(page.getByRole('heading', { name: 'All Activities', exact: true })).toBeVisible();
+  await expectActivitiesCurrent(page, 'page');
+  await expect(titles(page, 'Event')).toHaveText(['Lantern Walk', 'Bay Picnic']);
   await expect(page.locator('main')).not.toContainText('Private Supper');
-  await expect(page.getByRole('button', { name: 'Edit event details' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Edit event details', exact: true })).toHaveCount(0);
 
   // Direct entry: /events/all and /events/new are pages, never item reads.
   apiPaths.length = 0;
   await page.goto('/events/all');
-  await expect(heading(page)).toHaveText('All events');
+  await expect(page).toHaveURL(/\/activities\?type=Event&period=all$/);
+  await expect(heading(page)).toHaveText('Activities');
+  await expect(page.getByLabel('Activity dates')).toHaveValue('all');
+  await expect(titles(page, 'Event')).toHaveText(['Lantern Walk', 'Bay Picnic']);
+  await page.reload();
+  await expect(page).toHaveURL(/\/activities\?type=Event&period=all$/);
+  await expect(page.getByLabel('Activity dates')).toHaveValue('all');
+  await expect(titles(page, 'Event')).toHaveText(['Lantern Walk', 'Bay Picnic']);
   await page.screenshot({ path: resolve(captures, 'events-all-1440.png'), fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await expectNoOverflow(page);
   await page.screenshot({ path: resolve(captures, 'events-all-390.png'), fullPage: true });
   await page.goto('/events/new');
-  await expect(heading(page)).toHaveText('Create event');
+  await expect(heading(page)).toHaveText('Create Activity');
   await expectNoOverflow(page);
   await page.screenshot({ path: resolve(captures, 'events-new-390.png'), fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await expect(page.locator('.page-title')).toContainText('does not send an invitation or start location sharing');
-  await expectEventsCurrent(page, 'true');
+  await expectActivitiesCurrent(page, 'true');
   await page.screenshot({ path: resolve(captures, 'events-new-1440.png'), fullPage: true });
+  await page.waitForLoadState('networkidle');
   expect(apiPaths.filter(path => /^\/api\/events\/(new|all)$/.test(path))).toEqual([]);
 
-  // Dashboard → Create event → the created Event's item URL with the success message.
-  await page.goto('/events');
-  await page.getByRole('main').getByRole('link', { name: 'Create event', exact: true }).click();
+  // Activities → type chooser → Event create → item URL with a transient success message.
+  await page.goto('/activities');
+  await page.getByRole('main').getByRole('link', { name: 'Create Activity', exact: true }).click();
+  await expect(page).toHaveURL(/\/activities\/new$/);
+  await expect(heading(page)).toBeFocused();
+  await page.getByRole('navigation', { name: 'Choose activity type' }).getByRole('link', { name: /^Event / }).click();
   await expect(page).toHaveURL(/\/events\/new$/);
   await expect(heading(page)).toBeFocused();
   await page.locator('#event-name').fill('Harvest Supper');
@@ -223,28 +256,49 @@ test('direct entry, privacy, item links, Quick Links, All events, create → ite
   await page.reload();
   await expect(page.getByRole('heading', { level: 2, name: 'Harvest Supper' })).toBeVisible();
   await expect(page.getByText('Event created and shared')).toHaveCount(0);
+
+  // Only an explicit invitation adds an RSVP link; audience sharing alone did not.
+  const createdUrl = page.url();
+  const participation = page.locator('app-event-participation');
+  await expect(participation).toContainText('No invitations have been issued');
+  await participation.getByRole('button', { name: `Invite ${w.aName}`, exact: true }).click();
+  await expect(participation).toContainText('Invitation issued');
+  await useIdentity(page, w.a, '/home');
+  await page.getByLabel('Current Family').selectOption({ label: w.family1.name });
+  await mainNavigation(page).getByRole('link', { name: 'Activities', exact: true }).click();
+  await expect(pending(page).getByRole('link', { name: 'Harvest Supper', exact: true }))
+    .toHaveAttribute('href', new URL(createdUrl).pathname);
+  await pending(page).getByRole('link', { name: 'Harvest Supper', exact: true }).click();
+  await expect(page).toHaveURL(createdUrl);
+  await expect(participation.getByRole('heading', { name: 'Your invitation' })).toBeVisible();
+  await participation.getByRole('radio', { name: 'Going', exact: true }).check();
+  await participation.getByRole('button', { name: 'Save RSVP', exact: true }).click();
+  await expect(participation).toContainText('Current RSVP: Going');
+  await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
+  await expect(pending(page)).toContainText('You have no pending event invitations in this family.');
+  await expect(pending(page).getByRole('link', { name: 'Harvest Supper', exact: true })).toHaveCount(0);
 });
 
-test('Family switching clears and reloads the summaries, and administrator status adds no visibility', async ({ page, request }) => {
+test('Family switching clears and reloads Activities, and administrator status adds no visibility', async ({ page, request }) => {
   test.setTimeout(120_000);
   const w = await setUpWorld(request);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await useIdentity(page, w.a, '/home');
   await page.getByLabel('Current Family').selectOption({ label: w.family1.name });
-  await mainNavigation(page).getByRole('link', { name: 'Events' }).click();
-  await expect(page).toHaveURL(/\/events$/);
+  await mainNavigation(page).getByRole('link', { name: 'Activities', exact: true }).click();
+  await expect(page).toHaveURL(/\/activities$/);
   // A administers Family 1 but is outside the audience of B's Bay Picnic: it never appears.
   // The first test's created "Harvest Supper" (C → A) is also visible to A when both tests run; it is set aside here.
-  await expect(rows(card(page, 'upcoming')).first()).toHaveText('Private Supper');
-  expect((await rows(card(page, 'upcoming')).allTextContents()).map(name => name.trim()).filter(name => name !== 'Harvest Supper'))
+  await expect(titles(page, 'Event').first()).toHaveText('Private Supper');
+  expect((await titles(page, 'Event').allTextContents()).map(name => name.trim()).filter(name => name !== 'Harvest Supper'))
     .toEqual(['Private Supper', 'Lantern Walk']);
-  await expect(rows(card(page, 'trips'))).toHaveText(['Lantern Trip']);
+  await expect(titles(page, 'Trip')).toHaveText(['Lantern Trip']);
   await expect(page.locator('main')).not.toContainText(/Bay Picnic|Second Family/);
 
   await page.getByLabel('Current Family').selectOption({ label: w.family2.name });
-  await expect(page).toHaveURL(/\/events$/);
+  await expect(page).toHaveURL(/\/activities$/);
   await expect(page.locator('.page-title')).toContainText(w.family2.name);
-  await expect(rows(card(page, 'upcoming'))).toHaveText(['Second Family Dinner']);
-  await expect(rows(card(page, 'trips'))).toHaveText(['Second Family Trip']);
+  await expect(titles(page, 'Event')).toHaveText(['Second Family Dinner']);
+  await expect(titles(page, 'Trip')).toHaveText(['Second Family Trip']);
   await expect(page.locator('main')).not.toContainText(/Lantern|Private Supper|Bay Picnic/);
 });

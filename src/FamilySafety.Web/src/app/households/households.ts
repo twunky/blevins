@@ -1,6 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, Input, OnChanges, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { AppIcon } from '../icon';
+import { focusHeadingState } from '../navigation';
 import { FormsModule } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
@@ -8,8 +11,11 @@ export interface HouseholdMember { profileId: string; displayName: string }
 export interface Household { householdId: string; name: string; version: string; members: HouseholdMember[] }
 export interface HouseholdStructure { canManage: boolean; households: Household[]; unassignedMembers: HouseholdMember[] }
 
-@Component({ selector: 'app-households', imports: [FormsModule], templateUrl: './households.html', styleUrl: './households.scss' })
+@Component({ selector: 'app-households', imports: [FormsModule, RouterLink, AppIcon], templateUrl: './households.html', styleUrls: ['./households.scss', '../family-summary.scss'] })
 export class Households implements OnChanges {
+  @Input() summary = false;
+  protected readonly focusHeadingState = focusHeadingState;
+  protected initials(name: string): string { return name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toLocaleUpperCase(); }
   @Input() familyId: string | null = null;
   @Input() ownProfileId: string | null = null;
   private readonly http = inject(HttpClient);
@@ -35,7 +41,10 @@ export class Households implements OnChanges {
     if (!this.familyId || !this.ownProfileId) { this.state.set('unavailable'); return; }
     this.state.set('loading');
     this.http.get<HouseholdStructure>(this.url).pipe(takeUntil(this.changed), takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: data => { this.structure.set(data); this.state.set('ready'); },
+      next: data => {
+        if (!Array.isArray(data?.households) || !Array.isArray(data?.unassignedMembers) || typeof data.canManage !== 'boolean') { this.state.set('error'); return; }
+        this.structure.set(data); this.state.set('ready');
+      },
       error: (e: HttpErrorResponse) => this.state.set(e.status === 401 || e.status === 404 ? 'unavailable' : 'error'),
     });
   }

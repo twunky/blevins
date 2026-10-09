@@ -32,8 +32,18 @@ test('invited adult completes the continuous Phase 9 cross-feature journey', asy
   await page.goto('/home');
   const nav = page.getByRole('navigation', { name: 'Main navigation' });
   const area = async (name: string) => {
-    await nav.getByRole('link', { name, exact: true }).click();
-    await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+    const link = nav.getByRole('link', { name, exact: true });
+    const destination = new URL((await link.getAttribute('href'))!, page.url()).href;
+    const alreadyAtDestination = page.url() === destination;
+    await link.click();
+    await expect(page).toHaveURL(destination);
+    // D4 moves focus after navigation; reselecting the same URL does not navigate.
+    if (alreadyAtDestination) {
+      await expect(link).toHaveAttribute('aria-current', 'page');
+      await expect(link).toBeFocused();
+    } else {
+      await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+    }
   };
   const capture = async (name: string) => {
     for (const width of [1440, 390]) {
@@ -67,17 +77,21 @@ test('invited adult completes the continuous Phase 9 cross-feature journey', asy
     await expect(page).toHaveURL(/\/plans\/[\da-f-]+$/);
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Existing Family walk', exact: true })).toBeVisible();
-    await page.getByRole('link', { name: 'Back to Plans', exact: true }).click();
+    await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
     await area('Family');
-    await page.getByRole('button', { name: 'Development Adult', exact: true }).click();
-    await expect(page.locator('.member-detail')).toBeVisible();
+    await page.getByRole('list', { name: 'Active adult family members' }).getByRole('link', { name: 'View profile of Development Adult', exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`/family/${family.familyGroupId}/members/${aProfile}$`));
+    await expect(page.locator('app-member-profile').getByRole('heading', { name: 'Development Adult', exact: true })).toBeVisible();
+    await page.getByRole('link', { name: 'Back to Family', exact: true }).click();
     await page.getByRole('link', { name: 'Family settings', exact: true }).click();
     await expect(page.getByLabel('Recipient email')).toHaveCount(0);
     await page.getByRole('link', { name: 'Back to Family', exact: true }).click();
   });
   await test.step('create an Event and refresh its item route', async () => {
-    await area('Events');
-    await page.getByRole('link', { name: 'Create event', exact: true }).click();
+    await area('Activities');
+    await page.getByRole('link', { name: 'Create Activity', exact: true }).click();
+    await page.getByRole('navigation', { name: 'Choose activity type' }).getByRole('link', { name: /^Event / }).click();
+    await expect(page).toHaveURL(/\/events\/new$/);
     await page.locator('#event-name').fill('Invited adult Event');
     await page.locator('#event-location').fill('Family hall');
     await page.locator('#event-description').fill('Coordination created by the invited adult.');
@@ -88,22 +102,25 @@ test('invited adult completes the continuous Phase 9 cross-feature journey', asy
     await expect(page).toHaveURL(/\/events\/[\da-f-]+$/);
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Invited adult Event', exact: true })).toBeVisible();
-    await page.getByRole('link', { name: 'Back to Events', exact: true }).click();
+    await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
   });
-  await test.step('Plans & Trips reaches both; create and open a Plan and Trip', async () => {
-    await area('Plans & Trips');
-    await page.getByRole('link', { name: /^Open Plans/ }).click();
+  await test.step('Activities reaches both; create and open a Plan and Trip', async () => {
+    await area('Activities');
+    await page.getByRole('link', { name: 'Create Activity', exact: true }).click();
+    await page.getByRole('navigation', { name: 'Choose activity type' }).getByRole('link', { name: /^Plan / }).click();
+    await expect(page).toHaveURL(/\/plans\/new$/);
     await page.locator('#plan-activity').fill('Invited adult Plan');
     await page.locator('#plan-date').fill(date(3));
     await page.locator('#plan-time').fill('10:00');
     await page.locator('#plan-audience-group').check();
     await page.getByRole('button', { name: 'Create plan', exact: true }).click();
-    await page.getByRole('link', { name: /Invited adult Plan/ }).click();
+    await expect(page).toHaveURL(/\/plans\/[\da-f-]+$/);
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Invited adult Plan', exact: true })).toBeVisible();
-    await area('Plans & Trips');
-    await page.getByRole('link', { name: /^Open Trips/ }).click();
-    await page.getByRole('button', { name: 'Create trip', exact: true }).click();
+    await area('Activities');
+    await page.getByRole('link', { name: 'Create Activity', exact: true }).click();
+    await page.getByRole('navigation', { name: 'Choose activity type' }).getByRole('link', { name: /^Trip / }).click();
+    await expect(page).toHaveURL(/\/trips\/new$/);
     await page.locator('#trip-title').fill('Invited adult Trip');
     await page.locator('#trip-destination').fill('Family coast');
     await page.locator('#trip-start').fill(date(4));
@@ -111,9 +128,10 @@ test('invited adult completes the continuous Phase 9 cross-feature journey', asy
     await page.getByRole('group', { name: /^Travelers/ }).getByRole('checkbox', { name: /Development Recipient/ }).check();
     await page.getByRole('radio', { name: 'This Family', exact: true }).check();
     await page.locator('form.trip-form').getByRole('button', { name: 'Create trip', exact: true }).click();
+    await expect(page).toHaveURL(/\/trips\/[\da-f-]+$/);
     await expect(page.getByRole('heading', { name: 'Invited adult Trip', exact: true })).toBeVisible();
     await capture('created-trip');
-    await page.getByRole('link', { name: 'Back to Trips', exact: true }).click();
+    await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
   });
   await test.step('create a Concern; start a separate Incident from it', async () => {
     await area('Safety');

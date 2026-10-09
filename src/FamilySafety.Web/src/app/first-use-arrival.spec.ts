@@ -334,7 +334,7 @@ describe('First use and invitation arrival (WI-009-010)', () => {
     expect(root(harness).querySelector('app-trips')).not.toBeNull();
   });
 
-  it.each([['/events', 'section.events-page'], ['/plans', 'section.plans-page'], ['/family', 'section.family-dashboard']])(
+  it.each([['/activities', 'app-activities'], ['/plans/new', 'section.plans-page'], ['/family', 'section.family-dashboard']])(
     'renders %s for a selected Family with no prompt and no no-Family copy', async (url, selector) => {
       const harness = await visit(url);
       shellReads([a]);
@@ -344,7 +344,7 @@ describe('First use and invitation arrival (WI-009-010)', () => {
       expect(rendered(harness).textContent).not.toMatch(innerNoFamily);
     });
 
-  it.each(['/events', '/family'])('keeps %s when the first Family is chosen from no selection, then on a normal switch (O6)', async url => {
+  it.each(['/activities', '/family'])('keeps %s when the first Family is chosen from no selection, then on a normal switch (O6)', async url => {
     const router = TestBed.inject(Router);
     const context = TestBed.inject(CurrentFamilyContext);
     const harness = await visit(url);

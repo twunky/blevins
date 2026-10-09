@@ -75,7 +75,8 @@ Do not use `REQ-SAFETY-*`.
 | `REQ-UX-010` | Minimal-interaction mobile actions | `ux-contract.md#req-ux-010` | `APPROVED` | `CTX-1.0` | — |
 | `REQ-UX-011` | Conceptual navigation areas and current Family context | `ux-contract.md#req-ux-011` | `APPROVED` | `CTX-1.0`; clarified `CTX-1.24`; amended `CTX-1.27` | — |
 | `REQ-UX-012` | Visual direction | `ux-contract.md#req-ux-012` | `APPROVED` | `CTX-1.0` | — |
-| `REQ-UX-013` | MVP six-area primary navigation and its validation standard (resolves `OD-001`) | `ux-contract.md#req-ux-013` | `APPROVED` | `CTX-1.27` | — |
+| `REQ-UX-013` | Former MVP six-area primary navigation (resolved `OD-001`) | `ux-contract.md#req-ux-013` | `SUPERSEDED` | `CTX-1.27` | Replaced by `REQ-UX-018`, owner navigation reconciliation 2026-10-08 |
+| `REQ-UX-018` | MVP five-area primary navigation with Activities grouping and preserved validation standard | `ux-contract.md#req-ux-018` | `APPROVED` | Owner navigation reconciliation 2026-10-08; no new aggregate baseline | Replaces `REQ-UX-013`; Events, Plans, Trips remain distinct domains |
 | `REQ-UX-014` | Refresh-safe item URLs and authorized deep-link Family context; no fabricated Family context; one-time Family-list refresh | `ux-contract.md#req-ux-014` | `APPROVED` | `CTX-1.27`; amended `CTX-1.28` | — |
 
 ## Privacy, consent, and access

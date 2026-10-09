@@ -19,6 +19,7 @@ Do not recursively read the entire `ai-context/` tree. Bootstrap, archived, supe
 
 - Do not invent product behavior, permissions, user roles, requirements, architecture, dependencies, or scope.
 - UX mockups under `references/ux` are non-authoritative design evidence. They may guide presentation and workflow discussion but must not override canonical contracts, requirements, privacy rules, or approved work items.
+- Before UI implementation or modification, read the [canonical UI Visual Design Contract](ui-visual-design-contract.md). It records the owner-approved current dark visual language across Activities, Family, Home, Safety, and Me / Settings; product, UX behavior, privacy, and authorization contracts still govern functionality.
 - Report missing, ambiguous, contradictory, or outdated information explicitly.
 - If authoritative sources conflict, stop and report `BLOCKED—CONTEXT CONFLICT`, citing each conflicting source.
 - All work must follow current best practices and established patterns appropriate to the selected technology, product risk, and project phase.
@@ -56,6 +57,7 @@ After the mandatory entry files, select context by task:
 | Execute a story or work item | Approved story or work item, its `context_baseline`, its `required_context`, and `execute-story` skill |
 | Verify work | Story or work item, canonical requirement sources, evidence, and `verify-story` skill |
 | Maintain context | Accepted decision, affected canonical files, requirement index, and `maintain-context` skill |
+| Implement or modify UI presentation | [UI Visual Design Contract](ui-visual-design-contract.md), relevant shared/component styles, and applicable UX/product/privacy requirements |
 | Audit history | Only the specifically referenced bootstrap or archived material |
 
 Use [context routing](../claude-handoff/CONTEXT-ROUTING.md) to select topic-specific canonical sources. Completed work-item manifests, historical checkpoints, candidates, and verification evidence are not default session context; read them only for a specific historical or regression question.
@@ -126,4 +128,3 @@ Superseded IDs are never reused. Superseded material may be retained for audit b
 ## Architecture boundary
 
 Phase 3 may analyze and propose technical architecture only when authorized. Accepted Phase 3 decisions apply only when recorded in `decision-log.md` and reflected in the relevant planning/context files. No framework version, database production choice, hosting, authentication provider, deployment, infrastructure, application code, or implementation-domain design is authorized until explicitly approved. A proposal never authorizes implementation.
-

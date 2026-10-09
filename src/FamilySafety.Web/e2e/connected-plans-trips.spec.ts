@@ -22,11 +22,12 @@ test('Home navigation reaches Plan and Trip creation, supported Notes, and domai
   await page.setViewportSize({ width: 390, height: 844 });
 
   await test.step('Home to Plans, create and edit the existing note field', async () => {
-    await nav.getByRole('link', { name: 'Plans & Trips', exact: true }).focus();
+    await nav.getByRole('link', { name: 'Activities', exact: true }).focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('main h1')).toBeFocused();
-    await page.getByRole('link', { name: /^Open Plans/ }).click();
-    await expect(page).toHaveURL(/\/plans$/);
+    await page.getByRole('link', { name: 'Create Activity', exact: true }).click();
+    await page.getByRole('navigation', { name: 'Choose activity type' }).getByRole('link', { name: /^Plan / }).click();
+    await expect(page).toHaveURL(/\/plans\/new$/);
     await expect(page.locator('#plan-checkin-help')).toContainText('It does not schedule a Check-In or send reminders.');
     await page.locator('#plan-activity').fill('Connected Family walk');
     await page.locator('#plan-date').fill(date(1));
@@ -36,7 +37,6 @@ test('Home navigation reaches Plan and Trip creation, supported Notes, and domai
     await page.locator('#plan-notes').fill('Meet at the park gate.');
     await page.locator('#plan-audience-group').check();
     await page.getByRole('button', { name: 'Create plan', exact: true }).click();
-    await page.getByRole('link', { name: 'Connected Family walk', exact: true }).click();
     await expect(page).toHaveURL(/\/plans\/[\da-f-]+$/);
     await expect(page.locator('.item-page')).toContainText('Meet at the park gate.');
     await expect(page.locator('.item-page')).toContainText('It does not schedule a Check-In or send reminders.');
@@ -50,18 +50,20 @@ test('Home navigation reaches Plan and Trip creation, supported Notes, and domai
     await page.waitForLoadState('networkidle');
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
-    await page.getByRole('link', { name: 'Back to Plans', exact: true }).click();
-    await expect(page).toHaveURL(/\/plans$/);
+    await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
+    await expect(page).toHaveURL(/\/activities$/);
+    await expect(page.locator('.activity-row').filter({ hasText: 'Connected Family walk' })).toBeVisible();
     await nav.getByRole('link', { name: 'Home', exact: true }).click();
     await expect(page.getByRole('link', { name: 'Connected Family walk', exact: true })).toBeVisible();
   });
 
   let tripUrl = '';
   await test.step('grouping to Trips, create/view and contribute a Trip Note', async () => {
-    await nav.getByRole('link', { name: 'Plans & Trips', exact: true }).click();
-    await page.getByRole('link', { name: /^Open Trips/ }).click();
+    await nav.getByRole('link', { name: 'Activities', exact: true }).click();
+    await page.getByRole('link', { name: 'All accessible Trips, including Trips from former Families', exact: true }).click();
     await expect(page).toHaveURL(/\/trips$/);
-    await page.getByRole('button', { name: 'Create trip', exact: true }).click();
+    await page.getByRole('link', { name: 'Create trip', exact: true }).click();
+    await expect(page).toHaveURL(/\/trips\/new$/);
     await page.locator('#trip-title').fill('Connected Family coast trip');
     await page.locator('#trip-destination').fill('Synthetic coast');
     await page.locator('#trip-start').fill(date(2));
@@ -71,15 +73,19 @@ test('Home navigation reaches Plan and Trip creation, supported Notes, and domai
     await expect(page.locator('form.trip-form')).toContainText('Being a traveler does not grant access');
     await page.locator('form.trip-form').getByRole('button', { name: 'Create trip', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Connected Family coast trip', exact: true })).toBeVisible();
-    // Creation opens the existing inline detail. The saved list link owns its refresh-safe item URL.
-    await page.getByRole('link', { name: 'Back to Trips', exact: true }).click();
-    await page.getByRole('link', { name: /Connected Family coast trip/ }).click();
+    // Creation opens the item URL; the Activities row reaches that same detail.
     await expect(page).toHaveURL(/\/trips\/[\da-f-]+$/);
     tripUrl = new URL(page.url()).pathname;
+    await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
+    await page.getByRole('group', { name: 'Activity type' }).getByRole('button', { name: /^Trips / }).click();
+    const tripRow = page.locator('.activity-row').filter({ hasText: 'Connected Family coast trip' });
+    await expect(tripRow).toHaveAttribute('href', tripUrl);
+    await tripRow.click();
+    await expect(page).toHaveURL(new RegExp(`${tripUrl}$`));
     await page.getByLabel('Add a Note', { exact: true }).fill('Pack a raincoat.');
     await page.getByRole('button', { name: 'Add note', exact: true }).click();
     await expect(page.locator('.trip-note-list')).toContainText('Pack a raincoat.');
-    await expect(page.getByRole('button', { name: 'Edit trip details', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Edit trip details', exact: true })).toHaveAttribute('href', `${tripUrl}/edit`);
     await expect(page.getByRole('button', { name: 'Complete Trip', exact: true })).toBeVisible();
     await page.reload();
     await expect(page.locator('.trip-note-list')).toContainText('Pack a raincoat.');
@@ -87,8 +93,8 @@ test('Home navigation reaches Plan and Trip creation, supported Notes, and domai
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     await page.screenshot({ path: resolve(captureDirectory('connected-plans-trips'), 'trip-notes-390.png'), fullPage: true });
-    await page.getByRole('link', { name: 'Back to Trips', exact: true }).click();
-    await expect(page).toHaveURL(/\/trips$/);
+    await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
+    await expect(page).toHaveURL(/\/activities$/);
     await nav.getByRole('link', { name: 'Home', exact: true }).click();
     await expect(page.getByRole('link', { name: 'Connected Family coast trip', exact: true })).toBeVisible();
   });
@@ -101,11 +107,11 @@ test('Home navigation reaches Plan and Trip creation, supported Notes, and domai
     await nav.getByRole('link', { name: 'Home', exact: true }).click();
     await page.getByRole('link', { name: 'Connected Family coast trip', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`${tripUrl}$`));
-    await expect(page.getByRole('button', { name: 'Edit trip details', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Edit trip details', exact: true })).toHaveCount(0);
     await page.getByLabel('Add a Note', { exact: true }).fill('I will bring the picnic supplies.');
     await page.getByRole('button', { name: 'Add note', exact: true }).click();
     await expect(page.locator('.trip-note-list')).toContainText('I will bring the picnic supplies.');
-    await page.getByRole('link', { name: 'Back to Trips', exact: true }).click();
+    await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
     await nav.getByRole('link', { name: 'Home', exact: true }).click();
     await expect(page.locator('.current-family strong')).toHaveText('Development Family');
   });

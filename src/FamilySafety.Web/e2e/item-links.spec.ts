@@ -29,9 +29,9 @@ const urlPath: Record<ItemType, string> = {
 };
 /** What each item page shows: its area (main navigation), page h1, the item h2 for a label, and its unavailable card. */
 const page_: Record<ItemType, { area: string; h1: string; heading: (label: string) => string; noun: string; plural: string }> = {
-  event: { area: 'Events', h1: 'Events', heading: label => `${label} Event`, noun: 'Event', plural: 'Events' },
-  plan: { area: 'Plans & Trips', h1: 'Plans', heading: label => `${label} Plan`, noun: 'Plan', plural: 'Plans' },
-  trip: { area: 'Plans & Trips', h1: 'Trips', heading: label => `${label} Trip`, noun: 'Trip', plural: 'Trips' },
+  event: { area: 'Activities', h1: 'Events', heading: label => `${label} Event`, noun: 'Event', plural: 'Events' },
+  plan: { area: 'Activities', h1: 'Plans', heading: label => `${label} Plan`, noun: 'Plan', plural: 'Plans' },
+  trip: { area: 'Activities', h1: 'Trips', heading: label => `${label} Trip`, noun: 'Trip', plural: 'Trips' },
   concern: { area: 'Safety', h1: 'Concerns', heading: () => 'Concern about Development Recipient', noun: 'Concern', plural: 'Concerns' },
   incident: { area: 'Safety', h1: 'Safety Incidents', heading: () => 'Incident about Development Recipient', noun: 'Incident', plural: 'Incidents' },
 };
@@ -200,12 +200,12 @@ async function actAs(page: Page, identity: DevelopmentIdentity, path = '/home'):
 }
 
 /** In-app navigation to a URL without a reload, so the session-only Family selection is kept (REQ-UX-011). */
-async function goInApp(page: Page, url: string): Promise<void> {
+async function goInApp(page: Page, url: string, destination = url): Promise<void> {
   await page.evaluate(target => {
     history.pushState({}, '', target);
     dispatchEvent(new PopStateEvent('popstate', { state: {} }));
   }, url);
-  await page.waitForURL(`**${url}`);
+  await page.waitForURL(target => target.pathname + target.search === destination);
 }
 
 /** Selects a Family in the top bar on Home, as a person would. */
@@ -282,21 +282,21 @@ test('AC-01 to AC-10, AC-29, AC-41 — each item URL renders on direct entry and
   await expect(event).toContainText('Harbor Hall');
   await expect(event).toContainText('Harbor Event description');
   await expect(event).toContainText('Organized by Development Adult');
-  await expect(event.getByRole('button', { name: 'Edit event details' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Back to Events' })).toHaveAttribute('href', '/events');
+  await expect(event.getByRole('link', { name: 'Edit event details', exact: true })).toHaveAttribute('href', `/events/${w.family1Items.event}/edit`);
+  await expect(page.getByRole('link', { name: 'Back to Activities', exact: true })).toHaveAttribute('href', '/activities');
 
   await page.goto(`/plans/${w.family1Items.plan}`);
   const plan = page.getByRole('article', { name: 'Plan details' });
   await expect(plan).toContainText('Planned by Development Adult');
   await expect(plan.getByRole('button', { name: 'Add note' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Back to Plans' })).toHaveAttribute('href', '/plans');
+  await expect(page.getByRole('link', { name: 'Back to Activities', exact: true })).toHaveAttribute('href', '/activities');
 
   await page.goto(`/trips/${w.family1Items.trip}`);
   const trip = page.getByRole('article', { name: 'Trip details' });
   await expect(trip).toContainText('Harbor Coast');
   await expect(trip.getByRole('heading', { name: 'Trip Notes' })).toBeVisible();
   await expect(trip.getByRole('button', { name: 'Change audience' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Back to Trips' })).toHaveAttribute('href', '/trips');
+  await expect(page.getByRole('link', { name: 'Back to Activities', exact: true })).toHaveAttribute('href', '/activities');
 
   await page.goto(`/concerns/${w.family1Items.concern}`);
   await expect(page.getByText('Harbor Concern reason')).toBeVisible();
@@ -508,26 +508,32 @@ test('AC-11 to AC-16, AC-32, AC-36, AC-41 — list and Home rows are links; back
   }
 
   // AC-11 to AC-15: list rows are semantic links with the existing names; list → item → Back → Forward.
-  const lists: [ItemType, string, Locator][] = [
-    // WI-009-008: the complete Event list (with inline edit) is /events/all.
-    ['event', '/events/all', page.locator('.events-overview').getByRole('link', { name: 'Harbor Event' })],
-    ['plan', '/plans', page.locator('.plans-overview').getByRole('link', { name: 'Harbor Plan' })],
-    ['trip', '/trips', page.getByRole('link', { name: /Harbor Trip/ })],
-    ['concern', '/concerns', page.getByRole('link', { name: /Open Concern about Development Recipient, Open/ }).filter({ hasText: 'Harbor Concern reason' })],
-    ['incident', '/incidents', page.getByRole('link', { name: 'Open Incident about Development Recipient, Open' }).filter({ hasText: w.family1.name })],
+  const lists: [ItemType, string, string, Locator][] = [
+    // Legacy listing entries redirect into Activities while retaining type/date intent.
+    ['event', '/events/all', '/activities?type=Event&period=all', page.locator('.activity-row').filter({ hasText: 'Harbor Event' })],
+    ['plan', '/plans', '/activities?type=Plan', page.locator('.activity-row').filter({ hasText: 'Harbor Plan' })],
+    ['trip', '/trips', '/trips', page.getByRole('link', { name: /Harbor Trip/ })],
+    ['concern', '/concerns', '/concerns', page.getByRole('link', { name: /Open Concern about Development Recipient, Open/ }).filter({ hasText: 'Harbor Concern reason' })],
+    ['incident', '/incidents', '/incidents', page.getByRole('link', { name: 'Open Incident about Development Recipient, Open' }).filter({ hasText: w.family1.name })],
   ];
-  for (const [type, list, link] of lists) {
-    await goInApp(page, list);
+  for (const [type, list, destination, link] of lists) {
+    await goInApp(page, list, destination);
     await expect(link).toHaveAttribute('href', `${urlPath[type]}${w.family1Items[type]}`);
-    if (type === 'event') await expect(page.locator('.events-overview').getByRole('button', { name: 'Edit event details' }).first()).toBeVisible();
+    if (type === 'event' || type === 'plan') {
+      await expect(page.getByRole('group', { name: 'Activity type' }).getByRole('button', { name: type === 'event' ? /^Events / : /^Plans / }))
+        .toHaveAttribute('aria-pressed', 'true');
+      if (type === 'event') await expect(page.getByLabel('Activity dates')).toHaveValue('all');
+    }
     // Keyboard: the row link is reachable and opens with Enter.
     await link.focus();
     await expect(link).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(new RegExp(`${urlPath[type]}${w.family1Items[type]}$`));
     await expectItemPage(page, type, 'Harbor');
+    if (type === 'event') await expect(page.getByRole('article', { name: 'Event details' }).getByRole('link', { name: 'Edit event details', exact: true }))
+      .toHaveAttribute('href', `/events/${w.family1Items.event}/edit`);
     await page.goBack();
-    await expect(page).toHaveURL(new RegExp(`${list}$`));
+    await expect(page).toHaveURL(target => target.pathname + target.search === destination);
     await expect(link).toBeVisible();
     // No focus jump on popstate (WI-009-003 D4).
     await expect(page.locator('main h1')).not.toBeFocused();
@@ -667,19 +673,26 @@ test('AC-01 — editing an Event from its own page uses the existing form and PU
   await page.setViewportSize(widths[0].viewport);
   await actAs(page, w.a, `/events/${created.body.eventId}`);
   const article = page.getByRole('article', { name: 'Event details' });
-  await article.getByRole('button', { name: 'Edit event details' }).click();
-  await article.getByLabel('Event name').fill('Edited Event');
+  await article.getByRole('link', { name: 'Edit event details', exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/events/${created.body.eventId}/edit$`));
+  await expect(page.locator('main h1')).toHaveText('Edit Event');
+  const form = page.locator('.events-edit-form');
+  await expect(form.getByLabel('Event name')).toHaveValue('Editable Event');
+  await form.getByLabel('Event name').fill('Edited Event');
   const put = page.waitForResponse(response => response.request().method() === 'PUT'
     && response.url().endsWith(`/api/family-groups/${w.family1.familyGroupId}/events/${created.body.eventId}`));
-  await article.getByRole('button', { name: 'Save event details' }).click();
-  expect((await put).status()).toBe(200);
+  await form.getByRole('button', { name: 'Save event details' }).click();
+  const saved = await put;
+  expect(saved.status()).toBe(200);
+  expect((await saved.json()).name).toBe('Edited Event');
+  await expect(page).toHaveURL(new RegExp(`/events/${created.body.eventId}$`));
   await expect(itemHeading(page)).toHaveText('Edited Event');
-  await expect(page.getByRole('article', { name: 'Event details' }).getByText('Event details updated.')).toBeVisible();
+  await expect(article).toContainText('Before the edit');
   await page.reload();
   await expect(itemHeading(page)).toHaveText('Edited Event');
 
   // B is in the audience without edit access: the same page has no edit control.
   await actAs(page, w.b, `/events/${created.body.eventId}`);
   await expect(itemHeading(page)).toHaveText('Edited Event');
-  await expect(page.getByRole('button', { name: 'Edit event details' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Edit event details', exact: true })).toHaveCount(0);
 });

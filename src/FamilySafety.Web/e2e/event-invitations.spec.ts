@@ -11,7 +11,7 @@ interface Profile { profileId: string; displayName: string }
 interface World { a: Identity; b: Identity; c: Identity; family: Family; second: Family; bProfile: Profile; cProfile: Profile }
 let world: World | null = null;
 const section = (page: Page) => page.locator('app-event-participation');
-const discovery = (page: Page) => page.locator('.events-dash--rsvps');
+const discovery = (page: Page) => page.getByRole('region', { name: 'Pending RSVPs' });
 
 async function post(request: APIRequestContext, account: Identity, path: string, data: unknown) {
   return request.post(`${apiBaseUrl}${path}`, { headers: { [developmentAccountHeader]: account.accountId }, data });
@@ -48,6 +48,13 @@ async function identity(page: Page, account: Identity, path: string) {
   await page.getByLabel('Active test identity').selectOption({ label: account.label });
   await page.goto(path);
   await expect(page.getByLabel('Active test identity')).toHaveValue(account.accountId);
+  if (path === '/events') {
+    await expect(page).toHaveURL(/\/activities\?type=Event$/);
+    const current = page.getByRole('navigation', { name: 'Main navigation' }).locator('a[aria-current]');
+    await expect(current).toHaveCount(1);
+    await expect(current).toHaveText('Activities');
+    await expect(current).toHaveAttribute('aria-current', 'page');
+  }
 }
 async function capture(page: Page, state: string, axe = true) {
   await page.waitForLoadState('networkidle');
@@ -86,7 +93,7 @@ test('organizer issue, own Pending discovery, every RSVP, revoke, re-invite and 
   await expect(discovery(page).getByRole('link', { name: 'Invitation gathering' })).toHaveAttribute('href', `/events/${id}`);
   await capture(page, 'pending-dashboard');
   await chooseFamily(page, w.second);
-  await expect(discovery(page)).toContainText('no pending Event invitations');
+  await expect(discovery(page)).toContainText('no pending event invitations');
   await expect(discovery(page)).not.toContainText('Invitation gathering');
   await chooseFamily(page, w.family);
   await discovery(page).getByRole('link', { name: 'Invitation gathering' }).click();
@@ -101,8 +108,9 @@ test('organizer issue, own Pending discovery, every RSVP, revoke, re-invite and 
   await expect(section(page)).toContainText('Your RSVP was saved');
   await expect(section(page)).toContainText('Current RSVP: Going');
   await capture(page, 'invitee-going');
-  await page.getByRole('link', { name: 'Back to Events' }).click();
-  await expect(discovery(page)).toContainText('no pending Event invitations');
+  await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
+  await expect(page).toHaveURL(/\/activities$/);
+  await expect(discovery(page)).toContainText('no pending event invitations');
 
   await identity(page, w.a, `/events/${id}`);
   await expect(section(page)).toContainText('Active · Going'); await capture(page, 'organizer-going');
@@ -113,7 +121,7 @@ test('organizer issue, own Pending discovery, every RSVP, revoke, re-invite and 
     await expect(section(page)).toContainText(`Current RSVP: ${response}`);
   }
   await identity(page, w.c, `/events/${id}`);
-  await expect(page.getByRole('button', { name: 'Edit event details' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Edit event details', exact: true })).toHaveAttribute('href', `/events/${id}/edit`);
   await expect(section(page)).toContainText('no active invitation');
   await expect(section(page)).not.toContainText(w.bProfile.displayName);
   await expect(section(page).getByRole('button')).toHaveCount(0);
@@ -127,7 +135,9 @@ test('organizer issue, own Pending discovery, every RSVP, revoke, re-invite and 
   await identity(page, w.b, `/events/${id}`);
   await expect(section(page)).toContainText('no active invitation');
   await expect(section(page).getByRole('button', { name: 'Save RSVP' })).toHaveCount(0); await capture(page, 'invitee-revoked');
-  await page.getByRole('link', { name: 'Back to Events' }).click(); await expect(discovery(page)).toContainText('no pending');
+  await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
+  await expect(page).toHaveURL(/\/activities$/);
+  await expect(discovery(page)).toContainText('no pending');
   await identity(page, w.a, `/events/${id}`);
   await section(page).getByRole('button', { name: `Invite ${w.bProfile.displayName}`, exact: true }).click();
   await expect(section(page)).toContainText('Invitation issued');

@@ -55,13 +55,16 @@ test('invited adult reaches Home, discovers RSVP, coordinates Needs and Updates,
   expect((await post(`${base}/needs`, { title: 'Bring paper plates', detail: 'For the gathering', category: 'Supplies' })).status()).toBe(200);
   expect((await post(`${base}/updates`, { text: 'Use the side entrance.' })).status()).toBe(200);
 
-  await test.step('Home and Events discover the same actionable invitation', async () => {
+  await test.step('Home and Activities discover the same actionable invitation', async () => {
     await page.reload();
     const attention = page.locator('.home-attention');
     await expect(attention).toContainText('RSVP needed');
     await expect(attention.getByRole('link', { name: 'Connected Family gathering', exact: true })).toHaveAttribute('href', `/events/${eventId}`);
-    await nav.getByRole('link', { name: 'Events', exact: true }).click();
-    await expect(page.getByRole('link', { name: 'Connected Family gathering', exact: true }).first()).toBeVisible();
+    await nav.getByRole('link', { name: 'Activities', exact: true }).click();
+    await expect(page).toHaveURL(/\/activities$/);
+    await expect(page.getByRole('region', { name: 'Pending RSVPs' }).getByRole('link', { name: 'Connected Family gathering', exact: true }))
+      .toHaveAttribute('href', `/events/${eventId}`);
+    await expect(page.locator('.activity-row').filter({ hasText: 'Connected Family gathering' })).toHaveAttribute('href', `/events/${eventId}`);
     await nav.getByRole('link', { name: 'Home', exact: true }).click();
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForLoadState('networkidle');
@@ -87,7 +90,7 @@ test('invited adult reaches Home, discovers RSVP, coordinates Needs and Updates,
     await expect(needs.getByRole('button', { name: 'Add Need', exact: true })).toHaveCount(0);
     await expect(updates).toContainText('Use the side entrance.');
     await expect(updates.getByRole('button', { name: 'Post Update', exact: true })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Edit event details', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Edit event details', exact: true })).toHaveCount(0);
     // One intercepted read error checks that recovery returns to real authorized data.
     await page.route(`**${base}/updates`, route => route.fulfill({ status: 500, body: '{}' }), { times: 1 });
     await updates.getByRole('button', { name: 'Refresh Updates', exact: true }).click();
@@ -98,8 +101,8 @@ test('invited adult reaches Home, discovers RSVP, coordinates Needs and Updates,
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     await page.screenshot({ path: resolve(captureDirectory('connected-event-coordination'), 'event-member-390.png'), fullPage: true });
-    await page.getByRole('link', { name: 'Back to Events', exact: true }).click();
-    await expect(page).toHaveURL(/\/events$/);
+    await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
+    await expect(page).toHaveURL(/\/activities$/);
     await nav.getByRole('link', { name: 'Home', exact: true }).click();
     await expect(page.locator('.home-attention')).toContainText('No pending RSVPs or relationship suggestions.');
     await page.reload();

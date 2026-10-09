@@ -46,6 +46,7 @@ test('Family navigation preserves Date and Household boundaries across roles, se
   await test.step('admin discovers Dates on Family and Households in Settings', async () => {
     await nav.getByRole('link', { name: 'Family', exact: true }).click();
     await expect(dates).toContainText('No shared dates are available to you.');
+    await dates.getByRole('link', { name: 'View all Shared Family Dates' }).click();
     await dates.getByRole('button', { name: 'Add a date', exact: true }).click();
     await dates.getByLabel('Title', { exact: true }).fill('First Family date');
     await dates.getByLabel('Date including year').fill('2030-07-15');
@@ -53,6 +54,7 @@ test('Family navigation preserves Date and Household boundaries across roles, se
     await dates.getByRole('checkbox', { name: 'Development Recipient', exact: true }).check();
     await dates.getByRole('button', { name: 'Create date', exact: true }).click();
     await expect(dates).toContainText('First Family date');
+    await page.getByRole('link', { name: 'Back to Family', exact: true }).click();
     await page.getByRole('link', { name: 'Family settings', exact: true }).focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('main h1')).toBeFocused();
@@ -61,7 +63,8 @@ test('Family navigation preserves Date and Household boundaries across roles, se
     await households.getByLabel('Household name', { exact: true }).fill('First Family Household');
     await households.getByRole('button', { name: 'Create Household', exact: true }).click();
     const row = households.getByRole('article', { name: 'First Family Household', exact: true });
-    await row.getByLabel('Assign or move a member to First Family Household').selectOption({ label: 'Development Recipient' });
+    await row.getByRole('combobox', { name: 'Family member to add to First Family Household', exact: true }).selectOption({ label: 'Development Recipient' });
+    await row.getByRole('button', { name: 'Add Member', exact: true }).click();
     await expect(row).toContainText('Development Recipient');
     await expect(households.getByRole('region', { name: 'Unassigned members', exact: true })).toContainText('Development Audience Member');
     await expect(households).toContainText('Households do not change Family access or sharing permissions.');
@@ -74,11 +77,13 @@ test('Family navigation preserves Date and Household boundaries across roles, se
     await expect(dates).toContainText('First Family date');
     await expect(dates).not.toContainText('Second Family date');
     await expect(dates.getByRole('button', { name: 'Delete date', exact: true })).toHaveCount(0);
+    await dates.getByRole('link', { name: 'View all Shared Family Dates' }).click();
     await dates.getByRole('button', { name: 'Edit date', exact: true }).click();
     await expect(dates).toContainText('Only the creator can change associated members or delete this date.');
     await dates.getByLabel('Description', { exact: true }).fill('Reviewed by associated adult');
     await dates.getByRole('button', { name: 'Save date', exact: true }).click();
     await expect(dates).toContainText('Reviewed by associated adult');
+    await page.getByRole('link', { name: 'Back to Family', exact: true }).click();
     await page.getByRole('link', { name: 'Family settings', exact: true }).click();
     await expect(households).toContainText('First Family Household');
     await expect(households.getByRole('button', { name: 'Create a Household', exact: true })).toHaveCount(0);
@@ -121,7 +126,8 @@ test('Family navigation preserves Date and Household boundaries across roles, se
     await page.evaluate(id => { history.pushState({}, '', `/events/${id}`); dispatchEvent(new PopStateEvent('popstate', { state: {} })); }, sharedEvent);
     await expect(page.getByRole('heading', { name: 'Authorized second Family Event', exact: true })).toBeVisible();
     await expect(selected).toHaveValue(second.familyGroupId);
-    await page.getByRole('link', { name: 'Back to Events', exact: true }).click();
+    await page.getByRole('link', { name: 'Back to Activities', exact: true }).click();
+    await expect(page).toHaveURL(/\/activities$/);
     await expect(selected).toHaveValue(second.familyGroupId);
     for (const id of [privateEvent, '11111111-1111-1111-1111-111111111111']) {
       await page.evaluate(id => { history.pushState({}, '', `/events/${id}`); dispatchEvent(new PopStateEvent('popstate', { state: {} })); }, id);

@@ -1,0 +1,44 @@
+<div class="activity-tools">
+  <div class="activity-filters" role="group" aria-label="Activity type">
+    <button class="button--secondary" [attr.aria-pressed]="type() === 'All'" (click)="chosenType.set('All')">All <span>{{ periodRows().length }}</span></button>
+    @for (item of types; track item.type) {
+      <button class="button--secondary" [attr.aria-pressed]="type() === item.type" (click)="chosenType.set(item.type)"><app-icon [name]="item.icon" />{{ item.type }}s <span>{{ count(item.type) }}</span></button>
+    }
+  </div>
+  <label class="activity-search"><span class="visually-hidden">Search activities</span><input type="search" placeholder="Search activities…" [value]="search()" (input)="search.set($any($event.target).value)" /></label>
+</div>
+<div class="activity-layout">
+  <section aria-labelledby="activity-list-heading">
+    <div class="activity-list-heading"><h2 id="activity-list-heading">{{ period() === 'all' ? 'All Activities' : 'Upcoming Activities' }}</h2>
+      <label>Show <select aria-label="Activity dates" [value]="period()" (change)="chosenPeriod.set($any($event.target).value)"><option value="upcoming">Upcoming</option><option value="all">All dates</option></select></label>
+    </div>
+    @if (loading()) { <p role="status">Loading activities…</p> }
+    @if (errors().length) { <div class="message message--error" role="alert">@for (error of errors(); track error) { <p>{{ error }}</p> }<button class="button--secondary" (click)="retry.emit()">Retry loading activities</button></div> }
+    <ul class="activity-list">
+      @for (row of visible(); track row.type + row.id) {
+        @let tile = dateTile(row.date);
+        <li><a class="activity-row" [routerLink]="row.path" [state]="focusHeadingState">
+          <span class="activity-date" aria-hidden="true"><small>{{ tile.month }}</small><strong>{{ tile.day }}</strong></span>
+          <span class="activity-badge" [class]="'activity-badge activity-' + row.type.toLowerCase()"><app-icon [name]="icon(row.type)" />{{ row.type }}</span>
+          <span class="activity-copy"><strong>{{ row.title }}</strong><span>{{ row.timing }}</span><span>{{ row.location }}</span>@if (row.completed) { <span>Completed</span> }</span>
+          <app-icon name="chevron" />
+        </a></li>
+      } @empty { @if (!loading() && !errors().length) { <li class="card activity-empty">No activities match this view. Try another type, all dates, or a different search.</li> } }
+    </ul>
+  </section>
+  <aside class="activity-sidebar">
+    <section class="card" aria-labelledby="activity-rsvp-heading">
+      <div class="activity-card-heading"><app-icon name="check" /><h2 id="activity-rsvp-heading">Pending RSVPs</h2>@if (!pendingLoading() && !pendingError()) { <span>{{ pending().length }}</span> }</div>
+      @if (pendingLoading()) { <p role="status">Loading your pending invitations…</p> }
+      @else if (pendingError()) { <p role="alert">{{ pendingError() }}</p><button class="button--secondary" (click)="retryPending.emit()">Retry pending invitations</button> }
+      @else { <ul class="activity-pending">@for (invitation of pending(); track invitation.invitationId) { <li><a [routerLink]="['/events', invitation.eventId]" [state]="focusHeadingState">{{ invitation.name }}</a><p>Open Event to respond</p></li> } @empty { <li class="activity-empty"><app-icon name="calendar" /><h3>All caught up!</h3><p>You have no pending event invitations in this family.</p></li> }</ul> }
+    </section>
+    <section class="card" aria-labelledby="activity-insights-heading">
+      <div class="activity-card-heading"><app-icon name="tasks" /><h2 id="activity-insights-heading">Activity Insights</h2></div>
+      <p class="activity-caption">{{ period() === 'all' ? 'All dates' : 'Upcoming' }} · Shared with you</p>
+      @if (loading()) { <p role="status">Loading counts…</p> }
+      @else if (errors().length) { <p>Counts are incomplete while some activities are unavailable.</p> }
+      @else { @for (item of types; track item.type) { <div class="activity-insight"><span [class]="'activity-badge activity-' + item.type.toLowerCase()"><app-icon [name]="item.icon" /></span><strong>{{ count(item.type) }} {{ count(item.type) === 1 ? item.type : item.type + 's' }}</strong></div> } }
+    </section>
+  </aside>
+</div>

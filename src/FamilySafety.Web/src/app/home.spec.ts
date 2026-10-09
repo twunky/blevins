@@ -224,8 +224,8 @@ describe('Home and feature empty states', () => {
     familyReads(family, [{ profileId: ownProfile.profileId, displayName: 'Alex' }]);
     await listHarness.fixture.whenStable();
     listHarness.detectChanges();
-    expect(listHarness.routeNativeElement?.textContent).toContain('No Events are currently shared with you in this Family');
-    expect(listHarness.routeNativeElement?.textContent).toContain('family gatherings and activities');
+    http.expectOne('/api/trips').flush([]); listHarness.detectChanges();
+    expect(listHarness.routeNativeElement?.textContent).toContain('No activities match this view.');
     expect(listHarness.routeNativeElement?.textContent).not.toContain('Create or join a family group');
 
     const harness = listHarness;
@@ -248,8 +248,10 @@ describe('Home and feature empty states', () => {
     familyReads();
     await harness.fixture.whenStable();
     harness.detectChanges();
-    expect(harness.routeNativeElement?.textContent).toContain('No Plans are currently visible to you in this Family');
-    expect(harness.routeNativeElement?.textContent).toContain('lightweight way to share a future activity or destination');
+    http.expectOne('/api/trips').flush([]); harness.detectChanges();
+    expect(harness.routeNativeElement?.textContent).toContain('No activities match this view.');
+    expect(harness.routeNativeElement?.querySelector('#plan-notes')).toBeNull();
+    await harness.navigateByUrl('/plans/new', App); initial([family]); familyReads(); harness.detectChanges();
     expect(harness.routeNativeElement?.querySelector('#plan-notes')).not.toBeNull();
     expect(harness.routeNativeElement?.querySelector('#plan-audience-group')).not.toBeNull();
   });
@@ -263,7 +265,7 @@ describe('Home and feature empty states', () => {
     harness.detectChanges();
     expect(harness.routeNativeElement?.textContent).toContain('No Trips are currently available to you');
     expect(harness.routeNativeElement?.textContent).toContain('Trip Notes for authorized viewers');
-    expect(Array.from(harness.routeNativeElement!.querySelectorAll('button'))
+    expect(Array.from(harness.routeNativeElement!.querySelectorAll('a'))
       .some(button => button.textContent?.trim() === 'Create trip')).toBe(true);
   });
 
@@ -341,7 +343,7 @@ describe('Home and feature empty states', () => {
     expect(eventsHarness.routeNativeElement?.textContent).toContain('Events could not be loaded');
     expect(eventsHarness.routeNativeElement?.textContent).not.toContain('No Events are currently shared with you');
     expect(Array.from(eventsHarness.routeNativeElement!.querySelectorAll('button'))
-      .some(button => button.textContent?.trim() === 'Retry loading Events')).toBe(true);
+      .some(button => button.textContent?.trim() === 'Retry loading activities')).toBe(true);
   });
 
   it('does not present the Plan empty state when its authorized list fails to load', async () => {
@@ -354,17 +356,22 @@ describe('Home and feature empty states', () => {
     http.expectOne(`/api/family-groups/${family.familyGroupId}/relationships`).flush([]);
     http.expectOne(`/api/family-groups/${family.familyGroupId}/events`).flush([]);
     http.expectOne(`/api/family-groups/${family.familyGroupId}/plans`).flush({}, { status: 503, statusText: 'Unavailable' });
+    http.expectOne('/api/trips').flush([]);
     harness.detectChanges();
     expect(harness.routeNativeElement?.textContent).toContain('Plans could not be loaded');
-    expect(harness.routeNativeElement?.textContent).not.toContain('No Plans are currently visible to you');
+    expect(harness.routeNativeElement?.textContent).not.toContain('No activities match this view.');
 
     // Retry repeats only the Plan list read; a successful read shows the normal empty state.
     Array.from(harness.routeNativeElement!.querySelectorAll('button'))
-      .find(button => button.textContent?.trim() === 'Retry loading Plans')!.click();
+      .find(button => button.textContent?.trim() === 'Retry loading activities')!.click();
+    harness.detectChanges();
+    expect(harness.routeNativeElement?.textContent).toContain('Loading activities');
+    expect(harness.routeNativeElement?.textContent).not.toContain('No activities match this view.');
     http.expectNone(`/api/family-groups/${family.familyGroupId}/events`);
     http.expectOne(`/api/family-groups/${family.familyGroupId}/plans`).flush([]);
     harness.detectChanges();
-    expect(harness.routeNativeElement?.textContent).toContain('No Plans are currently visible to you');
+    expect(harness.routeNativeElement?.querySelector('.activity-list .activity-empty')?.textContent)
+      .toBe('No activities match this view. Try another type, all dates, or a different search.');
     expect(harness.routeNativeElement?.textContent).not.toContain('Plans could not be loaded');
   });
 
@@ -381,28 +388,16 @@ describe('Home and feature empty states', () => {
     expect(Array.from(root.querySelectorAll('button')).some(button => button.textContent?.trim() === 'Retry loading Trips')).toBe(true);
   });
 
-  it('distinguishes directory filter no-match from an unfiltered empty directory and clears the filter', async () => {
-    const harness = await visit('/family');
-    initial([family]);
+  it('distinguishes search with no matches and clears it without fetching again', async () => {
+    const harness = await visit('/family'); initial([family]);
     familyReads(family, [{ profileId: ownProfile.profileId, displayName: 'Alex' }]);
-    await harness.fixture.whenStable();
-    harness.detectChanges();
-    const search = harness.routeNativeElement!.querySelector<HTMLInputElement>('#directory-search')!;
-    search.value = 'nobody';
-    search.dispatchEvent(new Event('input'));
-    const filter = Array.from(harness.routeNativeElement!.querySelectorAll('button'))
-      .find(button => button.textContent?.trim() === 'Filter members')!;
-    filter.click();
-    http.expectOne(`/api/family-groups/${family.familyGroupId}/members?search=nobody`).flush([]);
-    harness.detectChanges();
-    expect(harness.routeNativeElement?.textContent).toContain('No active adult family members match this filter');
-    const clear = Array.from(harness.routeNativeElement!.querySelectorAll('button'))
-      .find(button => button.textContent?.trim() === 'Clear filter')!;
-    clear.click();
-    http.expectOne(`/api/family-groups/${family.familyGroupId}/members`).flush([{ profileId: ownProfile.profileId, displayName: 'Alex' }]);
-    harness.detectChanges();
-    expect(harness.routeNativeElement?.textContent).toContain('currently shows one active adult member');
-    expect(harness.routeNativeElement?.textContent).toContain('Family administrator may invite another adult');
+    await harness.fixture.whenStable(); harness.detectChanges();
+    const search = harness.routeNativeElement!.querySelector<HTMLInputElement>('#family-search')!;
+    search.value = 'nobody'; search.dispatchEvent(new Event('input')); harness.detectChanges();
+    http.expectNone(request => request.url.includes('?search='));
+    expect(harness.routeNativeElement!.textContent).toContain('No family members match your search.');
+    harness.routeNativeElement!.querySelector<HTMLButtonElement>('[aria-label="Clear Family search"]')!.click(); harness.detectChanges();
+    expect(harness.routeNativeElement!.querySelectorAll('.member-button')).toHaveLength(1);
   });
   for (const [name, start, expectedReturn, included] of [
     ['future-start', 2, null, true],
@@ -456,7 +451,7 @@ describe('Home and feature empty states', () => {
     expect(card.textContent).not.toMatch(/returned|no-return/);
     (Array.from(card.querySelectorAll('button')).find(button => button.textContent?.trim() === 'Open Plans')!).click();
     await harness.fixture.whenStable();
-    expect(TestBed.inject(Router).url).toBe('/plans');
+    expect(TestBed.inject(Router).url).toBe('/activities?type=Plan');
   });
 
   it('keeps ongoing and upcoming Trips without letting ended or other-Family Trips consume the three Home slots', async () => {
@@ -552,7 +547,7 @@ describe('Home and feature empty states', () => {
     const root = harness.routeNativeElement!;
     expect(Array.from(root.querySelectorAll('h1')).map(heading => heading.textContent?.trim())).toEqual(['Safety Incidents']);
     const navLabels = Array.from(root.querySelectorAll('nav a')).map(link => link.textContent?.trim());
-    expect(navLabels).toEqual(['Home', 'Family', 'Events', 'Plans & Trips', 'Safety', 'Me / Settings']);
+    expect(navLabels).toEqual(['Home', 'Family', 'Activities', 'Safety', 'Me / Settings']);
     expect(root.querySelector('nav button')).toBeNull();
     expect(Array.from(root.querySelectorAll('nav [aria-current]'))
       .map(link => [link.textContent?.trim(), link.getAttribute('aria-current')])).toEqual([['Safety', 'true']]);

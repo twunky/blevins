@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { App } from './app';
 
 const profile = {
@@ -18,7 +18,12 @@ const profile = {
 
 /** Shows one routed page in a router-less fixture (the shell picks its view from the route in the app). */
 function showView(fixture: { componentInstance: unknown }, view: string): void {
-  (fixture.componentInstance as { view: { set: (value: string) => void } }).view.set(view);
+  const app = fixture.componentInstance as any;
+  if (view === 'eventsAll') {
+    app.itemEvent.set(app.familyEvents()[0]); app.itemStatus.set('ready'); view = 'eventEdit';
+  }
+  if (view === 'planItem') { app.itemPlan.set(app.familyPlans()[0]); app.itemStatus.set('ready'); }
+  app.view.set(view === 'plans' ? 'planCreate' : view);
 }
 
 describe('App', () => {
@@ -32,6 +37,8 @@ describe('App', () => {
     }).compileComponents();
 
     http = TestBed.inject(HttpTestingController);
+    // Component-only tests inspect the saved state; routed success is tested in the router and browser suites.
+    vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -273,6 +280,7 @@ describe('App', () => {
 
   it('creates a plan with selected active adult recipients and no combined audience option', () => {
     const fixture = TestBed.createComponent(App);
+    showView(fixture, 'planCreate');
     fixture.detectChanges();
     http.expectOne('/api/profile').flush(profile);
     http.expectOne('/api/family-groups/administered').flush([]);
@@ -318,7 +326,7 @@ describe('App', () => {
     expect(checkInDate).not.toBeNull();
     expect(planNotes).not.toBeNull();
     expect(returnDate!.compareDocumentPosition(audience!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(audience!.compareDocumentPosition(checkInDate!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(checkInDate!.compareDocumentPosition(audience!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(checkInDate!.compareDocumentPosition(planNotes!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     const component = fixture.componentInstance as unknown as {
@@ -384,9 +392,9 @@ describe('App', () => {
           notes: 'Bring snacks.\nMeet by the north entrance.',
         },
       ]);
+    showView(fixture, 'planItem');
     fixture.detectChanges();
     expect(element.textContent).toContain('Visit the lake');
-    expect(element.textContent).toContain('Plans you can see');
     const renderedNotes = element.querySelector('.plan-notes');
     expect(renderedNotes?.textContent).toBe('Bring snacks.\nMeet by the north entrance.');
     expect(renderedNotes?.innerHTML).not.toContain('<br>');
@@ -609,7 +617,7 @@ describe('App', () => {
     expect(element.textContent).toContain('Development Adult');
   });
 
-  it('requires explicit Family selection and clears stale detail when the context changes', () => {
+  it('requires explicit Family selection and clears the search and stale relationships when context changes', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     http.expectOne('/api/profile').flush(profile);
@@ -632,18 +640,13 @@ describe('App', () => {
     fixture.detectChanges();
 
     const component = fixture.componentInstance as unknown as {
-      selectDirectoryMember: (member: object) => void;
-      selectedMember: () => object | null;
+      directorySearch: { set: (value: string) => void; (): string };
       familyRelationships: () => readonly object[];
     };
-    component.selectDirectoryMember({
-      profileId: profile.profileId,
-      displayName: profile.displayName,
-    });
-    expect(component.selectedMember()).not.toBeNull();
+    component.directorySearch.set('Development');
     selector!.value = 'group-two';
     selector!.dispatchEvent(new Event('change'));
-    expect(component.selectedMember()).toBeNull();
+    expect(component.directorySearch()).toBe('');
     expect(component.familyRelationships()).toEqual([]);
     http.expectOne('/api/family-groups/group-two/members').flush([]);
     http.expectOne('/api/family-groups/group-two/relationships').flush([]);
@@ -667,35 +670,14 @@ describe('App', () => {
     expect((fixture.nativeElement as HTMLElement).querySelector('#current-family')).not.toBeNull();
   });
 
-  it('loads another member profile only after selection', () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-    http.expectOne('/api/profile').flush(profile);
-    http.expectOne('/api/family-groups/administered').flush([]);
-    http
-      .expectOne('/api/family-groups/mine')
-      .flush([{ familyGroupId: 'group-one', name: 'Family One' }]);
-    http
-      .expectOne('/api/family-groups/group-one/members')
-      .flush([{ profileId: 'other-profile', displayName: 'Other Adult' }]);
-    http.expectOne('/api/family-groups/group-one/relationships').flush([]);
-    fixture.detectChanges();
-
-    const component = fixture.componentInstance as unknown as {
-      selectDirectoryMember: (member: object) => void;
-    };
-    component.selectDirectoryMember({ profileId: 'other-profile', displayName: 'Other Adult' });
-    http.expectOne('/api/family-members/other-profile/profile').flush({
-      profileId: 'other-profile',
-      displayName: 'Other Adult',
-      contactEmail: 'shared@example.com',
-      contactPhone: null,
-      birthdayMonth: null,
-      birthdayDay: null,
-    });
-    fixture.detectChanges();
-
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('shared@example.com');
+  it('does not fetch private member details for the directory summary', () => {
+    const fixture = TestBed.createComponent(App); fixture.detectChanges();
+    http.expectOne('/api/profile').flush(profile); http.expectOne('/api/family-groups/administered').flush([]);
+    http.expectOne('/api/family-groups/mine').flush([{ familyGroupId: 'group-one', name: 'Family One' }]);
+    http.expectOne('/api/family-groups/group-one/members').flush([{ profileId: 'other-profile', displayName: 'Other Adult' }]);
+    http.expectOne('/api/family-groups/group-one/relationships').flush([]); fixture.detectChanges();
+    http.expectNone(request => request.url.startsWith('/api/family-members/'));
+    expect(fixture.nativeElement.querySelector('.member-detail')).toBeNull();
   });
 
   it('renders reciprocal labels and removes self from relationship choices', () => {

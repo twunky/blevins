@@ -650,8 +650,8 @@ describe('Trips — item URL /trips/:tripId (REQ-UX-014, WI-009-005)', () => {
     http.expectOne(`/api/trips/${trip(true).tripId}/notes`).flush([]);
     fixture.detectChanges();
     expect(element.querySelector('h2')?.textContent).toContain('Family visit');
-    const back = Array.from(element.querySelectorAll('a')).find(link => link.textContent?.trim() === 'Back to Trips');
-    expect(back?.getAttribute('href')).toBe('/trips');
+    const back = Array.from(element.querySelectorAll('a')).find(link => link.textContent?.trim() === 'Back to Activities');
+    expect(back?.getAttribute('href')).toBe('/activities');
     expect(element.textContent).not.toContain('Create trip');
   });
 

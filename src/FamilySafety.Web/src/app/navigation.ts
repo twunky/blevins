@@ -13,13 +13,14 @@ import { IconName } from './icon';
  * (REQ-UX-014, WI-009-005); an Incident item is the `incidents` view, served by its existing shared route.
  */
 export type NavigableView =
+  | 'activities' | 'activityCreate' | 'planCreate' | 'tripCreate' | 'eventEdit' | 'planEdit' | 'tripEdit'
   | 'home' | 'family' | 'familySettings' | 'events' | 'eventCreate' | 'eventsAll' | 'eventItem'
   | 'plansTrips' | 'plans' | 'planItem' | 'trips' | 'tripItem'
   | 'safety' | 'concerns' | 'concernItem' | 'incidents'
-  | 'profile';
+  | 'memberProfile' | 'profile';
 
-/** The six primary areas. Plans & Trips and Safety are navigation groupings only. */
-export type PrimaryArea = 'home' | 'family' | 'events' | 'plansTrips' | 'safety' | 'me';
+/** The five primary areas. Activities and Safety are presentation groupings only. */
+export type PrimaryArea = 'home' | 'family' | 'activities' | 'safety' | 'me';
 
 export interface PrimaryDestination {
   readonly area: PrimaryArea;
@@ -30,22 +31,23 @@ export interface PrimaryDestination {
   readonly view: NavigableView;
 }
 
-/** The six REQ-UX-013 destinations, in the required order at every width. */
+/** The five REQ-UX-013 destinations, in the required order at every width. */
 export const primaryDestinations: readonly PrimaryDestination[] = [
   { area: 'home', label: 'Home', icon: 'home', path: '/home', view: 'home' },
   { area: 'family', label: 'Family', icon: 'users', path: '/family', view: 'family' },
-  { area: 'events', label: 'Events', icon: 'calendar', path: '/events', view: 'events' },
-  { area: 'plansTrips', label: 'Plans & Trips', icon: 'plane', path: '/plans-trips', view: 'plansTrips' },
+  { area: 'activities', label: 'Activities', icon: 'calendar', path: '/activities', view: 'activities' },
   { area: 'safety', label: 'Safety', icon: 'shield', path: '/safety', view: 'safety' },
   { area: 'me', label: 'Me / Settings', icon: 'user', path: '/me', view: 'profile' },
 ];
 
 /** Which primary area is current for each page. UI state only; never used for authorization. */
 export const areaForView: Readonly<Record<NavigableView, PrimaryArea>> = {
+  activities: 'activities', activityCreate: 'activities', planCreate: 'activities', tripCreate: 'activities',
+  eventEdit: 'activities', planEdit: 'activities', tripEdit: 'activities',
   home: 'home',
-  family: 'family', familySettings: 'family',
-  events: 'events', eventCreate: 'events', eventsAll: 'events', eventItem: 'events',
-  plansTrips: 'plansTrips', plans: 'plansTrips', planItem: 'plansTrips', trips: 'plansTrips', tripItem: 'plansTrips',
+  family: 'family', familySettings: 'family', memberProfile: 'family',
+  events: 'activities', eventCreate: 'activities', eventsAll: 'activities', eventItem: 'activities',
+  plansTrips: 'activities', plans: 'activities', planItem: 'activities', trips: 'activities', tripItem: 'activities',
   safety: 'safety', concerns: 'safety', concernItem: 'safety', incidents: 'safety',
   profile: 'me',
 };
@@ -55,7 +57,9 @@ export const areaForView: Readonly<Record<NavigableView, PrimaryArea>> = {
  * /concerns and /concerns/:id share one matcher (app.routes.ts), so moving between them keeps the shell.
  */
 export const pathForView: Readonly<Record<NavigableView, string>> = {
-  home: 'home', family: 'family', familySettings: 'family/settings', events: 'events', eventCreate: 'events/new',
+  activities: 'activities', activityCreate: 'activities/new', planCreate: 'plans/new', tripCreate: 'trips/new',
+  eventEdit: 'events/:eventId/edit', planEdit: 'plans/:planId/edit', tripEdit: 'trips/:tripId/edit',
+  home: 'home', family: 'family', memberProfile: 'family/:familyId/members/:profileId', familySettings: 'family/settings', events: 'events', eventCreate: 'events/new',
   eventsAll: 'events/all', eventItem: 'events/:eventId',
   plansTrips: 'plans-trips', plans: 'plans', planItem: 'plans/:planId', trips: 'trips', tripItem: 'trips/:tripId',
   safety: 'safety', concerns: 'concerns', concernItem: 'concerns/:concernId', incidents: 'incidents',

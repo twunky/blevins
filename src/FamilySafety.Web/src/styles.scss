@@ -456,6 +456,26 @@ app-root button.button--danger {
 }
 app-root button.button--danger:hover:not(:disabled) { background: #4a242b; border-color: #ffc6cb; color: #ffc6cb; }
 
+/* Safety homepage only: reuse Home's atmosphere and Family/Profile surfaces.
+   Shared controls, focus, status colors and the existing section order remain authoritative. */
+.app-main.app-main--safety {
+  background: radial-gradient(ellipse at 40% 0, #04141e 0, transparent 55%);
+  .page-title { margin-bottom: 24px; }
+  .page-title h1 { font-size: clamp(2rem, 3vw, 2.7rem); }
+  .card { background: linear-gradient(145deg, #11181e, #0b1014 80%); }
+  > :is(app-check-ins, app-sharing-sessions, app-safety-circles, app-trusted-contacts) { margin-top: var(--space-5); }
+  app-sharing-sessions > .card > button + button { margin-left: var(--space-2); }
+  #check-ins { scroll-margin-top: var(--space-5); }
+}
+
+@media (max-width: 43.99rem) {
+  .app-main.app-main--safety {
+    > :is(app-check-ins, app-sharing-sessions, app-safety-circles, app-trusted-contacts) { margin-top: var(--space-4); }
+    :is(app-check-ins, app-sharing-sessions) > .card > button { width: 100%; }
+    app-sharing-sessions > .card > button + button { margin: var(--space-2) 0 0; }
+  }
+}
+
 @media (max-width: 43.99rem) {
   .app-frame:not(.app-frame--home) {
     .page-title { margin-bottom: 24px; }

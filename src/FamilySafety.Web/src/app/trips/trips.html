@@ -1,7 +1,7 @@
 <section class="trips" aria-label="Trips">
   @if (activeGroups.length > 0 && !showingForm() && tripId === null) {
     <div class="trips-toolbar">
-      <button type="button" (click)="openCreate()"><app-icon name="plus" />Create trip</button>
+      <a class="button-link" routerLink="/trips/new" [state]="focusHeadingState"><app-icon name="plus" />Create trip</a>
     </div>
   }
 
@@ -166,7 +166,7 @@
       </div>
     </form>
   } @else if (selectedTrip(); as trip) {
-    <a class="detail-back-link" routerLink="/trips" [state]="focusHeadingState" (click)="tripId === null && closeDetail()"><app-icon name="back" />Back to Trips</a>
+    <a class="detail-back-link" routerLink="/activities" [state]="focusHeadingState" (click)="tripId === null && closeDetail()"><app-icon name="back" />Back to Activities</a>
     <article class="trip-detail" aria-label="Trip details">
       <section class="card trip-detail-hero" aria-label="Trip overview">
         <div class="trips-heading">
@@ -352,7 +352,7 @@
           <textarea id="trip-note-new" [formControl]="noteDraft" maxlength="1000" rows="4"></textarea>
           <button type="button" [disabled]="noteSaving()" (click)="addNote()">Add note</button></div>
       </section>
-      @if (trip.canEdit) { <div class="trip-management"><button type="button" [disabled]="completing()" (click)="beginEdit()">Edit trip details</button></div> }
+      @if (trip.canEdit) { <div class="trip-management"><a class="button-link" [routerLink]="['/trips', trip.tripId, 'edit']" [state]="focusHeadingState">Edit trip details</a></div> }
     </article>
   } @else {
     <section class="card trip-card" aria-labelledby="trip-list-heading">

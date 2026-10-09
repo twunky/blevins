@@ -39,6 +39,7 @@ describe('Invited adult first use', () => {
     TestBed.resetTestingModule();
   });
   function background() {
+    http.match(r => r.url.endsWith('/households')).forEach(r => { if (!r.cancelled) r.flush({ canManage: false, households: [], unassignedMembers: members }); });
     http.match(r => r.url.endsWith('/event-invitations/mine')).forEach(r => { if (!r.cancelled) r.flush([]); });
     http.match(r => r.url === '/api/sharing-sessions/mine').forEach(r => { if (!r.cancelled) r.flush([]); });
     http.match(r => r.url.endsWith('/dates')).forEach(r => { if (!r.cancelled) r.flush({ canCreate: true, dates: [] }); });
@@ -119,9 +120,8 @@ describe('Invited adult first use', () => {
     follow(fixture, 'Home', '/home');
     expect(fixture.nativeElement.querySelector('[aria-label="Family welcome"]').textContent).toContain('happening with Our Family today');
     expect(fixture.nativeElement.textContent).not.toContain('No family relationship suggestions need your response');
-    follow(fixture, 'Plans & Trips', '/plans-trips');
-    follow(fixture, 'Open Plans', '/plans');
-    expect(fixture.nativeElement.querySelector('[aria-labelledby="plans-heading"]').hidden).toBe(false);
+    follow(fixture, 'Activities', '/activities');
+    expect(fixture.nativeElement.querySelector('app-activities')).not.toBeNull();
   });
 
   it.each(['memberships', 'directory', 'relationships'])('retries failed %s loading without accepting the used token again', stage => {

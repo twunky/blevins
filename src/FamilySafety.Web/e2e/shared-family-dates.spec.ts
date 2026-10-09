@@ -9,7 +9,7 @@ interface DateEntry { dateId: string; title: string; description: string; date: 
 const section = (page: Page) => page.locator('app-shared-family-dates');
 async function identity(page: Page, actor: Identity, familyId: string) {
   await page.goto('/home'); await page.getByLabel('Active test identity').selectOption(actor.accountId);
-  await page.goto('/family');
+  await page.goto('/family/settings');
   const familySelector = page.getByLabel('Current Family', { exact: true });
   if (await familySelector.count()) await familySelector.selectOption(familyId);
   await expect(section(page)).toBeVisible(); await expect(section(page)).not.toContainText('Loading shared dates');

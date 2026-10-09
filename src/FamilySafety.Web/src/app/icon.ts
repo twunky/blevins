@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 export type IconName =
-  | 'home' | 'users' | 'calendar' | 'clipboard' | 'plane' | 'user' | 'shield'
+  | 'search' | 'home' | 'users' | 'calendar' | 'clipboard' | 'plane' | 'user' | 'shield'
   | 'alert' | 'link' | 'chevron' | 'plus' | 'heart' | 'check' | 'message' | 'tasks' | 'share' | 'settings' | 'info' | 'back';
 
 /** Decorative outline icons for navigation and card headers. Always hidden from assistive technology. */
@@ -11,6 +11,7 @@ export type IconName =
     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"
       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
       @switch (name) {
+        @case ('search') { <circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/> }
         @case ('home') { <path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/> }
         @case ('users') { <circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.2A6.5 6.5 0 0 1 21.5 20"/> }
         @case ('calendar') { <rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/> }

@@ -1,0 +1,15 @@
+<p><a class="member-back" routerLink="/family" [state]="focusHeadingState"><app-icon name="back" />Back to Family</a></p>
+<section class="card shared-member-profile" aria-label="Shared profile details">
+  @if (state() === 'loading') { <p role="status">Loading shared profile...</p> }
+  @else if (state() === 'unavailable') { <p role="status">This family member is unavailable.</p> }
+  @else if (profile(); as member) {
+    <div class="member-profile-heading"><span class="avatar" aria-hidden="true">{{ initials(member.displayName) }}</span><div><h2>{{ member.displayName }}</h2><p class="card-sub">Shared profile details</p></div></div>
+    <dl>
+      @if (member.contactEmail) { <div><dt>Contact email</dt><dd>{{ member.contactEmail }}</dd></div> }
+      @if (member.contactPhone) { <div><dt>Contact phone</dt><dd>{{ member.contactPhone }}</dd></div> }
+      @if (member.birthdayMonth && member.birthdayDay) { <div><dt>Birthday</dt><dd>{{ member.birthdayMonth }}/{{ member.birthdayDay }}</dd></div> }
+    </dl>
+    @if (!member.contactEmail && !member.contactPhone && !member.birthdayMonth) { <p>No optional profile details are shared.</p> }
+  }
+  <button type="button" class="button--secondary" (click)="refresh()">Refresh shared profile</button>
+</section>

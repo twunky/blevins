@@ -1,8 +1,9 @@
-.home-title { align-items: flex-end; gap: 24px; margin-bottom: 32px; }
+.app-frame--home .app-main { background: radial-gradient(ellipse at 40% 0, #04141e 0, transparent 55%); }
+.home-title { align-items: flex-end; gap: 24px; margin-bottom: 24px; }
 .home-title > div:first-child { flex: 1 1 32rem; min-width: 0; }
-.home-title h1 { font-size: clamp(2rem, 3.4vw, 3rem); font-weight: 550; letter-spacing: -0.045em; line-height: 1.12; margin-bottom: 14px; overflow-wrap: anywhere; }
-.home-title p { line-height: 1.6; }
-.home-title .home-eyebrow { color: #79e8ff; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.16em; margin-bottom: 16px; text-transform: uppercase; }
+.home-title h1 { font-size: clamp(2rem, 3vw, 2.7rem); font-weight: 550; letter-spacing: -0.04em; line-height: 1.2; margin-bottom: 10px; overflow-wrap: anywhere; }
+.home-title p { line-height: 1.65; }
+.home-title .home-eyebrow { color: var(--color-primary-hover); font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; }
 .home-title-aside { align-items: flex-end; display: flex; flex-direction: column; gap: 14px; }
 .home-title .page-date { font-size: 0.8rem; font-weight: 450; padding: 0; }
 .home-family-button { gap: 8px; }
@@ -15,7 +16,7 @@
 .home-grid .card-icon { background: #202328; color: #bdc7d4; height: 36px; width: 36px; }
 .home-grid .card-sub { font-size: 0.8rem; line-height: 1.55; margin-top: 6px; }
 .home-grid .card-sub + .card-sub { font-size: 0.75rem; margin-top: 2px; }
-.home-grid .home-attention { background: linear-gradient(125deg, #182124, #111 75%); border-top-color: #39707b; }
+.home-grid .home-attention { background: linear-gradient(145deg, #11181e, #0b1014 80%); }
 .home-attention .card-icon--attention { background: #382a1b; color: #f4cb89; }
 .attention-list { background: #ffffff04; border: 1px solid #ffffff14; border-radius: 12px; padding: 4px 16px; }
 .home-attention ul.attention-list { list-style: none; margin: 0; }
@@ -49,7 +50,6 @@
 .home-update-section { align-items: flex-start; display: flex; flex-direction: column; gap: 14px; }
 .home-update-section + .home-update-section { border-top: 1px solid var(--color-border); margin-top: 20px; padding-top: 20px; }
 .home-update-action { gap: 8px; }
-.home-grid .home-future--tasks { background: #0c0d0f; border-style: dashed; }
 .home-no-family { line-height: 1.7; }
 
 @media (min-width: 44rem) {

@@ -9,7 +9,7 @@ import {
   useIsolatedScenario,
 } from './fixtures/invitation-scenario';
 
-// WI-009-003: six-area main navigation (REQ-UX-013). Adult A (the default identity) is an active Family member,
+// Five-area main navigation (REQ-UX-018). Adult A (the default identity) is an active Family member,
 // which is all these journeys need, so no extra adult is seeded.
 useIsolatedScenario({ tripAudienceAdult: false });
 
@@ -20,8 +20,8 @@ const widths = [
   { name: 'desktop', viewport: { width: 1440, height: 1000 } },
   { name: 'narrow', viewport: { width: 390, height: 844 } },
 ] as const;
-const labels = ['Home', 'Family', 'Events', 'Plans & Trips', 'Safety', 'Me / Settings'];
-const hrefs = ['/home', '/family', '/events', '/plans-trips', '/safety', '/me'];
+const labels = ['Home', 'Family', 'Activities', 'Safety', 'Me / Settings'];
+const hrefs = ['/home', '/family', '/activities', '/safety', '/me'];
 // Transient captures (WI-009-002): routine runs never write canonical evidence under ai-context/.
 const captures = captureDirectory('navigation');
 
@@ -56,8 +56,8 @@ async function expectCurrent(page: Page, label: string, value: 'page' | 'true'):
   await expect(nav.locator('a.is-active')).toHaveText(label);
 }
 
-/** AC-01: six links, in order, with real URLs, and nothing else. */
-async function expectSixLinks(page: Page): Promise<void> {
+/** REQ-UX-018: five links, in order, with real URLs, and nothing else. */
+async function expectFiveLinks(page: Page): Promise<void> {
   const nav = mainNavigation(page);
   const links = nav.getByRole('link');
   await expect(links).toHaveText(labels);
@@ -102,16 +102,16 @@ for (const { name: widthName, viewport } of widths) {
 
       // Initial load: no focus movement (D4).
       await expect(heading(page)).not.toBeFocused();
-      await expectSixLinks(page);
+      await expectFiveLinks(page);
       await expectCurrent(page, 'Home', 'page');
 
-      // Layout (AC-09, AC-10): desktop sidebar is one column; narrow is three rows of two, read row by row.
+      // Desktop sidebar is one column; narrow has two links per row and a final single link.
       const layout = await boxes(nav.getByRole('link'));
       if (viewport.width === 390) {
         const rows = [...new Set(layout.map(box => box.y))];
         expect(rows).toHaveLength(3);
-        expect(layout.map(box => rows.indexOf(box.y))).toEqual([0, 0, 1, 1, 2, 2]);
-        for (let index = 0; index < 6; index += 2) expect(layout[index].x).toBeLessThan(layout[index + 1].x);
+        expect(layout.map(box => rows.indexOf(box.y))).toEqual([0, 0, 1, 1, 2]);
+        for (let index = 0; index + 1 < labels.length; index += 2) expect(layout[index].x).toBeLessThan(layout[index + 1].x);
         for (const box of layout) {
           expect(box.width).toBeGreaterThanOrEqual(44);
           expect(box.height).toBeGreaterThanOrEqual(44);
@@ -124,23 +124,24 @@ for (const { name: widthName, viewport } of widths) {
       await expectNoOverflow(page, viewport.width, 'Home');
       await capture(page, 'home', widthName);
 
-      // WI-009-003 AC-15, superseded for /safety by DEC-079 (WI-009-009): /safety is now the read-only Safety dashboard,
-      // so it may read the two authorized Safety list endpoints. It still makes no Trip, Check-In, or other domain request.
+      // Safety reads its authorized lists and standalone Check-Ins; it does not read Trips.
       const safetyDataRequests: string[] = [];
       const onRequest = (sent: { url(): string }) => {
-        if (/\/api\/(concerns|incidents|trips|checkins?)/i.test(sent.url())) safetyDataRequests.push(new URL(sent.url()).pathname);
+        if (/\/api\/(concerns|incidents|trips|check-?ins?)/i.test(sent.url())) safetyDataRequests.push(new URL(sent.url()).pathname);
       };
 
       const steps: { via: () => Locator; url: string; h1: string | RegExp; area: string; current: 'page' | 'true'; capture: string }[] = [
-        { via: () => link('Family'), url: '/family', h1: 'Family', area: 'Family', current: 'page', capture: 'family' },
+        { via: () => link('Family'), url: '/family', h1: family.name, area: 'Family', current: 'page', capture: 'family' },
         // WI-009-007: the gear opens Family settings, a Family child page; Back to Family returns.
         { via: () => page.getByRole('main').getByRole('link', { name: 'Family settings', exact: true }), url: '/family/settings', h1: 'Family settings', area: 'Family', current: 'true', capture: 'family-settings' },
-        { via: () => landingLink('Back to Family'), url: '/family', h1: 'Family', area: 'Family', current: 'page', capture: '' },
-        { via: () => link('Events'), url: '/events', h1: 'Events', area: 'Events', current: 'page', capture: 'events' },
-        { via: () => link('Plans & Trips'), url: '/plans-trips', h1: 'Plans & Trips', area: 'Plans & Trips', current: 'page', capture: 'plans-trips-landing' },
-        { via: () => landingLink('Open Plans'), url: '/plans', h1: 'Plans', area: 'Plans & Trips', current: 'true', capture: 'plans' },
-        { via: () => link('Plans & Trips'), url: '/plans-trips', h1: 'Plans & Trips', area: 'Plans & Trips', current: 'page', capture: '' },
-        { via: () => landingLink('Open Trips'), url: '/trips', h1: 'Trips', area: 'Plans & Trips', current: 'true', capture: 'trips' },
+        { via: () => landingLink('Back to Family'), url: '/family', h1: family.name, area: 'Family', current: 'page', capture: '' },
+        { via: () => link('Activities'), url: '/activities', h1: 'Activities', area: 'Activities', current: 'page', capture: 'activities' },
+        { via: () => landingLink('Create Activity'), url: '/activities/new', h1: 'Create Activity', area: 'Activities', current: 'true', capture: 'activity-create' },
+        { via: () => page.getByRole('navigation', { name: 'Choose activity type' }).getByRole('link', { name: /^Event / }), url: '/events/new', h1: 'Create Activity', area: 'Activities', current: 'true', capture: 'event-create' },
+        { via: () => page.getByRole('navigation', { name: 'Choose activity type' }).getByRole('link', { name: /^Plan / }), url: '/plans/new', h1: 'Create Activity', area: 'Activities', current: 'true', capture: 'plan-create' },
+        { via: () => page.getByRole('navigation', { name: 'Choose activity type' }).getByRole('link', { name: /^Trip / }), url: '/trips/new', h1: 'Create Activity', area: 'Activities', current: 'true', capture: 'trip-create' },
+        { via: () => link('Activities'), url: '/activities', h1: 'Activities', area: 'Activities', current: 'page', capture: '' },
+        { via: () => landingLink('All accessible Trips, including Trips from former Families'), url: '/trips', h1: 'Trips', area: 'Activities', current: 'true', capture: 'trips' },
         // WI-009-009: the Safety dashboard's View all links reach Concerns and Incidents; Back to Safety returns.
         { via: () => link('Safety'), url: '/safety', h1: 'Safety', area: 'Safety', current: 'page', capture: 'safety-dashboard' },
         { via: () => landingLink('View all Concerns'), url: '/concerns', h1: 'Concerns', area: 'Safety', current: 'true', capture: 'concerns' },
@@ -153,12 +154,12 @@ for (const { name: widthName, viewport } of widths) {
         const watchSafety = step.url === '/safety';
         if (watchSafety) { safetyDataRequests.length = 0; page.on('request', onRequest); }
         await follow(page, step.via(), step);
-        await expectSixLinks(page);
-        if (step.url === '/plans-trips') {
-          const cards = page.locator('app-group-landing section.card');
-          await expect(cards).toHaveCount(2);
-          await expect(cards.getByRole('heading', { level: 2 })).toHaveText(['Plans', 'Trips']);
-          await expect(page.locator('app-group-landing')).not.toContainText(/\d/);
+        await expectFiveLinks(page);
+        if (step.url === '/activities/new') {
+          const choices = page.getByRole('navigation', { name: 'Choose activity type' }).getByRole('link');
+          await expect(choices).toHaveCount(3);
+          expect(await choices.evaluateAll(items => items.map(item => item.getAttribute('href'))))
+            .toEqual(['/events/new', '/plans/new', '/trips/new']);
         }
         if (step.url === '/safety') {
           await expect(page.locator('app-safety-dashboard section.card').getByRole('heading', { level: 2 }))
@@ -170,8 +171,8 @@ for (const { name: widthName, viewport } of widths) {
         if (watchSafety) {
           await page.waitForLoadState('networkidle');
           page.off('request', onRequest);
-          expect([...new Set(safetyDataRequests)].sort(), 'the Safety dashboard reads only the two authorized Safety lists')
-            .toEqual(['/api/concerns', '/api/incidents']);
+          expect([...new Set(safetyDataRequests)].sort(), 'Safety reads authorized lists and Check-Ins, never Trips')
+            .toEqual(['/api/check-ins/mine', '/api/check-ins/received', '/api/concerns', '/api/incidents']);
         }
       }
     });
@@ -186,7 +187,7 @@ for (const { name: widthName, viewport } of widths) {
         return `${style.outlineStyle} ${style.outlineWidth}`;
       });
 
-      // Tab from the start of the page reaches the six links after the top-bar controls, in order.
+      // Tab from the start of the page reaches the five links after the top-bar controls, in order.
       await page.locator('body').focus();
       for (let presses = 0; presses < 25 && await focusedText() !== 'Home'; presses++) await page.keyboard.press('Tab');
       expect(await page.evaluate(() => !!document.activeElement?.closest('nav[aria-label="Main navigation"]'))).toBe(true);
@@ -200,39 +201,47 @@ for (const { name: widthName, viewport } of widths) {
       expect(order).toEqual(labels);
 
       // Enter on a nav link follows it; focus lands on the page h1 with a visible focus indication.
-      await nav.getByRole('link', { name: 'Plans & Trips', exact: true }).focus();
+      await nav.getByRole('link', { name: 'Activities', exact: true }).focus();
       await page.keyboard.press('Enter');
-      await expect(page).toHaveURL(/\/plans-trips$/);
+      await expect(page).toHaveURL(/\/activities$/);
       await expect(heading(page)).toBeFocused();
       expect(await focusedOutline()).toBe('solid 3px');
-      await expectCurrent(page, 'Plans & Trips', 'page');
+      await expectCurrent(page, 'Activities', 'page');
 
-      // From the h1, Tab reaches the landing links in order; Enter follows one.
+      // From the h1, Tab reaches Create Activity; its chooser retains distinct domain routes.
       await page.keyboard.press('Tab');
-      expect(await focusedText()).toBe('Open Plans');
+      expect(await focusedText()).toBe('Create Activity');
+      expect(await focusedOutline()).toBe('solid 3px');
+      await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(/\/activities\/new$/);
+      await expect(heading(page)).toBeFocused();
+      await expectCurrent(page, 'Activities', 'true');
+      // Event, Plan and Trip follow the chooser heading in keyboard order.
+      await page.keyboard.press('Tab');
+      expect(await focusedText()).toMatch(/^Event/);
       expect(await focusedOutline()).toBe('solid 3px');
       await page.keyboard.press('Tab');
-      expect(await focusedText()).toBe('Open Trips');
-      await page.keyboard.press('Shift+Tab');
+      expect(await focusedText()).toMatch(/^Plan/);
+      expect(await focusedOutline()).toBe('solid 3px');
       await page.keyboard.press('Enter');
-      await expect(page).toHaveURL(/\/plans$/);
-      await expect(heading(page)).toHaveText('Plans');
+      await expect(page).toHaveURL(/\/plans\/new$/);
+      await expect(heading(page)).toHaveText('Create Activity');
       await expect(heading(page)).toBeFocused();
-      await expectCurrent(page, 'Plans & Trips', 'true');
+      await expectCurrent(page, 'Activities', 'true');
 
       // Refresh restores history state, but it is the initial navigation: no focus movement.
       await page.reload();
-      await expect(heading(page)).toHaveText('Plans');
-      await expectCurrent(page, 'Plans & Trips', 'true');
+      await expect(heading(page)).toHaveText('Create Activity');
+      await expectCurrent(page, 'Activities', 'true');
       await expect(heading(page)).not.toBeFocused();
 
       // Back is a popstate navigation: natural, no focus movement.
       await page.goBack();
-      await expect(page).toHaveURL(/\/plans-trips$/);
-      await expect(heading(page)).toHaveText('Plans & Trips');
+      await expect(page).toHaveURL(/\/activities\/new$/);
+      await expect(heading(page)).toHaveText('Create Activity');
       await expect(heading(page)).not.toBeFocused();
       await page.goForward();
-      await expect(page).toHaveURL(/\/plans$/);
+      await expect(page).toHaveURL(/\/plans\/new$/);
       await expect(heading(page)).not.toBeFocused();
     });
 
@@ -240,10 +249,13 @@ for (const { name: widthName, viewport } of widths) {
       test.setTimeout(120_000);
       await setUp(page, request, viewport);
       const routes = [
-        { url: '/plans-trips', h1: 'Plans & Trips', area: 'Plans & Trips', current: 'page' },
+        { url: '/activities', h1: 'Activities', area: 'Activities', current: 'page' },
+        { url: '/activities/new', h1: 'Create Activity', area: 'Activities', current: 'true' },
+        { url: '/events/new', h1: 'Create Activity', area: 'Activities', current: 'true' },
+        { url: '/plans/new', h1: 'Create Activity', area: 'Activities', current: 'true' },
+        { url: '/trips/new', h1: 'Create Activity', area: 'Activities', current: 'true' },
         { url: '/safety', h1: 'Safety', area: 'Safety', current: 'page' },
-        { url: '/plans', h1: 'Plans', area: 'Plans & Trips', current: 'true' },
-        { url: '/trips', h1: 'Trips', area: 'Plans & Trips', current: 'true' },
+        { url: '/trips', h1: 'Trips', area: 'Activities', current: 'true' },
         { url: '/concerns', h1: 'Concerns', area: 'Safety', current: 'true' },
         { url: '/incidents', h1: 'Safety Incidents', area: 'Safety', current: 'true' },
         { url: '/incidents/new', h1: 'Safety Incidents', area: 'Safety', current: 'true' },
@@ -256,8 +268,28 @@ for (const { name: widthName, viewport } of widths) {
           await expect(heading(page)).toHaveText(route.h1);
           await expectCurrent(page, route.area, route.current);
           await expect(heading(page)).not.toBeFocused();
-          await expectSixLinks(page);
+          await expectFiveLinks(page);
           if (viewport.width === 390) await expectNoOverflow(page, viewport.width, `${route.url} ${pass}`);
+        }
+      }
+      // Listing aliases preserve type/date intent without restoring obsolete landing pages.
+      for (const [legacy, target, type, period] of [
+        ['/plans-trips', '/activities', 'All', 'upcoming'],
+        ['/events', '/activities?type=Event', 'Events', 'upcoming'],
+        ['/events/all', '/activities?type=Event&period=all', 'Events', 'all'],
+        ['/plans', '/activities?type=Plan', 'Plans', 'upcoming'],
+      ]) {
+        await page.goto(legacy);
+        for (const pass of ['direct', 'refresh']) {
+          if (pass === 'refresh') await page.reload();
+          await expect(page).toHaveURL(url => url.pathname + url.search === target);
+          await expect(heading(page)).toHaveText('Activities');
+          await expectCurrent(page, 'Activities', 'page');
+          await expect(page.getByRole('group', { name: 'Activity type' }).getByRole('button', { name: new RegExp(`^${type} \\d+$`) })).toHaveAttribute('aria-pressed', 'true');
+          await expect(page.getByLabel('Activity dates')).toHaveValue(period);
+          await expect(heading(page)).not.toBeFocused();
+          await expectFiveLinks(page);
+          if (viewport.width === 390) await expectNoOverflow(page, viewport.width, `${legacy} ${pass}`);
         }
       }
       await page.goto('/not-a-real-area');
@@ -267,17 +299,17 @@ for (const { name: widthName, viewport } of widths) {
   });
 }
 
-test('keeps all six destinations visible, in order, without overflow at intermediate widths (D2)', async ({ page, request }) => {
+test('keeps all five destinations visible, in order, without overflow at intermediate widths (D2)', async ({ page, request }) => {
   await setUp(page, request, { width: 1024, height: 900 });
   for (const width of [1024, 768, 600]) {
     await page.setViewportSize({ width, height: 900 });
-    await expectSixLinks(page);
+    await expectFiveLinks(page);
     await expectNoOverflow(page, width, `Home at ${width} px`);
     const layout = await boxes(mainNavigation(page).getByRole('link'));
     // Row by row, left to right: the visual order is the logical order.
     const visualOrder = layout.map((box, index) => ({ ...box, index }))
       .sort((left, right) => left.y - right.y || left.x - right.x).map(box => box.index);
-    expect(visualOrder).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(visualOrder).toEqual([0, 1, 2, 3, 4]);
     for (const box of layout) expect(box.height).toBeGreaterThanOrEqual(44);
     await capture(page, 'home', `${width}`);
   }

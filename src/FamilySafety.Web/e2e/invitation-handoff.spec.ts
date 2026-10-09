@@ -175,7 +175,7 @@ test('Adult B accepts an invitation without inheriting Adult A state or access',
   }
   await page.goto('/family');
   await expect(page.locator('section.context-prompt p')).toHaveText(sharedNoFamily);
-  await expect(page.getByRole('heading', { name: 'Family members', exact: true })).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'Family Members', exact: true })).toBeHidden();
   await capture(page, 'family-required-single-message', [1440, 390]);
   await page.locator('section.context-prompt').getByRole('link', { name: 'Review your profile' }).click();
   await expect(page).toHaveURL(/\/me$/);
@@ -281,7 +281,7 @@ test('Adult B accepts an invitation without inheriting Adult A state or access',
   await expect(page.getByRole('heading', { name: 'Review your profile' })).toBeVisible();
   await expect(activeIdentity).toHaveValue(adultB!.accountId);
   expect(postAcceptDocumentLoads).toBe(0);
-  await expect(page.getByRole('heading', { name: 'Family members', exact: true })).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'Family Members', exact: true })).toBeHidden();
 
   const bMembershipsAfterAccept = await apiJson<FamilyGroup[]>(request, '/api/family-groups/mine', adultB!.accountId);
   expect(bMembershipsAfterAccept.status).toBe(200);
@@ -313,7 +313,7 @@ test('Adult B accepts an invitation without inheriting Adult A state or access',
 
   // WI-009-007: B is an active member but not an administrator: Settings shows membership, never Invite.
   await page.getByRole('link', { name: 'Family', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Family members', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Family Members', exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'Family settings', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Family settings' })).toBeVisible();
   await expect(page.getByText('You are an active member.', { exact: false })).toBeVisible();

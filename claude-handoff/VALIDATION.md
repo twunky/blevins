@@ -40,6 +40,6 @@ SQL-gated tests return early and can report passed without RUN_FAMILYSAFETY_SQL_
 
 ## UI review when warranted
 
-Inspect affected states at desktop and narrow widths. Check overflow, labels, heading order, keyboard/focus, announcements, and non-color status cues as relevant. For visual alignment, compare against the mapped [primary reference](MOCKUP-ALIGNMENT.md), explaining material differences. Capture only evidence needed for acceptance; exhaustive screenshots, transcripts, and per-state comparison tables are not default requirements.
+Inspect affected states at desktop and narrow widths. Check overflow, labels, heading order, keyboard/focus, announcements, and non-color status cues as relevant. For visual alignment, compare against the [current visual contract](../ai-context/ui-visual-design-contract.md) and relevant implemented screen or explicitly approved new reference, explaining material differences. Capture only evidence needed for acceptance; exhaustive screenshots, transcripts, and per-state comparison tables are not default requirements.
 
 Label mocked/intercepted states. Distinguish automated accessibility results from actual manual/keyboard review, and do not infer owner visual approval.

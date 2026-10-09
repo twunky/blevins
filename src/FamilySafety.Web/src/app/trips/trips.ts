@@ -6,7 +6,7 @@ import { Component, DestroyRef, Input, OnChanges, OnInit, inject, signal } from 
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AdoptItemFamily, isItemId } from '../item-route';
 import { ItemUnavailable } from '../item-unavailable';
 import { focusHeadingState } from '../navigation';
@@ -75,6 +75,9 @@ interface TripAudiencePreview {
 })
 export class Trips implements OnInit, OnChanges {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router, { optional: true });
+  @Input() createMode = false;
+  @Input() editMode = false;
   @Input() activeGroups: readonly FamilyGroup[] = [];
   @Input() allActiveGroups: readonly FamilyGroup[] = [];
   @Input() currentFamilyId: string | null = null;
@@ -197,7 +200,8 @@ export class Trips implements OnInit, OnChanges {
   });
 
   ngOnInit(): void {
-    if (this.tripId === null) this.loadTrips();
+    if (this.createMode) this.openCreate();
+    else if (this.tripId === null) this.loadTrips();
     else this.openRoutedTrip(this.tripId);
   }
 
@@ -261,6 +265,10 @@ export class Trips implements OnInit, OnChanges {
   }
 
   protected cancelForm(): void {
+    if (this.createMode || this.editMode) {
+      void this.router?.navigate(this.tripId ? ['/trips', this.tripId] : ['/activities'], { state: focusHeadingState });
+      return;
+    }
     this.showingForm.set(false);
     this.error.set('');
   }
@@ -285,9 +293,15 @@ export class Trips implements OnInit, OnChanges {
           this.unavailable.set(true);
           return;
         }
+        if (this.editMode && !trip.canEdit) {
+          this.itemLoading.set(true);
+          void this.router?.navigate(['/trips', trip.tripId], { replaceUrl: true, state: focusHeadingState });
+          return;
+        }
         this.selectedTrip.set(trip);
         this.showingForm.set(false);
-        this.loadNotes(trip.tripId);
+        if (this.editMode && trip.canEdit) this.beginEdit();
+        else this.loadNotes(trip.tripId);
       },
       error: (response: HttpErrorResponse) => {
         this.itemLoading.set(false);
@@ -580,6 +594,10 @@ export class Trips implements OnInit, OnChanges {
         );
     request.pipe(finalize(() => this.saving.set(false))).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: trip => {
+        if (this.router?.config.some(route => route.path === 'trips/:tripId')) {
+          void this.router.navigate(['/trips', trip.tripId], { state: focusHeadingState });
+          return;
+        }
         this.showingForm.set(false);
         this.selectedTrip.set(trip);
         this.loadNotes(trip.tripId);

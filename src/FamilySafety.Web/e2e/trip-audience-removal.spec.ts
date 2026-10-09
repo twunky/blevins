@@ -131,9 +131,11 @@ test('Adult A removes B from a Trip audience while C and creator access remain a
   const activeIdentity = page.getByLabel('Active test identity');
   await expect(activeIdentity).toHaveValue(adultA!.accountId);
   console.log('Angular ready: http://localhost:4200');
-  await page.getByRole('link', { name: 'Plans & Trips', exact: true }).click();
-  await page.getByRole('link', { name: 'Open Trips', exact: true }).click();
-  await page.getByRole('button', { name: 'Create trip', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Activities', exact: true }).click();
+  await page.getByRole('link', { name: 'All accessible Trips, including Trips from former Families', exact: true }).click();
+  await expect(page).toHaveURL(/\/trips$/);
+  await page.getByRole('link', { name: 'Create trip', exact: true }).click();
+  await expect(page).toHaveURL(/\/trips\/new$/);
 
   const tripTitle = `Audience access ${test.info().workerIndex}-${Date.now()}`;
   const noteContent = `B note ${Date.now()}`;
@@ -156,6 +158,7 @@ test('Adult A removes B from a Trip audience while C and creator access remain a
   expect(createResponse.status()).toBe(201);
   const createdTrip = await createResponse.json() as Trip;
   const tripId = createdTrip.tripId;
+  await expect(page).toHaveURL(new RegExp(`/trips/${tripId}$`));
   expect(createdTrip.creatorProfileId).toBe(aProfile!.profileId);
   const recipientProfileIds = createdTrip.audienceRecipients.map(person => person.profileId);
   const bProfileAfterJoin = (await apiJson<FamilyMember[]>(request,
@@ -188,8 +191,8 @@ test('Adult A removes B from a Trip audience while C and creator access remain a
 
   await activeIdentity.selectOption(adultB!.accountId);
   await expect(activeIdentity).toHaveValue(adultB!.accountId);
-  await page.getByRole('link', { name: 'Plans & Trips', exact: true }).click();
-  await page.getByRole('link', { name: 'Open Trips', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Activities', exact: true }).click();
+  await page.getByRole('link', { name: 'All accessible Trips, including Trips from former Families', exact: true }).click();
   await expect(page.getByRole('link', { name: new RegExp(tripTitle) })).toBeVisible();
   await page.getByRole('link', { name: new RegExp(tripTitle) }).click();
   const bDetail = page.getByRole('article', { name: 'Trip details' });
@@ -219,8 +222,8 @@ test('Adult A removes B from a Trip audience while C and creator access remain a
 
   await activeIdentity.selectOption(adultA!.accountId);
   await expect(activeIdentity).toHaveValue(adultA!.accountId);
-  await page.getByRole('link', { name: 'Plans & Trips', exact: true }).click();
-  await page.getByRole('link', { name: 'Open Trips', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Activities', exact: true }).click();
+  await page.getByRole('link', { name: 'All accessible Trips, including Trips from former Families', exact: true }).click();
   await expect(page.getByRole('link', { name: new RegExp(tripTitle) })).toBeVisible();
   await page.getByRole('link', { name: new RegExp(tripTitle) }).click();
   await page.getByRole('button', { name: 'Change audience', exact: true }).click();
@@ -297,8 +300,8 @@ test('Adult A removes B from a Trip audience while C and creator access remain a
 
   await activeIdentity.selectOption(adultB!.accountId);
   await expect(activeIdentity).toHaveValue(adultB!.accountId);
-  await page.getByRole('link', { name: 'Plans & Trips', exact: true }).click();
-  await page.getByRole('link', { name: 'Open Trips', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Activities', exact: true }).click();
+  await page.getByRole('link', { name: 'All accessible Trips, including Trips from former Families', exact: true }).click();
   await expect(page.getByRole('link', { name: new RegExp(tripTitle) })).toHaveCount(0);
   await expect(page.getByText('No Trips are currently available to you.', { exact: false })).toBeVisible();
   const bDirectAfterRefetch = await request.get(`${apiBaseUrl}/api/trips/${tripId}`, {

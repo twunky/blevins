@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { DeferBlockState, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
@@ -65,97 +65,37 @@ describe('Family dashboard and Family settings (WI-009-007)', () => {
   const buttons = (root: Element, name: string) =>
     Array.from(root.querySelectorAll('button')).filter(button => button.textContent?.trim() === name);
 
-  it('renders /family as the dashboard: title, gear for every member, members, and the coordination grid', async () => {
+  it('renders the selected Family, compact directory and organization summaries', async () => {
     const harness = await open('/family');
-    const blocks = await harness.fixture.getDeferBlocks();
-    await blocks[0].render(DeferBlockState.Complete);
+    http.expectOne('/api/family-groups/family-a/households').flush({ canManage: false, households: [], unassignedMembers: members });
     http.expectOne('/api/family-groups/family-a/dates').flush({ canCreate: true, dates: [] });
     harness.detectChanges();
     const root = harness.routeNativeElement!;
-    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Family');
-    expect(root.querySelector('.page-title p')?.textContent).toContain('Family A');
-    const gear = root.querySelector<HTMLAnchorElement>('a.family-settings-link')!;
-    expect(gear.getAttribute('aria-label')).toBe('Family settings');
-    expect(gear.getAttribute('href')).toBe('/family/settings');
-    const dashboard = visible(root, 'section.family-dashboard');
-    expect(dashboard.hidden).toBe(false);
-    expect(visible(root, 'section.family-settings').hidden).toBe(true);
-    expect(Array.from(dashboard.querySelectorAll('.family-coordination h2')).map(h => h.textContent?.trim()))
-      .toEqual(['Shared Family Dates', 'Waiting for you', 'Upcoming birthdays', 'Recent Family Updates', 'Recent Check-Ins']);
-    expect(dashboard.textContent).toContain('No shared dates are available to you.');
-    // Management controls are not on the dashboard.
-    expect(dashboard.querySelector('#relationship-member, #invitation-email')).toBeNull();
-    expect(root.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe('Family');
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Family A');
+    expect(root.querySelector('a.family-settings-link')?.getAttribute('href')).toBe('/family/settings');
+    expect(Array.from(root.querySelectorAll('.family-coordination h2')).map(h => h.textContent?.trim())).toEqual(['Households', 'Shared Family Dates']);
+    expect(root.querySelector('.member-detail')).toBeNull();
+    expect(root.querySelector('.home-future')).toBeNull();
+    expect(root.querySelector('.family-dashboard')?.textContent).toContain('No shared dates are available to you.');
+    expect(root.querySelector('.family-dashboard #relationship-member')).toBeNull();
+    expect(root.querySelector('.member-button')?.getAttribute('href')).toBe('/me');
+    expect(root.querySelectorAll('.member-button')[1].getAttribute('href')).toBe('/family/family-a/members/sam');
+    expect(root.querySelector('.summary-view-all')?.getAttribute('href')).toBe('/family/settings#household-management');
   });
 
-  it('keeps summaries data-free and request-free while linking to existing protected areas', async () => {
+  it('filters authorized members immediately without another API read, and clears the query', async () => {
     const harness = await open('/family');
-    const placeholders = Array.from(harness.routeNativeElement!.querySelectorAll<HTMLElement>('.family-coordination .home-future'));
-    expect(placeholders.map(section => section.querySelector('.home-future-note')?.textContent?.trim())).toEqual([
-      'This card does not show a birthday summary. Review dates shared with you in Shared Family Dates.',
-      'A Family activity feed is not available here. Read Event Updates on an Event you can access.',
-      'See your sent Check-Ins and those explicitly shared with you in Safety. This card does not show a Family-wide Check-In feed.',
-    ]);
-    expect(placeholders.flatMap(section => Array.from(section.querySelectorAll('a')).map(link => link.getAttribute('href')))).toEqual(['/events', '/safety']);
-    for (const section of placeholders) {
-      expect(section.querySelectorAll('button, input, select, img, li, .avatar')).toHaveLength(0);
-      expect(section.textContent).not.toMatch(/\d|Coming later|Phase|roadmap|work item/i);
-    }
-    http.expectNone(request => !/^\/api\/(profile|family-groups)/.test(request.url));
-  });
-
-  it('shows only incoming suggestions in Waiting for you, and Accept and Decline call the existing endpoints (D2)', async () => {
-    const harness = await open('/family', [incoming, outgoing, acceptedWithMe]);
-    const waiting = harness.routeNativeElement!.querySelector<HTMLElement>('.family-waiting')!;
-    const items = waiting.querySelectorAll('.family-request');
-    expect(items).toHaveLength(1);
-    expect(items[0].textContent).toContain('Sam Lee suggested a relationship');
-    expect(waiting.textContent).not.toContain('Kim Lee');
-    expect(waiting.querySelector<HTMLAnchorElement>('a.family-card-link')?.getAttribute('href')).toBe('/family/settings');
-
-    buttons(waiting, 'Accept relationship')[0].click();
-    http.expectOne(r => r.method === 'POST' && r.url === '/api/family-groups/relationships/incoming/accept').flush({});
-    http.expectOne('/api/family-groups/family-a/relationships').flush([relationship('incoming', 'sam', 'me', 'Accepted', 'Parent', 'AdultChild')]);
-    harness.detectChanges();
-    expect(waiting.querySelectorAll('.family-request')).toHaveLength(0);
-    expect(waiting.textContent).toContain('No relationship suggestions are waiting for you.');
-    expect(waiting.textContent).toContain('Relationship confirmed.');
-  });
-
-  it('declines from Waiting for you', async () => {
-    const harness = await open('/family', [incoming]);
-    buttons(harness.routeNativeElement!.querySelector('.family-waiting')!, 'Decline suggestion')[0].click();
-    http.expectOne(r => r.method === 'POST' && r.url === '/api/family-groups/relationships/incoming/decline').flush({});
-    http.expectOne('/api/family-groups/family-a/relationships').flush([]);
-    harness.detectChanges();
-    expect(harness.routeNativeElement!.querySelector('.family-waiting')?.textContent).toContain('No relationship suggestions are waiting for you.');
-  });
-
-  it('shows a tile note only for an accepted relationship with the signed-in adult, and no administrator status (D5)', async () => {
-    const harness = await open('/family', [incoming, outgoing, acceptedWithMe, acceptedOthers], [family]);
-    const tiles = Array.from(harness.routeNativeElement!.querySelectorAll<HTMLElement>('.member-list .member-button'));
-    const note = (name: string) => tiles.find(tile => tile.querySelector('.member-name')?.textContent?.trim() === name)!
-      .querySelector('.member-note')?.textContent?.trim() ?? null;
-    expect(note('Pat Lee')).toBe('Parent'); // Pat's own side of the accepted relationship with me.
-    expect(note('Alex')).toBeNull(); // No fallback such as "You".
-    expect(note('Sam Lee')).toBeNull(); // Pending only.
-    expect(note('Kim Lee')).toBeNull(); // Accepted, but not with me.
-    expect(harness.routeNativeElement!.querySelector('.member-list')?.textContent).not.toMatch(/administrator|admin/i);
-  });
-
-  it('opens member details with the shared fields and accepted relationships for that member', async () => {
-    const harness = await open('/family', [acceptedOthers]);
-    const sam = Array.from(harness.routeNativeElement!.querySelectorAll<HTMLButtonElement>('.member-button'))
-      .find(button => button.textContent?.includes('Sam Lee'))!;
-    sam.click();
-    http.expectOne('/api/family-members/sam/profile').flush({
-      profileId: 'sam', displayName: 'Sam Lee', contactEmail: 'sam@example.invalid', contactPhone: null, birthdayMonth: null, birthdayDay: null,
-    });
-    harness.detectChanges();
-    const detail = harness.routeNativeElement!.querySelector('[aria-labelledby="selected-member-heading"]')!;
-    expect(detail.textContent).toContain('sam@example.invalid');
-    expect(detail.textContent).toContain('Sam Lee: Spouse or partner');
-    expect(sam.classList).toContain('member-button--selected');
+    const root = harness.routeNativeElement!;
+    const search = root.querySelector<HTMLInputElement>('#family-search')!;
+    search.value = 'sAM'; search.dispatchEvent(new Event('input')); harness.detectChanges();
+    expect(root.querySelectorAll('.member-button')).toHaveLength(1);
+    expect(root.querySelector('.member-name')?.textContent).toBe('Sam Lee');
+    http.expectNone('/api/family-groups/family-a/members');
+    search.value = 'missing'; search.dispatchEvent(new Event('input')); harness.detectChanges();
+    expect(root.querySelector('[role="status"].directory-empty')?.textContent).toContain('No family members match');
+    root.querySelector<HTMLButtonElement>('[aria-label="Clear Family search"]')!.click(); harness.detectChanges();
+    expect(root.querySelectorAll('.member-button')).toHaveLength(4);
+    expect(document.activeElement).toBe(search);
   });
 
   it('renders Settings for an administrator with Back to Family, details, Invite, and grouped relationships', async () => {
@@ -224,46 +164,17 @@ describe('Family dashboard and Family settings (WI-009-007)', () => {
       .toEqual(['Choose a family member', 'Sam Lee', 'Kim Lee', 'Pat Lee']);
   });
 
-  it('offers separate Retry actions for failed member and relationship reads on the Family dashboard', async () => {
+  it('offers Retry when the authorized directory read fails', async () => {
     const harness = await RouterTestingHarness.create();
     await harness.navigateByUrl('/family', App);
     http.expectOne('/api/profile').flush(profile);
     http.expectOne('/api/family-groups/administered').flush([]);
     http.expectOne('/api/family-groups/mine').flush([family]);
-    const fail = { status: 503, statusText: 'Unavailable' };
-    http.expectOne('/api/family-groups/family-a/members').flush({}, fail);
-    http.expectOne('/api/family-groups/family-a/relationships').flush({}, fail);
-    http.expectOne('/api/family-groups/family-a/events').flush([]);
-    http.expectOne('/api/family-groups/family-a/plans').flush([]);
+    http.expectOne('/api/family-groups/family-a/members').flush({}, { status: 503, statusText: 'Unavailable' });
     harness.detectChanges();
-    const dashboard = harness.routeNativeElement!.querySelector('section.family-dashboard')!;
-    expect(dashboard.textContent).toContain('Your family directory could not be loaded.');
-    expect(dashboard.textContent).toContain('Family relationships could not be loaded.');
-
-    buttons(dashboard, 'Retry loading Family members')[0].click();
-    http.expectNone('/api/family-groups/family-a/relationships');
-    http.expectOne('/api/family-groups/family-a/members').flush(members);
-    harness.detectChanges();
-    expect(dashboard.textContent).toContain('Sam Lee');
-    expect(buttons(dashboard, 'Retry loading Family members')).toHaveLength(0);
-
-    buttons(dashboard, 'Retry loading relationships')[0].click();
-    http.expectNone('/api/family-groups/family-a/members');
-    http.expectOne('/api/family-groups/family-a/relationships').flush([incoming]);
-    harness.detectChanges();
-    expect(dashboard.textContent).toContain('Sam Lee suggested a relationship');
-    expect(buttons(dashboard, 'Retry loading relationships')).toHaveLength(0);
-  });
-
-  it('does not offer Retry for an unavailable member profile, which is not a failed list read', async () => {
-    const harness = await open('/family');
-    const dashboard = harness.routeNativeElement!.querySelector('section.family-dashboard')!;
-    Array.from(dashboard.querySelectorAll<HTMLButtonElement>('button.member-button'))
-      .find(button => button.textContent?.includes('Sam Lee'))!.click();
-    http.expectOne('/api/family-members/sam/profile').flush({}, { status: 404, statusText: 'Not Found' });
-    harness.detectChanges();
-    expect(dashboard.textContent).toContain('This family member is unavailable.');
-    expect(buttons(dashboard, 'Retry loading Family members')).toHaveLength(0);
+    buttons(harness.routeNativeElement!, 'Retry loading Family members')[0].click();
+    http.expectOne('/api/family-groups/family-a/members').flush(members); harness.detectChanges();
+    expect(harness.routeNativeElement!.querySelectorAll('.member-button')).toHaveLength(4);
   });
 
   it('in Settings, shows a failed member read with Retry instead of claiming no other adult exists', async () => {

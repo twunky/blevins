@@ -153,24 +153,30 @@ test('390 px: Invite feedback stays in the Invite card; B arrives on Home after 
   await expect(page.getByText('You joined')).toHaveCount(0);
 });
 
-test('a first Family choice keeps /events and /family, and the ordinary switch is unchanged (O6)', async ({ page }) => {
+test('a first Family choice preserves the Events redirect and /family, and the ordinary switch is unchanged (O6)', async ({ page }) => {
   const w = await world(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/home');
   await useIdentity(page, w.a);
   for (const path of ['/events', '/family']) {
+    const destination = path === '/events' ? /\/activities\?type=Event$/ : /\/family$/;
     await page.goto(path);
+    await expect(page).toHaveURL(destination);
     await expect(familySelect(page)).toHaveValue('');
     await expect(page.locator('section.context-prompt')).toContainText('Choose your current Family above to use this area.');
     await familySelect(page).selectOption(w.family1.familyGroupId);
-    await expect(page).toHaveURL(new RegExp(`${path}$`));
+    await expect(page).toHaveURL(destination);
     await expect(page.locator('section.context-prompt')).toHaveCount(0);
     await expect(page.locator('header.page-title')).toContainText(w.family1.name);
-    if (path === '/family') await expect(page.getByRole('heading', { name: 'Family members', exact: true })).toBeVisible();
-    else await expect(page.locator('.events-dash--upcoming')).toBeVisible();
+    if (path === '/family') await expect(page.getByRole('heading', { name: 'Family Members', exact: true })).toBeVisible();
+    else {
+      await expect(page.getByRole('heading', { level: 1, name: 'Activities', exact: true })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Upcoming Activities', exact: true })).toBeVisible();
+      await expect(page.getByRole('group', { name: 'Activity type' }).getByRole('button', { name: /^Events / })).toHaveAttribute('aria-pressed', 'true');
+    }
 
     await familySelect(page).selectOption(w.family2.familyGroupId);
-    await expect(page).toHaveURL(new RegExp(`${path}$`));
+    await expect(page).toHaveURL(destination);
     await expect(page.locator('header.page-title')).toContainText(w.family2.name);
     await expect(page.locator('header.page-title')).not.toContainText(`${w.family1.name}.`);
   }

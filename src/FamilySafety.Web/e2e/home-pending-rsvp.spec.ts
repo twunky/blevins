@@ -67,11 +67,12 @@ test('Home Pending attention opens Event RSVP and disappears on return and reloa
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
     for (const source of ['/home', '/family']) {
       await page.goto(source);
-      const discovery = page.locator(source === '/home' ? '[aria-labelledby="home-updates-heading"]' : '[aria-labelledby="family-updates-heading"]');
-      await expect(discovery).toContainText('A Family activity feed is not available here.');
       const isHome = source === '/home';
-      const updates = discovery.getByRole('link', { name: isHome ? 'Open Events' : 'Open Events for Updates' });
-      await expect(updates).toHaveAttribute('href', '/events');
+      const discovery = isHome ? page.locator('[aria-labelledby="home-updates-heading"]')
+        : page.getByRole('navigation', { name: 'Main navigation' });
+      if (isHome) await expect(discovery).toContainText('A Family activity feed is not available here.');
+      const updates = discovery.getByRole('link', { name: isHome ? 'Open Events' : 'Activities', exact: true });
+      await expect(updates).toHaveAttribute('href', isHome ? '/events' : '/activities');
       if (isHome) {
         await expect(updates).toHaveClass(/button-link.*button--secondary|button--secondary.*button-link/);
         await expect(updates).toHaveCSS('border-radius', '10px');
@@ -90,11 +91,22 @@ test('Home Pending attention opens Event RSVP and disappears on return and reloa
         await expect(updates).toHaveCSS('outline-width', '3px');
       }
       await page.keyboard.press('Enter');
-      await expect(page).toHaveURL(/\/events$/);
+      await expect(page).toHaveURL(isHome ? /\/activities\?type=Event$/ : /\/activities$/);
+      await expect(page.getByRole('navigation', { name: 'Main navigation' }).locator('a[aria-current]')).toHaveText('Activities');
       await expect(page.locator('main h1')).toBeFocused();
       await page.goto(source);
-      const safety = page.locator(source === '/home' ? '[aria-labelledby="home-updates-heading"]' : '[aria-labelledby="family-checkins-heading"]');
-      const checkIns = safety.getByRole('link', { name: isHome ? 'Open Check-Ins' : 'Open Safety for Check-Ins' });
+      if (!isHome) {
+        const safety = page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Safety', exact: true });
+        await expect(safety).toHaveAttribute('href', '/safety');
+        await safety.focus();
+        await expect(safety).toHaveCSS('outline-style', 'solid');
+        await page.keyboard.press('Enter');
+        await expect(page).toHaveURL(/\/safety$/);
+        await expect(page.locator('main h1')).toBeFocused();
+      }
+      const safety = isHome ? page.locator('[aria-labelledby="home-updates-heading"]') : page.locator('app-safety-dashboard');
+      const checkIns = safety.getByRole('link', { name: 'Open Check-Ins', exact: true });
+      await expect(checkIns).toHaveAttribute('href', '/safety#check-ins');
       if (isHome) {
         await expect(checkIns).toHaveAttribute('href', '/safety#check-ins');
         await expect(checkIns).toHaveClass(/button-link.*button--secondary|button--secondary.*button-link/);
@@ -112,18 +124,17 @@ test('Home Pending attention opens Event RSVP and disappears on return and reloa
         await expect(checkIns).toHaveCSS('outline-width', '3px');
       }
       await page.keyboard.press('Enter');
-      if (isHome) await expect(page).toHaveURL(/\/safety#check-ins$/);
-      else await expect(page).toHaveURL(/\/safety$/);
+      await expect(page).toHaveURL(/\/safety#check-ins$/);
       await expect(page.getByRole('heading', { name: 'Check-Ins', exact: true })).toBeVisible();
-      if (isHome) await expect(page.locator('#check-ins')).toBeInViewport();
-      else await expect(page.locator('main h1')).toBeFocused();
+      await expect(page.locator('#check-ins')).toBeInViewport();
+      await expect(page.locator('#check-ins-heading')).toBeFocused();
     }
-    for (const source of ['/home', '/family', '/plans']) {
+    for (const source of ['/home', '/family', '/plans/new']) {
       await page.goto(source);
       await page.waitForLoadState('networkidle');
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-      await page.screenshot({ path: resolve(captures, `readiness-${source.slice(1)}-${width}.png`), fullPage: true });
+      await page.screenshot({ path: resolve(captures, `readiness-${source.slice(1).replaceAll('/', '-')}-${width}.png`), fullPage: true });
     }
   }
   const expectation = 'Expected check-in records a planned time only. It does not schedule a Check-In or send reminders.';
@@ -137,7 +148,8 @@ test('Home Pending attention opens Event RSVP and disappears on return and reloa
   await page.locator('#plan-checkin-time').fill('12:00');
   await page.locator('#plan-audience-group').check();
   await page.getByRole('button', { name: 'Create plan', exact: true }).click();
-  await page.getByRole('link', { name: 'Recorded expectation only', exact: true }).click();
+  await expect(page).toHaveURL(/\/plans\/[0-9a-f-]{36}$/);
+  await expect(page.getByRole('heading', { level: 2, name: 'Recorded expectation only', exact: true })).toBeVisible();
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
     await page.reload();

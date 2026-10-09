@@ -1,9 +1,10 @@
 import { CircleRecipientPreset } from '../safety-circles/circle-recipient-preset';
 import { DatePipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, Input, OnChanges, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, Input, OnChanges, afterRenderEffect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { forkJoin, Subject, takeUntil } from 'rxjs';
 
 export const checkInStatuses = [
@@ -27,6 +28,9 @@ export class CheckIns implements OnChanges {
   @Input() ownProfileId: string | null = null;
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly route = inject(ActivatedRoute, { optional: true });
+  private readonly fragmentPending = signal(false);
   private readonly changed = new Subject<void>();
   private generation = 0;
   protected readonly state = signal<'loading' | 'ready' | 'error' | 'unavailable'>('loading');
@@ -43,6 +47,22 @@ export class CheckIns implements OnChanges {
   protected note = '';
   protected presetLoading = false;
   protected recipientIds: string[] = [];
+
+  constructor() {
+    this.route?.fragment.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(fragment => {
+      this.fragmentPending.set(fragment === 'check-ins');
+    });
+    // The Safety sections are deferred, so native fragment scrolling can run before this target exists.
+    afterRenderEffect(() => {
+      if (!this.fragmentPending()) return;
+      const section = this.host.nativeElement.querySelector<HTMLElement>('#check-ins');
+      if (section) {
+        section.scrollIntoView?.({ block: 'start' });
+        this.host.nativeElement.querySelector<HTMLElement>('#check-ins-heading')?.focus({ preventScroll: true });
+        this.fragmentPending.set(false);
+      }
+    });
+  }
 
   ngOnChanges(): void { this.refresh(); }
   refresh(preserveMessage = false): void {

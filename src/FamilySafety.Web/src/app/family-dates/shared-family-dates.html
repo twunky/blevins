@@ -1,3 +1,18 @@
+@if (summary) {
+<section class="card family-summary" aria-labelledby="date-summary-heading">
+  <div class="card-header"><span class="card-icon"><app-icon name="calendar" /></span><div><h2 id="date-summary-heading">Shared Family Dates</h2><p class="card-sub">See important dates shared with you.</p></div><a class="summary-view-all" routerLink="/family/settings" fragment="shared-date-management" [state]="focusHeadingState">View all<span class="visually-hidden"> Shared Family Dates</span><app-icon name="chevron" /></a></div>
+  @if (status() === 'loading') { <p role="status">Loading shared dates...</p> }
+  @else if (status() === 'error') { <p role="alert">Shared dates could not be loaded.</p><button type="button" class="button--secondary" (click)="refresh()">Retry loading dates</button> }
+  @else if (status() === 'unavailable') { <p>Shared dates are currently unavailable.</p> }
+  @else if (data()) {
+    <ul class="summary-list">
+      @for (entry of summaryDates(); track entry.dateId) {
+        <li><a class="date-summary-row" routerLink="/family/settings" fragment="shared-date-management" [state]="focusHeadingState"><app-icon name="calendar" /><strong>{{ entry.title }}</strong><time [attr.datetime]="entry.date">{{ displayDate(entry.date) }}</time><app-icon name="chevron" /></a></li>
+      } @empty { <li class="summary-empty">No shared dates are available to you.</li> }
+    </ul>
+  }
+</section>
+} @else {
 <section class="card family-dates" aria-labelledby="family-dates-heading">
   <div class="card-header"><h2 id="family-dates-heading">Shared Family Dates</h2></div>
   @if (message()) { <p class="message message--success" role="status">{{ message() }}</p> }
@@ -73,3 +88,5 @@
     }
   }
 </section>
+
+}

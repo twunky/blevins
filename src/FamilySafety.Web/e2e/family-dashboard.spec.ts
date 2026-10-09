@@ -44,7 +44,7 @@ async function expectFamilyCurrent(page: Page, value: 'page' | 'true'): Promise<
   await expect(current).toHaveAttribute('aria-current', value);
 }
 
-test('direct entry, gear, Back to Family, administrator Settings, member detail, and data-free placeholders', async ({ page, request }) => {
+test('direct entry, summaries, gear, Back to Family, administrator Settings and member profile', async ({ page, request }) => {
   await recordScenario(test.info());
   const { adultA, adultC } = await identities(request);
   const family = (await apiJson<FamilyGroup[]>(request, '/api/family-groups/mine', adultA.accountId)).body[0];
@@ -58,16 +58,11 @@ test('direct entry, gear, Back to Family, administrator Settings, member detail,
   await useIdentity(page, adultA, '/home');
   apiPaths.length = 0;
   await page.goto('/family');
-  await expect(heading(page)).toHaveText('Family');
+  await expect(heading(page)).toHaveText(family.name);
   await expect(page.locator('.page-title')).toContainText(family.name);
   await expectFamilyCurrent(page, 'page');
-  await expect(page.locator('.family-coordination h2')).toHaveText(['Shared Family Dates', 'Waiting for you', 'Upcoming birthdays', 'Recent Family Updates', 'Recent Check-Ins']);
-  await expect(page.getByText('No relationship suggestions are waiting for you.')).toBeVisible();
-  const placeholders = page.locator('.family-coordination .home-future');
-  await expect(placeholders).toHaveCount(3);
-  await expect(placeholders.locator('button, input, select, img, li')).toHaveCount(0);
-  await expect(placeholders.getByRole('link', { name: 'Open Events for Updates' })).toHaveAttribute('href', '/events');
-  await expect(placeholders.getByRole('link', { name: 'Open Safety for Check-Ins' })).toHaveAttribute('href', '/safety');
+  await expect(page.locator('.family-coordination h2')).toHaveText(['Households', 'Shared Family Dates']);
+  await expect(page.locator('.member-detail, .family-coordination .home-future')).toHaveCount(0);
   await page.waitForLoadState('networkidle');
   expect(apiPaths.filter(path => !/^\/api\/(profile|development\/|family-groups(\/|$)|family-members\/)/.test(path)),
     'the Family dashboard makes no request beyond existing profile and Family reads').toEqual([]);
@@ -76,10 +71,12 @@ test('direct entry, gear, Back to Family, administrator Settings, member detail,
   await expect(inviteHeading(page)).toBeHidden();
 
   // 7: member selection and detail.
-  await page.getByRole('list', { name: 'Active adult family members' }).getByRole('button', { name: /Development Audience Member/ }).click();
+  await page.getByRole('list', { name: 'Active adult family members' }).getByRole('link', { name: /Development Audience Member/ }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Development Audience Member' })).toBeVisible();
-  await expect(page.locator('[aria-labelledby="selected-member-heading"]')).toContainText('No optional profile details are shared.');
+  await expect(page.locator('app-member-profile')).toContainText('No optional profile details are shared.');
   await page.screenshot({ path: resolve(captures, 'family-dashboard-1440.png'), fullPage: true });
+
+  await page.getByRole('link', { name: 'Back to Family', exact: true }).click();
 
   // 3: gear → Settings moves focus to the h1; 10: Family stays current on the child page; 5: administrator sees Invite.
   await gear(page).click();
@@ -94,7 +91,7 @@ test('direct entry, gear, Back to Family, administrator Settings, member detail,
   // 4: Back to Family.
   await page.getByRole('link', { name: 'Back to Family' }).click();
   await expect(page).toHaveURL(/\/family$/);
-  await expect(heading(page)).toHaveText('Family');
+  await expect(heading(page)).toHaveText(family.name);
   await expect(heading(page)).toBeFocused();
   await expectFamilyCurrent(page, 'page');
 
@@ -108,8 +105,7 @@ test('direct entry, gear, Back to Family, administrator Settings, member detail,
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/family');
   await expect(gear(page)).toBeVisible();
-  const [h1Box, gearBox] = [await heading(page).boundingBox(), await gear(page).boundingBox()];
-  expect(Math.abs(h1Box!.y - gearBox!.y)).toBeLessThan(24);
+  await expect(page.getByRole('searchbox', { name: 'Search Family' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   expect(adultC).toBeTruthy();
 });
@@ -140,20 +136,13 @@ test('a member who is not an administrator uses Settings without Invite; Waiting
   await expect(sent).toContainText('Waiting for Development Adult to confirm Sibling');
   await expect(sent.getByRole('button', { name: 'Withdraw suggestion' })).toBeVisible();
 
-  // 8: A sees it in Waiting for you on the dashboard and accepts it there.
-  await useIdentity(page, adultA, '/family');
-  const waiting = page.getByRole('region', { name: 'Waiting for you' });
-  await expect(waiting).toContainText('Development Audience Member suggested a relationship');
+  // Relationship responses remain available in Family Settings.
+  await useIdentity(page, adultA, '/family/settings');
+  const waiting = page.getByRole('list', { name: 'Waiting for you' });
+  await expect(waiting).toContainText('Development Audience Member suggests: Sibling to them and Sibling to you.');
   await waiting.getByRole('button', { name: 'Accept relationship' }).click();
-  await expect(waiting.getByRole('status')).toContainText('Relationship confirmed.');
-  await expect(waiting).toContainText('No relationship suggestions are waiting for you.');
-  // D5: the tile note appears only for the member in an accepted relationship with A.
-  const members = page.getByRole('list', { name: 'Active adult family members' });
-  await expect(members.getByRole('button', { name: /Development Audience Member/ }).locator('.member-note')).toHaveText('Sibling');
-  await expect(members.getByRole('button', { name: /Development Adult/ }).locator('.member-note')).toHaveCount(0);
-
-  // Remove from Settings, after confirmation.
-  await gear(page).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Relationship confirmed.' })).toBeVisible();
+  // Existing relationship removal stays in Settings.
   const accepted = page.getByRole('list', { name: 'Accepted relationships' });
   await accepted.getByRole('button', { name: 'Remove relationship' }).click();
   await accepted.getByRole('button', { name: 'Confirm removal' }).click();

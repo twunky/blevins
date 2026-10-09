@@ -1,0 +1,29 @@
+.app-main.app-main--activities { max-width: 1500px; padding: 28px; background: radial-gradient(ellipse at 40% 0, #04141e 0, transparent 55%); }
+.app-main--activities .activity-title h1 { font-size: clamp(2rem, 3vw, 2.7rem); }
+.app-main--activities .page-content { gap: 1rem; }
+.app-main--activities .page-title { margin-bottom: 24px; }
+.app-main--activities .card-header { margin-bottom: 16px; }
+.activity-form-details > .field:first-child { margin-top: 0; }
+.app-main--activities app-activity-type-chooser { margin-bottom: 0; }
+.activity-retained-link { margin-top: 1.5rem; font-size: .85rem; }
+.activity-create-layout { width: 100%; }
+.activity-form-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 2rem; }
+.activity-form-details, .activity-form-audience { min-width: 0; }
+.activity-form-audience { background: var(--color-surface-soft); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 1rem; }
+.activity-form-audience fieldset { margin-top: 0; }
+.activity-form-audience .field-hint { background: none; padding: 0; }
+.activity-form-audience .plans-notes-field { margin-top: 1.2rem; }
+.activity-form-audience textarea { min-height: 7rem; }
+.activity-form-details .plans-optional-fields { border: 0; padding: 0; margin-top: 1rem; }
+.activity-form-details .plans-optional-fields h3 { display: none; }
+.activity-form-actions { display: flex; justify-content: space-between; align-items: center; gap: 1rem; border-top: 1px solid var(--color-border); padding-top: 1rem; margin-top: 1rem; }
+.activity-character-count { display: block; text-align: right; color: var(--color-muted); font-size: .8rem; }
+.events-subpage--create { max-width: none; }
+.item-detail { padding: 1.5rem; }
+@media (max-width: 55rem) { .activity-form-grid { grid-template-columns: 1fr; gap: 1rem; } }
+@media (max-width: 44rem) {
+  .app-main.app-main--activities { padding: 24px 16px; }
+  .activity-title.events-title { display: flex; flex-direction: column; align-items: stretch; }
+  .activity-title.events-title > div:first-child { display: block; }
+  .activity-title .events-create-link { align-self: flex-start; }
+}

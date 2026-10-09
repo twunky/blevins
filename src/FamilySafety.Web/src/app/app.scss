@@ -9,18 +9,27 @@
 :is(.context-prompt, .home-no-family) p { margin: 0; }
 .home-no-family { max-width: 44rem; }
 
-/* Me / Settings: card grid */
+/* Me / Settings: one cohesive form using the established Family surfaces. */
+.app-main.app-main--profile { background: radial-gradient(ellipse at 40% 0, #04141e 0, transparent 55%); }
 .profile-form { display: grid; gap: var(--space-4); grid-template-columns: minmax(0, 1fr); }
-.profile-form .card-header { margin-bottom: var(--space-2); }
-.profile-form > .form-section > .field:first-of-type { margin-top: var(--space-2); }
-.action-bar { margin: 0; }
+.profile-card { padding: 24px; background: linear-gradient(145deg, #11181e, #0b1014 80%); }
+.profile-identity { display: grid; grid-template-columns: 120px minmax(0, 1fr); align-items: center; gap: var(--space-6); }
+.profile-avatar { width: 120px; height: 120px; border: 1px solid rgb(0 212 255 / 50%); background: linear-gradient(145deg, #19232c, #10171e); font-size: 2rem; }
+.profile-form .field { margin-top: 0; }
+.profile-form .help { margin: 0; }
+.profile-group { border-top: 1px solid var(--color-border); margin-top: var(--space-5); padding-top: var(--space-5); }
+.profile-birthday h2 { font-size: 1.05rem; font-weight: 650; margin: 0; }
+.profile-birthday h2 span { color: var(--color-muted); font-weight: 400; }
+.profile-birthday .section-help { margin: 4px 0 0; }
+.profile-form .birthday-grid { margin-top: var(--space-4); }
+.profile-form .action-bar { margin: 0; }
 .profile-review-intro { align-items: center; display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: space-between; }
 .profile-review-end { margin-top: var(--space-2); }
-
-/* Keep the birthday's three fields inside the card at sidebar widths. */
-@media (min-width: 80rem) {
-  .profile-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .profile-contact, .action-bar { grid-column: 1 / -1; }
+@media (min-width: 44rem) {
+  .profile-form .field-grid { grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr); column-gap: var(--space-6); }
+  .profile-form .birthday-grid { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 2.6fr); column-gap: var(--space-5); }
 }
-
-
+@media (max-width: 43.99rem) {
+  .profile-card { padding: 20px; }
+  .profile-identity { grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
+}

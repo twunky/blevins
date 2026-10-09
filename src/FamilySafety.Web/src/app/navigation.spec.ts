@@ -3,11 +3,11 @@ import { routes } from './app.routes';
 import { NavigableView, areaForView, matchedPath, pathForView, primaryDestinations, viewForPath } from './navigation';
 
 describe('Main navigation definition (REQ-UX-013)', () => {
-  it('has exactly the six destinations in the required order', () => {
+  it('has exactly the five destinations in the required order', () => {
     expect(primaryDestinations.map(destination => destination.label))
-      .toEqual(['Home', 'Family', 'Events', 'Plans & Trips', 'Safety', 'Me / Settings']);
+      .toEqual(['Home', 'Family', 'Activities', 'Safety', 'Me / Settings']);
     expect(primaryDestinations.map(destination => destination.path))
-      .toEqual(['/home', '/family', '/events', '/plans-trips', '/safety', '/me']);
+      .toEqual(['/home', '/family', '/activities', '/safety', '/me']);
   });
 
   it('maps each destination to its own page and that page to its own area', () => {
@@ -18,8 +18,8 @@ describe('Main navigation definition (REQ-UX-013)', () => {
   });
 
   it.each([
-    ['home', 'home'], ['family', 'family'], ['events', 'events'], ['eventItem', 'events'],
-    ['plansTrips', 'plansTrips'], ['plans', 'plansTrips'], ['planItem', 'plansTrips'], ['trips', 'plansTrips'], ['tripItem', 'plansTrips'],
+    ['home', 'home'], ['family', 'family'], ['events', 'activities'], ['eventItem', 'activities'],
+    ['plansTrips', 'activities'], ['plans', 'activities'], ['planItem', 'activities'], ['trips', 'activities'], ['tripItem', 'activities'],
     ['safety', 'safety'], ['concerns', 'safety'], ['concernItem', 'safety'], ['incidents', 'safety'],
     ['profile', 'me'],
   ] as const)('places the %s page in the %s area', (view, area) => {

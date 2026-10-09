@@ -1,6 +1,8 @@
+import { Activities, ActivityRow } from './activities/activities';
+import { ActivityTypeChooser } from './activities/activity-type-chooser';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, ElementRef, HostListener, Injector, OnInit, afterNextRender, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, HostListener, Injector, OnInit, afterNextRender, afterRenderEffect, computed, inject, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -17,7 +19,6 @@ import { Concerns } from './concerns/concerns';
 import { Incidents } from './incidents/incidents';
 import { AppIcon, IconName } from './icon';
 import { dateTile, displayDateTime, displayRange } from './date-format';
-import { GroupLanding } from './plans-trips/group-landing';
 import { SafetyDashboard } from './safety/safety-dashboard';
 import { ItemUnavailable } from './item-unavailable';
 import { EventParticipation, PendingEventInvitation } from './events/event-participation';
@@ -27,6 +28,7 @@ import { SharedFamilyDates } from './family-dates/shared-family-dates';
 import { CheckIns } from './check-ins/check-ins';
 import { SharingSessions } from './sharing-sessions/sharing-sessions';
 import { SafetyCircles } from './safety-circles/safety-circles';
+import { MemberProfile } from './member-profile/member-profile';
 import { Households } from './households/households';
 import { TrustedContacts } from './trusted-contacts/trusted-contacts';
 import { AdoptItemFamily, ItemKind, isItemId } from './item-route';
@@ -84,15 +86,6 @@ interface FamilyRelationshipView {
   isCurrentUserRecipient: boolean;
 }
 
-interface SharedAdultProfile {
-  profileId: string;
-  displayName: string;
-  contactEmail: string | null;
-  contactPhone: string | null;
-  birthdayMonth: number | null;
-  birthdayDay: number | null;
-}
-
 interface FamilyEventView {
   eventId: string;
   familyGroupId: string;
@@ -138,8 +131,8 @@ interface HomeTripPreview {
 
 @Component({
   selector: 'app-workspace',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, Trips, Concerns, Incidents, AppIcon, GroupLanding, SafetyDashboard, ItemUnavailable, EventParticipation, EventNeeds, EventUpdates, SharedFamilyDates, CheckIns, SharingSessions, TrustedContacts, SafetyCircles, Households],
-  styleUrls: ['./app.scss', './home-shell.scss', './home.scss', './family.scss', './family-settings.scss', './events.scss', './events-dashboard.scss', './plans.scss'],
+  imports: [MemberProfile, Activities, ActivityTypeChooser, CommonModule, ReactiveFormsModule, RouterLink, Trips, Concerns, Incidents, AppIcon, SafetyDashboard, ItemUnavailable, EventParticipation, EventNeeds, EventUpdates, SharedFamilyDates, CheckIns, SharingSessions, TrustedContacts, SafetyCircles, Households],
+  styleUrls: ['./app.scss', './home-shell.scss', './home.scss', './family.scss', './family-settings.scss', './events.scss', './events-dashboard.scss', './plans.scss', './activity-forms.scss'],
   templateUrl: './app.html',
 })
 export class App implements OnInit {
@@ -150,20 +143,12 @@ export class App implements OnInit {
   private readonly injector = inject(Injector);
   /** The navigation that created this shell. The router creates the shell while activating a route, before that navigation ends. */
   private readonly creatingNavigation = this.router?.currentNavigation() ?? null;
+  private planCorrectionConfirmationShown = false;
   private readonly familyContext = inject(CurrentFamilyContext);
   protected readonly currentFamilyId = this.familyContext.familyId;
   protected readonly view = signal<NavigableView | 'invitation' | 'handoff'>('home');
   protected readonly primaryDestinations = primaryDestinations;
   protected readonly focusHeadingState = focusHeadingState;
-  /** Events dashboard Quick Links (WI-009-008 D8): real destinations only. Navigation only; each page still decides access. */
-  protected readonly eventQuickLinks: readonly { id: string; label: string; detail: string; icon: IconName; path: string }[] = [
-    { id: 'create', label: 'Create an event', detail: 'Share a gathering with family', icon: 'plus', path: '/events/new' },
-    { id: 'all', label: 'All events', detail: 'Upcoming and past events', icon: 'calendar', path: '/events/all' },
-    { id: 'trips', label: 'Trips', detail: 'Travel details you can see', icon: 'plane', path: '/trips' },
-    { id: 'plans', label: 'Plans', detail: 'Lightweight shared plans', icon: 'clipboard', path: '/plans' },
-    { id: 'family', label: 'Family members', detail: 'See who is in your family', icon: 'users', path: '/family' },
-    { id: 'profile', label: 'Your profile', detail: 'Profile and sharing choices', icon: 'user', path: '/me' },
-  ];
   /** The primary area shown as selected. Derived only from the routed page; never from data or permissions. */
   protected readonly currentArea = computed(() => {
     const view = this.view();
@@ -174,13 +159,13 @@ export class App implements OnInit {
   /** An item page renders its host whether or not a Family is selected; the item read decides, never the selection. */
   protected readonly isItemView = computed(() => {
     const view = this.view();
-    return view === 'eventItem' || view === 'planItem' || view === 'tripItem' || view === 'concernItem'
+    return view === 'eventEdit' || view === 'planEdit' || view === 'tripEdit' || view === 'eventItem' || view === 'planItem' || view === 'tripItem' || view === 'concernItem'
       || (view === 'incidents' && !!this.routeItemId() && this.routeItemId() !== 'new');
   });
   /** The shared "Family context required" prompt. Item pages show it only for a membership error (REQ-UX-014). */
   protected readonly familyContextPromptShown = computed(() => {
     const view = this.view();
-    if (this.isItemView()) return !!this.membershipError();
+    if (this.isItemView() || view === 'memberProfile') return !!this.membershipError();
     return view !== 'home' && view !== 'profile' && view !== 'invitation' && view !== 'handoff'
       && view !== 'plansTrips' && view !== 'safety' && !this.selectedFamily()
       && !(view === 'trips' && this.familyGroupsLoaded() && !this.membershipError() && this.activeFamilyGroups().length === 0);
@@ -232,26 +217,27 @@ export class App implements OnInit {
   protected readonly acceptedRelationships = computed(() =>
     this.familyRelationships().filter(item => item.status === 'Accepted'));
 
-  /** Accepted relationships that include this member. Accepted relationships are visible to every active adult. */
-  protected acceptedRelationshipsFor(profileId: string): readonly FamilyRelationshipView[] {
-    return this.acceptedRelationships().filter(item => item.proposerProfileId === profileId || item.recipientProfileId === profileId);
+  protected readonly activityType = signal('All');
+  protected readonly activityPeriod = signal('upcoming');
+  protected readonly activityRows = computed<readonly ActivityRow[]>(() => {
+    const now = new Date();
+    const today = localDateString(now);
+    const family = this.currentFamilyId();
+    return [
+      ...this.familyEvents().filter(x => x.familyGroupId === family).map(x => ({ id: x.eventId, type: 'Event' as const, title: x.name, date: x.date, time: x.time, timing: displayDateTime(x.date, x.time), location: x.location, path: '/events/' + x.eventId, upcoming: scheduledStartIsUpcoming(x.date, x.time, now) })),
+      ...this.familyPlans().filter(x => x.familyGroupId === family).map(x => ({ id: x.planId, type: 'Plan' as const, title: x.activityOrDestination, date: x.date, time: x.time, timing: displayDateTime(x.date, x.time), location: 'Planned activity', path: '/plans/' + x.planId, upcoming: scheduledStartIsUpcoming(x.date, x.time, now) })),
+      ...this.homeTripResults().filter(x => x.familyGroupId === family).map(x => ({ id: x.tripId, type: 'Trip' as const, title: x.title, date: x.startDate, time: '', timing: displayRange(x.startDate, x.endDate), location: x.primaryDestination, path: '/trips/' + x.tripId, upcoming: !x.isCompleted && x.endDate.slice(0, 10) >= today, completed: x.isCompleted })),
+    ];
+  });
+  protected readonly activityErrors = computed(() => [this.eventsLoadError(), this.plansLoadError(), this.homeTripsError()].filter(Boolean));
+  protected retryActivities(): void {
+    if (this.eventsLoadError()) this.retryEvents();
+    if (this.plansLoadError()) this.retryPlans();
+    if (this.homeTripsError()) this.retryHomeTrips();
   }
 
-  /** D5: a directory tile's second line, only the member's side of an accepted relationship with the signed-in adult; otherwise none. */
-  protected memberTileNote(profileId: string): string {
-    const ownId = this.ownerProfile()?.profileId;
-    if (!ownId || profileId === ownId) return '';
-    const shared = this.acceptedRelationshipsFor(profileId).find(item => item.isCurrentUserProposer || item.isCurrentUserRecipient);
-    if (!shared) return '';
-    return this.relationshipLabelText(shared.proposerProfileId === profileId ? shared.proposerLabel : shared.recipientLabel);
-  }
   protected homeEvents(): readonly FamilyEventView[] {
     return this.upcomingEvents(3);
-  }
-
-  /** Events dashboard summary (WI-009-008): the same upcoming selection as Home, a few more rows. /events/all keeps every Event. */
-  protected dashboardEvents(): readonly FamilyEventView[] {
-    return this.upcomingEvents(5);
   }
 
   private upcomingEvents(limit: number): readonly FamilyEventView[] {
@@ -287,10 +273,6 @@ export class App implements OnInit {
       .slice(0, 3);
   }
 
-  protected clearDirectoryFilter(): void {
-    this.directoryForm.controls.search.setValue('');
-    this.searchDirectory();
-  }
   protected readonly today = new Date();
 
   /** Home greeting from the local time and the already-loaded own profile name; no extra request. */
@@ -304,7 +286,9 @@ export class App implements OnInit {
   protected readonly pageTitle = computed(() => ({
     home: this.selectedFamily() ? this.homeGreeting() : 'Home',
     profile: this.profileReview() ? 'Review your profile' : 'Your profile',
-    family: 'Family', familySettings: 'Family settings', events: 'Events', eventCreate: 'Create event', eventsAll: 'All events',
+    activities: 'Activities', activityCreate: 'Create Activity', planCreate: 'Create Activity', tripCreate: 'Create Activity',
+    eventEdit: 'Edit Event', planEdit: 'Correct Plan', tripEdit: 'Edit Trip',
+    memberProfile: 'Shared member profile', family: this.selectedFamily()?.name ?? 'Family', familySettings: 'Family settings', events: 'Events', eventCreate: 'Create Activity', eventsAll: 'All events',
     eventItem: 'Events', plans: 'Plans', planItem: 'Plans',
     trips: 'Trips', tripItem: 'Trips', plansTrips: 'Plans & Trips', safety: 'Safety', concerns: 'Concerns', concernItem: 'Concerns',
     incidents: 'Safety Incidents', invitation: 'Family invitation', handoff: 'Joining your family',
@@ -313,8 +297,13 @@ export class App implements OnInit {
   /** One-line description shown under the page title; each page has a single visual title. */
   protected readonly pageSubtitle = computed(() => ({
     home: this.selectedFamily() ? `Here's what's happening with ${this.selectedFamily()!.name} today.` : '',
+    activities: this.selectedFamily() ? `Everything planned and shared with you in ${this.selectedFamily()!.name}.` : '',
+    activityCreate: 'Choose the type of activity you want to share.',
+    planCreate: 'Choose the type of activity and enter the details you want to share.',
+    tripCreate: 'Choose the type of activity and enter the details you want to share.',
+    eventEdit: 'Update the details of this Event.', planEdit: 'Correct activity and timing. Notes and audience stay separate.', tripEdit: 'Update your travel details.',
     profile: 'Your profile and your choices for who can see each shared profile field.',
-    family: this.selectedFamily() ? `Members, relationships, and coordination for ${this.selectedFamily()!.name}.` : '',
+    memberProfile: '', family: this.selectedFamily() ? 'Browse your family members and open the profile details they choose to share.' : '',
     familySettings: this.selectedFamily() ? `${this.selectedFamily()!.name}. Your membership, relationships, and the Family actions available to you.` : '',
     events: this.selectedFamily() ? `Upcoming events and trips shared with you in ${this.selectedFamily()!.name}.` : '',
     eventCreate: 'Create an event and choose the active adult family members who can see it. Event sharing does not send an invitation or start location sharing.',
@@ -359,6 +348,7 @@ export class App implements OnInit {
     // WI-009-010 O6: choosing a Family, whether the first choice or a switch, keeps the current page; the page reloads
     // its data for the newly selected Family.
     this.familySwitchAnnouncement.set('');
+    if (this.view() === 'memberProfile') void this.router?.navigateByUrl('/family', { state: focusHeadingState });
     this.clearFamilyScopedState();
     this.familyContext.familyId.set(familyId);
     this.loadSelectedFamily(familyId);
@@ -439,7 +429,6 @@ export class App implements OnInit {
 
   protected readonly directoryForm = this.formBuilder.group({
     familyGroupId: [''],
-    search: [''],
   });
 
   protected readonly relationshipForm = this.formBuilder.group({
@@ -508,12 +497,18 @@ export class App implements OnInit {
   protected readonly activeFamilyGroups = signal<readonly ActiveFamilyGroup[]>([]);
   protected readonly familyGroupsLoaded = signal(false);
   protected readonly membershipError = signal('');
+  protected readonly directorySearch = signal('');
+  protected readonly visibleDirectoryMembers = computed(() => {
+    const query = this.directorySearch().trim().toLocaleLowerCase();
+    return this.directoryMembers().filter(member => member.displayName.toLocaleLowerCase().includes(query));
+  });
+  protected requestedMemberFamilyId: string | null = null;
+  private readonly familyManagementTarget = signal('');
   protected readonly directoryMembers = signal<readonly FamilyDirectoryEntry[]>([]);
   protected readonly directoryLoading = signal(false);
   protected readonly directoryError = signal('');
   /** The member list read itself failed (Retry applies), as opposed to a single member's profile being unavailable. */
   protected readonly directoryLoadFailed = signal(false);
-  protected readonly selectedMember = signal<SharedAdultProfile | null>(null);
   protected readonly familyRelationships = signal<readonly FamilyRelationshipView[]>([]);
   protected readonly relationshipLoading = signal(false);
   protected readonly relationshipSubmitting = signal(false);
@@ -580,7 +575,28 @@ export class App implements OnInit {
     { value: 'OtherFamily', label: 'Other family' },
   ];
 
+  constructor() {
+    afterRenderEffect(() => {
+      const target = this.familyManagementTarget();
+      if (!target || this.view() !== 'familySettings' || !this.selectedFamily() || !this.ownerProfile()) return;
+      const section = this.host.nativeElement.querySelector<HTMLElement>('#' + target);
+      if (section) {
+        section.scrollIntoView?.({ block: 'start' });
+        section.focus({ preventScroll: true });
+        this.familyManagementTarget.set('');
+      }
+    });
+  }
+
   ngOnInit(): void {
+    this.activatedRoute?.fragment.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(fragment => {
+      this.familyManagementTarget.set(fragment === 'household-management' || fragment === 'shared-date-management' ? fragment : '');
+    });
+    this.activatedRoute?.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      const type = params.get('type');
+      this.activityType.set(type && ['Event', 'Plan', 'Trip'].includes(type) ? type : 'All');
+      this.activityPeriod.set(params.get('period') === 'all' ? 'all' : 'upcoming');
+    });
     if (!location.hash.startsWith('#invite=')) {
       const routeConfig = this.activatedRoute?.snapshot.routeConfig;
       if (routeConfig?.matcher && this.activatedRoute) {
@@ -599,7 +615,8 @@ export class App implements OnInit {
         if (view) {
           this.view.set(view);
           const params = this.activatedRoute?.snapshot.paramMap;
-          this.routeItemId.set(params?.get('eventId') ?? params?.get('planId') ?? params?.get('tripId') ?? null);
+          this.requestedMemberFamilyId = params?.get('familyId') ?? null;
+          this.routeItemId.set(params?.get('profileId') ?? params?.get('eventId') ?? params?.get('planId') ?? params?.get('tripId') ?? null);
         } else if (path === '' && this.router?.config.some(route => route.path === 'home')) {
           void this.router.navigateByUrl('/home', { replaceUrl: true });
         }
@@ -627,11 +644,13 @@ export class App implements OnInit {
    * If the list cannot be loaded, the existing membership error and Retry show, and the decision waits for a
    * successful Retry: nothing renders and nothing switches meanwhile.
    */
-  protected readonly adoptAuthorizedItemFamily: AdoptItemFamily = async (familyGroupId, kind) => {
+  protected readonly adoptAuthorizedItemFamily: AdoptItemFamily = async (familyGroupId, kind, isCurrent) => {
     await this.familiesLoaded();
+    if (isCurrent && !isCurrent()) return 'unavailable';
     if (!this.isActiveFamily(familyGroupId)) {
       this.loadMemberships(true);
       await this.familiesLoaded();
+      if (isCurrent && !isCurrent()) return 'unavailable';
     }
     if (!this.isActiveFamily(familyGroupId)) return kind === 'trip' ? 'retained' : 'unavailable';
     if (familyGroupId === this.currentFamilyId()) return 'current';
@@ -655,8 +674,8 @@ export class App implements OnInit {
   /** Event and Plan item pages (OD-C): read the item by ID, let the server authorize it, decide the Family, then render. */
   private openRoutedItem(): void {
     const view = this.view();
-    if (view !== 'eventItem' && view !== 'planItem') return;
-    const kind: ItemKind = view === 'eventItem' ? 'event' : 'plan';
+    if (!['eventItem', 'planItem', 'eventEdit', 'planEdit'].includes(view)) return;
+    const kind: ItemKind = (view === 'eventItem' || view === 'eventEdit') ? 'event' : 'plan';
     const id = this.routeItemId();
     this.cancelPlanNoteEdit();
     this.planNoteMessage.set('');
@@ -677,12 +696,24 @@ export class App implements OnInit {
           this.itemStatus.set('unavailable');
           return;
         }
+        if (view === 'eventEdit' && !(item as FamilyEventView).canEdit) {
+          void this.router?.navigate(['/events', id], { replaceUrl: true, state: focusHeadingState });
+          return;
+        }
         if (kind === 'event') {
           this.itemEvent.set(item as FamilyEventView);
           if (this.arrivedFromEventCreate()) this.eventMessage.set('Event created and shared with the selected family members.');
         }
-        else this.itemPlan.set(item as FamilyPlanView);
+        else {
+          this.itemPlan.set(item as FamilyPlanView);
+          if (view === 'planEdit') {
+            this.openAuthorizedPlanEdit(item as FamilyPlanView);
+            return;
+          }
+          if (this.consumePlanCorrectionConfirmation(id)) this.planCorrectionMessage.set('Plan activity and timing saved.');
+        }
         this.itemStatus.set('ready');
+        if (view === 'eventEdit' && (item as FamilyEventView).canEdit) this.beginEventEdit(item as FamilyEventView);
       },
       error: (error: HttpErrorResponse) => {
         if (error.status === 404) {
@@ -694,6 +725,17 @@ export class App implements OnInit {
         this.itemStatus.set('error');
       },
     });
+  }
+
+  private openAuthorizedPlanEdit(plan: FamilyPlanView): void {
+    // The existing correction permission also depends on the loaded owner profile.
+    if (!this.ownerProfile()) return;
+    if (!this.canCorrectPlan(plan)) {
+      void this.router?.navigate(['/plans', plan.planId], { replaceUrl: true, state: focusHeadingState });
+      return;
+    }
+    this.beginPlanCorrection(plan);
+    this.itemStatus.set('ready');
   }
 
   /**
@@ -721,6 +763,15 @@ export class App implements OnInit {
       && navigation.extras.state?.['eventCreated'] === true;
   }
 
+  /** Show save feedback once on the saved Plan, never on initial navigation or history traversal. */
+  private consumePlanCorrectionConfirmation(planId: string): boolean {
+    const navigation = this.creatingNavigation;
+    if (this.planCorrectionConfirmationShown || !navigation || navigation.trigger !== 'imperative'
+      || !navigation.previousNavigation || navigation.extras.state?.['planCorrectionSavedId'] !== planId) return false;
+    this.planCorrectionConfirmationShown = true;
+    return true;
+  }
+
   private focusHeadingAfterUserNavigation(): void {
     const navigation = this.creatingNavigation;
     if (!navigation || navigation.trigger !== 'imperative' || !navigation.previousNavigation
@@ -738,6 +789,7 @@ export class App implements OnInit {
       .pipe(finalize(() => this.profileReloading.set(false)), takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (profile) => {
           this.ownerProfile.set(profile);
+          if (this.view() === 'planEdit' && this.itemPlan()) this.openAuthorizedPlanEdit(this.itemPlan()!);
           this.applyProfile(profile);
           this.loading.set(false);
         },
@@ -783,7 +835,9 @@ export class App implements OnInit {
         this.activeFamilyGroups.set(groups);
         this.familyGroupsLoaded.set(true);
         const priorChoice = this.currentFamilyId();
-        const familyId = groups.length === 1 ? groups[0].familyGroupId
+        const familyId = this.view() === 'memberProfile'
+          ? (groups.some(group => group.familyGroupId === priorChoice) ? priorChoice : null)
+          : groups.length === 1 ? groups[0].familyGroupId
           : groups.some(group => group.familyGroupId === priorChoice) ? priorChoice : null;
         if (!refresh || familyId !== priorChoice) {
           this.clearFamilyScopedState(this.view() === 'invitation' || this.view() === 'handoff');
@@ -816,15 +870,16 @@ export class App implements OnInit {
     this.loadRelationships();
     this.loadEvents();
     this.loadEventAudienceMembers();
-    if (this.view() === 'home' || this.view() === 'events') this.loadPendingEventInvitations();
+    if (this.view() === 'home' || this.view() === 'events' || this.view() === 'activities') this.loadPendingEventInvitations();
     this.loadPlans();
     this.loadPlanAudienceMembers();
     // Home and the Events dashboard Trips card (WI-009-008 D3) share one read and one current-Family filter.
-    if (this.view() === 'home' || this.view() === 'events') this.loadHomeTrips(familyId);
+    if (this.view() === 'home' || this.view() === 'events' || this.view() === 'activities') this.loadHomeTrips(familyId);
   }
 
   private clearFamilyScopedState(preserveInvitation = false): void {
     this.familyScopeChanged.next();
+    this.directorySearch.set('');
     ++this.directoryRequestVersion;
     ++this.relationshipRequestVersion;
     ++this.eventsRequestVersion;
@@ -839,7 +894,7 @@ export class App implements OnInit {
     this.directoryLoading.set(false);
     this.directoryError.set('');
     this.directoryLoadFailed.set(false);
-    this.clearDirectorySelection();
+    this.clearDirectoryMembers();
     this.familyRelationships.set([]);
     this.relationshipLoading.set(false);
     this.relationshipError.set('');
@@ -881,7 +936,7 @@ export class App implements OnInit {
     this.homeTripsLoading.set(false);
     this.homeTripsError.set('');
     ++this.homeTripsRequestVersion;
-    this.directoryForm.reset({ familyGroupId: '', search: '' });
+    this.directoryForm.reset({ familyGroupId: '' });
     this.eventForm.reset({ familyGroupId: '', name: '', description: '', date: '', time: '', location: '' });
     this.planForm.reset({ familyGroupId: '', activityOrDestination: '', date: '', time: '',
       expectedReturnDate: '', expectedReturnTime: '', audienceType: '',
@@ -940,7 +995,7 @@ export class App implements OnInit {
         this.clearFamilyScopedState(true);
         this.familyContext.familyId.set(familyGroupId);
         this.membershipError.set('');
-        this.directoryForm.reset({ familyGroupId, search: '' });
+        this.directoryForm.reset({ familyGroupId });
         this.eventForm.controls.familyGroupId.setValue(familyGroupId);
         this.planForm.controls.familyGroupId.setValue(familyGroupId);
         this.activeFamilyGroups.set(groups);
@@ -955,7 +1010,7 @@ export class App implements OnInit {
       finalize(() => this.handoffBusy.set(false)),
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: ({ members, relationships }) => {
-        this.clearDirectorySelection();
+        this.clearDirectoryMembers();
         this.directoryMembers.set(members);
         this.familyRelationships.set(relationships);
         this.directoryLoading.set(false);
@@ -1133,7 +1188,7 @@ export class App implements OnInit {
       )
       .pipe(takeUntil(this.familyScopeChanged), finalize(() => this.planSubmitting.set(false)))
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: () => {
+        next: created => {
           this.planForm.reset({
             familyGroupId,
             activityOrDestination: '',
@@ -1150,6 +1205,8 @@ export class App implements OnInit {
           this.planAudienceSearch.set('');
           this.planMessage.set('Plan created with the selected audience.');
           this.loadPlans();
+          if (this.router?.config.some(route => route.path === 'plans/:planId'))
+            void this.router.navigate(['/plans', created.planId], { state: focusHeadingState });
         },
         error: () => this.planError.set('The plan could not be created. Please try again.'),
       });
@@ -1172,6 +1229,11 @@ export class App implements OnInit {
       expectedCheckInDate: plan.expectedCheckInDate?.slice(0, 10) ?? '', expectedCheckInTime: plan.expectedCheckInTime ?? '',
     });
     this.editingPlanFactsId.set(plan.planId);
+  }
+
+  protected leavePlanCorrection(id: string): void {
+    if (this.view() === 'planEdit') void this.router?.navigate(['/plans', id], { state: focusHeadingState });
+    else this.cancelPlanCorrection();
   }
 
   protected cancelPlanCorrection(): void {
@@ -1206,14 +1268,17 @@ export class App implements OnInit {
     }).pipe(takeUntil(this.familyScopeChanged), finalize(() => this.planCorrectionSaving.set(false)),
       takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => {
-        if (this.view() !== 'planItem' || this.routeItemId() !== updated.planId) return;
+        if ((this.view() !== 'planItem' && this.view() !== 'planEdit') || this.routeItemId() !== updated.planId) return;
         this.itemPlan.set(updated);
         this.familyPlans.update(plans => plans.map(current => current.planId === updated.planId ? updated : current));
         this.cancelPlanCorrection();
         this.planCorrectionMessage.set('Plan activity and timing saved.');
+        if (this.view() === 'planEdit') void this.router?.navigate(['/plans', updated.planId], {
+          state: { ...focusHeadingState, planCorrectionSavedId: updated.planId },
+        });
       },
       error: (error: HttpErrorResponse) => {
-        if (this.view() !== 'planItem' || this.routeItemId() !== plan.planId) return;
+        if ((this.view() !== 'planItem' && this.view() !== 'planEdit') || this.routeItemId() !== plan.planId) return;
         if (error.status === 404) {
           this.itemPlan.set(null);
           this.itemStatus.set('unavailable');
@@ -1343,6 +1408,7 @@ export class App implements OnInit {
           this.editingEventId.set(null);
           this.eventEditForm.reset();
           this.eventMessage.set('Event details updated.');
+          if (this.view() === 'eventEdit') void this.router?.navigate(['/events', updatedEvent.eventId], { state: focusHeadingState });
           if (this.itemEvent()?.eventId === updatedEvent.eventId) this.itemEvent.set(updatedEvent);
           this.familyEvents.update((events) =>
             events.map((current) =>
@@ -1352,11 +1418,6 @@ export class App implements OnInit {
         },
         error: () => this.eventEditError.set('The event could not be updated. Please try again.'),
       });
-  }
-
-  protected searchDirectory(): void {
-    this.clearDirectorySelection();
-    this.loadDirectory();
   }
 
   protected availableRelationshipMembers(): readonly FamilyDirectoryEntry[] {
@@ -1455,29 +1516,6 @@ export class App implements OnInit {
     this.relationshipRemovalPendingId.set('');
   }
 
-  protected selectDirectoryMember(member: FamilyDirectoryEntry): void {
-    this.directoryError.set('');
-    const owner = this.ownerProfile();
-    if (owner?.profileId === member.profileId) {
-      this.selectedMember.set(toSharedProfile(owner));
-      return;
-    }
-
-    this.directoryLoading.set(true);
-    this.http
-      .get<SharedAdultProfile>(
-        `/api/family-members/${encodeURIComponent(member.profileId)}/profile`,
-      )
-      .pipe(takeUntil(this.familyScopeChanged), finalize(() => this.directoryLoading.set(false)))
-      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: (profile) => this.selectedMember.set(profile),
-        error: () => {
-          this.selectedMember.set(null);
-          this.directoryError.set('This family member is unavailable.');
-        },
-      });
-  }
-
   protected save(): void {
     this.successMessage.set('');
     this.errorMessage.set('');
@@ -1562,14 +1600,12 @@ export class App implements OnInit {
     const requestVersion = ++this.directoryRequestVersion;
     const familyGroupId = this.directoryForm.controls.familyGroupId.value;
     if (!familyGroupId) return;
-    const search = this.directoryForm.controls.search.value?.trim() ?? '';
-    const query = search ? `?search=${encodeURIComponent(search)}` : '';
     this.directoryLoading.set(true);
     this.directoryError.set('');
     this.directoryLoadFailed.set(false);
     this.http
       .get<FamilyDirectoryEntry[]>(
-        `/api/family-groups/${encodeURIComponent(familyGroupId)}/members${query}`,
+        `/api/family-groups/${encodeURIComponent(familyGroupId)}/members`,
       )
       .pipe(finalize(() => {
         if (requestVersion === this.directoryRequestVersion) this.directoryLoading.set(false);
@@ -1596,7 +1632,7 @@ export class App implements OnInit {
 
   protected loadPendingEventInvitations(): void {
     const familyId = this.currentFamilyId();
-    if (!familyId || (this.view() !== 'home' && this.view() !== 'events')) return;
+    if (!familyId || (this.view() !== 'home' && this.view() !== 'events' && this.view() !== 'activities')) return;
     const version = ++this.pendingEventInvitationsVersion;
     this.pendingEventInvitations.set([]);
     this.pendingEventInvitationsLoading.set(true);
@@ -1813,8 +1849,7 @@ export class App implements OnInit {
       });
   }
 
-  private clearDirectorySelection(): void {
-    this.selectedMember.set(null);
+  private clearDirectoryMembers(): void {
     this.directoryMembers.set([]);
   }
 
@@ -1852,16 +1887,6 @@ export class App implements OnInit {
   }
 }
 
-function toSharedProfile(profile: AdultProfile): SharedAdultProfile {
-  return {
-    profileId: profile.profileId,
-    displayName: profile.displayName,
-    contactEmail: profile.contactEmail,
-    contactPhone: profile.contactPhone,
-    birthdayMonth: profile.birthdayMonth,
-    birthdayDay: profile.birthdayDay,
-  };
-}
 
 function readInvitationToken(): string {
   const prefix = '#invite=';
@@ -1884,6 +1909,18 @@ function localDateString(value: Date): string {
 
 function compareDateTime(leftDate: string, leftTime: string, rightDate: string, rightTime: string): number {
   return `${leftDate.slice(0, 10)}T${leftTime}`.localeCompare(`${rightDate.slice(0, 10)}T${rightTime}`);
+}
+
+function scheduledStartIsUpcoming(date: string, time: string | null | undefined, now: Date): boolean {
+  const day = date.slice(0, 10);
+  const today = localDateString(now);
+  if (day !== today) return day > today;
+  if (!time) return true;
+  // API times are local wall-clock values (HH:mm[:ss]), not UTC timestamps.
+  const [hours, minutes, seconds = 0] = time.split(':').map(Number);
+  const startSeconds = hours * 3600 + minutes * 60 + seconds;
+  const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds() + now.getMilliseconds() / 1000;
+  return startSeconds > nowSeconds;
 }
 
 function birthdayValidator(control: AbstractControl): ValidationErrors | null {
